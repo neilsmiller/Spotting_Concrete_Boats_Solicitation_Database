@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile Ordnance Training Team (MOTT) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Mobile Ordnance Training Team (MOTT)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d971d6e1be6143878317588351c64935</span>
+      <a class="sam-link" href="https://sam.gov/opp/d971d6e1be6143878317588351c64935/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-30</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC SAN DIEGO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-30</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Cost Plus Fixed Fee (CPFF), Single-Award Task Order under an IDIQ (SeaPort NXG)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The MOTT solicitation exhibits a moderate compliance-over-outcomes problem. The accountability structure is built primarily around activity reporting — Monthly Status Reports with prescribed sections covering what was done, who was deployed, and what is planned — plus quarterly Program Management Reviews focused on cost, schedule, and plan deviation. These mechanisms measure whether the contractor is executing the contract as planned, not whether the MOTT teams are actually improving ordnance readiness, qualification rates, or certification throughput across COMNAVAIRFORCES units.
+
+The core mission — delivering I-level training, managing weapons life cycles, and administering qualification and certification programs — has obvious, measurable outcomes: how many personnel qualified, how many units achieved certification, qualification pass/fail rates, how quickly the MOTT responded to fleet training requests, and whether backlogs in certification programs were reduced. None of these outcome metrics appear in the accountability framework visible in the solicitation text.
+
+Mitigating factors prevent a severity-3 rating. The solicitation is for a training and logistics support service in a specialized military domain, where some activity-based reporting is genuinely necessary (personnel deployment tracking, equipment status for ordnance-related materiel). The PWS content visible in the solicitation text is limited to 32 pages across multiple attachments, and several CDRLs (including attachments 4/005 and 4/006) were unreadable in the provided text, meaning additional outcome-oriented acceptance criteria or performance standards may exist in the full contract documentation that were not visible for analysis. The Q&amp;A document also shows the government engaged substantively with qualification standards questions, suggesting some awareness of outcomes. However, based on the observable accountability structure, the dominant accountability mechanism is process-compliance reporting, earning a severity-2 (moderate) rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide the COR with a Monthly Status Report (MSR) detailing all training activities conducted, personnel deployed, equipment status, and any issues or concerns encountered during the reporting period.</blockquote>
+  <div class="ev-explanation">This reporting requirement focuses on documenting activities performed (training conducted, personnel deployed, equipment status) rather than measuring whether the training achieved its purpose — e.g., qualification pass rates, unit readiness improvement, or trainee competency outcomes. It tracks what happened, not whether it was effective.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall submit a Monthly Status Report (MSR) NLT the 10th calendar day of the following month... The MSR shall include: (1) A summary of training events conducted during the reporting period; (2) Personnel deployment status; (3) Equipment and materials status; (4) Issues, risks, and concerns; (5) Plans for the upcoming reporting period.</blockquote>
+  <div class="ev-explanation">The prescribed MSR format is structured around activity tracking and forward planning rather than performance outcomes. The five mandatory sections all measure process inputs and schedule adherence. There is no required section for training effectiveness metrics, qualification/certification rates achieved, or unit readiness outcomes — the core purpose of the MOTT contract.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall participate in a Program Management Review (PMR) on a quarterly basis... The PMR shall include a review of contract status, schedule performance, cost performance, and any issues or corrective actions.</blockquote>
+  <div class="ev-explanation">While quarterly PMRs are a reasonable management cadence, the prescribed content (contract status, schedule performance, cost performance) focuses on plan adherence and resource consumption rather than mission outcomes such as whether target units have achieved required ordnance qualifications or certifications. Combined with monthly status reporting covering similar ground, this creates overlapping process-compliance cadences.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall submit a Contractor&#x27;s Progress, Status and Management Report in accordance with CDRL requirements... reporting deviations from the approved plan.</blockquote>
+  <div class="ev-explanation">Requiring reporting on &#x27;deviations from the approved plan&#x27; is a hallmark of compliance-over-outcomes thinking. It frames good performance as plan adherence rather than mission accomplishment. A contractor who adapts its training approach mid-period to better serve fleet units — even if it deviates from the original plan — would appear to be underperforming under this accountability structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards profile. The individual requirements — SeaPort NXG vehicle requirement, SDVOSB set-aside, specialized ordnance qualifications, and SME experience benchmarks — each have independent justification. SeaPort NXG is the designated vehicle for these services; SDVOSB set-asides serve a legitimate small business policy goal; ordnance qualifications reflect genuine safety and competency needs; and senior SME experience reflects the complexity of the work. However, their cumulative effect substantially narrows the competitive pool. The most significant structural barrier is the SeaPort NXG vehicle requirement combined with NAICS 541330-1 specificity — this eliminates any SDVOSB that has not already been onboarded to the SeaPort NXG vehicle under that NAICS code, regardless of technical capability. The domain specificity of the work (Navy I-level ordnance, COMNAVAIRFORCES-specific qualification and certification programs) further means that personnel qualifications in Section C paragraph 11.1 almost certainly require Navy-specific credentials or experience that only prior incumbents or military-to-contractor pipeline personnel would possess. The Q&amp;A clarification that the 15-year SME benchmark is &#x27;descriptive not mandatory&#x27; is a mitigating factor — the government explicitly pushed back on one potential exclusionary criterion. Overall, the solicitation tilts toward experienced incumbents and firms with deep Navy ordnance contractor backgrounds, but it does not appear to impose explicit dollar thresholds, short lookback windows, or explicit bonus points for prior similar contracts — the hallmarks of severe insider rewards. Severity 2 is appropriate: the field is tilted but not formally closed, and a well-qualified SDVOSB with SeaPort NXG access and relevant Navy ordnance personnel could realistically compete.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Section C, Paragraph 11.1: &#x27;Qualifications for Instructors&#x27; [referenced throughout Q&amp;A as the definitive required qualifications for Training Instructor positions]</blockquote>
+  <div class="ev-explanation">The solicitation establishes mandatory instructor qualifications in Section C, Paragraph 11.1 that govern who can fill the key personnel roles. While the full text of this paragraph is not reproduced in the available attachments, the Q&amp;A confirms these are &#x27;definitive, required qualifications&#x27; that all proposed personnel must meet. Given the highly specialized nature of conventional ordnance training (Intermediate-Level ordnance support, weapons life cycle management, qualification and certification programs for COMNAVAIRFORCES), these qualifications almost certainly require specific military or government ordnance credentials — certifications, ratings, or designations that are exclusively earned through Naval service or prior federal ordnance contract work. A commercial training firm without Navy ordnance program experience would be structurally unable to staff these positions.</div>
+</div><div class="evidence-item">
+  <blockquote>SME-III (Senior SME) described as &#x27;often 15+ years&#x27; of experience in Section L, Table L2</blockquote>
+  <div class="ev-explanation">While the government clarified that 15 years is &#x27;descriptive&#x27; rather than mandatory, the inclusion of this benchmark in the labor category definition shapes evaluator expectations and proposal strategy. Offerors competing on capability rather than incumbency must now actively argue against an embedded benchmark that favors long-tenured practitioners — most of whom will have that experience specifically from prior federal ordnance contracts or military service in the same functional area.</div>
+</div><div class="evidence-item">
+  <blockquote>&#x27;This requirement is set-aside exclusively for SeaPort NXG Service-Disabled Veteran-Owned Small Business (SDVOSB) concerns under NAICS code 541330-1: Military and Aerospace Equipment and Military Weapons.&#x27;</blockquote>
+  <div class="ev-explanation">The dual constraint of SeaPort NXG vehicle membership AND SDVOSB status AND the narrow NAICS 541330-1 sub-code substantially compresses the eligible vendor pool before any experience requirements are even applied. Only firms already holding a SeaPort NXG contract under this specific NAICS sub-code can compete. While each constraint individually may be defensible, their combination means that a qualified SDVOSB firm without an existing SeaPort NXG vehicle — regardless of its ordnance training capability — cannot compete at all. This is a structural barrier that functions similarly to insider rewards.</div>
+</div><div class="evidence-item">
+  <blockquote>Services are needed to deliver comprehensive support for conventional ordnance to all units under Commander, Naval Air Forces (COMNAVAIRFORCES), which include providing Intermediate-Level (I-level) training and logistics, managing weapons life cycles, and administering qualification and certification programs.</blockquote>
+  <div class="ev-explanation">The scope of work encompasses highly specialized Navy-specific functions — I-level ordnance maintenance training, weapons life cycle management under COMNAVAIRFORCES frameworks, and administration of Navy qualification and certification programs. These are not generic training or logistics functions; they are defined by Navy doctrine, publications, and organizational structures. Meaningful performance requires institutional familiarity with COMNAVAIRFORCES command structures, ordnance qualification standards, and weapons systems that essentially only exist in the Navy&#x27;s own operational and contractor ecosystem. A firm entering this space without prior Navy ordnance contract experience would face a steep knowledge barrier that the solicitation&#x27;s requirements implicitly demand.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS reflects a pattern common in training support contracts where the government has essentially documented an incumbent&#x27;s operating model and converted it into requirements. Multiple sections specify exact staffing structures (4 instructors per location), named organizational touchpoints (COs, XOs, Weapons Officers), sequential process steps for assessments and scheduling, and specific tool categories (TMS) — all of which constrain HOW rather than WHAT. A vendor cannot propose a different instructor deployment model, a different readiness assessment methodology, or an alternative records management approach without running afoul of explicit &#x27;shall&#x27; requirements. However, the solicitation is not purely prescriptive: it does include outcome-adjacent language around qualification and certification program administration, and the CPFF cost-plus structure suggests the government anticipates variability in execution. The 11-day response window and the Q&amp;A clarifications (e.g., clarifying that SME-III experience thresholds are descriptive not mandatory) also suggest some flexibility in interpretation. The sprawl is real and would constrain competitive innovation — particularly in staffing model design and assessment methodology — but it does not rise to severe because outcome-oriented requirements co-exist throughout the document and the core mission (train naval aviators in conventional ordnance to I-level standards before deployment) is clearly defined. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The MOTT shall consist of at least four (4) Training Instructors assigned to each MOTT location (San Diego, CA for CNAP and Norfolk, VA for CNAL). The MOTT shall provide I-Level training to student aviators in COMNAVAIRFORFOR units prior to deployment.</blockquote>
+  <div class="ev-explanation">This prescribes a minimum headcount (4 instructors per location) and physical staffing structure rather than defining the outcome (e.g., training throughput targets, certification pass rates, or coverage requirements). A vendor with a more efficient training model or different instructor-to-student ratios cannot propose it without being non-compliant on its face.</div>
+</div><div class="evidence-item">
+  <blockquote>The MOTT shall coordinate with each unit Weapons Department representative and supply accurate advanced course scheduling information to the applicable TYCOM Weapons Department NLT 30 days prior to each scheduled deployment.</blockquote>
+  <div class="ev-explanation">This prescribes a specific coordination process and timeline (30-day advance notice to a specific organizational level) rather than defining the outcome — that units are properly informed and prepared before deployment. A vendor cannot propose an alternative scheduling or notification system that achieves the same readiness outcome more efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>The MOTT shall: Conduct and document interviews with unit Commanding Officers (CO), Executive Officers (XO), Weapons Officers, and other relevant unit personnel... Review existing maintenance and training records... Conduct an Initial Readiness Assessment (IRA) for each unit visited... Develop and submit a written Readiness Assessment Report (RAR) to the COR...</blockquote>
+  <div class="ev-explanation">This is a step-by-step workflow specifying exactly which stakeholders must be interviewed, what records must be reviewed, what the assessment must be called, and what the output document must be — all prescribed in sequence. Rather than requiring &#x27;an accurate assessment of unit readiness,&#x27; the solicitation mandates the exact process, precluding vendors from using more efficient diagnostic approaches or modern assessment tools.</div>
+</div><div class="evidence-item">
+  <blockquote>The MOTT shall maintain a Training Management System (TMS) to track and record all training events, qualifications, certifications, and personnel records for all students trained under this contract. The TMS shall be accessible to authorized Government personnel at all times.</blockquote>
+  <div class="ev-explanation">While government access is a legitimate constraint, &#x27;maintain a TMS&#x27; mandates a specific tool category rather than specifying what information management outcomes are required (e.g., &#x27;training records shall be retrievable within X hours&#x27; or &#x27;qualification data shall be auditable&#x27;). This forecloses vendors who might achieve the same records management outcome through integration with existing government systems or alternative platforms.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the available solicitation content — the description, Q&amp;A document, and metadata — there is no evidence of a rule pool problem. The regulatory citations present in the available text are few in number and each is accompanied by clear explanatory context: FAR subpart 16.5 is cited to explain the IDIQ ordering mechanism, FAR 52.222-2 is cited with a direct explanation of its operational application to overtime premium costs, and FAR clauses appear to be incorporated in a standard, purposeful manner. The Q&amp;A responses demonstrate that the contracting officer is actively interpreting and clarifying regulatory requirements rather than passively delegating that burden to offerors. The solicitation&#x27;s primary PWS attachment (referenced as the document containing all requirements) is not fully rendered in the provided text — two PDF attachments failed to load (&#x27;Please wait...&#x27; error pages) — so it is possible that a more extensive &#x27;Applicable Documents&#x27; section exists in the Performance Work Statement that could not be reviewed. However, based on what is available, the compliance landscape appears focused and navigable. The overall contract scope — ordnance training, weapons lifecycle management, qualification and certification programs for naval aviation — is a specialized, regulated domain where citing military-specific standards and instructions would be expected and appropriate. There is no evidence of the hallmarks of rule pools: no bulk undifferentiated lists, no clearly irrelevant regulations, no contradictions between cited policies and the solicitation&#x27;s purpose, and no signs of copy-forward accumulation. The severity is assessed at 1 — minimal — with a caveat that the unrendered PWS attachments prevent full confirmation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This is a solicitation prepared in accordance with the Indefinite-Delivery, Indefinite Quantity (IDIQ) contract ordering procedures in Federal Acquisition Regulation (FAR) subpart 16.5: Indefinite-Delivery Contracts.</blockquote>
+  <div class="ev-explanation">The solicitation references FAR subpart 16.5 in direct context — explaining the contract vehicle type being used. This is a curated, purposeful citation rather than a bulk dump.</div>
+</div><div class="evidence-item">
+  <blockquote>Yes. If there are overtime premium costs proposed, the ceiling of this premium cost will be specified in the clause at FAR 52.222-2(a) at the time of task order award... any request for overtime premiums exceeding this agreed-upon ceiling shall follow the procedures in FAR 52.222-2(b).</blockquote>
+  <div class="ev-explanation">FAR 52.222-2 is cited with explicit context explaining exactly how it applies — overtime premium ceiling provisions and the procedures for exceeding them. This is the hallmark of curated regulatory citation, not a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The CPFF contract type is not egregiously wrong for this requirement, but it is a questionable fit. CPFF is warranted under FAR when requirements are so uncertain that costs cannot be estimated accurately. Here, the government has articulated a clear operational mission (ordnance training, certification, and logistics support), fixed team locations, defined labor categories, and estimated annual hours — including overtime. These characteristics suggest a workload that, while variable in exact quantities (appropriate for an IDIQ vehicle), is stable and predictable enough in character that a labor-hour or even fixed-price level-of-effort structure could have been considered. A labor-hour IDIQ would preserve flexibility in ordering quantities while providing stronger cost-control incentives than CPFF. Under CPFF, the contractor is reimbursed for all allowable costs regardless of efficiency, and the fixed fee provides no incentive to control labor expenditures. The severity is assessed as moderate (2) rather than severe (3) for several reasons: (1) the IDIQ structure introduces genuine quantity uncertainty that provides some rationale for cost-reimbursement; (2) ordnance training for Navy aviation units involves classified, safety-critical, and operationally sensitive activities where cost risk on the contractor side could be inappropriate; (3) the government has not provided a fully detailed PWS in the extracted text, so the full scope of uncertainty cannot be assessed; and (4) CPFF on a SeaPort NXG task order is a common and accepted approach for professional services of this type within the DoN community. The mismatch is real but defensible, placing this at severity 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award a single-award, Cost Plus Fixed Fee (CPFF) contract for the effort as outlined in the Performance Work Statement (PWS) in the solicitation.</blockquote>
+  <div class="ev-explanation">The contract type is explicitly stated as Cost Plus Fixed Fee (CPFF). Under CPFF, the government reimburses all allowable costs plus a fixed fee, giving the contractor limited incentive to control costs or work efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>Services are needed to deliver comprehensive support for conventional ordnance to all units under Commander, Naval Air Forces (COMNAVAIRFORCES), which include providing Intermediate-Level (I-level) training and logistics, managing weapons life cycles, and administering qualification and certification programs.</blockquote>
+  <div class="ev-explanation">The core services — ordnance training, logistics support, and certification program administration — are relatively well-defined recurring activities. Training delivery and certification administration are not inherently uncertain in scope; they follow established curricula and qualification standards, which is more characteristic of services that could support a fixed-price or labor-hour contract structure.</div>
+</div><div class="evidence-item">
+  <blockquote>This will be a Mobile Ordnance Training Team (MOTT) that consists of two teams: one physically located in San Diego, CA providing support to the Pacific Fleet (PACFLEET) commands, and another to be in Norfolk, VA providing support to the Atlantic Fleet (LANTFLEET) commands.</blockquote>
+  <div class="ev-explanation">The two-team structure with fixed geographic locations suggests a stable, ongoing operational model rather than a research or highly uncertain development effort. Fixed staffing locations and known labor categories suggest cost and effort could be estimated with reasonable accuracy, which is a prerequisite for considering fixed-price or labor-hour contract types.</div>
+</div><div class="evidence-item">
+  <blockquote>Section L, Page 54, Table L2 of the solicitation document describes Overtime hours as a separate Labor Category than Regular hours, with an estimated 320 annual overtime hours for Commander, Naval Air Force Pacific (CNAP) and an estimated 320 annual overtime hours for Commander, Naval Air Force Atlantic (CNAL).</blockquote>
+  <div class="ev-explanation">The government has estimated specific annual labor hours including overtime, suggesting the workload is sufficiently predictable to be quantified in advance. This level of estimability weakens the justification for CPFF, which is warranted when costs cannot be estimated with sufficient accuracy. The existence of estimated hours points more toward a labor-hour or T&amp;M contract, or even a fixed-price level-of-effort structure.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a solicitation prepared in accordance with the Indefinite-Delivery, Indefinite Quantity (IDIQ) contract ordering procedures in Federal Acquisition Regulation (FAR) subpart 16.5: Indefinite-Delivery Contracts.</blockquote>
+  <div class="ev-explanation">The IDIQ vehicle introduces some variability in task order quantities, which provides a partial justification for cost-reimbursement. However, IDIQ contracts are also routinely awarded as labor-hour or T&amp;M vehicles when the work type is known but quantities vary — and this work type (ordnance training and certification) is sufficiently well-defined that a labor-hour approach would likely provide better cost control while still accommodating quantity uncertainty.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 - DD1423-1 %28CDRL%29 002.pdf">Attachment 4 - DD1423-1 %28CDRL%29 002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d971d6e1be6143878317588351c64935_Attachment+4+-+DD1423-1+%28CDRL%29+002.pdf" download="Attachment 4 - DD1423-1 %28CDRL%29 002.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 - DD1423-1 %28CDRL%29 005.pdf">Attachment 4 - DD1423-1 %28CDRL%29 005.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d971d6e1be6143878317588351c64935_Attachment+4+-+DD1423-1+%28CDRL%29+005.pdf" download="Attachment 4 - DD1423-1 %28CDRL%29 005.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 - DD1423-1 %28CDRL%29 006.pdf">Attachment 4 - DD1423-1 %28CDRL%29 006.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d971d6e1be6143878317588351c64935_Attachment+4+-+DD1423-1+%28CDRL%29+006.pdf" download="Attachment 4 - DD1423-1 %28CDRL%29 006.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFP Amended N00244-26-R-3104 0001.pdf">RFP Amended N00244-26-R-3104 0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d971d6e1be6143878317588351c64935_RFP+Amended+N00244-26-R-3104+0001.pdf" download="RFP Amended N00244-26-R-3104 0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="RFP Questions and Answers_MOTT.docx">RFP Questions and Answers_MOTT.docx</div></div>
+  <a class="dl-btn" href="../attachments/d971d6e1be6143878317588351c64935_RFP+Questions+and+Answers_MOTT.docx" download="RFP Questions and Answers_MOTT.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

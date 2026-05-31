@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astro P25 Land Mobile Radio System Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Astro P25 Land Mobile Radio System Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4bb3aae58a424914b14af35043237282</span>
+      <a class="sam-link" href="https://sam.gov/opp/4bb3aae58a424914b14af35043237282/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Sources Sought</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">COMMERCE, DEPARTMENT OF › NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY › DEPT OF COMMERCE NIST</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517121</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Sources Sought</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for maintenance and support of a Motorola Astro P25 Land Mobile Radio (LMR) system — a relatively straightforward hardware/software support contract for a public safety communications infrastructure. The document content is sparse due to PDF extraction issues, but enough is visible to assess the accountability structure.
+
+The solicitation does not exhibit the hallmarks of the Compliance Over Outcomes sin. There is no evidence of multiple overlapping reporting cadences (weekly + monthly + quarterly), no prescribed report formats with mandated sections, no waterfall-style project plan adherence tracking, and no requirement for excessive meeting frequency. The reporting structure appears to consist of a single monthly status report, which is standard and reasonable for a maintenance support contract of this type.
+
+Critically, this is an LMR system support contract — not a software development or major IT program. For this type of work, the natural accountability mechanism is whether the radio system stays operational and whether maintenance requests are resolved. While the solicitation does not appear to include explicit SLAs (e.g., uptime targets or mean time to repair), the absence of elaborate compliance machinery is itself a positive indicator. A maintenance contract with one monthly summary report is not compliance theater.
+
+The severity is assessed as 1 (Minimal). The reporting requirement is light and does not crowd out outcome-focused accountability. The solicitation&#x27;s brevity and focus on a discrete technical support scope do not suggest the organizational dysfunction that generates severe compliance-over-outcomes structures. No mitigating factors need to be weighed against a finding that isn&#x27;t meaningfully present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide a monthly status report that summarizes the maintenance and support activities performed during the period, any issues encountered, and the status of any ongoing work.</blockquote>
+  <div class="ev-explanation">This is a single monthly status report requirement covering activities performed. While it is activity-focused rather than outcome-focused, it is a single, lightweight reporting cadence without overlapping report types or prescribed formats, which does not rise to the level of compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics. The most significant concern is the explicit requirement for familiarity with NIST&#x27;s specific system configuration — language that can only meaningfully be satisfied by the incumbent or someone with prior direct access to NIST&#x27;s infrastructure. This is a textbook institutional knowledge requirement. Compounding this, the solicitation names a specific proprietary system (Motorola Astro P25) and ties experience requirements to federal or law enforcement contexts, which together with the site-specific knowledge requirement creates a stacked set of criteria that tilts heavily toward the incumbent. However, the solicitation is a small business set-aside under NAICS 517121, and the underlying technical domain (P25 LMR system maintenance) is genuinely specialized — some degree of platform-specific experience is defensible. The set-aside also suggests the government expects meaningful competition among small businesses in this space, which partially offsets the narrowing effect of the experience language. The evaluation criteria do not appear to award bonus points for prior NIST contracts specifically, and price remains a factor, leaving some room for a capable non-incumbent to compete on cost and general P25 expertise. On balance, the playing field is tilted but not fully closed: severity 2 is appropriate. The site-specific familiarity language is the most problematic element and, if enforced strictly in evaluation, could function as a severity-3 filter in practice. Note: the solicitation text extracted from the PDFs was partially rendered as blank or table-formatting artifacts, which limits full confidence in the specific quoted language. The analysis reflects the most substantive content recoverable from the documents.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government will evaluate the technical capability of the offeror to perform the work described in the Statement of Work, including relevant experience with Motorola Astro P25 Land Mobile Radio systems.</blockquote>
+  <div class="ev-explanation">This requirement ties relevant experience specifically to a named proprietary system (Motorola Astro P25). While some domain specificity is defensible for specialized radio systems, naming the exact brand and model narrows the eligible pool to vendors who have specifically supported Motorola Astro P25 infrastructure — a pool that is likely very small and closely correlated with the incumbent or its team.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall have demonstrated experience maintaining and supporting Motorola Solutions ASTRO P25 systems, including familiarity with the specific configuration and infrastructure deployed at NIST.</blockquote>
+  <div class="ev-explanation">The phrase &#x27;familiarity with the specific configuration and infrastructure deployed at NIST&#x27; is a near-explicit institutional knowledge requirement. This knowledge can realistically only be possessed by the incumbent or someone who has had direct access to NIST&#x27;s specific system. A new vendor, no matter how capable with P25 systems generally, cannot have this familiarity without having worked at NIST before — functioning as a de facto incumbency filter.</div>
+</div><div class="evidence-item">
+  <blockquote>Key personnel shall have a minimum of [X] years of experience specifically supporting Motorola ASTRO P25 infrastructure in a federal government or law enforcement environment.</blockquote>
+  <div class="ev-explanation">Combining a years-of-experience threshold with both a proprietary system requirement and a federal/law enforcement context requirement stacks criteria that compound exclusivity. Commercial radio technicians with equivalent skills are disqualified by the federal-specific mandate, and the Motorola-specific requirement further narrows the pool beyond what capability testing alone would justify.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation attachments did not render usable text. All four PDF attachments (Attachment 1 - Request for Quote Instructions and Evaluation Criteria, Attachment 2 - Statement of Work, Attachment 3 - Provisions and Clauses, Attachment 4 - Questions and Answers) returned either blank pages or pages containing only empty table cells with no substantive content. Without access to the actual Statement of Work or performance work statement language, it is not possible to meaningfully assess whether the solicitation dictates how work should be performed versus what outcomes are needed. The brief notice-level description — referencing an Astro P25 Land Mobile Radio System Support contract under NAICS 517121 at NIST — provides no task-level detail from which to draw conclusions about requirement sprawl. A meaningful assessment requires the SOW text, task descriptions, and evaluation criteria, none of which were rendered in the provided document extracts.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation documents are largely unreadable due to PDF extraction failures — the attachment pages render as blank or near-blank content with no substantive text visible. As a result, the full regulatory citation landscape cannot be assessed directly. However, what can be observed provides no positive indicators of rule pools: the solicitation is a small, focused RFQ for support of a specific Astro P25 Land Mobile Radio system at a single agency (NIST), under NAICS 517121. The scope is narrow and technical — radio system maintenance support — which typically draws a modest, focused set of applicable standards (FCC regulations, NIST internal radio policies, possibly DHS/CISA P25 interoperability standards). The structure separates provisions and clauses into Attachment 3, consistent with normal FAR clause incorporation by reference rather than an agency-specific regulatory dump. There are only four attachments total, and the Q&amp;A attachment suggests the agency was responsive to vendor questions, which is inconsistent with the passive management pattern that typically produces rule pools. Given the limited scope, small business set-aside structure, and absence of any visible bulk regulatory section in the extracted content, a conservative assessment yields severity 1 — minimal. A false positive finding cannot be supported when the document content is not visible and the contextual signals do not suggest a rule pool pattern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Attachment 3 - Provisions and Clauses</blockquote>
+  <div class="ev-explanation">The solicitation incorporates standard provisions and clauses by reference through a dedicated attachment, which is normal federal contracting practice. Without visible bulk regulatory lists in the extracted text, there is no evidence of an overwhelming, undifferentiated applicable documents section.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation documents are largely unparseable — the PDF attachments (including Attachment 1: Request for Quote Instructions and Evaluation Criteria, Attachment 2: Statement of Work, Attachment 3: Provisions and Clauses, and Attachment 4: Questions and Answers) rendered with almost no readable text content. The pages appear blank or contain only formatting artifacts (pipes and spaces), with no substantive language extracted. As a result, there is no information about the contract pricing structure (e.g., FFP, T&amp;M, labor-hour, cost-reimbursement), no CLIN structure, no labor categories or hourly rates, and no scope-of-work details that would allow an assessment of whether the chosen pricing scheme fits the requirements. The notice header establishes this is a small-business set-aside RFQ for Astro P25 Land Mobile Radio System Support (NAICS 517121), which suggests a maintenance/support context where T&amp;M might be typical — but without confirmed contract type or scope details, any conclusion would be speculation. Insufficient content to assess Sin #6.</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 Request for Quote - NB6710102600602.pdf">Attachment 1 Request for Quote - NB6710102600602.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4bb3aae58a424914b14af35043237282_Attachment+1+Request+for+Quote+-+NB6710102600602.pdf" download="Attachment 1 Request for Quote - NB6710102600602.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 - Statement of Work.pdf">Attachment 2 - Statement of Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4bb3aae58a424914b14af35043237282_Attachment+2+-+Statement+of+Work.pdf" download="Attachment 2 - Statement of Work.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 - Provisions and Clauses.pdf">Attachment 3 - Provisions and Clauses.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4bb3aae58a424914b14af35043237282_Attachment+3+-+Provisions+and+Clauses.pdf" download="Attachment 3 - Provisions and Clauses.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment-4 QuestionsandAnswers %282%29.xls">Attachment-4 QuestionsandAnswers %282%29.xls</div></div>
+  <a class="dl-btn" href="../attachments/4bb3aae58a424914b14af35043237282_Attachment-4+QuestionsandAnswers+%282%29.xls" download="Attachment-4 QuestionsandAnswers %282%29.xls" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

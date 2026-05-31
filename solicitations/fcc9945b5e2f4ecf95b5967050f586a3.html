@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOF Global Services Delivery (SOFGSD) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SOF Global Services Delivery (SOFGSD)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 fcc9945b5e2f4ecf95b5967050f586a3</span>
+      <a class="sam-link" href="https://sam.gov/opp/fcc9945b5e2f4ecf95b5967050f586a3/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › US SPECIAL OPERATIONS COMMAND (USSOCOM) › HQ USSOCOM</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541611</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Multiple Award IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">5-year Base Ordering Period, with two 1-year option periods</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor 1: Technical Proposal (HTRO Self-Score)</li><li>Factor 2: Cost/Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a multiple-award IDIQ with a Highest Technically Rated Offeror (HTRO) evaluation methodology — its primary purpose is vendor selection, not performance management. The actual SOW (Attachment 01 SOFGSD IDIQ SOW) is referenced but its full text is not available in the provided materials, which significantly limits assessment of QA and reporting requirements during performance. What is visible includes: the contract clause incorporating the IDIQ Program Manager as the only key personnel, a monthly CAC departure report, and standard contract administration clauses. The evaluation framework (Section M) is heavily outcome-proximate — it uses scored work samples measuring actual past performance, personnel scale, geographic reach, transition speed, and retention rates rather than process adherence. The pricing mechanism (unpriced IDIQ with task-order competition) defers all performance accountability to the task order level. The solicitation does not exhibit the hallmarks of the compliance-over-outcomes sin: there are no prescribed weekly/monthly/quarterly report formats visible, no overlapping reporting cadences, no plan-adherence tracking requirements, and no QA surveillance plans focused on process documentation. The one notable absence is that without the full SOW text, I cannot rule out that performance reporting requirements exist within it; however, based on the IDIQ structure and the evaluation framework&#x27;s outcome orientation, there is insufficient evidence to assign a severity above 1. The sin is assessed as minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5652.237-9001 Key Personnel Requirements (2003) Section I... The contractor agrees that such personnel shall not be removed from the contract work or replaced without compliance with the following...</blockquote>
+  <div class="ev-explanation">This clause focuses on process compliance (replacement approval procedures) rather than outcomes, but it is a standard FAR clause rather than a QA mechanism. It does not represent a meaningful reporting or surveillance burden.</div>
+</div><div class="evidence-item">
+  <blockquote>5652.242-9002 Accounting for Common Access Cards (CACs) for Contractor Personnel Departing HQ USSOCOM... the contractor shall include a monthly report listing contractor employees who departed during the previous month and the date their CACs were turned in...</blockquote>
+  <div class="ev-explanation">This is a security-administrative reporting requirement, not a performance QA mechanism. It tracks process compliance (CAC accountability) but is a narrow administrative obligation rather than a primary accountability structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards problem — severity 2 — driven primarily by the cumulative effect of several individually defensible but collectively tilting requirements. The HTRO self-scoring methodology is creative and transparency-oriented, and the government deserves credit for structuring evaluation around verifiable artifacts rather than pure narrative claims. However, the scoring architecture consistently advantages vendors with prior SOF prime contracting experience at scale.
+
+The most significant tilt comes from the interaction of three factors: (1) the 3:1 scoring multiplier for SOF-related work samples in Category 5, which structurally disadvantages companies with equivalent capability but non-SOF contract histories; (2) the Category 1 requirement to demonstrate 40–50+ personnel on a single contract, which excludes vendors who have built comparable capability through multiple smaller contracts; and (3) the Tier 1 requirement that the small business prime must have held prime (not subcontractor) contracts, which excludes relevant experience accumulated under teaming arrangements.
+
+Critically, the government explicitly confirmed (Q&amp;A #63) that an affiliate&#x27;s work sample does NOT qualify as Tier 1, and (Q&amp;A #176) that the Strategic Planner LCAT requires experience having literally been the J3 Director, J5 Director, or Chief of Staff at a TSOC or above — a requirement that can only be met by individuals with very specific prior government billet experience. While LCAT qualifications apply to task-order personnel rather than the vendor itself, this illustrates the underlying pattern: requirements calibrated to a narrow prior-experience profile.
+
+The solicitation is NOT a severe case: it is a multiple-award vehicle open to small businesses, it permits subcontractor work samples at Tier 2, it allows a 5-year lookback, it has addressed many industry concerns through Q&amp;A, and it does not require specific dollar thresholds for work samples. A capable small business without SOF prime contract history could still compete and potentially win, but would score materially lower on the evaluation than a SOF incumbent, and the scoring gap from Category 5 alone (150 points maximum for non-SOF vs. 450 for SOF) is substantial enough to represent a meaningful structural disadvantage.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Tier 1: Proposed SOFGSD Prime Offeror Small Business or the JV protégé performing as the prime contractor on the Work Sample. At least one Work Sample shall be Tier 1.</blockquote>
+  <div class="ev-explanation">The requirement that at least one work sample must come from the small business prime acting as a prime contractor (not a subcontractor) is a meaningful restriction. Many small businesses in this space have accumulated relevant experience as subcontractors to larger primes — which is common in the SOF support market. This requirement structurally disadvantages businesses that have performed equivalent work but under a subcontract arrangement, favoring those who have already won prime contracts of comparable scope.</div>
+</div><div class="evidence-item">
+  <blockquote>The Period of Performance of the Work Samples shall be within the last five years of the date of this solicitation. A minimum of six consecutive months of performance within the five-year period is required.</blockquote>
+  <div class="ev-explanation">A five-year lookback is standard and reasonable on its own. However, combined with the SOF-specific domain requirements (Category 5), the LCAT qualification requirements (Category 4), the scale requirements (Category 1: up to 50 personnel on a single contract), and the retention/transition requirements (Categories 3 and 6), the recency window becomes part of a stacking pattern. Vendors who performed relevant work more than five years ago — or who are scaling up — cannot use that experience.</div>
+</div><div class="evidence-item">
+  <blockquote>Non-JVs are limited to 50 total # of contracted personnel, JV Proteges are limited to 40 personnel... Any Offerors who submit numbers in both rows may be considered non-compliant and determined ineligible for award.</blockquote>
+  <div class="ev-explanation">Category 1 rewards demonstrated experience managing a specific number of personnel on a single contract. A small business that has performed excellent work on multiple smaller contracts — each with 15–20 personnel — cannot aggregate that experience. Only firms that have already won and managed large single-award contracts with 40–50+ personnel score full points. This is a scale threshold that functions as a proxy for incumbency or prior large-contract experience.</div>
+</div><div class="evidence-item">
+  <blockquote>For a work sample to be evaluated as &#x27;SOF-related&#x27; under Category 5, the primary requiring activity, funding entity, or supported command explicitly identified in the contract documentation must be a recognized Special Operations Forces enterprise entity (e.g., USSOCOM HQ, a Theater Special Operations Command [TSOC], a SOF Service Component, or a SOF Joint Task Force).</blockquote>
+  <div class="ev-explanation">Category 5 awards 30 points for SOF-related work samples versus 10 points for non-SOF work. This 3:1 scoring advantage for prior SOF contract experience creates a significant structural advantage for incumbent or prior SOF contractors. A company with equivalent management and technical capability but whose prior contracts were with conventional forces or other DoD agencies is systematically disadvantaged in scoring — not because they lack capability, but because they haven&#x27;t previously worked within the SOF enterprise specifically.</div>
+</div><div class="evidence-item">
+  <blockquote>No. The Government confirms that USCYBERCOM uses the CPEA system that is an exact replica of the CPAR System. Can the Government confirm the offeror can provide a CPEA in lieu of a CPARS given that the evaluation methods, criteria, and format are identical to CPARS? No. The Government will not accept CPEA in lieu of CPARS.</blockquote>
+  <div class="ev-explanation">The strict requirement for CPARS — and rejection of functionally identical evaluation systems from agencies that don&#x27;t issue CPARS — limits the universe of qualifying past performance to federal contracts within the traditional CPARS-issuing universe. While not a classic insider reward, it contributes to the cumulative effect of narrowing eligible vendors to those with specific prior federal contracting histories.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is an IDIQ vehicle establishment vehicle, not a performance-based SOW for ongoing services. The document package at the IDIQ level is almost entirely focused on (1) qualifying criteria for award eligibility and (2) an HTRO self-scoring methodology based on past work samples. The IDIQ-level SOW (Atch 01) is referenced repeatedly but not fully provided in the extracted text; the excerpts available describe service areas at a high level (&#x27;Education and Training Services,&#x27; &#x27;Program Management,&#x27; &#x27;Professional Services&#x27;) rather than prescribing step-by-step processes. The evaluation methodology is outcome-adjacent: it measures demonstrated past performance through objective proxies (personnel scale, geographic reach, transition speed, retention rates, LCAT presence, SOW coverage) rather than mandating how future work will be delivered. The administrative requirements — facility clearances, accounting system documentation, CMMC compliance, financial capacity — are regulatory compliance constraints, not process prescriptions. The post-award conference pricing template is the most prescriptive element in the materials provided, but it governs a single 60-minute event with a $2,500 ceiling, not the delivery of services. The cross-teaming restrictions and work sample documentation requirements are competitive safeguards, not operational process mandates. Absent the full IDIQ SOW text, there is some residual uncertainty about whether the task order performance work statements contain sprawl, but the IDIQ-level documents reviewed do not exhibit the pattern of prescribing how contractors must execute work. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Offeror shall not create or submit any new documentation, such as project narratives, or project descriptions. The work samples are derived from the Offeror&#x27;s past or current contract or task orders and shall consist of official contract documentation which may include Performance Work Statements, Statements of Work, Contract Data Requirement Lists (CDRLs), DD-254, etc.</blockquote>
+  <div class="ev-explanation">This restricts the forms of evidence vendors may submit for evaluation, but it is a reasonable administrative constraint tied to ensuring verifiability of past performance claims, not a prescription of how future work should be performed. It does not dictate the approach to contract execution.</div>
+</div><div class="evidence-item">
+  <blockquote>To be eligible for award, total proposed price must equal $2,500... Offeror must identify and propose fully burdened labor rates for up to four (4) personnel which will attend the post-award conference in person or virtually on Tab 2 of this Excel spreadsheet.</blockquote>
+  <div class="ev-explanation">The post-award conference pricing template prescribes a fixed price ceiling and a specific staffing structure (up to four personnel) for one discrete event. This is mildly prescriptive but is a narrow, administratively bounded requirement for a single kickoff meeting, not indicative of how ongoing work will be performed.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pool sin in any meaningful way. The documents provided — Section L (proposal instructions), Section M (evaluation criteria), the SOW, the HTRO Self-Score Matrix, and the extensive Q&amp;A — are focused on proposal submission mechanics, evaluation methodology, and work sample substantiation requirements. There is no &#x27;Applicable Documents&#x27; section, no bulk list of regulatory citations, and no undifferentiated compliance framework dump. The contract clauses section in the SF30 amendment incorporates a small, titled set of SOFARS and FAR clauses by reference — this is standard federal contracting practice and not a rule pool. The solicitation&#x27;s compliance demands on offerors are primarily administrative (FCL documentation, CMMC/SPRS scores, accounting system adequacy) and each requirement is explained with specific applicability context in the Q&amp;A and Section L. The sheer volume of Q&amp;A content reflects complexity in evaluation methodology and proposal mechanics, not regulatory compliance interpretation burden. A vendor reviewing this solicitation would have a clear, if demanding, picture of what compliance is required and why. The absence of a dedicated &#x27;Applicable Documents&#x27; or &#x27;Referenced Standards&#x27; section is itself significant — the government appears to have made deliberate choices about what to include rather than dumping a master list.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Section I - Contract Clauses: 5652.216-9002 Withholding of Fixed Fee or Incentive Fee (2005)... 5652.216-9005, Government Down Time for Various Reasons (2005)... 5652.237-9001 Key Personnel Requirements (2003)... 5652.242-9002 Accounting for Common Access Cards (CACs)... FAR Clauses Incorporated by Reference: 52.222-90 Addressing DEI Discrimination by Federal Contractors. (Deviation 2026-O0038)</blockquote>
+  <div class="ev-explanation">The contract clauses section incorporates a modest, named set of SOFARS clauses and FAR clauses. Each is listed with its title and section, and the full-text versions are provided in context. This is standard FAR/DFARS clause incorporation practice, not a bulk undifferentiated list. The clauses are plausibly relevant to the contract type (fixed-fee, key personnel, CAC management, DEI compliance).</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">SOFGSD is a broad, multiple-award IDIQ for global SOF services spanning training, intelligence support, program management, advisory services, and professional services — requirements that are inherently variable in scope, quantity, and duration. The solicitation states a preference for FFP in Section H, which creates some concern: many of the anticipated task orders involve labor-intensive advisory and support services where the quantity of effort cannot be reliably predicted in advance, making T&amp;M or labor-hour contracts more appropriate for those categories. However, the severity is moderated to 2 rather than 3 for several reasons. First, the IDIQ is explicitly unpriced at the base level, deferring all pricing decisions — including contract type — to individual task orders. This means the FFP &#x27;preference&#x27; does not lock the government into FFP for every task order; contracting officers retain discretion to use T&amp;M or cost-reimbursement when appropriate. Second, the solicitation includes clauses for both fixed-fee and incentive-fee withholding, signaling that cost-reimbursable task orders are anticipated. Third, a blanket preference for FFP on performance-based services is a defensible policy position that aligns with FAR Part 37 performance-based acquisition principles, even if it is not optimal for all task types. The main residual concern is that the stated FFP preference could pressure task-order contracting officers toward FFP even when T&amp;M or cost-reimbursement would better serve the government&#x27;s interests, particularly for the more exploratory and advisory elements of the SOW. This is a moderate mismatch warranting a severity 2 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government contemplates award of a Multiple Award IDIQ contract resulting from this solicitation... Section I Clause 5652.216-9002 Withholding of Fixed Fee or Incentive Fee (2005): Pursuant to FAR 52.216-8 &#x27;Fixed Fee&#x27; or FAR 52.216-10 &#x27;Incentive Fee&#x27;, the withheld amount of the fixed or incentive fee shall not exceed 15% of the total fee or $100,000, whichever is less.</blockquote>
+  <div class="ev-explanation">The inclusion of both fixed-fee and incentive-fee withholding clauses signals that the IDIQ will support cost-reimbursement task orders (cost-plus-fixed-fee and cost-plus-incentive-fee), in addition to other contract types. This is appropriate for an umbrella vehicle with diverse SOF support requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>Section H.1: &#x27;Firm Fixed Price (FFP) as the Government&#x27;s preferred contract type for performance-based work under SOFGSD&#x27;... Q&amp;A #430: &#x27;Section H identifies Firm Fixed Price (FFP) as the Government&#x27;s preferred contract type for performance-based work under SOFGSD.&#x27;</blockquote>
+  <div class="ev-explanation">The solicitation expresses a preference for FFP across a broad scope of services that includes advisory support, intelligence analysis, training, program management, and professional services. Many of these service categories — particularly advisory, intelligence, and training support — involve unpredictable quantities of labor and evolving requirements, making FFP potentially problematic even as a &#x27;preferred&#x27; type.</div>
+</div><div class="evidence-item">
+  <blockquote>SOW describes services across SOW 5.1 Education and Training Services, 5.2 Management Support Services, 5.3 Acquisition Program Management, and 5.5 Professional Services including &#x27;exploitation support, signature reduction, and other theater operational support&#x27;... &#x27;The SOFGSD IDIQ is designed to provide a broad, flexible contracting vehicle to meet dynamic and evolving Special Operations Forces (SOF) requirements globally.&#x27;</blockquote>
+  <div class="ev-explanation">The breadth and dynamism of requirements — global SOF support spanning training, intelligence, program management, and theater operations — are fundamentally difficult to scope and price in advance. Applying FFP as the preferred type to such requirements creates risk of either overpricing (contractors building in contingency) or underperformance (contractors cutting corners when costs run over).</div>
+</div><div class="evidence-item">
+  <blockquote>Q&amp;A #86: &#x27;This is a non-priced IDIQ. All pricing will be at the Task Order (TO) level and evaluated based on the individual TO requirements at time of TO Request For Proposal. Offerors are not required to &#x27;allocate the 253.6K FTEs / year amongst the 12 PLCs&#x27; for this IDIQ proposal.&#x27; Q&amp;A #137: &#x27;As established in the solicitation, this is an unpriced IDIQ where all operational requirements will be competed at the Task Order level.&#x27;</blockquote>
+  <div class="ev-explanation">The IDIQ itself is unpriced, deferring all contract-type decisions to the task order level. This mitigates the square peg concern significantly: the government retains flexibility to choose the appropriate type (FFP, T&amp;M, cost-reimbursement) for each individual task order based on that task order&#x27;s specific scope and predictability. The FFP &#x27;preference&#x27; in Section H is a preference, not a mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>Q&amp;A #431 (Government response): &#x27;The Government will not implement an evaluation adjustment, scoring normalization, or risk-weighting based on the contract type of a submitted Work Sample... The assumption of financial risk under an FFP arrangement does not inherently demonstrate the specific workforce management capabilities required by the HTRO Matrix.&#x27;</blockquote>
+  <div class="ev-explanation">The government&#x27;s own acknowledgment that FFP work samples may produce documentation gaps for workforce tracking (Categories 1 and 6) implicitly confirms that FFP is not ideal for the labor-intensive, people-tracking nature of many anticipated task orders. This tension between the stated FFP preference and the evaluation criteria designed around labor-hour tracking is a structural inconsistency.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="A1 SOFGSD Section L %28r1 20260424%29.docx">A1 SOFGSD Section L %28r1 20260424%29.docx</div></div>
+  <a class="dl-btn" href="../attachments/fcc9945b5e2f4ecf95b5967050f586a3_A1+SOFGSD+Section+L+%28r1+20260424%29.docx" download="A1 SOFGSD Section L %28r1 20260424%29.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Atch 04 Staffing Proposal Pricing Template.xlsx">Atch 04 Staffing Proposal Pricing Template.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/fcc9945b5e2f4ecf95b5967050f586a3_Atch+04+Staffing+Proposal+Pricing+Template.xlsx" download="Atch 04 Staffing Proposal Pricing Template.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SF30 - H9240026RE001 Amd 0002.pdf">SF30 - H9240026RE001 Amd 0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fcc9945b5e2f4ecf95b5967050f586a3_SF30+-+H9240026RE001+Amd+0002.pdf" download="SF30 - H9240026RE001 Amd 0002.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="SOFGSD Open Questions 20260424.xlsx">SOFGSD Open Questions 20260424.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/fcc9945b5e2f4ecf95b5967050f586a3_SOFGSD+Open+Questions+20260424.xlsx" download="SOFGSD Open Questions 20260424.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="SOFGSD Symphony Webinar QnA %2820260414%29.xlsx">SOFGSD Symphony Webinar QnA %2820260414%29.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/fcc9945b5e2f4ecf95b5967050f586a3_SOFGSD+Symphony+Webinar+QnA+%2820260414%29.xlsx" download="SOFGSD Symphony Webinar QnA %2820260414%29.xlsx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SETA JIAMDO Re-Compete — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SETA JIAMDO Re-Compete</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 f483dd19c7a043f48c134922d65f3f63</span>
+      <a class="sam-link" href="https://sam.gov/opp/f483dd19c7a043f48c134922d65f3f63/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-24</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-24</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Cost Plus Fixed Fee (CPFF)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Past Performance</li><li>Cost/Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The accountability structure combines weekly written status reports, monthly progress reports with prescribed sections, weekly program review meetings, monthly status reviews, quarterly PMRs, and ad hoc meetings — a layered set of overlapping reporting obligations that collectively focus on activity documentation and schedule adherence. The prescribed MPR format (accomplishments, schedule status, problems, upcoming activities, financial status) is a classic waterfall-era process compliance template.
+
+However, the severity does not reach 3 for several reasons. First, this is SETA support — advisory and analytical services to a policy and planning organization. It is inherently harder to define outcome metrics for advisory work than for IT systems or logistics services. The government is purchasing expert judgment and analytical capacity, which is genuinely difficult to measure in SLA terms. Second, the solicitation references a QASP and the document includes a Performance Work Statement structure that implies deliverable acceptance criteria exist, even if they are not richly specified in the excerpts reviewed. Third, the reporting cadences, while overlapping, are not extreme for a high-visibility advisory contract supporting Joint Staff operations in a sensitive national security domain — weekly touchpoints are common in that environment and may reflect mission tempo rather than bureaucratic excess.
+
+The core problem is the absence of any outcome-oriented accountability language: no measures of advisory quality, no government satisfaction criteria, no metrics tied to whether JIAMDO&#x27;s analytical products improved, no indicators that the SETA support influenced program decisions favorably. The entire evaluation apparatus asks &#x27;did the contractor show up, report activities, and follow the plan?&#x27; rather than &#x27;did the contractor make JIAMDO more effective?&#x27; That imbalance warrants a moderate severity rating of 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Monthly Progress Report (MPR) – shall be submitted NLT 5 working days after the end of each month. The MPR shall document current month&#x27;s activities and accomplishments, as well as plan for the next month&#x27;s upcoming activities. Each report will contain sections pertaining to: current month&#x27;s accomplishments; schedule status; problems encountered and proposed resolution; upcoming activities; and financial status.</blockquote>
+  <div class="ev-explanation">The MPR is structured around process documentation — activities performed, schedule status, upcoming plans — with no outcome measures. &#x27;Accomplishments&#x27; are undefined and self-reported; there is no external validation, performance target, or user satisfaction benchmark against which accomplishments are measured. &#x27;Schedule status&#x27; is a plan-adherence metric, not a results metric.</div>
+</div><div class="evidence-item">
+  <blockquote>Weekly Status Report (WSR) – shall be submitted NLT COB Monday for the prior week. The WSR shall contain a summary of activities and actions completed and planned for the upcoming week.</blockquote>
+  <div class="ev-explanation">The WSR is a pure activity log — what was done last week, what is planned next week. It contains no performance indicators, outcome measures, or quality criteria. Combined with the MPR, this creates overlapping reporting cadences (weekly and monthly) covering substantially the same content: activities performed and activities planned.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall attend and support Weekly Program Reviews (WPR) with the Government to review status on current activities. Contractor shall support and prepare material for monthly Status Reviews (MSR), quarterly Program Management Reviews (PMR), and ad hoc meetings upon request.</blockquote>
+  <div class="ev-explanation">This establishes four distinct meeting cadences — weekly program reviews, monthly status reviews, quarterly PMRs, and ad hoc meetings — layered on top of weekly and monthly written reports. The WPR and WSR likely cover identical ground. None of these forums are described as evaluating the quality or impact of work product; they review &#x27;status on current activities,&#x27; which is process compliance, not outcome assessment.</div>
+</div><div class="evidence-item">
+  <blockquote>The QASP will be used by the Government to evaluate contractor performance. The QASP identifies the key areas to be measured on a regular basis during contract performance to ensure that the Government is receiving what was specified in the contract.</blockquote>
+  <div class="ev-explanation">The QASP as described focuses on ensuring the government receives &#x27;what was specified&#x27; — i.e., contractual conformance — rather than measuring whether the SETA support is actually improving IAMD policy outcomes, improving program decision quality, or achieving mission results. This framing is inherently compliance-oriented: did the contractor deliver the specified outputs, not did those outputs produce value.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the solicitation notice and description provided, this SETA re-compete for JIAMDO exhibits moderate insider rewards characteristics. The most significant structural factor is the highly specialized domain: IAMD SETA support to a specific Joint Staff organization (J8/JIAMDO) in the Pentagon. SETA contracts of this nature — advising senior government officials on classified, technically complex programs — inherently favor incumbents because: (1) the work requires deep familiarity with specific programs, stakeholders, and classified architectures that takes years to develop; (2) the government client&#x27;s expectations are shaped by the incumbent&#x27;s approach; and (3) transition costs and risks in classified advisory roles are high, creating implicit pressure to retain the incumbent. The Seaport NxG MAC restriction further narrows the pool before any technical evaluation occurs. However, I cannot assess the full severity without the attached solicitation documents (SOW/PWS and evaluation criteria), which are described as 63 pages across 2 attachments but whose contents were not provided for analysis. The most consequential evidence of insider rewards — specific dollar thresholds for past performance, key personnel qualification requirements, and scoring rubrics — would be embedded in those attachments. Based on available text alone, severity is assessed at 2 (moderate): the domain narrowness and re-compete structure tilt the playing field toward the incumbent, but the solicitation uses full and open competition framing and the Seaport NxG MAC vehicle is broadly accessible to qualified defense contractors. A qualified IAMD-domain vendor who holds a Seaport NxG MAC could theoretically compete, though the incumbent retains meaningful structural advantages. If the attached documents contain specific dollar thresholds, short lookback windows, or evaluation bonus points for prior JIAMDO-specific work, severity could warrant elevation to 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall serve as a subject matter expert in the mission area of IAMD and provide advice to the Government based on that expertise.</blockquote>
+  <div class="ev-explanation">The core requirement is deep subject matter expertise in Integrated Air and Missile Defense (IAMD) — a highly specialized, narrow national security domain. While this tests genuine capability, the combination of domain narrowness and the nature of the work (advising senior Joint Staff officials on classified IAMD programs) means the pool of vendors with relevant prior experience is inherently small, and the incumbent holds a structural advantage through accumulated institutional knowledge of JIAMDO-specific processes, programs, and personnel.</div>
+</div><div class="evidence-item">
+  <blockquote>This solicitation N0018926RD009 is a re-compete of Systems Engineering Technical Assistance (SETA) support to the Joint Integrated Air and Missile Defense Organization (JIAMDO) of the Joint Staff, J8 in the Pentagon, Washington, DC.</blockquote>
+  <div class="ev-explanation">The explicit framing as a &#x27;re-compete&#x27; of an existing SETA contract signals that the work has been performed by a specific incumbent. SETA contracts in classified, advisory roles are particularly prone to incumbent capture because the value delivered is largely through personnel relationships and institutional knowledge accumulated over the contract period — knowledge that a new vendor cannot replicate without having held the contract.</div>
+</div><div class="evidence-item">
+  <blockquote>The acquisition is to be procured through full and open competition under the Seaport NxG MAC N0017819D7693 and only MAC holders may submit a quote.</blockquote>
+  <div class="ev-explanation">Restricting competition to Seaport NxG MAC holders is a gateway requirement that, while administratively common, narrows the pool before any evaluation criteria are applied. Vendors not already holding a Seaport NxG MAC — including potentially qualified IAMD-domain firms — cannot participate regardless of their technical qualifications. This compounds any other insider-favoring requirements.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This SETA solicitation for JIAMDO support exhibits moderate requirement sprawl (Severity 2). The Performance Work Statement contains multiple sections that dictate specific activities, staffing structures, and step-by-step tasks rather than defining measurable outcomes or desired end states. The most significant manifestation is the prescriptive 14-FTE staffing structure broken down by specific role types and headcounts — a strong signal that the incumbent&#x27;s current team composition has been codified into the requirement, preventing meaningful competition on delivery approach. Task areas also frequently devolve into enumerated activity lists (attend this, prepare that, track X, coordinate with Y) without corresponding performance standards or quality measures that would allow vendors to propose better methods.
+
+Mitigating factors exist, however. The contract is for SETA support — an advisory and assistance service where some level of process description is inherent and expected, since the government is buying expert judgment rather than a discrete deliverable. Some sections do reference outcomes such as providing advice that enables government decision-making, and the subject matter expertise requirements are framed around knowledge domains rather than step-by-step processes. The solicitation is also a re-compete rather than a first-generation contract, which normalizes some degree of continuity in how work is structured.
+
+Nevertheless, the combination of prescriptive meeting attendance requirements, multi-step task lists without performance standards, and a rigid FTE mandate is sufficient to warrant a Severity 2 finding. The solicitation constrains vendors meaningfully in several areas but does not rise to Severity 3 because it is not uniformly prescriptive throughout — some sections retain legitimate outcome or expertise framing. A vendor could still propose differentiated approaches in how they staff qualifications, manage knowledge transfer, or structure deliverables, even if team size and composition are largely locked.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall attend all scheduled and unscheduled meetings and conferences as required, including but not limited to: Senior Staff Meetings, Working Groups, Integrated Product Teams (IPTs), program reviews, technical demonstrations, tri-chairs, and Integrated Air and Missile Defense Weapons (IAMDW) program meetings.</blockquote>
+  <div class="ev-explanation">This requirement specifies a process activity (attending specific categories of meetings) rather than defining an outcome. A vendor cannot optimize meeting participation or propose more effective collaboration methods — they must simply show up to whatever meetings are listed. This locks in a specific activity without defining what value those meeting attendances must produce.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall assist the Government in meeting all JIAMDO Milestone Review (JMR) events by: (1) Preparing all required products for JMR review; (2) Tracking review and assessment findings from previous JMR events; (3) Track scheduling for future JMR events; (4) Attend all JMR events and create a record of proceedings.</blockquote>
+  <div class="ev-explanation">This is a step-by-step process prescription rather than an outcome statement. The four numbered sub-tasks dictate exactly how the vendor must support JMR events. A vendor cannot propose a more efficient workflow, automate tracking, or consolidate activities — they must execute each listed step individually. The requirement would be more appropriately framed around deliverable quality or readiness rates for JMR events.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall: (1) Provide written and oral technical briefings and reports; (2) Coordinate with appropriate agencies and components to obtain technical data; (3) Research technical publications; (4) Attend technical meetings and reviews; (5) Prepare technical documentation as required by JIAMDO; (6) Conduct technical analysis; (7) Provide technical expertise to support studies and assessments.</blockquote>
+  <div class="ev-explanation">This multi-part task list prescribes a broad array of process activities rather than defining the standard or quality of technical support expected. A vendor reading this has no meaningful flexibility — they must execute each activity as listed. The absence of measurable outcomes (e.g., accuracy standards, turnaround times, quality benchmarks) means performance cannot be assessed except by checking whether activities occurred.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide a minimum of 14 FTEs consisting of: (1) two (2) Government Program Support (GPS); (2) one (1) System Integrator; (3) two (2) Architecture; (4) one (1) Operational Assessment; (5) one (1) Financial management; (6) two (2) Communications and Networks; (7) two (2) Warfighter Requirements; (8) one (1) Science and Technology; (9) two (2) Program Management/Administration Support.</blockquote>
+  <div class="ev-explanation">This prescribes an exact staffing structure by role type and headcount rather than defining capability requirements or outcomes. By mandating 14 FTEs across nine specific roles, the solicitation eliminates any vendor ability to optimize team composition, leverage automation, use higher-skilled generalists, or otherwise innovate on delivery approach. This is a classic indicator of copy-paste from the incumbent&#x27;s current staffing model becoming the de facto requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. It does not include a single consolidated &#x27;Applicable Documents&#x27; list of the 20+ items that would mark a severe case, but it achieves a similar effect through a series of open-ended, catch-all compliance mandates with &#x27;including but not limited to&#x27; language that expands each cited category into an undefined universe of obligations. The enumerated documents span cybersecurity (DODI 8510.01, ICD 503, DCSA DAAPM), acquisition policy (DODI 5000.02, 5000.88), organizational charters (DODD 5105.21, DODD 5134.09), arms control (DODD 2060.02), intelligence oversight (DIA ICD, IC Directives), and administrative policies (J6/J2 IT and travel policies) — a wide-ranging set that is at least plausibly connected to advisory SETA work supporting a Joint Staff organization, but that is never explained or prioritized. The solicitation provides no context distinguishing which documents create hard compliance obligations versus which are background reference material. Some inclusions — particularly the DCSA DAAPM (which governs cleared contractor facility accreditation rather than day-to-day advisory task performance) and the open-ended IC Directive reference — appear to be defensive inclusions rather than genuinely operative requirements. Mitigating factors: This is a SETA support role for a high-security, multi-domain organization (JIAMDO/Joint Staff), so a higher-than-average regulatory surface area is somewhat inherent to the work. Security, classification, and intelligence oversight requirements are legitimately broad for a cleared advisory contract. The solicitation does not reach the absurdity level of citing irrelevant EOs or contradictory policies. Severity 2 is appropriate: elevated but not impenetrable, with no glaring contradictions, but meaningful ambiguity about the actual compliance landscape that incumbents will navigate more easily than new entrants.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall comply with all applicable laws and regulations, DoD Instructions, Joint Staff Manuals, DoD Directives, CJCS Instructions, CJCS Manuals, CJCS Directives, Chairman&#x27;s Standing Orders/Guidance, and Secretary of Defense (SECDEF) Memoranda that govern JIAMDO operations and IAMD mission areas.</blockquote>
+  <div class="ev-explanation">This is an open-ended, catch-all compliance mandate that does not enumerate the specific documents at issue. Vendors cannot determine from this language which DoD Instructions, Joint Staff Manuals, CJCS Instructions, or SECDEF Memoranda are actually operative — they are simply told to comply with whatever exists, with no list, no prioritization, and no guidance on what is current and enforceable versus superseded or inapplicable.</div>
+</div><div class="evidence-item">
+  <blockquote>Applicable documents include but are not limited to: CJCSI 3270.01, CJCSM 3270.01, CJCSI 5123.01, CJCSI 6212.01, DODD 5134.09, DODI 5000.02, DODI 5000.88, DODI 8510.01, DODD 2060.02, DODD 5105.21, DIA ICD, ICD 503, DCSA DAAPM, and other Government-provided references.</blockquote>
+  <div class="ev-explanation">The &#x27;other Government-provided references&#x27; tail on this list means the enumerated documents are not exhaustive — they are illustrative of an undefined universe of compliance obligations. Without explaining how each cited document (e.g., DODI 8510.01 RMF/cybersecurity, DCSA DAAPM) connects to advisory SETA work rather than system development or acquisition program management, vendors cannot assess which create enforceable compliance obligations versus which are background context.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall comply with the DD Form 254, DoD Contract Security Classification Specification, and all pertinent security regulations contained therein, to include but not limited to NISPOM, ICD 705, and applicable Intelligence Community Directives.</blockquote>
+  <div class="ev-explanation">&#x27;To include but not limited to&#x27; again signals an open-ended, uncurated compliance tail. Intelligence Community Directives span a broad and growing body of policy; citing them without identifying which specific ICDs apply to this SETA role (versus ICDs governing collection, analysis, or system accreditation) leaves vendors unable to accurately scope their compliance obligations.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall adhere to the Joint Staff&#x27;s administrative and operational security policies, travel policies, and IT policies as disseminated by the Joint Staff J6 and J2, and as updated throughout the period of performance.</blockquote>
+  <div class="ev-explanation">Compliance obligations that can be updated throughout the period of performance without a defined mechanism for vendor notification or contract modification create a rolling, unknowable compliance burden. This is characteristic of copy-forward accumulation — the clause was drafted broadly so that nothing future-dated would fall outside its scope, rather than actively curating what is actually required.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation describes a SETA contract providing systems engineering technical assistance and subject matter expertise on Integrated Air and Missile Defense to a Joint Staff organization. This is quintessentially the type of work suited to a labor-hour or T&amp;M contract: the government is buying expert labor whose volume and direction will shift based on mission priorities, policy developments, and leadership needs. There are no defined deliverables of the sort that would support firm-fixed-price, and the advisory nature of the work means neither scope nor quantity of effort can be predicted with the precision required for FFP. The solicitation does not explicitly state the contract type in the posted notice text, but SETA contracts of this nature under SeaPort NxG are almost universally structured as cost-plus or labor-hour vehicles, which is the appropriate vehicle for this requirement. There is no evidence of a pricing structure mismatch. The work is inherently variable in scope and depth; labor-hour or cost-reimbursement pricing appropriately places risk on the government side where that risk actually lives, and motivates the contractor to provide quality expertise rather than manage to an artificial fixed price. No square peg concern is identified. Severity is assessed at 1 — Minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall serve as a subject matter expert in the mission area of IAMD and provide advice to the Government based on that expertise.</blockquote>
+  <div class="ev-explanation">The core requirement is expert advisory and technical assistance (SETA) support — a classic labor-hour or T&amp;M use case where the government is purchasing expertise and intellectual output rather than a defined deliverable. The quantity and nature of advisory tasks will vary with operational demands, making fixed-price inappropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>This solicitation N0018926RD009 is a re-compete of Systems Engineering Technical Assistance (SETA) support to the Joint Integrated Air and Missile Defense Organization (JIAMDO) of the Joint Staff, J8 in the Pentagon.</blockquote>
+  <div class="ev-explanation">SETA contracts are widely recognized in DoD acquisition practice as labor-intensive, expertise-driven support where scope evolves with mission needs. The re-compete nature and SETA label strongly imply a labor-hour or T&amp;M pricing structure is in use, which aligns with the nature of the work.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Past Performance Information Form.docx">Past Performance Information Form.docx</div></div>
+  <a class="dl-btn" href="../attachments/f483dd19c7a043f48c134922d65f3f63_Past+Performance+Information+Form.docx" download="Past Performance Information Form.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926RD009.pdf">Solicitation - N0018926RD009.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f483dd19c7a043f48c134922d65f3f63_Solicitation+-+N0018926RD009.pdf" download="Solicitation - N0018926RD009.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

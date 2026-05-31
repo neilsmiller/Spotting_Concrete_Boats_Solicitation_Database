@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naval Sea Logistics Center Readiness Based Sparing Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Naval Sea Logistics Center Readiness Based Sparing Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 fe834c0b5507424783a981760a4d7984</span>
+      <a class="sam-link" href="https://sam.gov/opp/fe834c0b5507424783a981760a4d7984/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-02-17</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NAVSEALOGCENKYPTDIVNUWC  MECH PA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-02-17</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Cost Plus Fixed Fee (CPFF)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, warranting a severity 2 rating. The core work — producing Readiness Based Sparing models that optimize naval spare parts allowances to meet Operational Availability (Ao) goals — is inherently outcome-oriented: either ships have the right parts on hand to meet their Ao thresholds or they don&#x27;t. Yet the solicitation&#x27;s accountability structure is almost entirely process- and schedule-based. Deliverables are defined by mandatory form fields, turnaround windows, and review cycle counts. There are no stated performance targets such as: percentage of models accepted at first MARRC-RB submission, reduction in model rework rate over the contract period, or downstream fleet readiness metrics attributable to the contractor&#x27;s allowance recommendations. The MARRC-RB checklist system (enclosures to the NAVSEAINST) does include substantive technical validation criteria — reviewing Ao goal sourcing, reliability parameter reasonableness, funding availability — which is genuine outcome focus embedded in the broader Navy governance process. This is a meaningful mitigating factor: the government has a real quality gate in the MARRC-RB board itself. However, that quality gate is a government-side process; the solicitation does not translate it into contractor performance standards or use MARRC-RB outcomes (acceptance rates, rework frequency, error attribution) as contract performance metrics. The result is a contract where the measurable accountability falls primarily on schedule adherence and form compliance, while the substantive quality judgment resides in an external board with no direct feedback loop into contractor evaluation. This is a structural compliance-over-outcomes problem, but it stops short of severe because the work product itself is technical and quantitative (OPUS Suite models with defined Ao inputs and outputs), which provides an implicit quality check that pure documentation-production contracts lack. Severity 2 is appropriate: noticeable process-compliance orientation, with some structural outcome accountability present but not formalized in contractor performance terms.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CDRL A001 - Monthly Status Report... CDRL A002 - NAVSEALOGCEN RBS Results Spreadsheet + coversheet... CDRL A003 - Quarterly Program Review (QPR) Briefing</blockquote>
+  <div class="ev-explanation">The solicitation includes multiple reporting cadences — monthly status reports plus quarterly program review briefings — layered on top of per-model deliverable submissions. This creates overlapping reporting obligations that measure contractor activity and schedule adherence rather than mission outcomes such as fleet operational availability improvements or allowance accuracy rates.</div>
+</div><div class="evidence-item">
+  <blockquote>Results spreadsheet will be provided upon contract award and all fields in the spreadsheet will be mandatory. Training and spreadsheet will be provided upon contract award.</blockquote>
+  <div class="ev-explanation">The primary model-output deliverable (CDRL A002) is defined entirely by mandatory form fields determined by the government, with no indication that acceptance criteria are tied to the analytical quality of the RBS results — e.g., whether the modeled Ao values are defensible, whether the sparing recommendations are cost-effective, or whether MARRC-RB acceptance rates improve over time. Compliance with the form is the measurable standard, not the quality of the underlying analysis.</div>
+</div><div class="evidence-item">
+  <blockquote>There isn&#x27;t a typical number of review cycles. Turn around time with comments can vary but is generally within a week. Internally developed NSLC models generally are accepted in 1-2 reviews.</blockquote>
+  <div class="ev-explanation">The acceptance workflow is described entirely in terms of review cycle counts and turnaround time — process metrics. There is no articulated standard for what constitutes an acceptable model on the merits (e.g., Ao accuracy thresholds, data quality benchmarks, or rejection rates attributable to contractor error vs. government data problems). The implicit success criterion is &#x27;submitted correctly and on time,&#x27; not &#x27;produced analytically sound results.&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Once data is available, typical turnaround expectations 2-4 weeks per model for initial model execution, rerun with comments 1-2 weeks, MARRC-RB final delivery 1 week.</blockquote>
+  <div class="ev-explanation">Contractor performance expectations are defined entirely in schedule/turnaround terms. The solicitation does not define quality-of-output standards — such as a target percentage of models accepted at first review, error rates, or downstream fleet readiness outcomes attributable to contractor-produced allowance recommendations. Timeliness is the primary measurable accountability lever.</div>
+</div><div class="evidence-item">
+  <blockquote>Model projection of 800 models per year and 800 in flight at once.</blockquote>
+  <div class="ev-explanation">At 800 models per year, throughput volume is the implicit performance measure. The solicitation does not define what fraction of those models must be accepted without rework, what the acceptable rate of MARRC-RB rejections is, or how model quality will be assessed beyond checklist compliance. High volume with no quality floor means the accountability structure rewards activity, not analytical rigor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards concern, primarily driven by the tool-specific experience requirement for OPUS Suite at the Senior Engineer key personnel level. The requirement is confirmed as non-waivable in the Q&amp;A, meaning a vendor&#x27;s Senior Engineer must have at least two years of experience with this specific Navy-licensed modeling software. OPUS Suite is not widely used outside Navy/DoD sparing programs, so this requirement functions as a de facto screen that advantages vendors already embedded in the Navy logistics support ecosystem.
+
+The severity is moderated by several factors that prevent a severity-3 finding. First, the solicitation explicitly states there is no incumbent (&#x27;Naval Sea Logistics Center is not aware of any contracts or orders under which this work is being performed&#x27;), which means the insider rewards dynamic, to the extent it exists, advantages a class of Navy logistics contractors broadly rather than a single protected incumbent. Second, the Q&amp;A confirms that past performance as a subcontractor is acceptable, which meaningfully broadens the pool. Third, the WOSB set-aside limits the competition to a defined category, and the question is whether WOSB firms with OPUS Suite experience exist — the government appears to believe they do. Fourth, the experience requirements are not stacked with aggressive dollar thresholds or short lookback windows; the personnel qualifications use &#x27;desired&#x27; language for education and most experience dimensions, with OPUS Suite being the sole hard requirement.
+
+The practical concern is real: OPUS Suite experience is concentrated in a narrow population of defense logistics engineers who have worked Navy sparing programs. A WOSB with excellent sparing optimization capabilities using commercial or Air Force/Army-equivalent tools would be disqualified at the key personnel level regardless of demonstrated performance outcomes. This tilts the playing field toward incumbents in the Navy logistics space without clearly serving a legitimate technical requirement — the Navy could instead require &#x27;demonstrated experience with RBS/sparing optimization modeling software, with preference for OPUS Suite familiarity&#x27; and achieve the same technical outcome while preserving competition. The severity-2 rating reflects a tilted but not closed playing field.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Required Experience: 2+ years of modeling experience using OPUS Suite software</blockquote>
+  <div class="ev-explanation">OPUS Suite is a specific Navy-approved software tool. Requiring demonstrated experience with this particular software — rather than &#x27;experience with RBS/sparing optimization software&#x27; or &#x27;comparable modeling tools&#x27; — narrows the eligible pool to personnel who have worked in contexts where OPUS Suite is used, which is primarily Navy/DoD logistics work. The Q&amp;A confirms this is a strict requirement for the Senior Engineer key personnel position: &#x27;Per Attachment 4, at least two years of modeling experience using OPUS Suite software is required experience for the Senior Engineer positions.&#x27; A vendor could have highly capable engineers with equivalent sparing optimization experience using commercial tools (e.g., LORA, LOG Suite, or other ILS modeling tools) and be effectively disqualified at the key personnel level.</div>
+</div><div class="evidence-item">
+  <blockquote>Per RFP Section L, paragraph 3.1.3, &#x27;Offeror shall provide one resume for each individual proposed to fulfill the positions identified as key personnel in accordance with Attachment 4 - Personnel Qualifications. All key personnel positions shall identify a current employee or contingent hire to fulfil the role.&#x27;</blockquote>
+  <div class="ev-explanation">Requiring identified key personnel who currently possess the OPUS Suite experience requirement (and Secret clearance) means offerors cannot propose to train engineers on OPUS Suite post-award. The combination of OPUS Suite specificity + active clearance + must be a current employee or confirmed contingent hire significantly narrows the pool of eligible candidates and advantages firms that already have OPUS Suite-experienced personnel on staff — which correlates strongly with firms already working Navy sparing contracts.</div>
+</div><div class="evidence-item">
+  <blockquote>Question 13: &#x27;Please clarify whether experience using functionally equivalent modeling tools is acceptable, or whether OPUS Suite experience is a strict requirement for key personnel eligibility.&#x27; Answer: &#x27;Per Attachment 4, at least two years of modeling experience using OPUS Suite software is required experience for the Senior Engineer positions. Experience with OPUS Suite or similar modeling experience is desired for the Engineer II position.&#x27;</blockquote>
+  <div class="ev-explanation">The government explicitly confirmed that OPUS Suite experience is a hard requirement for Senior Engineers, while accepting equivalents only for junior Engineer II positions. This creates a tool-specific barrier at the senior level that is not justified on technical grounds — the underlying sparing optimization skills are transferable across modeling platforms. This functions as a de facto incumbency filter, as OPUS Suite experience is predominantly found in personnel who have worked Navy/DoD sparing programs.</div>
+</div><div class="evidence-item">
+  <blockquote>Results spreadsheet will be provided upon contract award and all fields in the spreadsheet will be mandatory. Training and spreadsheet will be provided upon contract award.</blockquote>
+  <div class="ev-explanation">The government&#x27;s own NAVSEALOGCEN RBS Results Spreadsheet (CDRL A002) format is not disclosed pre-proposal. While training is promised post-award, this creates an information asymmetry: vendors familiar with NAVSEALOGCEN&#x27;s internal processes and output formats (i.e., prior NSLC contractors or subcontractors) have a clearer picture of the actual workflow complexity than newcomers. This is a mild form of institutional knowledge advantage, though partially mitigated by the promise of post-award training.</div>
+</div><div class="evidence-item">
+  <blockquote>Currently required Navy Enterprise software is OPUS Suite 2024.1</blockquote>
+  <div class="ev-explanation">Requiring a specific version (2024.1) of a Navy-licensed enterprise tool implies the successful contractor must already have or immediately obtain access to a licensed OPUS Suite installation. OPUS Suite is not commercially available off-the-shelf — access is controlled through Navy licensing arrangements. Vendors without existing Navy contracts may face practical barriers to obtaining the tool, evaluating their own readiness to perform, and demonstrating credible experience with the specific version required.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl, concentrated primarily in the staffing and tooling sections rather than being pervasive throughout. The core work — performing Readiness Based Sparing analysis and submitting models to MARRC-RB — is a well-defined technical domain with a legitimate government-mandated tool (OPUS Suite as the interim NCRM). The MARRC-RB instruction and associated technical enclosures are policy documents, not contractor requirements, and their detail is appropriate for the regulatory context. However, several features of the solicitation meaningfully constrain the solution space beyond what the mission need requires. The hard cap on total labor hours combined with evaluation penalties for deviating from the recommended labor mix effectively prescribes the staffing structure. The requirement for OPUS Suite experience as a personnel qualification (rather than as a technical compatibility requirement) and the specification of a particular software version both reflect how-based rather than what-based requirements. The government is essentially saying: do it with these people, at these staffing levels, using this exact tool. The mitigating factor is that this is a highly specialized, regulated Navy logistics function with a genuinely mandated toolset (OPUS Suite is the OPNAV-approved interim RBS model) and a defined submission process (MARRC-RB). Some of what appears prescriptive — tool mandates, specific data element parameters — reflects legitimate technical interoperability constraints with the MARRC-RB repository system. The solicitation does allow some labor category flexibility (noting Logisticians or Data Scientists could be substituted) and uses CPFF contract type appropriate for the work scope. On balance, the staffing structure constraints and tool-version specificity represent genuine sprawl that would constrain a capable vendor&#x27;s ability to propose a more efficient or innovative approach, but the sprawl does not dominate the entire solicitation. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors&#x27; proposals may not deviate from the total number of hours included in Section B.</blockquote>
+  <div class="ev-explanation">This is a hard constraint on total labor hours, not an outcome requirement. It effectively prevents vendors from proposing more efficient or automated approaches that might require fewer hours to achieve the same results. A vendor who could accomplish the RBS modeling work with fewer hours through better tooling or process optimization is locked out of proposing that approach.</div>
+</div><div class="evidence-item">
+  <blockquote>Required Experience: 2+ years of modeling experience using OPUS Suite software [for Senior Engineer Key Personnel]</blockquote>
+  <div class="ev-explanation">Mandating experience with a specific commercial software tool (OPUS Suite) as a hard requirement for key personnel locks the solution into a particular toolset. While OPUS Suite is the Navy-approved interim RBS model per the MARRC-RB instruction, framing tool familiarity as a personnel qualification requirement rather than a technical interoperability constraint blurs the line — it effectively dictates that the contractor execute work using this specific tool rather than allowing the contractor to demonstrate equivalent capability.</div>
+</div><div class="evidence-item">
+  <blockquote>Currently required Navy Enterprise software is OPUS Suite 2024.1 [Q&amp;A Answer #5, specifying a version]</blockquote>
+  <div class="ev-explanation">Specifying not just the tool but a specific software version (OPUS Suite 2024.1) further narrows how the work must be performed. This goes beyond a technical interoperability constraint — it dictates the exact tool version the contractor must use, removing any flexibility to propose equivalent or improved approaches.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government strongly recommends offerors provide the following labor mix [followed by specific hours per labor category per year, e.g., Engineer II: 19,200 base year, 26,880 OY1, 32,640 OY2-4]</blockquote>
+  <div class="ev-explanation">While framed as a &#x27;recommendation,&#x27; the attachment states proposals &#x27;may not deviate from the total number of hours&#x27; and that deviating from the labor mix &#x27;may result in upward cost adjustments or one or more weaknesses/deficiencies during evaluation.&#x27; This effectively prescribes the staffing structure — number of engineers at each level, hours per year — rather than allowing vendors to propose how best to staff approximately 800 models per year. A vendor who could use more junior staff with better tooling, or fewer senior engineers with improved automation, faces evaluation penalties for doing so.</div>
+</div><div class="evidence-item">
+  <blockquote>Results spreadsheet will be provided upon contract award and all fields in the spreadsheet will be mandatory. Training and spreadsheet will be provided upon contract award. [Q&amp;A Answer #6]</blockquote>
+  <div class="ev-explanation">Requiring use of a government-defined results spreadsheet with all mandatory fields, combined with government-provided training on submission standards, indicates the government is prescribing a specific workflow and output format in detail. While standardized deliverable formats are generally legitimate, the combination of government-controlled tools, mandatory training, and fixed output formats suggests the contractor is being directed into a very specific operational process rather than being evaluated on whether they can deliver accurate RBS models.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful Rule Pool behavior. The regulatory citations present in the solicitation text and attachments are focused and contextually grounded. Security requirements (NIST SP 800-171, CMMC Level 2, OPSEC) are cited with explicit applicability explanations and specific compliance thresholds. The MARRC-RB instruction (Attachment 5 equivalent) is included not as a boilerplate policy dump but as a substantive operational reference that directly governs the work the contractor will perform — it describes the exact board processes, artifacts, and submission standards the contractor must support. The OPUS Suite parameter tables (Enclosures 6 and 7) are likewise directly operational, specifying the exact data element requirements for models the contractor will build. The personnel qualifications attachment (Attachment 4) provides BLS SOC crosswalks, pay range guidance, and clear security clearance requirements — all of which reflect deliberate curation rather than passive accumulation. Standard FAR/DFARS clauses are incorporated by reference at the SeaPort MAC level, which is entirely normal for a task order under a MAC vehicle. There is no evidence of a bulk &#x27;Applicable Documents&#x27; list with 20+ entries, no obviously irrelevant policies, and no contradictions between cited regulations and the solicitation&#x27;s purpose. The Q&amp;A exchange (Amendment 0001) further demonstrates active management: the government clarified which regulatory requirements are strict versus desired, and confirmed applicability of FAR 52.222-41 only conditionally. A vendor reading this solicitation would have a clear and manageable picture of the compliance landscape. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Per DFARS 252.204-7019, Notice of NIST SP 800-171 DoD Assessment Requirements, the National Institute of Standards and Technology (NIST) Special Publication (SP) 800-171 applies to this procurement. The Offeror shall have a current (not more than 3 years old) minimum Confidence Level assessment of &#x27;Basic&#x27;... The Program Office has determined CMMC compliance is required effective 10 November 2025. The minimum CMMC assessment requirement for this tasking is CMMC Level 2 (Self).</blockquote>
+  <div class="ev-explanation">Security compliance citations (NIST SP 800-171, CMMC Level 2, DFARS 252.204-7019) are provided with direct context explaining why they apply and what specific threshold is required. This is curated citation, not pooling — each reference is accompanied by an actionable requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Cost-Plus-Fixed-Fee (CPFF), a cost-reimbursement contract type. The requirements are for Readiness Based Sparing (RBS) modeling services — a technically specialized, analytically intensive effort involving OPUS Suite modeling, MARRC-RB package submissions, and iterative collaboration with multiple government stakeholders. Several characteristics of this requirement support CPFF as the appropriate vehicle. First, the scope is partially undefined at award: the government projects 800 models per year but explicitly states in the Q&amp;A that &#x27;NAVSEA is working to determine model reruns and direction will be provided to the successful contractor upon award.&#x27; This is a textbook indicator that fixed-price contracting would be inappropriate — the government cannot estimate costs with sufficient certainty. Second, the work is inherently iterative and stakeholder-driven, with variable review cycles, unclear comment turnaround times, and data cleanup responsibilities that depend on program office inputs and ISEA collaboration. Third, the labor mix (predominantly engineering hours at three skill levels) reflects ongoing analytical support rather than delivery of a discrete product. The labor hour structure — with 251,580 total hours across five years — is consistent with a continuous services model where effort intensity varies with demand. CPFF is appropriate here because it allows the government to reimburse actual costs incurred while providing the contractor a fixed fee, giving some incentive for cost management without requiring the government to pre-specify an unknowable scope. A T&amp;M structure could also have been defensible for this type of support work, but CPFF is the stronger choice for a multi-year, technically complex program where the government wants visibility into contractor cost behavior. Fixed-price contracting would be clearly inappropriate given the undefined rework volume and iterative nature of deliverables. The contract type is well-matched to the requirements; this is not a square peg.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The resultant Seaport task order is anticipated to be awarded as a cost plus fixed fee (CPFF) task order with a base year and four (4) optional years.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states CPFF pricing, which is a cost-reimbursement contract type. This is the primary data point for assessing contract type alignment.</div>
+</div><div class="evidence-item">
+  <blockquote>Model projection of 800 models per year and 800 in flight at once... Currently NAVSEA is working to determine model reruns and direction will be provided to the successful contractor upon award.</blockquote>
+  <div class="ev-explanation">The government acknowledges it cannot yet define the volume of rework or re-runs, confirming that the scope of effort is not fully predictable at contract award. This supports the use of a cost-reimbursement contract rather than fixed-price.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4_Personnel Qualifications.pdf">Attachment 4_Personnel Qualifications.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fe834c0b5507424783a981760a4d7984_Attachment+4_Personnel+Qualifications.pdf" download="Attachment 4_Personnel Qualifications.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 5_Past Performance Reference.docx">Attachment 5_Past Performance Reference.docx</div></div>
+  <a class="dl-btn" href="../attachments/fe834c0b5507424783a981760a4d7984_Attachment+5_Past+Performance+Reference.docx" download="Attachment 5_Past Performance Reference.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="NAVSUPINST 4441.37A - NAVSEAINST 4441.12A - MARRC-RB %2804 SEP 2020%29.pdf">NAVSUPINST 4441.37A - NAVSEAINST 4441.12A - MARRC-RB %2804 SEP 2020%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fe834c0b5507424783a981760a4d7984_NAVSUPINST+4441.37A+-+NAVSEAINST+4441.12A+-+MARRC-RB+%2804+SEP+2020%29.pdf" download="NAVSUPINST 4441.37A - NAVSEAINST 4441.12A - MARRC-RB %2804 SEP 2020%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N6572626R3000.pdf">Solicitation - N6572626R3000.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fe834c0b5507424783a981760a4d7984_Solicitation+-+N6572626R3000.pdf" download="Solicitation - N6572626R3000.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment N6572626R30000001 SF 30.pdf">Solicitation Amendment N6572626R30000001 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fe834c0b5507424783a981760a4d7984_Solicitation+Amendment+N6572626R30000001+SF+30.pdf" download="Solicitation Amendment N6572626R30000001 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pointwise Software — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Pointwise Software</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 2e5ef4c3a494425c91b1764516f9807a</span>
+      <a class="sam-link" href="https://sam.gov/opp/2e5ef4c3a494425c91b1764516f9807a/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-29</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NSWC CARDEROCK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-29</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed-Price (FFP) Purchase Order</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 year (June 1, 2026 – May 31, 2027)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a combined synopsis/solicitation for a sole-source renewal of Pointwise software maintenance and support — a commercial software subscription under the Simplified Acquisition Threshold. The posted documents consist of a brief public notice and an internal sole-source justification memorandum. There is no Statement of Work, Performance Work Statement, Quality Assurance Surveillance Plan, deliverables list, or reporting requirements of any kind. The acquisition is for a software license renewal from a single vendor (Cadence Design Systems), and the entire justification focuses on why competition is not feasible, not on how performance will be measured. Given the nature of the procurement — annual software maintenance from an OEM with no alternative sources — there would be little occasion for complex QA structures in any case. There is simply insufficient content to assess whether the solicitation exhibits compliance-over-outcomes patterns. No reporting cadences, meeting requirements, format mandates, or QA surveillance language are present in the available text.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a sole-source combined synopsis/solicitation for renewal of Pointwise software maintenance and support from Cadence Design Systems, Inc. The &#x27;Insider Rewards&#x27; sin concerns solicitations that use experience requirements, evaluation criteria, or institutional knowledge expectations to effectively exclude non-incumbent vendors from competing. That framework simply does not apply here in any meaningful way.
+
+The solicitation is not structured as a competitive procurement at all — it is a sole-source action justified under FAR 13.106-1(b)(1)(i) and FAR 6.302-1(a)(2)(ii) on the basis that Cadence Design Systems holds proprietary rights to Pointwise software and is the only entity capable of providing the required support. There are no evaluation criteria, no past performance scoring rubrics, no experience thresholds, no lookback windows, and no personnel qualification requirements of any kind. The sole-source justification memo explains the technical basis: NSWCCD has used Pointwise for over 20 years for submarine maneuvering simulation, the software generates hull meshes used directly by MCSIM through conformal mapping, and there is no commercially compatible alternative. Converting to an alternative would require regenerating over a hundred existing hull meshes at prohibitive cost and schedule impact.
+
+The absence of competitive evaluation criteria means there is nothing to analyze for insider rewards. The vendor &#x27;lock-in&#x27; present here is a legitimate software dependency on a proprietary product — a different concern from the structural pattern where an agency writes competition criteria that only an incumbent can satisfy. The appropriate analytical lens for this solicitation would be vendor dependency or lack of market research to assess alternatives, not insider rewards as defined by this sin taxonomy.
+
+In short: there are no experience requirements, evaluation factors, or knowledge expectations in this solicitation because there is no competition being conducted. Severity is 1 — minimal — with no evidence items, because the sin does not apply to the document as written.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a sole-source combined synopsis/solicitation for a straightforward commercial software maintenance renewal — a 1-year renewal of Pointwise annual software maintenance and support service from Cadence Design Systems. The document set consists of a brief public notice and a non-competitive procurement justification memo. There is no Statement of Work, Performance Work Statement, or technical requirements document prescribing how the vendor must perform.
+
+The solicitation does not exhibit requirement sprawl in any meaningful sense. The entire scope is: renew an existing software maintenance and support subscription for one year. There are no bullet lists of prescribed tasks, no staffing structure requirements, no workflow procedures, and no step-by-step process mandates. The justification memo explains WHY competition is being restricted (proprietary rights, no compatible alternatives, 20+ years of incumbent use, existing hull mesh libraries that would take significant effort to recreate) — this is outcome-context, not process prescription.
+
+The references to specific tools (Pointwise, NavyFOAM, IFLOW) are not sprawl — they are interoperability constraints and the literal subject matter of the procurement. The government is buying support for software it already owns and has integrated into operational workflows (MCSIM). Naming the software being maintained is not equivalent to dictating how a vendor must perform work.
+
+The sole-source justification structure is standard FAR compliance documentation. The short response window (2 days) and simplified acquisition procedures are consistent with a routine annual software renewal at or below the SAT.
+
+In sum, this solicitation contains insufficient prescriptive language about HOW work is to be performed to constitute requirement sprawl. It describes WHAT is being purchased (1-year software maintenance renewal) and WHY only one source can provide it. Severity 1 is appropriate.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simplified acquisition sole-source combined synopsis/solicitation for a straightforward commercial software maintenance renewal (Pointwise, a CFD mesh generation tool). The documents provided consist of the public notice and a non-competitive procurement justification memo. Neither document contains an &#x27;Applicable Documents&#x27; section, a &#x27;Referenced Standards&#x27; list, or any bulk regulatory citation section. The only regulations cited are FAR 13.106-1(b)(1)(i), FAR 8.405-6, and FAR 6.302-1(a)(2)(ii) — all directly relevant to the sole-source justification being made. Each citation is used in context: FAR 13.106-1(b)(1)(i) authorizes single-source solicitation under SAT; FAR 8.405-6 governs FSS source limitations; FAR 6.302-1(a)(2)(ii) is the specific authority cited for the sole-source determination. The sole-source justification memo is appropriately focused on explaining why competition is not feasible for this specific software product. There is no evidence of copy-forward regulatory accumulation, irrelevant policy citations, or undifferentiated compliance burden. Given the simplified acquisition nature of this procurement and the narrow, well-defined scope (annual software maintenance renewal for an existing tool in continuous use for 20+ years), the absence of an elaborate regulatory compliance section is appropriate, not a gap. Severity is 1 — no rule pool pattern is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a firm-fixed-price purchase order for the renewal of a one-year Pointwise software maintenance and support subscription from Cadence Design Systems. FFP is the correct and expected contract type for this acquisition. The requirement is a commercial software license renewal — the scope is fully defined (one year of support), the deliverable is known (maintenance and support access), the duration is fixed (May 31, 2026 to May 31, 2027), and the price is determinable in advance from the sole-source vendor. There is no ambiguity in scope, no variable labor component, and no unpredictable performance risk that would argue for T&amp;M or cost-reimbursement. The FAR explicitly recognizes FFP as appropriate for commercial items and routine services where risk is minimal and costs are predictable. Cadence has a known price list for Pointwise renewals, and NSWCCD has over 20 years of purchasing history with this product (evidenced by the previous purchase order reference), meaning cost estimation is straightforward. No square peg issue is present here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The NSWCCD intends to award a firm fixed-price purchase order to Cadence Design Systems, Inc. using Simplified Acquisition Procedures.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a firm-fixed-price (FFP) contract type will be used for this procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>NSWCCD Code requests the 1-Year renewal of Pointwise annual software maintenance and support service... The software maintenance service must be purchased to meet the project schedules by May 31, 2026 with a new period of performance ending May 31, 2027.</blockquote>
+  <div class="ev-explanation">The requirement is a one-year renewal of a commercial software maintenance and support subscription — a well-defined deliverable with a known scope, fixed duration, and predictable cost. This is precisely the kind of requirement for which FFP is the appropriate contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="GPE Post.docx">GPE Post.docx</div></div>
+  <a class="dl-btn" href="../attachments/2e5ef4c3a494425c91b1764516f9807a_GPE+Post.docx" download="GPE Post.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="N0016726Q1081.pdf">N0016726Q1081.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2e5ef4c3a494425c91b1764516f9807a_N0016726Q1081.pdf" download="N0016726Q1081.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="REDACTED Sole Source Justification.docx">REDACTED Sole Source Justification.docx</div></div>
+  <a class="dl-btn" href="../attachments/2e5ef4c3a494425c91b1764516f9807a_REDACTED+Sole+Source+Justification.docx" download="REDACTED Sole Source Justification.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

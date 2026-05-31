@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SB Set-Aside under Seaport - Shore Operations Training Group Support for CNIC — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SB Set-Aside under Seaport - Shore Operations Training Group Support for CNIC</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 6670f81e09ba4b1794ffc3b269ce2a34</span>
+      <a class="sam-link" href="https://sam.gov/opp/6670f81e09ba4b1794ffc3b269ce2a34/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R408</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP) with Cost No Fee travel CLINs</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">8-month base period (02 Aug 2026 to 01 Apr 2027) + 4 one-year option periods + 6-month option IAW FAR 52.217-8 (total not to exceed 62 months)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Performance Approach</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The entire formal QA architecture — the QASP and deliverables table — is built around process and timeliness metrics rather than training effectiveness or operational readiness outcomes. The two QASP performance elements measure (1) timely deliverable submission with no rework, and (2) a satisfactory CPARS rating, which is an undefined circular standard. The deliverables table tracks weekly/monthly reports, a transition plan, and travel documentation — all administrative artifacts. There are no learning outcome measures, no assessment of whether trained personnel demonstrate competency, no course evaluation scores or student feedback mechanisms, no metrics tied to the stated mission of improving &#x27;Navy&#x27;s operational shore readiness.&#x27; For a contract explicitly responsible for delivering training to 10 regions and 70 installations worldwide covering emergency management and life-safety functions, the absence of training effectiveness metrics is notable. However, I am assigning severity 2 rather than 3 for several mitigating reasons: (1) the reporting cadence is not excessive — two cadences (weekly and monthly) is standard, not egregiously burdensome; (2) the solicitation&#x27;s PWS qualitative language does invoke professional standards (&#x27;consistent with NETC standards,&#x27; &#x27;PBED process,&#x27; &#x27;HSEEP&#x27;) that suggest some outcome awareness, even if not contractually measured; (3) training delivery contracts are genuinely harder to instrument with outcome metrics than IT systems, so the absence of SLAs is less pathological than it would be in a technology context; and (4) the PWS references CPARS which, while circular as a standard, does enable qualitative COR judgment about training quality in practice. The sin is present and meaningful — the formal accountability structure measures compliance — but it is not the most severe form, as the reporting requirements are not excessively layered and some professional quality standards are referenced in the performance standards narrative.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Weekly &amp; Monthly Progress Report | Zero deficiencies in submission time | 100% Inspection | COR/ACOR | Lead contractors provide update on the 1st day of each week covering the previous weeks execution and the monthly PM summary NLT the 10th day of every month to COR.</blockquote>
+  <div class="ev-explanation">The primary deliverable table in Section C defines two overlapping reporting cadences — weekly and monthly — with the sole performance threshold being &#x27;zero deficiencies in submission time.&#x27; This measures whether reports were submitted on schedule, not whether training quality improved, whether course graduates demonstrated competency, or whether Navy installations became more operationally ready. Success equals timely report submission.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Element: Contract Deliverables | Performance Requirement: Contract deliverables furnished as prescribed in the PWS, attachments, CDRLs, Task Orders, etc., as applicable. | Surveillance Method: Inspection by the COR | 100% inspection of all contract deliverables. | Acceptable Quality Level: &gt;95% of deliverables submitted timely and without rework required.</blockquote>
+  <div class="ev-explanation">The QASP&#x27;s first performance element defines quality almost entirely as timeliness and freedom from rework. The AQL of &#x27;&gt;95% of deliverables submitted timely and without rework required&#x27; is a process compliance metric: it asks whether deliverables arrived on schedule and required no iteration, not whether the training was effective, whether students achieved learning objectives, or whether installation emergency readiness improved. This is the core accountability mechanism for an instructional services contract and it measures administrative compliance, not training outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Overall Contract Performance | Overall contract performance of sufficient quality to earn a Satisfactory (or higher) rating in the COR&#x27;s annual report on Contractor Performance | Assessment by the COR | Annual | All performance elements rated Satisfactory (or higher)</blockquote>
+  <div class="ev-explanation">The second QASP performance element defines success as receiving a satisfactory CPARS rating — a circular definition that measures whether the COR rates performance as satisfactory, rather than specifying any outcome target. It defers entirely to subjective assessment without defining what &#x27;satisfactory&#x27; means in terms of training effectiveness, student outcomes, or operational readiness impact.</div>
+</div><div class="evidence-item">
+  <blockquote>Critical to the performance of administering CNIC&#x27;s SOTG Support is the timely, accurate and thorough completion of all task order requirements. Schedule - The due dates for deliverables and the actual accomplishment of the schedule will be assessed against original due dates and milestones. Deliverables – The deliverables required to be submitted will be assessed against the specifications for the deliverables detailed in the task for the required content, quality, timeliness, and accuracy.</blockquote>
+  <div class="ev-explanation">The QASP&#x27;s articulation of what is &#x27;critical&#x27; to performance focuses on timeliness and schedule adherence. The word &#x27;quality&#x27; appears but is operationalized only as conformance to specifications — i.e., did the deliverable match the prescribed format — rather than whether training produced competent emergency managers or improved installation readiness. The entire framework is backward-looking (did you meet the schedule?) rather than forward-looking (did the training work?).</div>
+</div><div class="evidence-item">
+  <blockquote>Transition Plan - Task Order | Zero deficiencies - delivered on-time and revised as necessary | 100% Inspection | COR/ACOR | 10 days from task order award</blockquote>
+  <div class="ev-explanation">Transition planning is tracked as a standalone deliverable with a binary timeliness standard. While transition plans are legitimate requirements, making this one of only three performance-tracked items in the deliverables table — alongside weekly reports and travel documentation — illustrates the document-centric accountability structure. None of the three tracked deliverables measure training quality or mission impact.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider-rewards characteristics — severity 2 — for several converging reasons. The experience requirements are genuinely Navy-specific in ways that go beyond what the work strictly requires: emergency management training principles and adult education methodologies are not fundamentally different across military services or between federal and commercial contexts, yet the solicitation&#x27;s skill requirements consistently privilege Navy-specific credentials (NWTS, ATG instructor, PB4T, Navy Master Training Specialist, Navy classroom experience). The Step One viability gate is particularly concerning because it allows elimination based on experience &#x27;relative to other interested sources,&#x27; which in practice means any firm competing against the incumbent&#x27;s deep institutional knowledge is at structural risk of elimination before even submitting a full proposal. That said, several mitigating factors prevent a severity 3 rating: there are no explicit dollar thresholds on prior contracts; the past performance section allows up to two references and explicitly accommodates subcontractor experience; the solicitation does not require specific quantities of prior federal contracts at specific dollar levels; the Navy-specific preferences are largely framed as &#x27;ideal&#x27; or &#x27;highly desired&#x27; rather than mandatory minimums; and the Seaport PSMAC vehicle itself provides some pre-qualification that normalizes the competitive pool. The cumulative effect is a solicitation that tilts meaningfully toward the incumbent and Navy-experienced vendors, but does not categorically close the door to a well-teamed new entrant who could bring the right Navy-credentialed personnel through subcontracting or hiring. A severity 2 reflects this as a real structural disadvantage, not merely theoretical, but one that a capable competitor could potentially overcome.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Each of the contractor employees must have at least 5 years of combined Navy classroom, team exercise training, and virtual training experience.
+- Each of the contractor employees must have at least 5 years in exercise planning and/or training development.</blockquote>
+  <div class="ev-explanation">The requirement for &#x27;Navy classroom, team exercise training, and virtual training experience&#x27; is service-branch-specific. A vendor whose staff have equivalent experience in Army, Air Force, FEMA, or state emergency management training programs would be disadvantaged even if their capabilities are functionally identical. However, the 5-year threshold itself is not extreme, and the requirement for &#x27;Navy&#x27; experience has some legitimate basis given the Navy-specific course catalog (NETC standards, NWTS, Navy-specific exercises). This is borderline — it tilts toward incumbents but is not an outright bar.</div>
+</div><div class="evidence-item">
+  <blockquote>The ideal individual for the requirements should have a strong understanding of the operational training needs of a Navy installation, the National Incident Management System (NIMS), National Response Framework (NRF), Incident Command System (ICS), Defense Support for Civil Authorities (DSCA), FEMA Emergency Management principles, Command &amp; Control ashore, the Navy Warfare Training System (NWTS), Navy integrated training. The ideal contractor will also have worked on an installation staff, been involved in the Planning Board for Training (PB4T), have experience in designing and conducting installation integrated training drills or exercises or have experience as an Installation Training Officer or Emergency Manager (EM). Navy Master Training Specialist qualification and experience as a schoolhouse or Navy afloat training group (ATG) instructor is highly desired.</blockquote>
+  <div class="ev-explanation">This passage stacks a substantial list of Navy-specific credentials and experiences: NWTS, PB4T involvement, ATG instructor experience, Navy Master Training Specialist qualification, Installation Training Officer experience. While framed as &#x27;ideal&#x27; and &#x27;highly desired,&#x27; these criteria collectively describe a very narrow population of individuals — largely those who have worked as Navy military or civilian employees or on prior Navy training contracts. A training firm with strong emergency management credentials from DHS, FEMA, or DOD non-Navy contexts would be systematically disadvantaged in staffing this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>Step One Evaluation: The contracting officer will evaluate each submission and determine which interested sources are viable competitors for award in accordance with terms of the solicitation. An interested source will be determined to be viable if the experience provided in their Step One submission demonstrates the interested source&#x27;s ability to provide services consistent with the requirements of the PWS... An interested source could be determined to be nonviable because of its experience relative to other interested sources.</blockquote>
+  <div class="ev-explanation">The Step One viability gate explicitly permits elimination of sources based on relative experience — not just absolute capability. The phrase &#x27;relative to other interested sources&#x27; means that if the incumbent (Capstone Corporation) submits its deep Navy-specific experience, any challenger with more generalized emergency management training experience could be deemed nonviable by comparison, even if it is objectively capable. This gatekeeping mechanism compounds the insider-favoring nature of the experience requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>5. Incumbent: This is a follow-on requirement to Task Order N00189-26-F-W061 awarded to Capstone Corporation under the CNIC PSMAC.</blockquote>
+  <div class="ev-explanation">The solicitation openly identifies the incumbent. When combined with the Navy-specific experience requirements and Step One viability determination based on relative experience, the incumbent&#x27;s advantage is structural. Capstone has both the institutional knowledge of specific SOTG courses, the existing personnel with Navy credentials, and a CPARS record from this exact work — all of which would be difficult for a new entrant to match on the short 30-day response timeline.</div>
+</div><div class="evidence-item">
+  <blockquote>Relevant past performance is performance under contracts or efforts within the past three (3) years that is the same as, or similar to, the scope, magnitude, and complexity of the work described by this solicitation.</blockquote>
+  <div class="ev-explanation">The 3-year lookback window for past performance, combined with the Navy-specific scope, narrows the field considerably. The scope here is quite particular — SOTG mobile training teams, Navy installation emergency management, specific course catalogs (EMSLC, ROC CAT, EOC-IMT, etc.). A vendor without prior work on this contract or a nearly identical one would struggle to identify &#x27;similar&#x27; past performance within the past three years at comparable specificity.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS contains genuine outcome-oriented language — the overall purpose is clearly stated, the courses to be delivered are enumerated, and some performance standards exist in the QASP (e.g., &gt;95% of deliverables submitted timely). These are legitimate elements that define what the government needs.
+
+However, Section 3 (Specific Task Explanation) and Section 4 (Specific Skills Sets Required) contain meaningful prescriptive sprawl. The task list descends into granular operational duties that mirror an incumbent&#x27;s day-to-day operations rather than defining training delivery outcomes. The staffing requirements specify Navy-pedigree credentials and residential location constraints that go beyond capability requirements. The mandate to follow PBED methodology forecloses alternative instructional approaches.
+
+The root cause appears to be copy-paste from the prior task order (N00189-26-F-W061, Capstone Corporation), where the incumbent&#x27;s current work practices have been transcribed as requirements for the successor. This is evident in the specificity of items like &#x27;QOTES data tracking,&#x27; &#x27;G2 website,&#x27; and OPNAV ETMS2 references — these are operational details of how SOTG currently operates, not outcome definitions.
+
+The severity is assessed as 2 (Moderate) rather than 3 (Severe) because: (1) the solicitation does maintain genuine outcome language in the purpose section and QASP; (2) the prescriptive elements, while real, are concentrated in the task bullet list rather than dominating every section; (3) some process prescriptions (HSEEP, NWTS alignment) reflect legitimate doctrinal requirements in the emergency management training domain rather than arbitrary choices; and (4) the overall scope — providing trained instructors to deliver specific established courses — is inherently somewhat prescriptive, as the courses themselves are defined government products. A vendor could still propose meaningful staffing and delivery innovations within the stated framework. This is not a solicitation that reads as an operating manual; it reads as a task order with some over-specified elements that would benefit from conversion to outcome language.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor shall provide personnel to provide dynamic and interactive training and exercises across the SOTG competencies. These training and exercises must be professional, and the personnel must be capable of facilitating the training and exercises in a professional manner consistent with the Navy Warfare Training System, Planning Briefing Execution &amp; Debriefing (PBED) process, and the Homeland Security Exercise Evaluation Program (HSEEP).</blockquote>
+  <div class="ev-explanation">This prescribes a specific methodology (PBED process) and a specific external framework (HSEEP) as the delivery approach. While HSEEP compliance may be a genuine programmatic requirement given the emergency management context, mandating the PBED process forecloses the contractor&#x27;s ability to propose alternative adult learning frameworks or instructional design approaches that might achieve equivalent or better training outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Manage the SOTG (N36T) pages including the Quarterly Operational Training and Exercise Summary (QOTES) data tracking and updating monthly G2 website and associated team pages. Coordinate and participate in regularly scheduled teleconferences. Support MTT/VTT scheduling. Print, package, and deliver training materials in support of courses, as necessary.</blockquote>
+  <div class="ev-explanation">This is a laundry list of granular operational tasks — website management, teleconference participation, scheduling support, and physical printing and packaging — that prescribe specific day-to-day processes rather than defining an outcome. A vendor cannot propose an automated scheduling tool, a paperless materials delivery system, or a streamlined communications approach; they are locked into performing each listed task as described.</div>
+</div><div class="evidence-item">
+  <blockquote>Each of the contractor employees must have at least 5 years of combined Navy classroom, team exercise training, and virtual training experience. Each of the contractor employees must have at least 5 years in exercise planning and/or training development... Navy Master Training Specialist qualification and experience as a schoolhouse or Navy afloat training group (ATG) instructor is highly desired.</blockquote>
+  <div class="ev-explanation">While minimum experience thresholds are a legitimate constraint, requiring Navy-specific credentials (MTS qualification, ATG instructor experience) as a desired standard goes beyond outcome-oriented workforce requirements. This effectively prescribes a staffing profile drawn from the incumbent&#x27;s personnel structure rather than defining the capability outcomes personnel must demonstrate. A vendor employing equally qualified instructors with equivalent but non-Navy backgrounds would be disadvantaged despite potentially delivering identical outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>All contractors MUST reside at a CONUS location within 50 miles of an airport capable of supporting proper travel availability within Travel CLIN funding availability.</blockquote>
+  <div class="ev-explanation">This mandates a specific residential constraint on contractor employees — prescribing WHERE personnel must live rather than defining a travel response time or availability outcome. The government&#x27;s actual need (timely ability to travel for MTTs) could be stated as a performance standard (e.g., &#x27;available to depart within 24 hours of tasking&#x27;) that vendors could meet through various staffing arrangements. Instead, the solicitation dictates a geographic solution.</div>
+</div><div class="evidence-item">
+  <blockquote>Duties include conducting analysis on assigned topics, writing and delivering briefs, point papers, position papers, Assist Gov&#x27;t personnel in development of products in support of OPNAV ETMS2 tasker usage, and briefing... Must possess a valid United States Passport</blockquote>
+  <div class="ev-explanation">The extended bullet list of staff duties — including specific document types (point papers, position papers), specific systems (OPNAV ETMS2), and administrative requirements (passport) — reads as a transcription of the incumbent&#x27;s current job descriptions rather than a definition of the outcomes the government needs. This pattern, where the &#x27;how&#x27; of the last vendor&#x27;s work becomes the requirement for the next, is a classic incumbent-capture indicator that constrains vendors from proposing differently organized or more efficient delivery models.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pool pattern in any significant way. There is no dedicated &#x27;Applicable Documents&#x27; list, no bulk citation of regulations without context, and no accumulation of unrelated policies appended to the requirement. The regulatory and doctrinal references that appear in the PWS — NIMS, NRF, ICS, HSEEP, NWTS, PBED, DSCA, JTR — are all directly relevant to the emergency management training mission being solicited, and most are cited with explanatory context rather than as bare citations. The FAR and DFARS clauses incorporated into Section I are standard and expected for this contract type (FFP services, small business set-aside, IDIQ task order), and they are incorporated by reference in the normal fashion. The travel reimbursement section (Section H) cites FAR 31.2, FAR 31.205-46, and the DoD Joint Travel Regulations — all legitimately applicable to cost-reimbursable travel under this structure. There are no citations of irrelevant executive orders, unrelated IT security frameworks, badge policies, or energy regulations. The solicitation is lean and mission-focused. The compliance landscape a prospective offeror would need to understand is modest and clearly tied to the work. Severity 1 is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor shall provide personnel to provide dynamic and interactive training and exercises across the SOTG competencies. These training and exercises must be professional, and the personnel must be capable of facilitating the training and exercises in a professional manner consistent with the Navy Warfare Training System, Planning Briefing Execution &amp; Debriefing (PBED) process, and the Homeland Security Exercise Evaluation Program (HSEEP).</blockquote>
+  <div class="ev-explanation">The solicitation names specific frameworks (NWTS/PBED, HSEEP) in the context of explaining how training must be delivered. This is curated citation — the frameworks are named because they directly govern how the work is executed, not as entries in a bulk applicable-documents list.</div>
+</div><div class="evidence-item">
+  <blockquote>The ideal individual for the requirements should have a strong understanding of the operational training needs of a Navy installation, the National Incident Management System (NIMS), National Response Framework (NRF), Incident Command System (ICS), Defense Support for Civil Authorities (DSCA), FEMA Emergency Management principles, Command &amp; Control ashore, the Navy Warfare Training System (NWTS), Navy integrated training.</blockquote>
+  <div class="ev-explanation">This passage names about eight frameworks/doctrines, but each is directly germane to the emergency management and integrated training mission being contracted. The list reads as a skills inventory tied to the subject matter rather than an undifferentiated compliance mandate. No irrelevant or contradictory entries are identifiable here.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses FFP for its primary labor CLINs (SOTG Support), structured on a monthly basis across the base year and options. The requirement is fundamentally a staff augmentation or advisor/instructor support arrangement: the government is buying the availability of qualified personnel who will perform a broad range of tasks, travel extensively, respond to changing requirements on short notice, and integrate into government teams. This is a classic labor-hour or T&amp;M use case, not an FFP use case.
+
+The FFP contract type is defensible at severity 2 rather than 3 for several reasons. First, the Seaport PSMAC vehicle commonly uses FFP task orders for professional services, and the labor categories appear to be fixed (a defined number of personnel over a defined period), which gives FFP some structural grounding — the contractor is essentially pricing a team for a period rather than an unpredictable quantity of hours. Second, the deliverables table in the PWS does enumerate specific outputs (weekly/monthly reports, transition plans, travel documentation), which provides some anchoring for the FFP structure. Third, this is a follow-on contract with an established incumbent (Capstone Corporation), meaning pricing history exists and cost estimation is more feasible than for a novel requirement.
+
+However, the mismatch is real and meaningful. The PWS acknowledges variable workload (&#x27;up to 50 additional VTT courses,&#x27; &#x27;potentially additional&#x27; courses), short-notice requirement changes, and extensive travel variability. A monthly FFP rate does not adjust for these fluctuations — the contractor is paid the same whether delivering 36 MTTs or 86 VTT/MTT combinations. This creates incentives misaligned with performance: the contractor may underperform during high-demand periods without financial consequence, or the government may face modification requests if actual workload diverges substantially from assumptions. A labor-hour contract with fixed LCAT rates would better align payment with actual effort and give the government more leverage over cost control in a variable-demand environment. Overall, the contract type choice is imperfect but not egregiously wrong — most practitioners would note the tension without unanimously condemning it.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>0001 | SOTG Support - Base Year
+Pricing Arrangement: Firm Fixed Price | 8 | Months</blockquote>
+  <div class="ev-explanation">The primary labor CLIN is priced as FFP by the month. This is a monthly time-based unit, which functionally resembles a level-of-effort arrangement rather than a deliverable-based FFP. The government is buying personnel availability over time, not a discrete output — a structure that sits awkwardly within FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide experienced full-time personnel who meet the specific skill sets as defined in para 3, and who are willing to travel up to 40% of the time and who possess exceptional oral and written communication skills.</blockquote>
+  <div class="ev-explanation">The PWS is structured around providing qualified people rather than producing defined deliverables. The primary output is the presence and availability of skilled instructors, which is a labor-hour or T&amp;M model in substance, even if labeled FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>Training requirements are subject to change short notice. Specific skills and requirements addressed above include the development and delivery of administrative support and curricula associated with current and future operational mission support.</blockquote>
+  <div class="ev-explanation">The PWS explicitly acknowledges that requirements can change on short notice, which is a hallmark indicator that FFP is problematic. Scope instability is a key reason to use T&amp;M or labor-hour contracts, because FFP price cannot adapt to scope changes without costly modifications.</div>
+</div><div class="evidence-item">
+  <blockquote>As directed by Commander, Navy Installations Command and the CNIC Shore Training Plan and Shore Training Manual, and in addition to the planned annual delivery of 36 MTTs, the SOTG will deliver up to 50 additional VTT courses. N36 will add additional Area Command staff training to existing courses and potentially additional EOC IMT and/or ROC CAT Courses</blockquote>
+  <div class="ev-explanation">The workload is described with significant variability (&#x27;up to 50 additional VTT courses,&#x27; &#x27;potentially additional&#x27; courses), meaning the quantity of labor is not reliably predictable. FFP pricing by month does not account for variation in actual workload delivered within that month.</div>
+</div><div class="evidence-item">
+  <blockquote>0002 | Travel - Base Year - NTE $90,000
+Pricing Arrangement: Cost No Fee | 1 | Lot</blockquote>
+  <div class="ev-explanation">Travel is correctly structured as cost-reimbursement with a NTE ceiling, which is appropriate for reimbursable ODCs. This contrast with the FFP SOTG labor CLINs highlights that the government distinguished between cost types but still applied FFP to the inherently variable labor effort.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Past Performance Information Form.doc">Past Performance Information Form.doc</div></div>
+  <a class="dl-btn" href="../attachments/6670f81e09ba4b1794ffc3b269ce2a34_Past+Performance+Information+Form.doc" download="Past Performance Information Form.doc" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926R3104 - Attachments.pdf">Solicitation - N0018926R3104 - Attachments.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6670f81e09ba4b1794ffc3b269ce2a34_Solicitation+-+N0018926R3104+-+Attachments.pdf" download="Solicitation - N0018926R3104 - Attachments.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926R3104.pdf">Solicitation - N0018926R3104.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6670f81e09ba4b1794ffc3b269ce2a34_Solicitation+-+N0018926R3104.pdf" download="Solicitation - N0018926R3104.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

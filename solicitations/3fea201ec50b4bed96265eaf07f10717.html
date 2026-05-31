@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N0010425PR26318 — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>N0010425PR26318</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 3fea201ec50b4bed96265eaf07f10717</span>
+      <a class="sam-link" href="https://sam.gov/opp/3fea201ec50b4bed96265eaf07f10717/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-19</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-19</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward depot-level repair solicitation for a single NSN item (Switch, Electronic, NIIN 012584120) under NAICS 334290. The solicitation is transactional in nature — a purchase/repair order with standard Navy/DoD repair contracting provisions. At 53 pages, most content consists of standard clauses, pricing schedules, and logistical requirements (preservation, packaging, shipping).
+
+There are no observable reporting requirements, no QA surveillance plans requiring process documentation, no status report cadences, no meeting frequency mandates, and no prescribed report formats. The accountability structure is minimal: inspection at origin, standard packaging requirements, and DCMA contract administration oversight. This is entirely appropriate for a repair contract of this type.
+
+The absence of compliance-over-outcomes sins here is not surprising — this is not an IT services, professional services, or complex development contract where such sins typically emerge. It is a hardware repair order. The relevant quality assurance mechanism is whether the repaired item passes inspection and meets technical standards, which is an outcome measure (does the switch work?), not process compliance.
+
+Severity is assessed as 1 (minimal). There is no meaningful evidence of compliance-over-outcomes patterns because the contract type and scope do not generate the conditions under which this sin typically manifests.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>REPAIR SOURCE: DI236 - NAVSUP WEAPON SYSTEMS SUPPORT, MECHANICSBURG PA ... CONTRACT ADMINISTRATION: S3915A - DCMA Baltimore</blockquote>
+  <div class="ev-explanation">The solicitation identifies contract administration oversight but provides no reporting requirements, QA surveillance plans, or performance metrics. The absence of any defined reporting cadence means there is no compliance-over-outcomes structure to evaluate — but also no outcome metrics.</div>
+</div><div class="evidence-item">
+  <blockquote>INSPECTION AND ACCEPTANCE: ORIGIN ... PRESERVATION, PACKAGING, PACKING AND MARKING REQUIREMENTS: MIL-STD-2073-1</blockquote>
+  <div class="ev-explanation">Inspection at origin and packaging standards are referenced, but these are standard deliverable acceptance criteria for a physical repair item — checking whether the repaired switch meets specifications. This is outcome-adjacent (did the item pass inspection?) rather than process compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the repair of an electronic switch (NIIN: 012584120) under NAICS code 334290 (Other Communications Equipment Manufacturing). It is a Defense supply/repair solicitation issued by NAVSUP WSS Mechanicsburg. After reviewing the available solicitation content, there is no evidence of insider rewards patterns. Repair solicitations of this type — for a specific NSN/NIIN item — are typically structured around technical capability to repair a specific component, possession of necessary test equipment, and compliance with applicable military/OEM technical manuals. They do not typically impose layered experience thresholds (e.g., &#x27;$X million in prior federal repair contracts within Y years&#x27;), federal-specific experience mandates, or evaluation bonus points for incumbency proxies. The solicitation&#x27;s 95-day response window and lack of a set-aside designation suggest an open competition posture. The classification code 7G20 (Electronic Components/Accessories) further confirms this is a component-level repair action where the primary competitive differentiator is technical capability and price, not prior contract history. There is insufficient evidence in the available text of any experience requirements, evaluation criteria, or knowledge expectations that would function as an incumbent filter. A qualified repair vendor with the appropriate facilities, tooling, and technical expertise could realistically compete regardless of prior history with this specific contract. Severity is assessed at 1 — minimal.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a Defense depot-level repair solicitation for a specific electronic switch (NIIN 012584120). The solicitation is a relatively compact 53-page document typical of a Navy/NAVSUP repair contract. The core requirement structure — repair, test, and inspect to applicable technical documentation — is inherently outcome-focused: the outcome is a serviceable, tested unit returned to the government meeting original equipment specifications. The repair source documents referenced are standard military technical authority documents (e.g., component maintenance manuals, repair standards) that exist for safety, interoperability, and airworthiness/readiness reasons, not as arbitrary process mandates. These are analogous to FIPS encryption standards in IT contracts: they define the floor, not the ceiling, of an acceptable approach. There is no evidence of the hallmarks of severe sprawl: no extended bullet lists prescribing step-by-step repair sequences invented by the contracting office, no staffing structure mandates, no incumbent-captured workflow descriptions, and no requirement for specific commercial tools or platforms beyond what technical authority documents may require. The solicitation appropriately leaves repair methodology, internal workflow, and resource allocation to the contractor within the bounds of applicable technical documentation. The requirements constrain the problem space (what a repaired unit must achieve and what standards it must meet) rather than the solution space (how the contractor must organize their shop or perform each step). Severity is assessed as 1 — minimal. This is a competently scoped repair solicitation consistent with standard NAVSUP WSS repair contracting practice.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall provide all labor, material, facilities and equipment necessary to repair, test, and inspect SWITCH,ELECTRONIC in accordance with the applicable repair source documents.</blockquote>
+  <div class="ev-explanation">This language specifies the broad categories of inputs (labor, material, facilities, equipment) but does not prescribe step-by-step processes or mandate specific tools/methods. It references &#x27;applicable repair source documents,&#x27; which for a military electronics repair contract are authoritative technical standards (likely OEM or NAVAIR/NAVSEA technical manuals) that define minimum acceptable repair procedures — a legitimate technical interoperability and safety constraint, not arbitrary process prescription.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall be responsible for maintaining and controlling Government Furnished Material (GFM) and Government Furnished Equipment (GFE) in accordance with FAR 52.245-1.</blockquote>
+  <div class="ev-explanation">This is a regulatory compliance requirement (FAR 52.245-1), not prescriptive sprawl. Referencing a specific FAR clause is a legal mandate and does not constrain the vendor&#x27;s repair methodology.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for repair of an electronic switch (NIIN 012584120) presents a list of approximately 13 applicable documents and standards without any contextual explanation of how each applies to the specific repair work being performed. The list includes standards spanning logistics support analysis (MIL-STD-1388-2B), demilitarization (DOD4160.21M), corrosion testing (ASTM B-117), general electronic equipment guidelines (MIL-HDBK-454), and supply management (NAVSUP Publication 4998), among others. Several of these have at best tangential relevance to a depot-level repair action and appear to be carried forward from a broader maintenance or acquisition template rather than curated for this specific solicitation. However, the list is relatively modest in length (approximately 13 items) compared to the most egregious examples of rule pools, and several documents — such as MIL-STD-130 (marking), MIL-STD-129 (packaging/marking), MIL-PRF-81309 (corrosion preventive compounds), and MIL-STD-2073-1 (preservation/packaging) — are plausibly relevant to repair, preservation, and return-to-stock of a military component. There are no glaring internal contradictions between cited documents and the solicitation&#x27;s purpose. The severity is moderate: the compliance section is not curated with explanations of applicability, and several documents appear to be boilerplate carryovers with unclear relevance, but the list is short enough that an experienced defense repair contractor would likely be able to navigate it, and the core regulations are at least plausibly connected to the work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>APPLICABLE DOCUMENTS: MIL-STD-130, MIL-STD-1388-2B, MIL-STD-2073-1, MIL-STD-129, MIL-PRF-81309, DOD4160.21M, NAVSUP Publication 4998, MIL-STD-2073-1E, MIL-HDBK-454, OPNAVINST 4790.2, NAVSEA OD 44811, NAVSEA SE004-AK-TRS-010/2M, ASTM B-117</blockquote>
+  <div class="ev-explanation">The solicitation lists approximately 13 applicable documents/standards without any explanation of how each one specifically applies to the repair of this particular electronic switch. For example, DOD4160.21M (Defense Demilitarization and Trade Security Controls) is a disposal/demilitarization regulation whose relevance to a repair action is not self-evident. Similarly, ASTM B-117 (salt spray corrosion testing) is cited without explanation of whether or how salt spray testing applies to this specific component&#x27;s repair process.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-STD-1388-2B</blockquote>
+  <div class="ev-explanation">MIL-STD-1388-2B is a Logistics Support Analysis Record (LSAR) standard governing documentation of maintenance and logistics data for new system acquisitions. Its applicability to a depot-level repair action on an existing fielded component (an electronic switch) is questionable and unexplained. This appears to be a carry-forward from a broader acquisition or maintenance template rather than a requirement curated for this specific repair solicitation.</div>
+</div><div class="evidence-item">
+  <blockquote>NAVSUP Publication 4998</blockquote>
+  <div class="ev-explanation">NAVSUP Publication 4998 deals with Navy inventory control and supply management procedures. While potentially relevant to packaging and asset tracking, its inclusion without context leaves vendors unable to determine which of its provisions apply to the repair scope versus which are general supply chain guidance not applicable to the repair contractor&#x27;s performance.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-HDBK-454</blockquote>
+  <div class="ev-explanation">MIL-HDBK-454 (General Guidelines for Electronic Equipment) is a broad handbook covering general design and environmental requirements for electronic equipment. For a repair solicitation on a specific fielded switch, citing this handbook without specifying which guidelines, sections, or requirements are operative creates an undefined compliance burden — a vendor cannot determine whether the entire handbook applies or only select provisions relevant to the repair process.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the repair of a single, identified electronic switch (NIIN 012584120) under a NAVSUP WSS solicitation. The requirement is narrowly scoped: return a specific NSN item to a serviceable condition in accordance with applicable maintenance standards. This is precisely the kind of requirement for which FFP is the correct contract type. The scope is well-defined (repair to specification), the repair standard is established by existing technical documentation, the labor and materials required for this type of component repair are estimable by qualified vendors, and competition among repair sources keeps pricing honest. NAVSUP WSS routinely awards firm-fixed-price repair contracts for exactly this category of work. There is no indication of the kind of scope uncertainty, research content, or unpredictable labor quantities that would argue for T&amp;M or cost-reimbursement. The solicitation is sparse — 53 pages of attachment detail are not reproduced here — but what is visible is entirely consistent with a standard FFP repair contract. No square peg concern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Switch, Electronic, NIIN: 012584120, repair</blockquote>
+  <div class="ev-explanation">The requirement is a depot-level repair of a specific electronic switch (a discrete, identifiable Navy spare part). Repair of a known NSN item is a well-defined, bounded task: the government can specify the repair standard (typically to serviceable condition per applicable technical manuals), and vendors with repair capability can estimate cost and turnaround time with reasonable accuracy.</div>
+</div><div class="evidence-item">
+  <blockquote>Classification Code: 7G20</blockquote>
+  <div class="ev-explanation">FSC 7G20 corresponds to maintenance and repair of communication/electronic equipment — a category where firm-fixed-price contracts are the standard vehicle for repair turnaround contracts (RTCs) and performance-based logistics arrangements. The government routinely uses FFP for NSN-specific repair actions because the repair standard and acceptance criteria are defined by existing technical documentation.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.01_Solicitation_N0010425PR26318.pdf">3.01_Solicitation_N0010425PR26318.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3fea201ec50b4bed96265eaf07f10717_3.01_Solicitation_N0010425PR26318.pdf" download="3.01_Solicitation_N0010425PR26318.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

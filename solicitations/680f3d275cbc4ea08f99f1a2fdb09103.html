@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Identification of Roadway Design and Infrastructure Factors Influencing ADAS Sys — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Identification of Roadway Design and Infrastructure Factors Influencing ADAS Systems in Mitigating Rural Roadway Departure Crashes</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 680f3d275cbc4ea08f99f1a2fdb09103</span>
+      <a class="sam-link" href="https://sam.gov/opp/680f3d275cbc4ea08f99f1a2fdb09103/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">TRANSPORTATION, DEPARTMENT OF › FEDERAL HIGHWAY ADMINISTRATION › 693JJ3 ACQUISITION AND GRANTS MGT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541990</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 months (24 months for project completion and 6 months for HCC and HPA review)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technical Acceptability (LPTA)</li><li>Factor 1 – Technical Approach</li><li>Factor 2 – Staffing Approach</li><li>Price Quote</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate but clear compliance-over-outcomes problem. The Performance Requirements Summary (Technical Exhibit 1) is the primary place where accountability is defined, and it is almost entirely process-oriented. For three of four tasks, the sole performance threshold is &#x27;no technical and grammatical errors in documents and presentations&#x27; — a clerical standard, not a research quality standard. The one partial exception is PRS #2, which adds &#x27;acceptable quality assessment and control&#x27; and &#x27;consensus,&#x27; but these remain process descriptors rather than outcome measures. Conspicuously absent from the entire PRS are: any threshold for the validity or completeness of the crash dataset; any minimum statistical power or sample size requirements; any criterion for whether the identified infrastructure factors are actionable or evidence-based; any measure of whether the safety analysis conclusions are reproducible or peer-reviewable; and any target related to the ultimate mission objective — reducing rural roadway departure crashes. The reporting structure further reinforces this pattern. The contractor must produce bi-weekly meeting summaries, monthly analysis updates, and quarterly progress reports simultaneously, all of which document activity and process adherence. The deliverables schedule (Technical Exhibit 2) lists 20+ individual deliverables, but acceptance criteria for each amounts to document submission. That said, this solicitation is a research study, not an operational services contract, and some of the &#x27;sin&#x27; patterns that are most damaging in IT services (plan-adherence tracking for agile work, SLA monitoring) are less applicable here. The PWS does describe substantive technical work with genuine intellectual content — the sin here is that none of that content is translated into enforceable performance thresholds. The government has preserved maximum discretion to approve or reject work via TPOC review, but has not committed to any measurable standard by which it will exercise that discretion. This is a meaningful accountability gap, but because the underlying work is well-defined and the research methodology is substantive, severity is moderate (2) rather than severe.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Threshold (This is the maximum error rate.) — PRS #1 Task 1: &#x27;No technical and grammatical errors in documents&#x27;</blockquote>
+  <div class="ev-explanation">The sole performance threshold for Task 1 — the kick-off meeting and all associated administrative deliverables — is the absence of grammatical and technical errors. This measures document quality in the narrowest clerical sense, not whether the kick-off meeting achieved its stated purpose of ensuring &#x27;desired outcomes are understood and achieved.&#x27; There is no threshold for whether the work plan is realistic, whether the bi-weekly check-in cadence is functioning effectively, or whether project management is on track to deliver results.</div>
+</div><div class="evidence-item">
+  <blockquote>PRS #3 Task 3 – Develop Technical Report: Performance Standard: &#x27;The Contractor provided: Draft of technical report outline / Revised technical report outline / First draft technical report / Second draft technical report / Third draft technical report / Final draft technical report...&#x27; Performance Threshold: &#x27;No technical and grammatical errors in documents and presentations&#x27;</blockquote>
+  <div class="ev-explanation">For a task spanning the core intellectual deliverable of the entire contract — a technical research report — the only performance threshold is freedom from grammatical errors. There is no threshold for analytical rigor, validity of methodology, accuracy of findings, or usefulness of recommendations. The PRS confirms deliverables as acceptable simply by virtue of being submitted and free of typos, regardless of substantive quality.</div>
+</div><div class="evidence-item">
+  <blockquote>PRS #2 Task 2: Performance Threshold includes &#x27;Consensus among TPOC, FHWA technical panels and contractor&#x27;</blockquote>
+  <div class="ev-explanation">While PRS #2 adds a slightly more substantive criterion — &#x27;acceptable quality assessment and control for data-driven and collection&#x27; — &#x27;consensus&#x27; as a performance threshold is a process measure, not an outcome measure. Achieving consensus means the parties agreed, not that the data collection was scientifically sound, the sample was representative, or that the analysis will actually identify the infrastructure factors affecting ADAS performance. Consensus can be achieved even if the methodology is weak.</div>
+</div><div class="evidence-item">
+  <blockquote>Bi-weekly Check-in Meeting / Bi-weekly Check-in Meeting Summary Note / Quarterly Progress Report [all listed as Task 1 deliverables with recurring cadence throughout the 30-month performance period]</blockquote>
+  <div class="ev-explanation">The solicitation layers bi-weekly check-in meetings (plus summary notes due within 3 days) on top of quarterly progress reports. This creates three overlapping reporting obligations — meeting, written meeting notes, and quarterly summary — that run continuously for 30 months. None of these recurring deliverables are tied to outcome thresholds; they are all process-tracking instruments. Combined with the monthly &#x27;Data-Driven and Analysis Progress Update&#x27; required under Task 2, the contractor faces at least four distinct recurring reporting obligations, none of which is assessed against a performance outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>Monthly data-driven and analysis progress update [Task 2 deliverable, due monthly throughout performance period]</blockquote>
+  <div class="ev-explanation">A monthly progress update on data collection and analysis activities is, in isolation, reasonable. But in combination with bi-weekly check-ins, quarterly progress reports, and a detailed data-driven plan that must be approved &#x27;prior to conduct,&#x27; the overall surveillance structure is oriented entirely around documenting what the contractor is doing and whether they are following the approved plan — not whether the data collection is producing valid, reliable inputs for safety analysis. No threshold exists for data completeness rates, geographic coverage targets, or statistical sufficiency of the crash sample.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards. The past performance requirement is permissive rather than restrictive: it imposes no minimum contract dollar thresholds, no requirement for prior federal government contracts specifically, and no minimum number of prior contracts. The explicit treatment of an unknown/neutral past performance rating as &#x27;acceptable&#x27; under LPTA is a strong mitigating factor — it means an entirely new entrant with no track record in this domain can compete on equal footing with an experienced incumbent. The staffing evaluation criterion asks for names and qualifications of key personnel but imposes no requirement that those personnel have previously performed work on this specific contract or comparable federal contracts at a specific dollar level. The Q&amp;A document (Question 8) confirms this is a new project with no incumbent contractor, which eliminates the incumbency dynamic entirely. The technical requirements in Task 2 — GIS, image-based feature extraction, crash data analysis — are specialized but reflect a genuine capability test, not a requirement to have previously performed this specific work for FHWA. The domain is narrow and technical, but narrowness in subject matter is not the same as incumbency bias. A university research team, a transportation consulting firm, or a data analytics company with appropriate technical staff could realistically compete. No stacking of exclusionary criteria is present. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide examples of recent (within the last five years) and relevant (similar in nature to the requirements of the PWS) past experience performed by the quoter. Each past performance reference must contain contact information (contact name, email address/phone number), business name, total value of the order, period of performance, and description of work performed. If a quoter is without a record of relevant and recent past performance, the quoter will be assigned a neutral or unknown rating. In this Lowest Price Technical Acceptable process, this unknown rating is considered &#x27;acceptable&#x27;.</blockquote>
+  <div class="ev-explanation">The past performance requirement uses a standard five-year lookback with no minimum dollar threshold, no requirement for a specific number of contracts, and no federal-specific mandate. Critically, the solicitation explicitly states that a neutral/unknown rating is &#x27;acceptable&#x27; under LPTA — meaning a vendor with zero past performance of this type can still win on price and technical acceptability alone. This is the opposite of an insider reward; it actively levels the field for new entrants.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl, warranting a severity of 2. The PWS is fundamentally a research contract with well-articulated outcome goals: identify roadway infrastructure factors affecting ADAS performance, quantify safety benefits, and produce actionable recommendations. These are legitimate, outcome-oriented objectives. The background and objective sections (Sections 1.1 and 1.2) are commendably focused on &#x27;what&#x27; FHWA needs rather than &#x27;how&#x27; to get there. However, Task 2 — the methodological core of the contract — contains multiple passages that cross from outcome-definition into method-prescription, particularly around GIS/image-based extraction pipelines, VIN decoder tool selection, and the specific data systems to use (HPMS, ARNOLD). The multi-draft report review sequence in Task 3 is a process manual rather than a quality standard. Mitigating factors are significant: the Q&amp;A process actively loosened several constraints (Google Maps Platform became optional, alternative data sources were confirmed acceptable, LiDAR was explicitly permitted), which shows responsiveness to vendor concerns about method-locking. The original Google Maps Platform mandate — which would have been a clear proprietary tool prescription — was softened. The &#x27;but are not limited to&#x27; and &#x27;or comparable&#x27; qualifiers throughout Task 2 also preserve some flexibility. The Performance Requirements Summary (Technical Exhibit 1) is notably weak on outcome measurement — it counts deliverable production and &#x27;no grammatical errors&#x27; as performance thresholds rather than substantive research quality metrics — but this is more characteristic of a compliance-over-outcomes problem than sprawl per se. Overall, vendors have real methodological constraints in how they conduct the data collection and processing work, but the sprawl is not pervasive enough to reach severity 3; the research design space remains meaningfully open.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall identify, extract and compile roadway geometric design elements and infrastructure features that are potentially associated with operational effectiveness of RwD prevention ADAS features, which may include, but are not limited to, horizontal and vertical alignment characteristics, advanced signs and delineation, pavement and longitudinal markings (e.g., color, function, widths and patterns), roadside features, lane configuration, shoulder and median features, etc. through the integrated use of Geographic Information System (GIS) and image-based feature extraction processes.</blockquote>
+  <div class="ev-explanation">The solicitation prescribes the methodology (GIS and image-based feature extraction) rather than defining the outcome (a comprehensive, spatially-referenced dataset of roadway attributes). A vendor with superior LiDAR-based extraction, probe vehicle data, or existing compiled datasets could potentially deliver higher-quality results more efficiently, but the &#x27;shall...through the integrated use of GIS and image-based feature extraction processes&#x27; language ties them to a specific technical approach. Notably, the Q&amp;A clarified that alternatives like LiDAR are acceptable, but the PWS text itself was not updated to reflect this flexibility, leaving a prescriptive process mandate in the operative contract language.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor&#x27;s proposed and performed image-based feature extraction process shall employ vision technologies (e.g., aerial or street-level imagery) to detect, classify, assess, and extract roadway geometric design and infrastructure attributes. Furthermore, the extracted roadway and infrastructure attributes must be integrated with the GIS LRS framework, enabling a repeatable and scalable workflow that accurately assigns spatial attributes along roadways.</blockquote>
+  <div class="ev-explanation">This passage mandates a specific technical pipeline: vision-based imagery → extraction → GIS LRS integration. While &#x27;repeatable and scalable workflow&#x27; gestures toward an outcome, the requirement that the process &#x27;shall employ vision technologies&#x27; is a method prescription. A contractor who already possesses relevant compiled roadway attribute data from a prior project, or who could use machine learning on existing sensor datasets, is constrained to re-run an image-based extraction process regardless of whether it produces superior results.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall also collect historical crashes occurred on rural roads, including vehicle VIN information, at least four (4) States over the past five (5) years (since 2018), and use the NHTSA VIN Decoder API or a similar tool to decode the VIN to distinguish between vehicles equipped with and without RwD prevention ADAS.</blockquote>
+  <div class="ev-explanation">Specifying NHTSA VIN Decoder API (even with &#x27;or similar tool&#x27;) as the mechanism to distinguish ADAS-equipped vehicles prescribes a data-processing step rather than defining the outcome: a reliable classification of crash-involved vehicles by ADAS equipment status. A vendor with proprietary vehicle equipment databases, OEM data partnerships, or superior classification models is nudged toward a government-specified tool pipeline. The minimum four-state, five-year scope parameters are legitimate outcome constraints, but the tool specification is method-driven.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall prepare a comprehensive outline of the technical report first, and then revise it after FHWA review to reflect comments or inputs from the TPOC and the FHWA technical panel. With approval of the final outline, the Contractor shall develop and submit the first draft of final technical report for review by the TPOC and FHWA technical review panels...The TPOC will submit consolidated comments for the contractor to address in a second draft report. The contractor shall address any remaining technical comments and prepare a third draft for review by FHWA Office of Safety R&amp;D leadership and the Office of the Chief Counsel (if needed).</blockquote>
+  <div class="ev-explanation">The report development process is prescribed in a rigid multi-draft sequence (outline → first draft → second draft → third draft → final draft) with specific review actors at each stage baked into the contract. This is a workflow prescription rather than an outcome requirement. The outcome FHWA needs is a high-quality, technically sound, publicly releasable research report. The number of drafts, the sequencing of review panels, and which organizational units review which draft are process choices that could reasonably be left to the contractor to propose in their technical approach.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pools pattern in any meaningful way. The &#x27;Applicable Publications&#x27; section — the most common locus of rule pools — cites exactly one document (the TFHRC Communication Reference Guide), which is directly and obviously relevant to a contract requiring production of technical reports for FHWA publication. The statutory citations in Section 1.2 are authorization references, not operational compliance requirements imposed on the vendor. The FAR/TAR clauses in Part IV are standard commercial acquisition boilerplate — the 52.212-5 omnibus clause with a numbered checklist of optional provisions is a required FAR construct, not agency-specific regulatory accumulation. The clauses checked as applicable (52.204-10, 52.204-27, 52.209-6, 52.219-28, 52.222-3, 52.222-26, 52.222-40, 52.222-50, 52.225-13, 52.226-8, 52.232-33) are a modest, standard selection for a non-set-aside commercial services purchase order. None appear irrelevant or contradictory to a roadway safety research contract. The TAR clauses incorporated by reference (five total) are likewise standard DOT contract administration provisions. There is no bulk &#x27;Applicable Documents&#x27; list, no accumulation of agency-specific policies, no irrelevant regulations, and no contradictions between cited policies and the work being solicited. The compliance landscape a vendor must navigate here is straightforward and well within normal parameters for a federal research services purchase order. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.0 Applicable Publications (Current Editions)
+The Contractor must abide by the following regulations, publications, manuals, and local policies and procedures. TFHRC Communication Reference Guide (CRG) – https://www.fhwa.dot.gov/publications/research/general/15058/15058.pdf</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s entire &#x27;Applicable Publications&#x27; section cites exactly one document — the TFHRC Communication Reference Guide — which is directly relevant to a research deliverable that must follow FHWA publication standards. This is the opposite of a rule pool: a single, focused citation with clear applicability to the work (producing a technical report and outreach materials for FHWA).</div>
+</div><div class="evidence-item">
+  <blockquote>This purchase order seeks to support FHWA mission to improve safety on our nation&#x27;s roadways in accordance with 23 U.S.C. §503(b)(1)(A, B, C &amp; D); 23 U.S.C. §503(b)(2)(B)(i, ii, iii, iv, v &amp; vi); 23 U.S.C. §503(b)(2)(C)(i, ii, iii, vi, &amp; viii); and 23 U.S.C. §503(b)(3)(B)(ii).</blockquote>
+  <div class="ev-explanation">The statutory citations in the Objective section are dense subsection references, but they serve a specific purpose: establishing the legal authorization for the research activity. They are not presented as compliance requirements vendors must implement; they explain why FHWA is funding this work. This is a legal basis citation, not a compliance burden on the contractor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a research and analysis contract structured as FFP, which creates a moderate square peg concern. The requirements involve novel data integration work across multiple states, open-ended image-based feature extraction, iterative government-directed revisions, and a study plan that must be approved before substantive work begins — none of which can be scoped with precision at bid time. These characteristics are more consistent with cost-reimbursement or labor-hour contracting than FFP.
+
+That said, the severity is moderate rather than severe for several reasons. First, FHWA research contracts of this type are commonly procured as FFP in practice, and the deliverable structure (defined tasks, a technical report, outreach materials) does provide meaningful scope anchoring. The four CLINs correspond to discrete phases with specific outputs. Second, the government has partially mitigated scope uncertainty by allowing the contractor to propose the methodology in the technical quote and then refine it post-award — meaning competition and vendor judgment help calibrate the price. Third, for a relatively small purchase order (simplified acquisition threshold range implied by the RFQ format), the FFP structure reduces government administrative burden and is not unusual.
+
+The primary risk is that Task 2 — the core data collection and analysis work — involves inherently uncertain labor and data acquisition costs. If state crash data is harder to obtain than anticipated, if VIN decoding yields incomplete results, or if FHWA redirects the analytical focus during the TPOC review process, the contractor is exposed to cost overruns with no relief mechanism. A labor-hour contract with a ceiling price would have been a more appropriate vehicle for this type of research work, preserving cost visibility while sharing schedule and scope risk more appropriately between the parties.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This Request for Quotation (RFQ) will result in a Firm-Fixed-Price (FFP) purchase order.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly establishes FFP as the contract type for all four CLINs across a 30-month period of performance involving research, data collection, analysis, and report writing.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 2: Collect, Extract, Integrate, and Evaluate Roadway Geometric Design Elements and Infrastructure Factors Affecting RwD Avoidance ADAS... The Contractor shall conduct a comprehensive data-driven process to collect, extract, integrate, and analyze various data from various resources including, but are not limited to, geometric design elements, infrastructure features, historical crash data and vehicle trajectory data</blockquote>
+  <div class="ev-explanation">Task 2 involves open-ended data collection, integration, and analysis across at least four states covering five years of crash data. The scope includes &#x27;but are not limited to&#x27; language throughout, signaling that the government cannot fully define what data will be needed or how much effort it will take — a hallmark of work ill-suited for firm-fixed-price.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor&#x27;s proposed and performed image-based feature extraction process shall employ vision technologies (e.g., aerial or street-level imagery) to detect, classify, assess, and extract roadway geometric design and infrastructure attributes.</blockquote>
+  <div class="ev-explanation">Image-based feature extraction at scale across rural road networks in at least four states is a technically uncertain, labor-intensive process. The volume of data and computational effort required cannot be reliably estimated in advance, creating significant risk that a vendor will underbid to win and then struggle to deliver — a classic FFP failure mode for research-oriented work.</div>
+</div><div class="evidence-item">
+  <blockquote>The study plan shall describe data sources, methodologies, quality control procedures, analytical approaches, limitations, and anticipated deliverables, and shall be submitted for FHWA review and approval prior to conduct.</blockquote>
+  <div class="ev-explanation">The government has deferred key methodological decisions to after award, requiring FHWA approval of the data-driven plan before work can proceed. This means neither the government nor the vendor knows the full scope at solicitation time — undermining the core premise of FFP, which requires that risk can be estimated with acceptable certainty.</div>
+</div><div class="evidence-item">
+  <blockquote>The period of performance for this purchase order shall be for 30 months that consists of 24 months for project completion and 6 months for HCC and HPA review of the paper.</blockquote>
+  <div class="ev-explanation">A 30-month period including iterative FHWA review cycles (three drafts of the technical report, multiple rounds of comments on data plans) creates schedule dependencies outside the contractor&#x27;s control. Under FFP, the contractor bears the risk of delays caused by government review timelines, yet has no mechanism to recover costs — this mismatch can lead to either padding in bids or contractor losses.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Question and Answer.xlsx">Question and Answer.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/680f3d275cbc4ea08f99f1a2fdb09103_Question+and+Answer.xlsx" download="Question and Answer.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 693JJ326Q000018 ADAS Technologies_4_20_2026_final.pdf">RFQ 693JJ326Q000018 ADAS Technologies_4_20_2026_final.pdf</div></div>
+  <a class="dl-btn" href="../attachments/680f3d275cbc4ea08f99f1a2fdb09103_RFQ+693JJ326Q000018+ADAS+Technologies_4_20_2026_final.pdf" download="RFQ 693JJ326Q000018 ADAS Technologies_4_20_2026_final.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 1.pdf">RFQ 693JJ326Q000018 ADAS Technologies_Amendment 1.pdf</div></div>
+  <a class="dl-btn" href="../attachments/680f3d275cbc4ea08f99f1a2fdb09103_RFQ+693JJ326Q000018+ADAS+Technologies_Amendment+1.pdf" download="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 1.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 3.pdf">RFQ 693JJ326Q000018 ADAS Technologies_Amendment 3.pdf</div></div>
+  <a class="dl-btn" href="../attachments/680f3d275cbc4ea08f99f1a2fdb09103_RFQ+693JJ326Q000018+ADAS+Technologies_Amendment+3.pdf" download="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 3.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 4.pdf">RFQ 693JJ326Q000018 ADAS Technologies_Amendment 4.pdf</div></div>
+  <a class="dl-btn" href="../attachments/680f3d275cbc4ea08f99f1a2fdb09103_RFQ+693JJ326Q000018+ADAS+Technologies_Amendment+4.pdf" download="RFQ 693JJ326Q000018 ADAS Technologies_Amendment 4.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIH Medical Support Assistants — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>NIH Medical Support Assistants</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 78df57767cab4500befe4bf2aa84626e</span>
+      <a class="sam-link" href="https://sam.gov/opp/78df57767cab4500befe4bf2aa84626e/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">HEALTH AND HUMAN SERVICES, DEPARTMENT OF › NATIONAL INSTITUTES OF HEALTH › NATIONAL INSTITUTES OF HEALTH OLAO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561110</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Labor Hours IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (06/01/2026 – 05/31/2028) + 2 option years (Option 1: 06/01/2027 – 05/31/2029; Option 2: 06/01/2028 – 05/31/2030)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor 1: Management Plan/Corporate Resources - 50 Points (Subfactor 1: Management Infrastructure; Subfactor 2: Recruitment and Retention Plan; Subfactor 3: Contractor&#x27;s Employee Salary)</li><li>Factor 2: Related Experience - 30 Points</li><li>Factor 3: Key Personnel - 10 Points</li><li>Factor 4: Past Performance - 10 Points</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, warranting a severity 2 rating. The QA structure is built primarily around process monitoring: weekly meetings with CORs, written complaint responses within 24 hours, documentation of adherence to the QCP, training certificate submission, and surveillance described as &#x27;inspect for compliance with contract terms.&#x27; The dominant accountability question throughout is &#x27;did the contractor follow the process?&#x27; rather than &#x27;did patients receive good service?&#x27;
+
+However, several mitigating factors prevent a severity 3 rating. First, this is a staffing support contract for administrative medical support roles — inherently a labor-category service where process compliance (showing up on time, completing training, wearing badges, following attendance protocols) is genuinely important and much of what the government needs to manage. The 10-minute tardiness grace period, the 2-hour absence notification requirement, and the Corrective Action Plan mechanism are appropriate operational controls for a staffing contract, not bureaucratic excess. Second, the solicitation does include some outcome-oriented language: customer service standards specify behavioral expectations (&#x27;all customers are greeted promptly,&#x27; &#x27;if customer has to wait longer than 15 minutes an explanation is provided&#x27;), and the evaluation criteria assess &#x27;customer satisfaction&#x27; and &#x27;quality of service&#x27; — though without quantified thresholds. Third, the reporting burden is not excessive by staffing contract standards; there is no elaborate multi-tiered report format requirement or overlapping cadence of written deliverables.
+
+The core deficit is the absence of any quantified performance metrics — no scheduling accuracy targets, no registration error rate thresholds, no patient satisfaction scores, no wait time SLAs — that would allow the government to evaluate whether the MSAs are producing good outcomes for clinical research patients. The QCP requirement delegates quality definition to the contractor without providing performance benchmarks. The government&#x27;s surveillance will in practice verify that staff showed up, completed training, and submitted paperwork — process compliance — rather than measuring service quality outcomes. This is a real but not severe manifestation of the sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Quality Control will be monitored by the Government by conducting periodic review of performance and reviewing customer complaints. The Contractor and the NIH Clinical Center will review performance of the Medical Support Assistant staffing services for meeting the terms and conditions of this contract. This will be accomplished through weekly/bi-weekly or monthly status/progress meetings between the NIH Clinical Center personnel responsible for managing and administering this contract (Contracting Officer and Contract Officer&#x27;s Representatives and the on-site contract supervisor. The frequency of the meetings will be determined by the CORs.</blockquote>
+  <div class="ev-explanation">The QA mechanism described here is &#x27;periodic review of performance&#x27; and &#x27;reviewing customer complaints&#x27; — vague process-monitoring language. No performance thresholds, service levels, or measurable outcomes are defined. The meeting cadence (weekly/bi-weekly or monthly) is the primary accountability tool, but no criteria are provided for what &#x27;good performance&#x27; looks like at those meetings. Success is implicitly defined as showing up and discussing issues, not meeting specific targets.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall develop a proactive Quality Control Program for measuring and attaining quality of performance under this award. The Contractor&#x27;s Quality Control Program shall explain the manner in which the Contractor shall ensure all requirements are being accomplished. A sustaining focus throughout the Quality Control Program shall be the attainment of continuous quality improvement.</blockquote>
+  <div class="ev-explanation">This language delegates the definition of quality entirely to the contractor&#x27;s internal process documentation. The government requires a QCP that explains &#x27;the manner in which&#x27; requirements are accomplished — a process compliance check — rather than specifying any outcome the QCP must achieve. &#x27;Continuous quality improvement&#x27; is aspirational boilerplate with no measurable baseline or target.</div>
+</div><div class="evidence-item">
+  <blockquote>The NIH Government Contract Officer Representative(s) will inspect for compliance with contract terms throughout the performance period. Typical procedures include random sampling, planned sampling, scheduled inspections, incident inspections, and validated customer complaints. The Contractor shall provide documentation of adherence to the Plan upon request.</blockquote>
+  <div class="ev-explanation">The surveillance methodology is framed entirely around &#x27;compliance with contract terms&#x27; and &#x27;documentation of adherence to the Plan.&#x27; This is textbook compliance-over-outcomes language: the government is checking whether the contractor followed the prescribed process, not whether patients received timely, high-quality service. No performance thresholds (e.g., wait time targets, scheduling accuracy rates, complaint resolution rates) are specified.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor will be responsible for responding, in writing, to any events/complaints involving a contract employee within 24 hours of notification of the event/complaint or next business day.</blockquote>
+  <div class="ev-explanation">The 24-hour written response requirement measures process compliance — did the contractor submit a written response on time — not whether the underlying complaint was resolved or whether the service failure that generated the complaint was corrected. Response timeliness is a process metric, not an outcome metric.</div>
+</div><div class="evidence-item">
+  <blockquote>Meet weekly with the CORs for this contract to discuss recruitment, issues related to performance or staffing, and any new process changes that may impact the contractors... Give each contractor a mid-year and end of year evaluation and provide COR a copy of the end of year evaluation... Ensures all mandatory training requirements, throughout the year, are completed and turning in the certificates for all contractors to the COR by the deadline required by the COR.</blockquote>
+  <div class="ev-explanation">The supervisor&#x27;s accountability obligations are dominated by meeting attendance, evaluation documentation submission, and training certificate forwarding. These are all process activities. No corresponding outcome metrics appear — there is no required patient satisfaction score, scheduling accuracy rate, registration error rate, or similar measure that would indicate whether the MSAs are actually performing well in their clinical support roles.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics. The incumbents are identified in the Q&amp;A (BGE Consulting and American Staffing), and several structural features of the evaluation criteria tilt the playing field toward firms that have already been performing this or comparable work — particularly in the DC metro area, in government clinical environments, recently.
+
+The cumulative effect of the experience requirements is meaningful: 30% of technical points go to related experience, with explicit scoring preferences for government clinical/research history; the solicitation requires demonstrated DC-area placement history within the past two years; and transition planning is scored partly on the ability to deliver trained staff &#x27;without disruption&#x27; — a standard only the incumbent or a vendor with pre-existing NIH-familiar personnel can fully meet.
+
+However, several mitigating factors prevent a severity-3 rating. The solicitation does not impose specific dollar-value thresholds for prior contracts — it does not require, for example, three previous contracts exceeding $5M. Commercial experience is explicitly accepted, not just tolerated. The set-aside structure (8(a) competed) means the competition is already restricted to a defined small-business pool, and within that pool, multiple staffing firms could plausibly hold relevant healthcare administrative staffing experience. The evaluation also heavily weights management plan and corporate resources (50 points), which a capable non-incumbent can address through technical approach quality rather than incumbency. The past performance section (10 points) explicitly provides a neutral rating for offerors with no past performance, further reducing the penalty for newcomers.
+
+The solicitation tilts toward incumbents — particularly through the DC-area placement history requirement and the government clinical environment preference — but does not functionally close the competition. A well-prepared 8(a) staffing firm with healthcare administrative experience and a credible DC-area pipeline could compete, even if the incumbent holds structural advantages. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Related experience includes providing and managing personnel serving in an administrative role to organizations of similar size. Specific experience in a clinical and/or research environment will be evaluated more favorably. Additionally, experience in a government clinical/research environment is preferred.</blockquote>
+  <div class="ev-explanation">This evaluation language creates a tiered scoring advantage: commercial experience is acceptable, clinical/research environment experience is better, and government clinical/research environment experience is preferred. Each tier narrows the competitive pool further. The incumbent contractors (BGE Consulting and American Staffing) would naturally score at the top tier, while a capable staffing firm with only commercial healthcare experience would be penalized. The requirement doesn&#x27;t test the fundamental capability — staffing administrative personnel in a healthcare setting — it rewards prior government contract history in this niche.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors shall provide evidence of a broad pool of applicants, in similar roles, that have been placed in the metropolitan DC area within the past two years.</blockquote>
+  <div class="ev-explanation">Requiring demonstrated placement of &#x27;similar roles&#x27; in the &#x27;metropolitan DC area within the past two years&#x27; is a geographic and recency constraint that advantages incumbents and locally-established staffing firms. A qualified national staffing firm that hasn&#x27;t previously operated in the DC metro area — or a newer firm without a two-year track record in this market — would struggle to demonstrate this, regardless of their overall capability to recruit and place administrative personnel. This functions as a soft incumbency filter.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will be evaluated on their demonstrated ability to recruit and maintain a stable, experienced staff so that NIH will be provided with continuity of support services... Describe your plan for providing trained staff at the start of this contract without any disruption to services currently being provided by contract Medical Support Assistants.</blockquote>
+  <div class="ev-explanation">Scoring vendors on their ability to provide &#x27;trained staff at the start of this contract without any disruption to services currently being provided&#x27; implicitly rewards the incumbent. Only a vendor who already has staff familiar with NIH Clinical Center systems (CRIS, Enterprise Scheduling, i-Med, NBS), building access, and operational procedures can credibly promise zero disruption. A new vendor would realistically need a transition period, which would be scored less favorably. This converts a reasonable transition planning criterion into a de facto incumbency proxy.</div>
+</div><div class="evidence-item">
+  <blockquote>Contract personnel shall have a minimum of 1 year experience in a health care setting working directly in-person with patients and have basic knowledge of medical terminology. The government is not responsible for training any contractor who has never worked in a health care setting.</blockquote>
+  <div class="ev-explanation">While a one-year healthcare experience requirement is defensible on its face, the added declaration that &#x27;the government is not responsible for training any contractor who has never worked in a health care setting&#x27; signals that the government expects the contractor to arrive with a pre-existing pipeline of healthcare-experienced personnel already cleared and ready. Combined with the DC-metro placement history requirement, this significantly narrows the realistic competitive pool to firms already operating in the local healthcare staffing market — which, given the two incumbent contractors identified, is a small group.</div>
+</div><div class="evidence-item">
+  <blockquote>Factor 2: Related Experience - 30 Points... Contracts may include those entered into by the Federal Government, agencies of state, local government, or commercial entities and should be for work completed during the past three years.</blockquote>
+  <div class="ev-explanation">Thirty of one hundred available technical points are allocated to related experience, with the evaluation criteria explicitly preferring government clinical/research environment experience. A three-year lookback window means vendors must demonstrate recent, relevant experience in this narrow domain. At 30% of total technical scoring weight, this factor alone can determine competitive standing. A firm with strong capability but without recent government clinical staffing contracts would enter the competition structurally disadvantaged by nearly a third of the available technical score.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe requirement sprawl. The Combined Statement of Work reads substantially as an operating manual for incumbent operations rather than a statement of mission need. The evidence of sprawl spans nearly every section of the SOW: duty descriptions specify exact workflow steps rather than service levels; the supervisory structure prescribes specific on-site hours and presence requirements; the recruitment process dictates each step of the vendor&#x27;s internal HR workflow including who must be on screening calls; and performance management mandates specific meeting cadences, evaluation timelines, and timecard approval procedures. The government&#x27;s desired outcome — reliable, professional administrative medical support in a clinical research hospital — could have been defined through outcome statements (e.g., position fill rates, patient processing times, customer satisfaction scores, training completion rates) while leaving vendors free to propose how to staff, supervise, and manage to those results. Instead, the SOW appears to have been drafted largely by copying the incumbent&#x27;s operating procedures into contractual requirements. This is reinforced by the Q&amp;A, which confirms two incumbent contractors (BGE Consulting and American Staffing), a classic condition for incumbent-capture sprawl. The extensive conduct, appearance, and scheduling requirements, while reflecting legitimate hospital operational constraints, are nonetheless prescribed at a procedural level (specific grace periods, exact dress code items, itemized misconduct categories) rather than as outcomes or standards. Mitigating factors are limited: the infectious disease compliance requirements and privacy/HIPAA requirements are genuine regulatory mandates and do not constitute sprawl. The differential pay structure documentation requirements, while detailed, serve a legitimate auditing purpose. But these legitimate elements are outnumbered by prescriptive process mandates that dominate the document. A competing vendor reading this SOW cannot meaningfully differentiate their approach — they can only demonstrate willingness to follow the government&#x27;s prescribed procedures. This is the defining characteristic of severity 3 sprawl.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>•Scheduling Activities: Schedules patient appointments in the computerized appointment scheduling system. Appointments must be entered accurately and according to the guidelines for the specific area assigned. All visits for the day must be statused (the patient status is marked as arrived, no-showed or canceled) in the scheduling system before the end of each day. Complete requests for new or modifications to existing schedule templates.
+•Admissions and Outpatient Registration Activities: Transcribe requests for patient admission; pre-register patients for admission; admit inpatients and register new outpatients. All these activities are entered in the NIH Clinical Research Information System (CRIS)...
+•Reception Activities: Prepare areas for the workday; receive and direct telephone calls; provide reception; make arrangements for interpreter services; close area for the work day according to the standard closing procedures for that area...</blockquote>
+  <div class="ev-explanation">The SOW specifies step-by-step operational procedures across seven distinct duty categories, dictating exactly what actions staff must perform and in what sequence. Rather than defining an outcome — e.g., &#x27;patients are accurately registered and admitted with no duplicate records within X minutes&#x27; — the solicitation prescribes the workflow itself. This mirrors the incumbent&#x27;s current operating procedures, leaving no room for a vendor to reorganize tasks, automate steps (e.g., automated status updates), or propose a more efficient workflow.</div>
+</div><div class="evidence-item">
+  <blockquote>ONSITE SUPERVISOR RESPONSIBILITES: The Contractor on-site supervisor shall be responsible for ensuring that all positions are filled by a trained contractor at the required times... On-Site Hours: 7:30 am – 4:00 pm Monday – Friday. It is recommended that the supervisor alter schedule, as needed, to assess performance of contract staff working on the off-shift</blockquote>
+  <div class="ev-explanation">The SOW prescribes not just the existence of an on-site supervisor but their specific working hours (7:30am–4:00pm M–F) and how they should monitor off-shift staff. This locks the vendor into a specific supervisory structure and schedule rather than defining the outcome (e.g., &#x27;all shifts are adequately supervised and staffed&#x27;). A vendor who might propose a remote supervisory model, a rotating supervisor, or a different coverage structure is effectively precluded.</div>
+</div><div class="evidence-item">
+  <blockquote>•Provide the government Contracting Officer Representative (COR) and the Government Supervisor of the location resumes of qualified applicants within 5 business days of request.
+•All qualified applicants must be pre-screened by the contractor and the on-site contract supervisor prior to providing resumes to the government. Applicants need to understand the salary, benefits, tour of duty, and emergency personnel status, prior to providing the government resumes.
+•On-site supervisor will coordinate with government supervisors/CORs telephone/virtual screening appointments for qualified applicants.
+•On-site supervisor will be present and participate in telephone/virtual screening calls with government supervisors.</blockquote>
+  <div class="ev-explanation">The RECRUITMENT section prescribes a multi-step hiring workflow in granular detail, including who pre-screens candidates, what information candidates must understand before resumes are submitted, who coordinates screening calls, and who must be physically present on those calls. This converts a vendor&#x27;s internal HR process into a government-mandated procedure. A vendor cannot propose an alternative talent pipeline, a different vetting process, or a technology-assisted screening approach — they must execute the government&#x27;s exact recruitment sequence.</div>
+</div><div class="evidence-item">
+  <blockquote>•Meet weekly with the CORs for this contract to discuss recruitment, issues related to performance or staffing, and any new process changes that may impact the contractors
+•Give each contractor a mid-year and end of year evaluation and provide COR a copy of the end of year evaluation
+•Review and approve all contractor timecards. Ensure differential-eligible hours are properly authorized and recorded; review and sign weekly differential hour summaries for assigned staff prior to submission to Contractor payroll.</blockquote>
+  <div class="ev-explanation">The PERFORMANCE MANAGEMENT section mandates specific internal management rhythms (weekly meetings, mid-year and end-of-year evaluation cycles, weekly timecard review and sign-off) as contractual requirements. These are internal management processes that the vendor should be free to design in pursuit of the outcome (well-performing, well-documented staff). Mandating these specific cadences and approval chains substitutes process compliance for outcome accountability.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor personnel shall report for duty at the scheduled start time. A grace period of ten (10) minutes after the scheduled start time is permitted. Arrival beyond the ten (10) minute grace period without prior Government approval constitutes tardiness and a failure to meet contract requirements. Habitual or repeated use of the grace period, as determined by the Government, may be considered excessive and shall constitute noncompliance with the contract attendance requirements, even if arrival occurs within the ten (10) minute grace period.</blockquote>
+  <div class="ev-explanation">Prescribing a specific 10-minute grace period and defining what constitutes &#x27;habitual&#x27; use of it as a contractual compliance standard substitutes a micro-managed attendance rule for an outcome-based availability standard (e.g., &#x27;all positions are filled and operational at shift start&#x27;). A vendor&#x27;s HR and scheduling practices are effectively overridden by the government&#x27;s operational preferences, leaving no room for the contractor to manage their workforce using their own proven methods.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-to-notable rule pool problem, concentrated almost entirely in Article H.2 (HHS Security and Privacy Language for Information and IT Procurements). The section runs approximately seven pages and cites roughly 15 distinct NIST, OMB, HHS, and NIH frameworks, imposing a comprehensive IT security compliance regime — SA&amp;A, ATO, SSP, SAR, independent third-party assessment, POA&amp;M, contingency planning, vulnerability scanning, media sanitization, and SDLC documentation — on a staffing services contract where all IT is government-furnished and workers perform administrative functions at NIH Clinical Center desks.
+
+The critical mitigating factor is that this appears to be institutional boilerplate rather than deliberate accumulation: HHS/NIH has a standard Article H.2 block that it inserts into contracts across its portfolio. The Q&amp;A confirms the disconnect — a vendor specifically asked whether the full SA&amp;A regime applies given that all IT is government-furnished, and NIH answered &#x27;ATO is not required.&#x27; However, this clarification exists only in an amendment attachment; the solicitation body itself never carves out an exemption or explains which cited requirements actually apply. Vendors who missed the Q&amp;A, or who are new to NIH, face a wall of IT security requirements they must parse and then independently determine are inapplicable.
+
+The broader solicitation — outside Article H.2 — is actually reasonably curated. The SOW is detailed and operationally specific. The infectious disease compliance section (OSHA 29 CFR 1910.1030, CDC guidelines, MMWR references) cites a manageable set of genuinely applicable health and safety standards directly tied to working in a clinical environment with patient contact. The SCA/SCLS reference is legitimate and appropriately handled. The standard FAR clauses incorporated by reference are appropriate.
+
+The severity is 2 rather than 3 because: (1) the rule pool is concentrated in one boilerplate section rather than pervasive throughout; (2) the FAR and HHSAR clauses elsewhere are appropriate for the work; (3) the regulations that do apply outside the IT block are legitimately relevant and explained with reasonable context; and (4) there are no genuinely contradictory regulations of the type that would create absurd compliance dilemmas. The primary failure is that a standard HHS IT security template has been inserted without being tailored or even annotated to indicate inapplicability — an undifferentiated compliance burden that elevates the interpretation cost for vendors unfamiliar with NIH contracting practice.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ARTICLE H.2. HHS SECURITY AND PRIVACY LANGUAGE FOR INFORMATION AND IT PROCUREMENTS
+
+A. Security Assessment and Authorization (SA&amp;A)- A valid authority to operate (ATO) certifies that the Contractor&#x27;s information system meets the contract&#x27;s requirements to protect the agency data. If the system under this contract does not have a valid ATO, the Contractor (and/or any subcontractor) shall work with the agency and supply the deliverables required to complete the ATO within the specified timeline(s) within three (3) months after contract award. The Contractor shall conduct the SA&amp;A requirements in accordance with HHS IS2P, NIST SP 800-37...</blockquote>
+  <div class="ev-explanation">The full SA&amp;A regime — including System Security Plan, Security Assessment Plan/Report, independent third-party assessment, POA&amp;M, and Contingency Plan — is imposed on what is explicitly a staff augmentation contract where all IT is government-furnished and workers operate exclusively on NIH-provided systems. The Q&amp;A confirms &#x27;ATO is not required&#x27; and that Level 1 (NACI) sensitivity applies to all positions, making nearly the entire Article H.2 framework inapplicable. The solicitation never explains this exemption in the body of the contract; instead, vendors must sort through pages of IT security requirements and discover their inapplicability only through a Q&amp;A amendment.</div>
+</div><div class="evidence-item">
+  <blockquote>System Security Plan (SSP) - due within 30 days after contract award... Security Assessment Plan/Report (SAP/SAR) - due 30 days after the contract award... Independent Assessment - due 90 days after the contract award... POA&amp;M - due 30 days after contract award... Contingency Plan and Contingency Plan Test - due 60 days after contract award... E-Authentication Questionnaire...</blockquote>
+  <div class="ev-explanation">Five distinct IT security deliverables with hard deadlines are enumerated in detail, referencing NIST SP 800-18, NIST SP 800-53, NIST SP 800-53A, NIST SP 800-30, NIST SP 800-37, NIST SP 800-63, NIST SP 800-34, NIST SP 800-64, NIST SP 800-88, FIPS 200, OMB 04-04, HHS IS2P, HHS Standard for POA&amp;M, HHS EPLC framework, and HHS EA requirements — roughly 15 distinct frameworks and standards — all cited for a contract where workers use government computers at a government worksite and the government has confirmed no ATO is required. No explanation is provided as to why any of these apply or which (if any) carry actual operational weight for this scope.</div>
+</div><div class="evidence-item">
+  <blockquote>Vulnerability Scanning Reports
+The Contractor shall report the results of the required monthly special vulnerability scans no later than 10 days following the end of each reporting period.</blockquote>
+  <div class="ev-explanation">Monthly vulnerability scanning and reporting is required of contractors whose sole IT interaction is using government-furnished NIH workstations onsite at Building 10. The contractor operates no independent system. This requirement has no logical connection to the actual work — scheduling patients, processing travel vouchers, and performing front-desk reception — and is carried forward from a boilerplate IT procurement template without review for applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>b. System Documentation- Contractors (and/or any subcontractors) must follow and adhere to NIST SP 800-64, Security Considerations in the System Development Life Cycle, at a minimum, for system development and provide system documentation at designated intervals...
+c. Sanitization of Government Files and Information- As part of contract closeout... the Contractor (and/or any subcontractor) shall provide all required documentation in accordance with the NIH Media Sanitization and Disposal Policy... in accordance with NIST SP 800-88, Guidelines for Media Sanitization.</blockquote>
+  <div class="ev-explanation">NIST SP 800-64, a standard governing the security of system development life cycles, is cited in a contract for administrative medical support staff who will not develop, modify, or maintain any government system. Similarly, media sanitization requirements under NIST SP 800-88 presuppose the contractor owns or controls media storing government data — but the government provides all equipment and systems. These requirements are plainly copied from an IT procurement template and applied wholesale without relevance review.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor (and/or any subcontractor) shall afford the Government access to the Contractor&#x27;s facilities, installations, operations, documentation, information systems, and personnel used in performance of this contract to the extent required to carry out a program of security assessment (to include vulnerability testing)... the audit may include but not be limited to such items as buffer overflows, open ports, unnecessary services, lack of user input filtering, cross site scripting vulnerabilities, SQL injection vulnerabilities, and any other known vulnerabilities.</blockquote>
+  <div class="ev-explanation">Cybersecurity audit rights including checks for SQL injection, cross-site scripting, and buffer overflows are cited in a solicitation for front-desk medical support staff performing scheduling, reception, and patient admissions. These vulnerability types are exclusively relevant to web application or software system contracts. Their inclusion here is a textbook copy-forward from an IT security template, cited without any evaluation of whether they could conceivably apply to a staffing services contract.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation uses a labor-hour IDIQ contract for a requirement that is well-defined, recurring, and location-specific. Medical Support Assistants perform routine administrative tasks — scheduling, admissions, reception, patient records — at a single NIH facility on a 24/7 basis. The shift structure, labor categories, qualifications, and duties are all specified in detail in the SOW. The government even has historical incumbents (BGE Consulting and American Staffing) and an anticipated contract ceiling of $25M over five years, suggesting the scope is estimable.
+
+Labor-hour contracts are most appropriate when the quantity of labor needed cannot be predicted in advance. Here, however, the government has published estimated hour quantities by labor category (75,296 hours for General Clerk III MSAs per year, 48,000 for PSSD MSAs, etc.), which are substantial and relatively stable figures for a hospital that operates continuously at a known patient volume. This level of predictability is more consistent with a fixed-price level-of-effort term contract (FFP-LOE) or a firm-fixed-price approach, both of which would give the government stronger cost control and incentivize the contractor to manage staffing efficiently.
+
+That said, there are legitimate reasons to rate this as moderate rather than severe. Staffing contracts inherently have some variability: surge demands, unexpected vacancies, and daily fluctuations in patient volume can make exact labor quantities hard to pin down. The SOW explicitly requires 24/7/365 coverage, emergency-essential designation, and flexible float staffing, all of which create genuine unpredictability in daily labor consumption. Labor-hour contracts are commonly used across the federal government for staffing support services of this type, and the use here is not unusual practice even if it is suboptimal. The government has also incorporated a structured differential pay plan with detailed invoicing requirements, which adds some oversight that partially mitigates the open-ended billing risk.
+
+The severity is assessed as 2 — Moderate. The labor-hour structure is a defensible but suboptimal choice: it transfers cost risk to the government for a requirement where enough is known about workload to support a more cost-controlling contract structure. The risk is real but not catastrophic, and the misalignment is common practice rather than an egregious mismatch.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contract Type: Labor Hours IDIQ</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a labor-hour IDIQ contract type. Labor-hour contracts are a variant of T&amp;M where the government pays fixed hourly rates for labor but the contractor does not supply materials. This means costs are not capped and scale directly with hours worked, with no strong incentive for the contractor to staff efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>It is anticipated that the award from this solicitation will be labor hours.</blockquote>
+  <div class="ev-explanation">This confirms the labor-hour structure. Under a labor-hour contract, the government bears the risk of cost escalation if staffing levels are higher than anticipated or if the contractor does not manage absenteeism and turnover tightly, since every hour billed is a billable cost.</div>
+</div><div class="evidence-item">
+  <blockquote>General Clerk III (MSA) | 75296 [hours] ... PSSD MSA | 48000 [hours] ... Labor Total | 236428 [hours]</blockquote>
+  <div class="ev-explanation">The pricing worksheet lists fixed estimated labor hour quantities across all labor categories for each period. These are not guaranteed minimums or ceilings — as confirmed in the Q&amp;A (&#x27;Pricing worksheet does not reflect guaranteed minimums, ceilings, or estimates. The worksheet will be used for price analysis.&#x27;) — meaning the government has acknowledged these are notional figures, not binding commitments. This makes cost control highly uncertain despite the well-defined, routine nature of the work.</div>
+</div><div class="evidence-item">
+  <blockquote>This contract is to provide on a long-term (not temporary) basis administrative medical support services at the NIH Clinical Center... The Contractor shall, on a consistent basis, provide contract personnel to provide Medical Support Assistant staffing services.</blockquote>
+  <div class="ev-explanation">The requirement is for recurring, long-term administrative staffing at a known facility with known roles (scheduling, admissions, reception, patient records). These are well-defined, routine tasks performed continuously at a fixed location. The work type, skill level, shift structure, and facility context are all well understood — characteristics that are typically associated with fixed-price or fixed-price-level-of-effort contracts rather than open-ended labor-hour arrangements.</div>
+</div><div class="evidence-item">
+  <blockquote>The ceiling is anticipated to be $25 million over the next 5 years.</blockquote>
+  <div class="ev-explanation">The government has identified an anticipated ceiling of $25M, which implies it has a reasonably accurate estimate of the required labor effort. When the government can estimate total contract value with this degree of confidence for a straightforward staffing requirement, it suggests a fixed-price level-of-effort or firm-fixed-price approach could have been viable, removing the open-ended billing risk inherent in labor-hour contracts.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATTACHMENT 1 Combined Statement of Work.pdf">ATTACHMENT 1 Combined Statement of Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/78df57767cab4500befe4bf2aa84626e_ATTACHMENT+1+Combined+Statement+of+Work.pdf" download="ATTACHMENT 1 Combined Statement of Work.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATTACHMENT 2 Evaluation Criteria.pdf">ATTACHMENT 2 Evaluation Criteria.pdf</div></div>
+  <a class="dl-btn" href="../attachments/78df57767cab4500befe4bf2aa84626e_ATTACHMENT+2+Evaluation+Criteria.pdf" download="ATTACHMENT 2 Evaluation Criteria.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="ATTACHMENT 3 Pricing Worksheet.xlsx">ATTACHMENT 3 Pricing Worksheet.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/78df57767cab4500befe4bf2aa84626e_ATTACHMENT+3+Pricing+Worksheet.xlsx" download="ATTACHMENT 3 Pricing Worksheet.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Question and Answers Medical Support Assistants NIH Clinical Center.pdf">Question and Answers Medical Support Assistants NIH Clinical Center.pdf</div></div>
+  <a class="dl-btn" href="../attachments/78df57767cab4500befe4bf2aa84626e_Question+and+Answers+Medical+Support+Assistants+NIH+Clinical+Center.pdf" download="Question and Answers Medical Support Assistants NIH Clinical Center.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation.pdf">Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/78df57767cab4500befe4bf2aa84626e_Solicitation.pdf" download="Solicitation.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

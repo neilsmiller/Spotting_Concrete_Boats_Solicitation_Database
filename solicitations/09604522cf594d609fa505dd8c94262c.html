@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Web of Science Subscription Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Web of Science Subscription Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 09604522cf594d609fa505dd8c94262c</span>
+      <a class="sam-link" href="https://sam.gov/opp/09604522cf594d609fa505dd8c94262c/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-28</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">HOMELAND SECURITY, DEPARTMENT OF › OFFICE OF PROCUREMENT OPERATIONS › DEPARTMENTAL OPERATIONS ACQUISITION DIVISION II</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">519290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-28</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">05/01/2026 to 04/30/2027 (12 months)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a commercial subscription acquisition for a named, single-vendor product (Clarivate Web of Science). The solicitation is extremely thin — a 2-page SF-1449, a brief 2-page SOW, a pricing sheet, and a J&amp;A. There are no reporting requirements, no quality assurance surveillance plan, no meeting cadences, no prescribed report formats, and no deliverables list beyond the subscription itself. The accountability structure is essentially: the vendor provides access to the platform for 12 months, and the government receives it.
+
+For this sin to manifest at severity 2 or 3, there would need to be a pattern of overlapping reporting requirements, prescribed format mandates, or process-compliance surveillance mechanisms that crowd out outcome measurement. None of those exist here. The SOW&#x27;s Section 2 requirements are almost entirely product specifications describing what the Web of Science platform contains (150 million records, 34,000 journals, unlimited users, Chinese database plugin) — these are outcome-adjacent because they describe what the government is paying for.
+
+The one genuine weakness is that Section 2.7&#x27;s &#x27;technical support and customer service&#x27; requirement lacks any SLA definition — no uptime percentage, no support response time, no escalation path. This means if the platform experiences sustained outages, there is no contractual performance standard to invoke. However, this is more accurately characterized as a gap in outcome measurement rather than an active compliance-over-outcomes structure. The solicitation does not substitute process compliance for outcome measurement; it simply has almost no accountability mechanism of any kind, which is a different problem.
+
+For a straightforward 12-month commercial database subscription renewal at a firm-fixed price, the thin accountability structure is less alarming than it would be for a complex services contract. The government is essentially buying a commercial product with standard vendor support terms. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.7 The contractor shall provide technical support and customer service to ensure uninterrupted access to the platform.</blockquote>
+  <div class="ev-explanation">This is the closest the SOW comes to a service quality requirement. It is vague — &#x27;uninterrupted access&#x27; and &#x27;technical support&#x27; are not defined with measurable SLAs, uptime targets, or response time standards — but it does gesture at an outcome (continued access) rather than a process. Its weakness is the absence of measurement criteria, not the presence of compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents a textbook — and severe — case of insider rewards. The J&amp;A explicitly invokes sole-source authority and names Clarivate Analytics as the only viable source before solicitation issuance. The SOW is written as a product specification for Clarivate&#x27;s specific platform rather than as outcome-based or capability-based requirements that any vendor could address. The market research consists of agency employees concluding that no alternative exists, without documented evaluation of competing platforms. The two-day response window renders any nominal competition impossible even if a challenger emerged. Every structural element — the sole-source justification, the product-specific SOW language, the pre-populated pricing sheet naming Clarivate, and the compressed timeline — stacks to produce a foregone conclusion. The sole mitigating consideration is that Web of Science is a genuinely proprietary database with unique content (specific journal coverage, citation indexes, the Chinese Science Citation Database plugin), meaning there may be a legitimate &#x27;only one responsible source&#x27; argument. However, the J&amp;A does not rigorously demonstrate that comparable capabilities cannot be met by alternatives; it simply asserts it. The severity is 3 because competition is not merely disadvantaged — it is eliminated entirely through the combination of sole-source structure, product-specific requirements, and an operationally impossible response window.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DHS intends to procure on a sole-source basis a renewal of the Web of Science Core Collection and platform... This sole-source contract is a follow-on award to 70RDA225P00000013, which has a period of performance from April 23, 2025 to April 22, 2026.</blockquote>
+  <div class="ev-explanation">The solicitation is explicitly structured as a sole-source, follow-on award to the incumbent (Clarivate Analytics). This is the most direct form of insider rewards: competition is not merely tilted toward the incumbent — it is entirely eliminated.</div>
+</div><div class="evidence-item">
+  <blockquote>Name and Address of the Contractor: Clarivate Analytics, LLC, 789 E. Eisenhower Parkway, Ann Arbor, MI 48108</blockquote>
+  <div class="ev-explanation">The J&amp;A names the contractor before the solicitation is even awarded. The pricing sheet (Attachment 2) already pre-populates &#x27;Clarivate&#x27; as the vendor for both CLINs. The solicitation form exists to justify a predetermined vendor selection, not to compete for one.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide access to over 150 million records from as many as 34,000 journals... The contractor shall ensure the platform provides exhaustive indexing of metadata and distinctive editorial capture of cited references and other citation connections.</blockquote>
+  <div class="ev-explanation">The SOW&#x27;s technical requirements are written as a description of Web of Science&#x27;s specific product features — &#x27;over 150 million records,&#x27; &#x27;34,000 journals,&#x27; &#x27;distinctive editorial capture&#x27; — rather than as functional outcomes any capable vendor could meet. These specifications can only be satisfied by Clarivate&#x27;s specific proprietary platform, making the SOW a product specification masquerading as a performance requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>There is no other tool available that provides us comprehensive information on foreign and US researchers&#x27; research topics, institutional affiliation, sub-institutional affiliations (i.e. research labs) not always found in visa applications, funding sources/grant numbers, and co-authors.</blockquote>
+  <div class="ev-explanation">The J&amp;A&#x27;s market research conclusion that &#x27;no other tool&#x27; exists is asserted without meaningful comparative analysis. The market research section notes it was conducted by agency employees and found no alternatives, but does not demonstrate evaluation of competing academic database platforms (e.g., Scopus, Dimensions, Semantic Scholar). This unsupported conclusion is the foundation for foreclosing all competition.</div>
+</div><div class="evidence-item">
+  <blockquote>A presolicitation notice will be posted to the Governmentwide point of entry (GPE) on April 10th, 2026... Quote is due by April 30, 2026 by 10:00 AM... Questions are due by April 29, 2026 by 10:00 AM</blockquote>
+  <div class="ev-explanation">The response window is two days (April 28 to April 30), with questions due the day before the quote deadline. Even if a competitor somehow existed and saw the posting, no realistic vendor could prepare, price, and submit a compliant quote in 48 hours. This timeline structurally guarantees the incumbent wins regardless of any nominal competition.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simple commercial subscription renewal for a named proprietary database platform (Web of Science by Clarivate Analytics). The SOW is appropriately brief and outcome-oriented for its nature. The &#x27;specific requirements&#x27; in Section 2 are largely product feature descriptions that define what the subscription must include — which databases, how many users, what content coverage — rather than prescribing how the vendor must perform work. This is the correct approach for a COTS subscription acquisition: you specify what you are buying, not how the vendor must build or operate it.
+
+The solicitation does name the specific tool and vendor (Clarivate Analytics Web of Science), but this is justified by the accompanying sole-source Justification and Approval, which documents that no comparable alternative exists for the agency&#x27;s specific intelligence mission needs. Naming the platform is not requirement sprawl in this context — it is an accurate description of the only available solution.
+
+There is no evidence of the classic sprawl patterns: no step-by-step process mandates, no prescribed staffing structures, no detailed workflow procedures copied from an incumbent&#x27;s operations manual. The requirements are concise and define what the subscription must provide. Severity 1 is appropriate — this is a competently scoped, appropriately minimal solicitation for a commercial subscription service.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.3 The contractor shall ensure the platform provides exhaustive indexing of metadata and distinctive editorial capture of cited references and other citation connections.</blockquote>
+  <div class="ev-explanation">This requirement describes characteristics of the Web of Science product itself rather than prescribing a process the vendor must follow. In context, it is a product specification for a commercial off-the-shelf subscription service — it defines what the platform must offer, not how the vendor must operate. Because this is a sole-source subscription renewal for a named proprietary platform, these &#x27;requirements&#x27; are effectively descriptions of the product being purchased, not prescriptive process mandates.</div>
+</div><div class="evidence-item">
+  <blockquote>2.7 The contractor shall provide technical support and customer service to ensure uninterrupted access to the platform.</blockquote>
+  <div class="ev-explanation">This is the one requirement that could be considered slightly under-specified as an outcome statement — it doesn&#x27;t define SLAs, response times, or uptime targets. However, it does define a desired outcome (uninterrupted access) rather than prescribing how support must be delivered. It is outcome-oriented, not process-prescriptive.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents no evidence of rule pools. The regulatory citation landscape is exceptionally lean: the SF-1449 form incorporates by reference only four standard FAR Part 12 commercial-item clauses (52.212-1, 52.212-3, 52.212-4, 52.212-5), which are the baseline clauses for virtually all commercial-item acquisitions. The SOW contains no &#x27;Applicable Documents&#x27; section, no list of agency-specific directives, no cited executive orders, and no compliance frameworks beyond what the standard form requires. The Section 4.0 &#x27;Government Terms &amp; Definitions&#x27; header in the SOW appears empty. This is a straightforward commercial subscription purchase — a single vendor, a defined product (Web of Science), a 12-month period of performance. The regulatory simplicity is appropriate to the nature of the acquisition. There are no bulk policy dumps, no tangential or contradictory citations, and no evidence of copy-forward accumulation. A vendor reading this solicitation faces a clear and manageable compliance landscape. Severity 1 is the correct assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7a. SOLICITATION INCORPORATES BY REFERENCE (FEDERAL ACQUISITION REGULATION) FAR 52.212-1, 52.212-4. ADDENDA ARE NOT ATTACHED. FAR 52.212-3 AND 52.212-5 ARE ATTACHED.</blockquote>
+  <div class="ev-explanation">The solicitation references only a small, standard set of FAR commercial-item clauses (52.212-1, 52.212-4, 52.212-3, 52.212-5). This is the normal, minimal regulatory footprint for a commercial-item acquisition under FAR Part 12 — not a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial subscription renewal for a named, proprietary database platform (Clarivate Analytics Web of Science). The requirement is fully defined: a 12-month subscription to specific named indexes, unlimited users, and a Chinese Database plugin. The cost is known from prior acquisition history and confirmed in the J&amp;A at $301,072.03. There is no variable labor component, no evolving scope, and no technical uncertainty that would make FFP inappropriate. Firm-Fixed Price is the canonical contract type for commercial software and database subscriptions under FAR Part 12, and its use here is entirely appropriate. The government bears minimal risk of needing contract modifications because the deliverable — continued access to an existing platform — is stable and well-understood. This is not a square peg situation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contract Type: Firm-Fixed Price</blockquote>
+  <div class="ev-explanation">The J&amp;A explicitly states the contract will be Firm-Fixed Price, which is the relevant contract type for this analysis.</div>
+</div><div class="evidence-item">
+  <blockquote>The purpose for this request is to purchase a subscription to Clarivate Analytics Web of Science Core Collection and platform for Science Citation Index Expanded, Social Science Citation Index, Conference Proceeding Citation Index, Korean Journal Database, SciELO Citation index for 12 months.</blockquote>
+  <div class="ev-explanation">The requirement is a standard commercial software subscription — a well-defined, commercially available product with a known price, fixed duration, and no variable labor component. This is precisely the kind of requirement for which FFP is the appropriate contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>Base Year | 12 mo. | $301,072.03 | $301,072.03</blockquote>
+  <div class="ev-explanation">The pricing structure reflects a single annual subscription fee, consistent with how commercial database subscriptions are sold in the market. There is no ambiguity in scope or deliverable that would require a different contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="70RDA226Q00000020.pdf">70RDA226Q00000020.pdf</div></div>
+  <a class="dl-btn" href="../attachments/09604522cf594d609fa505dd8c94262c_70RDA226Q00000020.pdf" download="70RDA226Q00000020.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1_ Web of Science Statement of Work %28SOW%29.docx">Attachment 1_ Web of Science Statement of Work %28SOW%29.docx</div></div>
+  <a class="dl-btn" href="../attachments/09604522cf594d609fa505dd8c94262c_Attachment+1_+Web+of+Science+Statement+of+Work+%28SOW%29.docx" download="Attachment 1_ Web of Science Statement of Work %28SOW%29.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 Web of Science Pricing Sheet.xlsx">Attachment 2 Web of Science Pricing Sheet.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/09604522cf594d609fa505dd8c94262c_Attachment+2+Web+of+Science+Pricing+Sheet.xlsx" download="Attachment 2 Web of Science Pricing Sheet.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RIIA-26-00020 JA 4.15.2026 CO Signed.pdf">RIIA-26-00020 JA 4.15.2026 CO Signed.pdf</div></div>
+  <a class="dl-btn" href="../attachments/09604522cf594d609fa505dd8c94262c_RIIA-26-00020+JA+4.15.2026+CO+Signed.pdf" download="RIIA-26-00020 JA 4.15.2026 CO Signed.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

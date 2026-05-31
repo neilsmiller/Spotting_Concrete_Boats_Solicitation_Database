@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automated Digital Network System (ADNS) Multiple Award Contract (MAC) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Automated Digital Network System (ADNS) Multiple Award Contract (MAC)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 1e8e3a3c70e94fe7b3093284fbd7862d</span>
+      <a class="sam-link" href="https://sam.gov/opp/1e8e3a3c70e94fe7b3093284fbd7862d/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2025-07-28</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › SPAWAR › SPAWAR HQ › NAVAL INFORMATION WARFARE SYSTEMS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-07-28</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">IDIQ Multiple Award Contract (MAC) with Firm-Fixed-Price (FFP) delivery orders</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Orders may be issued from date of Contract Award through eight (8) years thereafter; no deliveries required after ten (10) years from date of contract award</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor 1 	at	ADNS Production Processes and Capacity</li><li>Factor 2 	at	Management Approach</li><li>Factor 3 	at	ADNS Sample Delivery Order</li><li>Factor 4 	at	Past Performance</li><li>Factor 5 	at	Extent of Participation of Small Business (Large Business Vendors Only)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a Build-to-Print (BTP) hardware production contract for a Navy Program of Record, which meaningfully shapes the analysis. BTP contracts have an inherent outcome mechanism that services contracts lack: Factory Acceptance Testing (FAT, CDRL A00B) and delivery inspection provide tangible go/no-go gates — the system either conforms to the TDP or it does not. The As-Built Configuration List (A00D) and Certification of Component Authenticity (A00L) similarly tie to physical deliverable conformance. These are genuine outcome checkpoints, not pure compliance theater, and they prevent a severity-3 finding.
+
+However, the solicitation&#x27;s administrative and management accountability layer is heavily process-focused. The monthly status report (A003) and monthly IMS (A004) together create a dual reporting cadence that measures plan adherence rather than production outcomes. The IMS is particularly telling: it mandates specific commercial tools (MS Project 2016) and references DoD IMS guidance, establishing a waterfall-style monitoring regime where the government tracks deviations from the schedule rather than evaluating whether the underlying work is producing capable systems.
+
+The QA Checklist (A00A) is the most direct quality assurance instrument in the CDRL set, but it is structured as a documentation deliverable with no specified acceptance criteria or performance thresholds. The FRACAS report (A00C) is similarly a data-collection obligation without accompanying reliability targets — the contractor must report failures, but there is no stated MTBF requirement or acceptable failure rate against which the reports are evaluated.
+
+Mitigating factors: (1) FAT (A00B) represents a genuine outcome gate, not just a process check; (2) the contract is FFP, which creates inherent incentives for the contractor to meet delivery requirements efficiently; (3) the CDRL volume is appropriate for a multi-platform military hardware production program. The solicitation also references specific test procedures (0245682 Rev A) for SP4 systems, suggesting the government has defined technical standards elsewhere.
+
+The net assessment is moderate severity (2): the reporting and QA structure leans process-heavy, with multiple overlapping reporting cadences and a QA checklist that measures documentation rather than performance, but the FAT acceptance mechanism and TDP conformance requirements provide meaningful outcome accountability that prevents this from being purely compliance theater.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>BLOCK 4: The Contractor shall deliver a monthly Progress, Status, and Management Report. ... BLOCKS 12 and 13: The Contractor shall deliver the initial report 15 calendar days after Delivery Order Award. Subsequent submissions are due no later than 10 calendar days after the end of the prior month.</blockquote>
+  <div class="ev-explanation">A003 (Monthly Status Report) requires a recurring monthly report on progress, status, and management — but the CDRL specifies no performance targets, no outcome metrics, and no criteria for what constitutes a &#x27;good&#x27; report. The DID reference (DI-MGMT-81928) governs format and content of progress reporting, not whether work is achieving mission objectives. The monthly report becomes a process-documentation artifact rather than an outcome evaluation.</div>
+</div><div class="evidence-item">
+  <blockquote>A004 (IMS): MNTHLY ... 5 Business DAO ... 5 Business Days Before TIM. The Contractor shall submit the IMS in Microsoft Project 2016 and Microsoft Word 2016 or newer ... The Contractor shall create and deliver the IMS in accordance with the DoD Integrated Master Plan and Integrated Master Schedule Preparation and Use Guide of May 2023.</blockquote>
+  <div class="ev-explanation">The Integrated Master Schedule is required monthly and must conform to specific tool and format requirements (MS Project 2016, MS Word 2016). The accountability mechanism here is plan-adherence: the IMS tracks whether work is proceeding against a pre-established schedule. There are no outcome metrics tied to whether the schedule reflects actual mission readiness or system performance. This is waterfall-style compliance monitoring: the government measures whether the vendor is following the plan, not whether the plan is producing capable ADNS systems.</div>
+</div><div class="evidence-item">
+  <blockquote>A00A (Quality Assurance Checklist): Required for all production units. Contractor shall provide a copy of specific CLIN reports as required by COR, with a final composite CDRL delivery concurrent with final CLIN delivery and covering all production units.</blockquote>
+  <div class="ev-explanation">The QA Checklist (A00A) is the primary quality assurance instrument for production units, but it is structured as a documentation deliverable rather than an outcome measure. The solicitation does not specify pass/fail criteria, defect rates, or system performance thresholds that the checklist must confirm. Compliance with the checklist process — not demonstrated system capability — is the measurable output.</div>
+</div><div class="evidence-item">
+  <blockquote>A00C (FRACAS Report): The Contractor shall complete a FRACAS report with each production unit as they complete Factory Acceptance Test (FAT). The Contractor shall deliver FRACAS reports quarterly ... The report shall summarize the results of the contractor&#x27;s Failure Reporting, Analysis, and Corrective Action System (FRACAS) implementation required by the statement of work and shall include a cumulative tabulation of failure data.</blockquote>
+  <div class="ev-explanation">FRACAS reporting is a legitimate reliability engineering tool, but as implemented here it is a reporting cadence without outcome thresholds. The solicitation requires the contractor to document and report failures but sets no reliability targets (e.g., Mean Time Between Failures, maximum failure rate per production lot, or field return rate). Without quantitative performance standards against which the FRACAS data is measured, the report confirms process compliance — &#x27;we ran FRACAS&#x27; — rather than confirming that the system meets reliability outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>A003 (Monthly Status Report) + A004 (IMS, monthly) + A001 (Presentation Materials, as-required) + A002 (Meeting Minutes, as-required) + A00A (QA Checklist, as-required) + A00C (FRACAS, quarterly) + A00M (Small Business Subcontractor Report, quarterly) — all running concurrently across the contract period.</blockquote>
+  <div class="ev-explanation">The cumulative reporting burden spans multiple overlapping cadences: monthly status reports, monthly IMS updates, event-driven presentation materials and meeting minutes, quarterly FRACAS reports, and quarterly subcontracting reports. Every one of these deliverables focuses on activities performed, schedules tracked, or processes followed. None establish performance thresholds that the government will use to evaluate whether ADNS systems are fit for purpose. The accountability structure is heavily process-oriented.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics — severity 2 — for several compounding reasons. The core evaluation framework is capability-based and appropriately structured for a complex hardware production MAC: factors assess production processes, management approach, and sample delivery order execution, not just prior contract history. The multiple-award structure also mitigates some insider bias by awarding to all qualifying offerors rather than selecting a single winner. However, the past performance criteria impose meaningful structural advantages for incumbents and Navy-experienced vendors. The requirement that relevant experience must involve specifically &#x27;U.S. Navy Shipboard, Submarine, Airborne and Shore systems&#x27; — combined with explicit bonus credit for NAVWAR/PEO C4I experience, a five-year lookback, and the requirement that the prime (not just a subcontractor) supply at least one qualifying reference — creates a significantly tilted competitive landscape. The Build-to-Print nature of ADNS (adapting COTS/GOTS to Navy-specific TDPs) does legitimately require some degree of Navy platform knowledge, and the security classification and CUI technical data requirements are genuine operational constraints rather than manufactured barriers. The 8-day response window from posting is unusually short and further advantages incumbents who already hold the TDP data, though this is partly mitigated by the NDA/DD2345 access process. Critically, the evaluation does not impose specific dollar thresholds on past contracts, does not require a minimum number of qualifying contracts, and does not require personnel to have held specific titled positions on prior government programs — the most severe forms of insider rewards. A qualified vendor with rack-mounted naval systems production experience (e.g., a company that has produced sonar or weapons system electronics for the Navy) could potentially compete and score adequately. The playing field is tilted toward the incumbent and existing Navy integrators, but it is not categorically closed to qualified new entrants.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>For the purposes of this factor relevant past performance is defined as experience that demonstrates both the following: a) Production of rack-mounted, U.S. Navy Shipboard, Submarine, Airborne and Shore systems; and b) Similar scope, magnitude of effort, and complexity compared to the ADNS MAC Solicitation, ADNS Technical Data Package.</blockquote>
+  <div class="ev-explanation">The relevancy definition requires prior experience specifically with &#x27;U.S. Navy Shipboard, Submarine, Airborne and Shore systems&#x27; — not just rack-mounted systems or comparable military systems generally. This naval-platform specificity narrows the relevant experience pool significantly, as few companies outside the existing ADNS vendor base and a small number of Navy C4I integrators will have produced rack-mounted systems across all four of these Navy-specific platform categories.</div>
+</div><div class="evidence-item">
+  <blockquote>Relevancy. The second aspect is to determine how relevant a recent effort accomplished by the Offeror is to the effort to be acquired through the source selection... Direct experience providing similar support services to NAVWAR, PEO C4I and other Navy Systems Commands will be considered more favorably than non-Navy experience.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states that experience with NAVWAR and PEO C4I is treated as more favorable than non-Navy experience. This is not merely a capability test — it is an evaluation bonus for organizational familiarity with the specific Navy command structure that issued this contract. Vendors with equivalent production capability gained through Army, Air Force, or commercial programs would score lower regardless of actual capability.</div>
+</div><div class="evidence-item">
+  <blockquote>To be deemed recent, the work must have been performed since 1 January 2020 and demonstrate at least twelve (12) months of performance within those last five (5) years... Relevancy is defined as efforts that include production of rack-mounted, U.S. Navy Shipboard, Submarine, Airborne and Shore systems; and of similar scope, contract type, magnitude of effort, and complexity compared to the ADNS MAC Solicitation and Technical Data Package that are recent per the definition of recent in this solicitation.</blockquote>
+  <div class="ev-explanation">The combination of recency (since January 2020, 12 months minimum) and the narrowly defined relevancy (Navy Shipboard/Submarine/Airborne/Shore rack-mounted systems of similar scope) compounds the exclusionary effect. A vendor with extensive prior production experience on Navy platforms that concluded before 2020 receives no credit, while only vendors with recent Navy-specific production contracts will achieve favorable relevance ratings. This is particularly restrictive for the ADNS context, where the TDP-driven Build-to-Print nature means that deep familiarity with the specific Navy architecture is effectively a prerequisite for a &#x27;Very Relevant&#x27; rating.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors shall submit up to three (3) Attachment 4 - Relevant Experience Forms to explain the relevance and quality of the Offeror&#x27;s past performance since 01 January 2020. Offerors shall cite at least one reference from the prime Offeror, no more than one reference from any subcontractor, and no more than three references total.</blockquote>
+  <div class="ev-explanation">The requirement that the prime offeror must supply at least one reference — combined with the Navy-platform specificity of what counts as relevant — means that the prime must have had its own (not just a subcontractor&#x27;s) recent Navy shipboard/submarine/airborne/shore production contract. A capable integrator that could credibly perform the work but has historically teamed as a subcontractor under a large prime, or performed comparable work outside the Navy domain, cannot satisfy this requirement through teaming relationships alone.</div>
+</div><div class="evidence-item">
+  <blockquote>In order to obtain access to the Controlled Unclassified Information (CUI) ADNS MAC Technical Documents for the purposes of responding to this Solicitation, interested companies shall: 1. Provide a current copy of the approved DD Form 2345, Military Critical Technical Data Agreement, verifying eligibility and authority to receive export-controlled information; and 2. Complete a Non-Disclosure Agreement (NDA)... The ADNS MAC technical data will be sent by the Contract Specialist to interested companies via Department of Defense Secure Access File Exchange (DoD SAFE) once the DD2345 and NDA are completed.</blockquote>
+  <div class="ev-explanation">The TDP and technical data required to propose are themselves CUI/export-controlled and must be obtained through a multi-step access process with a firm deadline tied to the proposal due date. The Factor 3 sample delivery order requires detailed production planning against specific TDP requirements. Vendors who do not already possess this technical data from prior ADNS work face an additional access barrier, and the tight 8-day response window from posting to deadline makes it structurally difficult for a new entrant to obtain, review, and adequately respond to TDP-driven requirements before the proposal is due.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a Build-to-Print (BTP) hardware production solicitation, not a services contract. The fundamental nature of BTP procurement means the government necessarily specifies WHAT is to be built (technical data packages, build specifications, exact system configurations) — that is the entire point of a BTP approach. The solicitation explicitly states &#x27;specific requirements will be defined in individual Delivery Orders,&#x27; which is appropriate for an IDIQ MAC vehicle. The core document provided is a CDRL exhibit listing data deliverables, the solicitation SF33 and standard clauses, and an OPSEC attachment. The actual Statement of Work (Attachment 1) is referenced but not provided in the text. The CDRLs themselves are outcome-oriented: they define WHAT data must be delivered (monthly status reports, factory acceptance test results, FRACAS reports, as-built configuration lists, etc.), WHEN they are due, and in what format — all of which are reasonable deliverable specifications, not prescriptive process mandates. The CDRL structure (using standard DIDs like DI-MGMT-81928, DI-SESS-80255B, etc.) is the government&#x27;s standard method for data acquisition and does not constitute requirement sprawl. The proposal instructions in Section L are appropriately structured around capabilities and outcomes: Factor 1 asks offerors to describe their production process and capacity (not mandating a specific process); Factor 2 asks for management approach (not prescribing org structure); Factor 3 asks offerors to demonstrate approach to a sample delivery order. These are evaluation criteria that invite vendor-proposed solutions rather than locking in a specific method. The two prescriptive tool citations I identified (Microsoft Project, Microsoft Office) are minor and consistent with standard government interoperability requirements — not evidence of the kind of pervasive process prescription that characterizes true requirement sprawl. Without the SOW text (Attachment 1), a complete assessment is not fully possible, but based on what is available, this solicitation reads as a competently scoped procurement appropriate to its BTP hardware context. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall submit the IMS in Microsoft Project 2016 and Microsoft Word 2016 or newer, using DID as guidance. The Contractor shall create and deliver the IMS in accordance with the DoD Integrated Master Plan and Integrated Master Schedule Preparation and Use Guide of May 2023.</blockquote>
+  <div class="ev-explanation">This CDRL (A004) mandates specific software tools — Microsoft Project 2016 and Microsoft Word 2016 — for IMS delivery. A vendor using a different but equally capable scheduling platform (e.g., Primavera, Smartsheet) would need to convert outputs, adding friction. However, this is a modest constraint: IMS tool standardization is a common government interoperability requirement, the DID reference is standard practice, and the underlying outcome (a compliant, readable schedule) is clearly defined. This is a borderline prescriptive element but not dispositive of sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>Material shall be developed in Microsoft Office 2010 compatible software. Contractor format acceptable subject to Government approval.</blockquote>
+  <div class="ev-explanation">CDRL A002 specifies Microsoft Office 2010 compatibility for meeting minutes. This is mildly prescriptive regarding file format but does not constrain how the contractor conducts meetings, manages action items, or structures the content. It is a delivery format specification — the type of focused deliverable requirement that this sin definition explicitly excludes from sprawl. The phrase &#x27;contractor format acceptable subject to Government approval&#x27; further relaxes the constraint.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate but not severe instance of the rule pools pattern. The regulatory citation volume is substantial — approximately 80+ FAR/DFARS clauses in Section I, five overlapping OPSEC documents in an attachment, multiple DoD standards frameworks across the 17-CDRL exhibit — but much of this volume is explainable by the contract&#x27;s legitimate characteristics: a classified DoD hardware production IDIQ with supply chain risk requirements, cost reporting obligations, and complex configuration management needs for a Program of Record.
+
+The solicitation does not exhibit the most severe manifestations of rule pools: there is no single bulk &#x27;Applicable Documents&#x27; list of 50+ items, the CDRLs each have coherent scopes linked to specific SOW paragraphs (e.g., A009 Quality Assurance Plan references 3.1.2/3.1.8; A00C FRACAS Report references 3.1.15/3.2.2), and the OPSEC and security requirements are appropriate for work involving SECRET-level material and naval shipboard systems.
+
+However, meaningful rule pool indicators are present. The clause list in Section I presents all provisions at equal weight with no guidance on which carry particular operational significance for this hardware production context. The SMS/texting clause (52.226-8) and several generic behavioral clauses appear as compliance boilerplate alongside substantive supply chain and cybersecurity requirements with no differentiation. The OPSEC attachment cites five overlapping regulatory sources without explaining how a hardware production contractor should navigate any distinctions among them. The cumulative CDRL standards burden — spanning MIL-HDBK-61B, ANSI/EIA-649C, multiple CAPE DI numbers, FED-STD-313F, SAE-AS6174, and military packaging standards — is heavy for what is fundamentally a build-to-print production contract, and no prioritization is provided.
+
+Severity 2 is appropriate: the solicitation&#x27;s compliance landscape is elevated and includes undifferentiated clauses of clearly varying relevance, but stops short of the severity-3 pattern of a manifestly uncurated, contradictory accumulation with no contextual guidance. An experienced defense contractor familiar with Navy program-of-record hardware production would find this navigable; a vendor new to NAVWAR would face meaningful interpretation overhead before being able to price a responsive proposal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CLAUSES INCORPORATED BY REFERENCE
+52.202-1 Definitions JUN 2020
+52.203-3 Gratuities APR 1984
+52.203-5 Covenant Against Contingent Fees MAY 2014
+52.203-6 Restrictions On Subcontractor Sales To The Government JUN 2020
+52.203-7 Anti-Kickback Procedures JUN 2020
+52.203-8 Cancellation, Rescission, and Recovery of Funds for Illegal or Improper Activity MAY 2014
+52.203-10 Price Or Fee Adjustment For Illegal Or Improper Activity MAY 2014...</blockquote>
+  <div class="ev-explanation">Section I incorporates approximately 80+ FAR and DFARS clauses by reference. While many are standard for a DoD fixed-price IDIQ contract, they are presented as an undifferentiated list without any contextual guidance on which clauses carry particular operational weight for this specific hardware production effort. The sheer volume — spanning clauses on gratuities, convict labor, energy contracting, SMS text messaging, and unmanned aircraft — creates a compliance landscape that vendors must independently parse.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 Encouraging Contractor Policies To Ban Text Messaging While Driving MAY 2024</blockquote>
+  <div class="ev-explanation">This clause addresses employer policies prohibiting employees from texting while driving. While nominally applicable to all federal contracts, its relevance to a naval systems integration/production contract for shipboard networking equipment is extremely attenuated. Including it without context alongside supply chain cybersecurity and export control clauses of genuine operational significance contributes to the undifferentiated compliance burden.</div>
+</div><div class="evidence-item">
+  <blockquote>252.239-7000 Protection Against Compromising Emanations OCT 2019 [in Section C]
+...252.239-7001 Information Assurance Contractor Training and Certification JAN 2008
+252.239-7017 Notice of Supply Chain Risk DEC 2022
+252.239-7018 Supply Chain Risk DEC 2022</blockquote>
+  <div class="ev-explanation">Multiple overlapping cybersecurity and supply chain risk clauses are cited both in Section C and Section I without explanation of how they interact or which governs in the event of conflict. For a vendor producing COTS/GOTS integrated systems, the interaction between DFARS 252.239-7018 (Supply Chain Risk), 252.204-7012 (Safeguarding Covered Defense Information), 252.246-7007 (Counterfeit Electronic Part Detection), and 252.246-7008 (Sources of Electronic Parts) creates a layered compliance burden where the relative priority and operational implementation guidance is absent.</div>
+</div><div class="evidence-item">
+  <blockquote>All work is to be performed in accordance with DoD and Navy OPSEC requirements, per the following applicable documents:
+• National Security Decision Directive 298, National Operations Security Program (NSDD) 298
+• DOD 5205.02, DOD Operations Security (OPSEC) Program Manual
+• SECNAVINST 3070.2, Operations Security
+• OPNAVINST 3432.1, Operations Security
+• NAVWAR M-5510.1A, Chapter 11, Operations Security</blockquote>
+  <div class="ev-explanation">The OPSEC attachment cites five separate OPSEC regulatory documents without explaining how each one applies differently to this contractor&#x27;s specific scope of work (hardware production and integration). For a Build-to-Print production contract, the practical meaning of complying simultaneously with a national security directive, a DoD program manual, two Navy instructions, and a NAVWAR manual — each with overlapping but potentially distinct requirements — is left entirely to the contractor to resolve.</div>
+</div><div class="evidence-item">
+  <blockquote>BLOCK 4: MIL-HDBK-61B (Configuration Management Guidance) and ANSI/EIA649C (Configuration Management Standard) shall be used as guidance. [CDRL A00D]
+...The Contractor shall create and deliver the IMS in accordance with the DoD Integrated Master Plan and Integrated Master Schedule Preparation and Use Guide of May 2023. [CDRL A004]
+...Prepare the Cost and Hour Report (FlexFile) in accordance with DI-FNCL-82162 and the OSD CAPE Deputy Director, Cost Assessment (DDCA)-approved contract CSDR Plan. [CDRL A006]</blockquote>
+  <div class="ev-explanation">The CDRL exhibit references multiple overlapping standards frameworks — MIL-HDBK-61B, ANSI/EIA-649C, DoD IMS Guide, CAPE CSDR requirements, DI-FNCL-82162, DI-MGMT-82164, DI-FNCL-81765C — across 17 separate CDRL line items. While each individual CDRL has a plausible purpose for a program-of-record hardware contract, the aggregate set of referenced standards is substantial and cumulative. There is no prioritization or explanation of which standards take precedence when they conflict, creating an interpretation burden proportional to the number of standards cited.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a production contract for Build-to-Print hardware systems and associated software/spares delivered under an IDIQ MAC, with all delivery orders to be issued as Firm Fixed Price. FFP is the well-established, appropriate contract type for BTP manufacturing work. The government provides the Technical Data Package; the contractor&#x27;s obligation is to produce conforming hardware units to defined specifications, pass Factory Acceptance Testing, and deliver on schedule. These conditions — known deliverables, government-furnished design data, measurable acceptance criteria, commercial COTS/GOTS components, competitive award at the delivery order level — are precisely the conditions under which the FAR recommends FFP. The IDIQ structure appropriately handles demand uncertainty at the MAC level, while individual FFP delivery orders handle specific quantities and schedules once requirements are defined. The inclusion of software maintenance and renewals (CLIN 0003) under FFP is also reasonable: software license renewals are commercial items with predictable pricing. The CDRL and management reporting requirements (monthly status reports, IMS, FRACAS, etc.) are standard program management oversight tools that do not signal scope uncertainty inconsistent with FFP. There is no evidence of a mismatch between the contract type and the nature of the requirements. No severity concern is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Firm-Fixed-Price (FFP) delivery orders will be issued under this IDIQ MAC contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly establishes FFP as the pricing type for all delivery orders under the IDIQ MAC.</div>
+</div><div class="evidence-item">
+  <blockquote>ADNS Production Units / Sub-Assemblies ... ADNS Spares / System Components ... Software Initial, Renewals and Maintenance ... IDIQ Post-Award Conference</blockquote>
+  <div class="ev-explanation">The four substantive CLINs cover Build-to-Print production of hardware systems, spares, and software. Build-to-Print (BTP) production is precisely the scenario where FFP is appropriate: the government provides the Technical Data Package (TDP) and the contractor produces to that specification. Deliverables, quantities, and acceptance criteria are well-defined.</div>
+</div><div class="evidence-item">
+  <blockquote>This solicitation is for the delivery of Build-to-Print (BTP) ADNS production units, Cyber Threat Upgrades (CTUs) and Mission Focused Upgrades (MFUs), kits, modules, components, software, spares, and lab material for Shore, Surface, Submarine and Airborne platforms.</blockquote>
+  <div class="ev-explanation">BTP production means the contractor is manufacturing to a government-furnished design. The technical risk is borne by the government&#x27;s design authority, not the contractor&#x27;s development effort. Costs can be estimated from the TDP, making FFP the standard and appropriate contract type for this category of work.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2a_PEO C4I OPSEC.pdf">Attachment 2a_PEO C4I OPSEC.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1e8e3a3c70e94fe7b3093284fbd7862d_Attachment+2a_PEO+C4I+OPSEC.pdf" download="Attachment 2a_PEO C4I OPSEC.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3_N0003925R9510_ADNS MAC Contractor Performance Evaluation Survey.docx">Attachment 3_N0003925R9510_ADNS MAC Contractor Performance Evaluation Survey.docx</div></div>
+  <a class="dl-btn" href="../attachments/1e8e3a3c70e94fe7b3093284fbd7862d_Attachment+3_N0003925R9510_ADNS+MAC+Contractor+Performance+Evaluation+Survey.docx" download="Attachment 3_N0003925R9510_ADNS MAC Contractor Performance Evaluation Survey.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Exhibit A_N0003925R9510_ADNS MAC CDRLs_11 JUN 2025.pdf">Exhibit A_N0003925R9510_ADNS MAC CDRLs_11 JUN 2025.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1e8e3a3c70e94fe7b3093284fbd7862d_Exhibit+A_N0003925R9510_ADNS+MAC+CDRLs_11+JUN+2025.pdf" download="Exhibit A_N0003925R9510_ADNS MAC CDRLs_11 JUN 2025.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Exhibit A_N0003925R9510_ADNS MAC CDRLs_Rev 01_15 JULY 2025.pdf">Exhibit A_N0003925R9510_ADNS MAC CDRLs_Rev 01_15 JULY 2025.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1e8e3a3c70e94fe7b3093284fbd7862d_Exhibit+A_N0003925R9510_ADNS+MAC+CDRLs_Rev+01_15+JULY+2025.pdf" download="Exhibit A_N0003925R9510_ADNS MAC CDRLs_Rev 01_15 JULY 2025.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="N0003925R9510_ADNS MAC Solicitation_06-13-2025.pdf">N0003925R9510_ADNS MAC Solicitation_06-13-2025.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1e8e3a3c70e94fe7b3093284fbd7862d_N0003925R9510_ADNS+MAC+Solicitation_06-13-2025.pdf" download="N0003925R9510_ADNS MAC Solicitation_06-13-2025.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

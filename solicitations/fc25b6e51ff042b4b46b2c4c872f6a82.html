@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>General Electric (GE) Engineering Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>General Electric (GE) Engineering Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 fc25b6e51ff042b4b46b2c4c872f6a82</span>
+      <a class="sam-link" href="https://sam.gov/opp/fc25b6e51ff042b4b46b2c4c872f6a82/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › MSC › MSC HQS › MSCHQ NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">5 years (Years 1-5) plus a six-month option</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The CDRL suite (ten data items) constitutes the primary accountability structure and is oriented around documentation delivery: monthly logs, trip reports, as-found condition reports, annual cybersecurity reports, bi-annual obsolescence logs, software configuration management plans, and training curricula. Each CDRL has a defined submission frequency and distribution list, and the implicit measure of contractor performance is whether the documents arrive on time and contain the specified content.
+
+The solicitation does include some outcome-adjacent requirements that prevent a severity-3 finding. The response time standards in CDRL 001 (8-hour acknowledgment, 24-hour corrective action, 48-hour homeport visit, 72-hour deployed arrival) establish concrete time-bound obligations that go beyond pure documentation. The as-found condition reports (CDRL 005) create a mechanism for MSC to make timely maintenance decisions. The cybersecurity review (CDRL 003) references established frameworks (NIST SP-800-82r2, DHS Defense-in-Depth), providing external quality standards. These are meaningful countervailing factors.
+
+However, the solicitation stops short of defining what good performance looks like in operational terms. There are no SLAs for fault resolution time, no system availability or readiness metrics, no acceptance criteria for maintenance quality, and no user-satisfaction or mission-effectiveness measures. The government will know whether GE submitted its monthly remote support log; it will have less contractual basis to evaluate whether GE actually kept the ships&#x27; automation systems running reliably. The accountability structure tilts toward process compliance without fully crowding out outcomes. Severity 2 is appropriate: noticeable compliance focus, but some outcome-adjacent standards exist.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Remote Technical Support Log is to be submitted on a monthly basis to the Contracting Officer&#x27;s Representative (COR) and the Engineering Type Desk (TD) for that particular class of ships.</blockquote>
+  <div class="ev-explanation">This CDRL (001) requires a monthly Remote Technical Support Log. The deliverable documents activity — support requests received, acknowledgments, corrective action recommendations — but the CDRL contains no performance standard tied to actual system outcomes. There is no metric for whether the remote support resolved issues, whether ship systems were restored to operational status, or whether crew satisfaction was achieved. Compliance with the log submission schedule is the measurable obligation, not quality of resolution.</div>
+</div><div class="evidence-item">
+  <blockquote>All remote troubleshooting requests shall be acknowledged within 8 hours of receipt by the Program Manager (PM) or one of the designated GE engineers that received the request. The Contractor shall provide recommended initial technical corrective action directly to MSC within 24 hours of the request.</blockquote>
+  <div class="ev-explanation">The 8-hour acknowledgment and 24-hour initial corrective action timelines measure process responsiveness — did the contractor respond on time — not whether the problem was actually resolved. There is no SLA for time-to-resolution or system restoration, only for communication events. A contractor could acknowledge every request within 8 hours and recommend corrective actions within 24 hours while leaving ships&#x27; systems in a degraded state indefinitely without breaching any measurable standard.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall compile a report to document review data and associated recommendations. Review shall include, but not limited to, the following: ICS security architecture and topology as compared to established baseline. Document all system changes — Network segmentation and segregation design effectiveness — Boundary/perimeter and port security (physical and logical) [etc.]</blockquote>
+  <div class="ev-explanation">CDRL 003 (ICS Cybersecurity Services Report) requires an annual report documenting a checklist of reviewed items. The deliverable is the report itself — a process artifact — not a measurable cybersecurity outcome. There is no requirement that identified vulnerabilities be remediated within a defined period, no scoring against a security maturity model, and no acceptance standard distinguishing a high-quality security posture from a minimally compliant review. The government receives a document; whether the ships are actually more secure is unmeasured.</div>
+</div><div class="evidence-item">
+  <blockquote>Upon completion of each technical support effort requiring a shipboard visit, the Contractor shall prepare and submit a written report of maintenance performed and noted equipment conditions. The report shall be submitted to the COR... no later than fifteen (15) business days after completion of the work.</blockquote>
+  <div class="ev-explanation">CDRL 004 (Shipboard Technical Support - Response and Trip Report) measures compliance with the report submission deadline (15 business days) and distribution list. There is no requirement that the trip report demonstrate successful correction of the fault, restoration of system functionality to a specified standard, or any government acceptance criterion tied to equipment performance after the visit. The deliverable is administrative documentation of the visit, not evidence of outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall maintain a parts obsolescence log... The report shall be updated bi-annually and presented to the contracting officer&#x27;s representative (COR), Port Engineer, and Type Desk.</blockquote>
+  <div class="ev-explanation">CDRL 006 requires a bi-annual obsolescence log covering format-specified fields (part name, number, NSN, OEM, planned obsolescence date, replacement part, etc.). The accountability mechanism is whether the log is submitted twice per year in the correct format. There is no performance measure for whether the government actually procured replacement parts in advance of obsolescence, whether critical spare availability improved, or whether parts shortfalls affecting ship readiness were reduced. The deliverable tracks a process; ship readiness is unmeasured.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents the most severe form of insider rewards: it is explicitly a sole-source acquisition with GE named as the intended awardee. The entire requirement structure is built around GE&#x27;s proprietary systems, GE-authorized parts, and GE-specific institutional knowledge. The combination of factors is disqualifying for any non-GE vendor: (1) the explicit sole-source designation with GE as intended source; (2) the requirement for exclusively authorized OEM parts and technicians, which GE controls through its authorization process; (3) the scope defined entirely in terms of GE proprietary systems installed aboard specific vessels; (4) the 14-day post-award requirement to produce a software inventory list that only GE could compile; and (5) rapid-response requirements that presuppose existing infrastructure and deep system familiarity. There is no evaluation competition here at all — GE is the intended and only viable source. While the OEM/sole-source rationale may be legally defensible under FAR 6.302 (the document references this as a commercial acquisition under FAR Part 12 and explicitly states it is a sole source), the structural effect on competition is absolute. The severity is 3 because the solicitation does not merely tilt the playing field toward an incumbent — it eliminates competition entirely by design. The institutional dependency is so complete that the government cannot articulate its requirements in vendor-neutral terms. This is the endpoint of the incumbent capture cycle described in the sin definition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This is a sole source requirement. The intended source is GE as the Original Equipment Manufacturer for the proposed supplies and services.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates GE as the sole intended source. While framed as an OEM justification, this is the most extreme form of insider rewards: the requirement is written such that only one specific company — the manufacturer of the installed equipment — can perform the work. No other vendor, regardless of capability or experience, can compete.</div>
+</div><div class="evidence-item">
+  <blockquote>exclusively authorized Original Equipment Manufacturer (OEM) parts and technician services to maintain the automation systems onboard multiple MSC ship classes</blockquote>
+  <div class="ev-explanation">The requirement for &#x27;exclusively authorized OEM&#x27; parts and technicians means that the work scope is defined not by functional outcomes but by a specific vendor relationship. Only GE-authorized technicians can perform the work, and only GE OEM parts can be supplied. This institutionalizes GE&#x27;s incumbency by making authorization (which GE controls) a prerequisite for competition.</div>
+</div><div class="evidence-item">
+  <blockquote>Machinery Plant Systems and Machinery Centralized Control Systems (MCCS), CoGen Power Take Off Systems, (PTO), Power Take In Systems (PTI), Assured Power Modification Systems, and other associated items onboard MSC vessels</blockquote>
+  <div class="ev-explanation">The scope is defined by reference to specific GE proprietary systems installed on specific vessels. Knowledge of these systems — their architecture, configurations, part numbers, software versions, and failure modes — resides exclusively with GE and the current service provider. CDRL 007 requires the contractor to provide &#x27;an updated list of the software that is being managed (including which version is currently installed)&#x27; within 14 days of award, confirming the government expects the awardee to already possess this institutional knowledge.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor is to manage the configuration of any software associated with the equipment listed in Sections 1 and 2, including GE proprietary software. Within fourteen (14) days of contract award, the Contractor is to provide an updated list of the software that is being managed (including which version in currently installed) to meet this requirement.</blockquote>
+  <div class="ev-explanation">Requiring an updated software inventory within 14 days of award — covering GE proprietary software across multiple ship classes — presupposes that the contractor already has this configuration data. A new entrant would have no way to compile this list in 14 days; only GE or the incumbent with access to GE proprietary records could comply. This is a textbook institutional knowledge requirement that only the incumbent can satisfy.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide recommended initial technical corrective action directly to MSC within 24 hours of the request. Remote Technical Support shall be available during normal shipboard business hours, after hours (nights), weekends, and all holidays.</blockquote>
+  <div class="ev-explanation">Combined with the 48-hour homeport visit requirement and 72-hour deployed ship arrival requirement (CDRL 004), these response timelines assume an existing operational infrastructure — staffed engineering teams with deep familiarity with the specific GE systems aboard MSC vessels, ready to deploy. A new entrant would need to build this infrastructure from scratch while simultaneously learning proprietary system details, making it practically impossible to meet these timelines on day one of a new contract.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a sole-source OEM services contract for GE Power Conversion systems aboard MSC vessels — a context that inherently justifies more specificity than a competitive services contract, since GE is the only party and many requirements reflect existing operational relationships. The solicitation&#x27;s CDRL structure (10 data items) is itself appropriate for a complex, multi-year technical services IDIQ. However, several sections cross from outcome definition into process prescription. The training CDRL (008) dictates delivery modality and scheduling in ways that constrain GE&#x27;s established commercial training program without adding corresponding value. The Software CM Plan CDRL (007) requires an elaborate internal process document rather than measuring software configuration outcomes. The remote support log framework (CDRL 001) layers internal staffing and escalation path requirements alongside otherwise reasonable response SLAs. Countervailing factors: the cybersecurity review requirements (CDRL 003) are outcome-oriented, citing NIST SP-800-82r2 and specifying review scope rather than methodology. The obsolescence log (CDRL 006) is well-structured around data outputs rather than process steps. The as-found condition reports (CDRL 005) define what information must be captured rather than how inspections must proceed. On balance, the sprawl is real but not pervasive — it affects several CDRLs and appears to reflect incumbent process capture (requirements mirroring how GE currently operates rather than defining what outcomes MSC needs) rather than systematic over-prescription. Severity 2 is appropriate: prescriptive elements exist and would constrain a hypothetical new entrant, but the majority of the requirements remain outcome or deliverable-focused, and the sole-source nature limits the practical impact of this finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Remote Technical Support Log is to be submitted on a monthly basis to the Contracting Officer&#x27;s Representative (COR) and the Engineering Type Desk (TD) for that particular class of ships. All remote troubleshooting requests shall be acknowledged within 8 hours of receipt by the Program Manager (PM) or one of the designated GE engineers that received the request. The Contractor shall provide recommended initial technical corrective action directly to MSC within 24 hours of the request.</blockquote>
+  <div class="ev-explanation">This prescribes a specific internal workflow: who receives requests (PM or designated engineers), acknowledgment timelines tied to named roles, and a 24-hour initial action requirement. While response time SLAs are generally legitimate, requiring the acknowledgment to go through a &#x27;Program Manager&#x27; or &#x27;designated GE engineers&#x27; prescribes an internal staffing structure and escalation path rather than simply defining the outcome (remote support available and responsive). The monthly log requirement further layers process overhead onto what could be a simpler outcome-based reporting requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor is to develop a Software Configuration Management (CM) plan that describes the Contractor&#x27;s approach to software configuration management including, but not limited to, - Software Development &amp; Support Environments - Software Tools - Software Libraries - Software Code Releases - Software Records - Subcontractor software CM Controls and - Software Audits</blockquote>
+  <div class="ev-explanation">This CDRL item (007) requires the contractor to develop and submit a plan detailing its internal software CM approach across seven enumerated categories. For a sole-source OEM contract where the contractor&#x27;s existing CM processes are presumably already mature, mandating a bespoke plan document covering internal development environments, tool choices, and audit procedures prescribes the administrative apparatus rather than the outcome (software configurations are controlled and documented). This reads as a process compliance deliverable rather than an outcome measure.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide ten (10) T-AKE training courses at GE&#x27;s shore based facility. The courses will be eight days in length over a two-week period starting on Monday (travel day) and ending on the second Friday (travel day). Up to six (6) MSC employees will be able to attend each training class. MSC will notify the contractor a minimum of sixteen (16) weeks in advance to develop a syllabus, provide course material, laboratory equipment to including a representative automation system.</blockquote>
+  <div class="ev-explanation">The training requirement specifies not just the outcome (trained MSC personnel) but dictates the delivery format (shore-based facility), exact duration (eight days over two weeks), specific start and end days (Monday/Friday travel days), class size ceiling (6 students), and lead time (16 weeks). These parameters collectively lock in a single delivery modality. The government&#x27;s legitimate interest is in trained personnel; the specific scheduling structure and venue constraints go beyond that outcome and remove flexibility for the OEM to adapt its established commercial training program.</div>
+</div><div class="evidence-item">
+  <blockquote>If the ship is in homeport (CONUS), the Contractor shall visit the ship within 48 hours of the Government&#x27;s request. If the ship is deployed, the Contractor shall initiate travel within 24 hours of the Government&#x27;s request and arrive at the Government&#x27;s designated port or point of embarkation for technical support within 72 hours.</blockquote>
+  <div class="ev-explanation">Response time requirements for on-site technical support are generally legitimate SLAs. However, the distinction between &#x27;initiate travel&#x27; and &#x27;arrive&#x27; timelines for deployed ships, combined with the specific 48/24/72-hour cascading structure, reflects process choreography rather than pure outcome definition. The government&#x27;s actual need is timely on-site support; specifying &#x27;initiate travel within 24 hours&#x27; as a distinct contractual obligation separate from arrival measures the contractor&#x27;s internal process step rather than the service outcome. This is a mild example but indicative of the document&#x27;s tendency to specify intermediate process steps alongside end-state requirements.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pools pattern in any meaningful degree. The available document text — comprising the synopsis, representations and certifications attachment, NDA, rate table, and ten CDRLs — contains no &#x27;Applicable Documents&#x27; list, no bulk citation of regulatory frameworks, and no undifferentiated wall of standards. The regulatory citations that do appear are modest in number and contextually grounded: NIST SP-800-82r2 is cited in the ICS cybersecurity CDRL with an explanation of its purpose; FAR Part 12 is referenced as the procurement framework; DoDI 5230.24 governs technical data distribution statements in the NDA; and standard FAR/DFARS provisions (52.209-5, 52.219-1, 252.204-7016, etc.) are incorporated in the representations and certifications as required by regulation. None of these constitute a rule pool. The representations and certifications section is a standard pre-award package required for DoD solicitations — its length reflects regulatory mandates, not agency overreach. The CDRLs reference PWS sections by number (e.g., &#x27;PWS Section 3.5&#x27;) rather than dumping regulatory lists, which suggests the actual compliance architecture is contained in a PWS that was not provided as an attachment in the reviewed documents. Without the PWS, I cannot assess whether an &#x27;Applicable Documents&#x27; section exists there. However, based on what is available, there is no evidence of the rule pools pattern. The solicitation appears to be a competently structured OEM services contract with focused, justified regulatory touchpoints. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The ICS Cybersecurity Services Report (CDRL 003) states: &#x27;The contractor shall conduct an annual review of ICS network security status, including maintenance laptops as applicable, IAW NIST SP-800-82r2 and DHS Defense-in-Depth strategies&#x27;</blockquote>
+  <div class="ev-explanation">This is a targeted, contextually justified regulatory citation. NIST SP-800-82r2 is the directly applicable standard for ICS cybersecurity, and the solicitation explains precisely how it applies: annual review of network security status. This is curating, not pooling.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is structured as a Time-and-Materials (T&amp;M) IDIQ contract: labor categories with fixed hourly rates, variable estimated hours, and cost-reimbursable materials. The T&amp;M structure is defensible for several genuine reasons: maintenance and repair work on complex shipboard automation systems (MCCS, PTO, PTI, CoGen systems) across multiple vessel classes is inherently unpredictable in scope; the government cannot know in advance when a ship will have a casualty, how long repairs will take, or what parts will fail. The CDRLs reflect reactive, demand-driven work (trip reports &#x27;as required,&#x27; corrective maintenance &#x27;as required&#x27;), which supports T&amp;M. These are legitimate justifications for T&amp;M. However, the sole-source nature of this contract with a named OEM (GE Power Conversion) that has an established, long-running relationship with MSC vessels weakens the T&amp;M justification somewhat. Where a known incumbent with years of historical cost data is involved, the government should have enough information to structure at least some CLINs as not-to-exceed or fixed-price-per-task. The government has already estimated travel costs precisely enough to fix them at $1.1M in Year 1 with a defined escalation schedule — demonstrating that some elements are predictable enough for fixed pricing. The training CLIN (10 courses, defined duration, defined attendance) is also a well-scoped deliverable that would naturally support a fixed per-course price rather than T&amp;M. The concern is moderate rather than severe: the core maintenance and repair labor is genuinely variable, and T&amp;M is a widely accepted vehicle for ship repair services. The mismatch is not egregious — this is not a case where FFP was used for uncertain R&amp;D, or T&amp;M used for a product delivery. The severity is 2 because a more sophisticated contracting approach might have used hybrid CLINs (FFP for training and defined deliverables, T&amp;M for corrective maintenance) rather than a uniform T&amp;M structure, and the sole-source context with a known OEM mitigates some of the normal T&amp;M uncertainty justification.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror shall provide proposed labor hourly rates along with proposed total material and training prices for years 1-5 and the six-month option. Estimated labor hours and travel price have been provided, but the offeror may modify these estimates.</blockquote>
+  <div class="ev-explanation">The rate table structure — labor categories with hourly rates, estimated hours that the offeror can modify, plus separate material costs — is the defining structure of a Time-and-Materials (T&amp;M) contract. The government provides estimated hours but cannot lock them in, meaning actual costs at completion are variable and government-controlled surveillance is essential to prevent overbilling.</div>
+</div><div class="evidence-item">
+  <blockquote>Field Management/Senior Systems Specialists Straight Time - Onshore HR | 7000 ... Systems Specialists Straight Time - Onshore HR | 18000 ... Field Services and Commissioning Engr Straight Time - Onshore HR | 6000</blockquote>
+  <div class="ev-explanation">The solicitation provides government-estimated labor hours across multiple categories totaling tens of thousands of hours per year, but these are explicitly described as estimates the offeror may modify. This confirms T&amp;M pricing. For a sole-source OEM contract with a long-standing, well-understood maintenance relationship, the government likely has sufficient historical data to have estimated hours with reasonable confidence, raising the question of whether a fixed-price or not-to-exceed structure would have been preferable.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a sole source requirement. The intended source is GE as the Original Equipment Manufacturer for the proposed supplies and services.</blockquote>
+  <div class="ev-explanation">This is a sole-source contract with a single known OEM. GE Power Conversion has presumably performed this or similar work on MSC vessels before, meaning the government and GE both have historical cost data. In sole-source scenarios with known incumbents, there is a stronger case for fixed-price or not-to-exceed structures because cost history exists — T&amp;M in this context removes competitive pressure and gives GE no incentive to control hours.</div>
+</div><div class="evidence-item">
+  <blockquote>Travel | 1100000 | 1166000 | 1235960 | 1310118 | 1388725 | 694362</blockquote>
+  <div class="ev-explanation">Travel costs are pre-populated and fixed (escalating at roughly 6% annually), which is a firm-fixed element embedded within the T&amp;M rate table. This hybrid approach — fixed travel but variable labor hours and materials — is internally inconsistent and suggests the government could have structured more of the contract as fixed-price line items if it had sufficient data to fix travel costs.</div>
+</div><div class="evidence-item">
+  <blockquote>PARTS Tab: Offeror shall provide an exhaustive list of parts which may be ordered throughout the life of the resulting IDIQ. Estimated quantities, unit prices, and extended pricing shall also be provided for these parts.</blockquote>
+  <div class="ev-explanation">Parts are priced on an IDIQ basis with estimated quantities, which is a reasonable approach for unpredictable repair needs. However, for an OEM with long-standing vessel relationships, an exhaustive parts catalog with fixed unit prices is effectively a catalog price structure — a model that could support a fixed-price-per-task-order or catalog-based FFP approach rather than open-ended T&amp;M reimbursement for materials.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 - Representation and Certifications.docx">Attachment 2 - Representation and Certifications.docx</div></div>
+  <a class="dl-btn" href="../attachments/fc25b6e51ff042b4b46b2c4c872f6a82_Attachment+2+-+Representation+and+Certifications.docx" download="Attachment 2 - Representation and Certifications.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 - NON DISCLOSURE AGREEMENT.docx">Attachment 3 - NON DISCLOSURE AGREEMENT.docx</div></div>
+  <a class="dl-btn" href="../attachments/fc25b6e51ff042b4b46b2c4c872f6a82_Attachment+3+-+NON+DISCLOSURE+AGREEMENT.docx" download="Attachment 3 - NON DISCLOSURE AGREEMENT.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Exhibit A - Rate Table 1.xlsx">Exhibit A - Rate Table 1.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/fc25b6e51ff042b4b46b2c4c872f6a82_Exhibit+A+-+Rate+Table+1.xlsx" download="Exhibit A - Rate Table 1.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Exhibit B001 - 010 - CDRLS Final.pdf">Exhibit B001 - 010 - CDRLS Final.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fc25b6e51ff042b4b46b2c4c872f6a82_Exhibit+B001+-+010+-+CDRLS+Final.pdf" download="Exhibit B001 - 010 - CDRLS Final.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation  N3220526R6003.pdf">Solicitation  N3220526R6003.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fc25b6e51ff042b4b46b2c4c872f6a82_Solicitation++N3220526R6003.pdf" download="Solicitation  N3220526R6003.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UTTR Cable/Satellite Television Service — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>UTTR Cable/Satellite Television Service</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 cd813af3aae14954bf66f8f04d48f8a3</span>
+      <a class="sam-link" href="https://sam.gov/opp/cd813af3aae14954bf66f8f04d48f8a3/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2025-06-16</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR FORCE MATERIEL COMMAND › AIR FORCE SUSTAINMENT CENTER › FA8201  AFSC OL H PZIO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517410</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-06-16</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (17 July 2025 – 16 July 2026) with up to four (4) option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li><li>Price</li><li>Technical acceptability (meets requirements listed in the Bill of Materials)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for an extremely simple, low-value commercial service: one cable or satellite television connection at a single building on a remote installation. The SOW is four pages long and the service requirement is essentially a commodity subscription. In this context, the near-total absence of elaborate QA, reporting requirements, or performance measurement frameworks is appropriate — not a failing. The only QA language (Section 6) assigns a QAP to observe and inspect work, which is a minimal and proportionate oversight mechanism for a service of this scope. There are no weekly status reports, no prescribed report formats, no overlapping reporting cadences, no meeting mandates, and no plan-adherence tracking. The flip side — that there are also no outcome metrics, SLAs, or uptime standards — is technically consistent with compliance-over-outcomes framing (measuring process rather than results), but applying that critique here would be a false positive. For a satellite TV subscription, &#x27;is the TV working?&#x27; is a binary observable fact that requires no formal performance measurement architecture. The LPTA evaluation methodology and firm-fixed-price structure implicitly define the performance standard: the service either works or it doesn&#x27;t, and a non-working service would trigger standard contract remedies. This solicitation rates severity 1 — the accountability structure is minimal but proportionate to the work, and there is no evidence of the compliance-theater patterns that define this sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>QUALITY CONTROL: Quality Assurance Personnel (QAP) from the Utah Test and Training Range (UTTR) will observe and inspect the work to evaluate the contractor&#x27;s performance under this SOW. This individual is assigned to ensure the contractor meets the minimum requirements of the SOW.</blockquote>
+  <div class="ev-explanation">This is the solicitation&#x27;s entire QA framework. It describes observation and inspection by a QAP, which is process/compliance-adjacent language — but it is brief and does not impose reporting cadences, prescribed formats, or layered surveillance mechanisms. Notably, it also does not define any outcome metrics or performance standards against which the QAP would measure results. However, given the trivial nature of the service (one cable/satellite TV connection), the absence of elaborate QA machinery is appropriate, not a deficiency.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation contains no experience requirements, past performance evaluation criteria, or institutional knowledge mandates that would function as insider rewards. The acquisition is for a single cable/satellite television service connection at one building on Dugway Proving Ground, evaluated on Lowest Price Technically Acceptable (LPTA) basis with technical acceptability defined simply as meeting the channel package requirements listed in the Bill of Materials (local, national, and international news and weather channels at a minimum).
+
+The only feature that could superficially resemble an incumbency advantage is the statement that &#x27;The existing infrastructure and hardware at the location is compatible with DirecTV service; should the contractor propose an alternative provider, any necessary hardware or infrastructure modifications shall be the contractor&#x27;s responsibility.&#x27; This does create a mild cost asymmetry — DirecTV or a reseller thereof avoids infrastructure modification costs — but this reflects a genuine operational reality (existing equipment compatibility) and the solicitation explicitly permits alternative providers. It is not a requirement that the vendor have prior contract experience; it is a cost allocation provision. A new entrant offering DirecTV service, or any provider willing to absorb modification costs, could compete on equal footing.
+
+There are no past performance evaluation factors, no dollar threshold requirements, no federal-specific experience mandates, no lookback windows, and no institutional knowledge requirements anywhere in the solicitation or SOW. The LPTA structure with minimal technical requirements means the evaluation is essentially price-driven once the basic channel package is met. Any small business with access to satellite television service could realistically compete. This is a straightforward commodity services acquisition with no meaningful insider rewards structure.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a minimal, focused solicitation for a single-connection cable/satellite television service at a remote military installation. The SOW is brief (two pages) and the requirements are overwhelmingly outcome-oriented: provide TV service with specified channel categories at a specific location. The solicitation does not prescribe step-by-step processes, staffing structures, specific tools beyond disclosing existing infrastructure compatibility, or workflow procedures. The administrative requirements (escort coordination, driving on post, security credentials, English language proficiency for the contract manager, hours of operation) are standard installation-access constraints applicable to any on-site contractor at a controlled military installation — these are safety and security baselines, not process sprawl. The DirecTV infrastructure disclosure deserves note as a mild framing choice that could subtly constrain competition, but it is properly framed as a cost-responsibility allocation rather than a mandate. Overall, this solicitation is competently and concisely scoped. There is no evidence of requirement sprawl as a meaningful problem here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall provide cable/satellite television service for 1 connection, basic service must include local, national, international news and weather channels at a minimum.</blockquote>
+  <div class="ev-explanation">This is an outcome-based requirement. It defines what the service must include (specific channel categories at minimum) without prescribing which provider, which package, or how the service must be technically configured. The minimum channel requirement is a legitimate content standard, not a process mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>The infrastructure/hardware currently in place supports DirecTV service and any change to this infrastructure/hardware would be at the contractor&#x27;s expense.</blockquote>
+  <div class="ev-explanation">This is a borderline item worth noting. Disclosing DirecTV compatibility could be read as a soft preference that steers vendors toward a specific provider. However, it is framed as a cost-allocation disclosure — if you use a different provider, the modification cost is yours — rather than a mandate to use DirecTV. It preserves vendor choice while honestly disclosing the incumbent infrastructure. This is a legitimate constraint disclosure, not sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools. The clause list runs to approximately 50 FAR, DFARS, and AFFARS citations for what is, at its core, a commercial satellite television subscription for one building connection. The SOW itself is concise and appropriate — barely two pages — making the contrast between the spare operational requirements and the dense regulatory appendage particularly visible. Several clauses are clearly irrelevant to the scope: hexavalent chromium prohibition, refrigeration equipment disposal, aerosols, transportation by sea, and electronic parts sourcing have no logical application to a TV service contract. The labor and subcontracting clauses are presented as an undifferentiated block with no guidance on which ones actually govern this engagement. However, this does not rise to severity 3 because: (1) the list, while long, is recognizably a standard DoD commercial items template rather than a bespoke accumulated monster; (2) most FAR/DFARS clauses are incorporated by reference in the conventional manner; (3) there are no contradictions between cited regulations and the solicitation&#x27;s purpose (unlike the classic VA SMS example); and (4) the solicitation&#x27;s simplicity means a sophisticated vendor would quickly identify which few clauses actually matter. The compliance burden is elevated and the list is clearly not curated for this specific scope, but it is not impenetrable. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR 52.223-12 Maintenance, Service, Repair or Disposal of Refrigeration Equipment and Air Conditioners
+FAR 52.223-20 Aerosols
+DFARS 252.223-7008 Prohibition of Hexavalent Chromium</blockquote>
+  <div class="ev-explanation">These environmental/materials clauses govern refrigeration equipment, aerosol products, and hexavalent chromium — none of which have any logical connection to a cable/satellite television service for a single connection at one building. Their inclusion suggests copy-forward from a standard template without review for relevance to this scope.</div>
+</div><div class="evidence-item">
+  <blockquote>DFARS 252.246-7008 Sources of Electronic Parts
+DFARS 252.247-7023 Transportation of Supplies by Sea
+DFARS 252.247-7024 Notification of Transportation of Supplies by Sea</blockquote>
+  <div class="ev-explanation">Sources of Electronic Parts governs counterfeit part risk in supply chains for manufactured components; Transportation of Supplies by Sea governs maritime shipping. Neither clause has plausible relevance to a satellite TV subscription service at a Utah test range. These are standard DoD boilerplate carryovers, not curated requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.232-40 Providing Accelerated Payments to Small Business Subcontractors
+FAR 52.209-7 Information Regarding Responsibility Matters
+FAR 52.204-10 Reporting Executive Compensation and First-Tier Subcontract Awards</blockquote>
+  <div class="ev-explanation">These clauses presuppose meaningful subcontracting relationships. For a single-connection cable/satellite TV service — almost certainly a direct commercial subscription — subcontract payment acceleration, executive compensation reporting, and responsibility disclosures are unlikely to apply in any practical sense. Their inclusion without context adds compliance overhead disproportionate to the contract scope.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.222-56 Certification Regarding Trafficking in Persons Compliance Plan
+FAR 52.222-62 Paid Sick Leave Under Executive Order 13706 (Jan 2017)
+FAR 52.222-55 Minimum Wages Under Executive Order 13658</blockquote>
+  <div class="ev-explanation">While labor standards clauses are standard for service contracts, the solicitation provides no context distinguishing which of the many labor clauses (52.222-17, 52.222-21, 52.222-26, 52.222-36, 52.222-41, 52.222-50, 52.222-55, 52.222-56, 52.222-62) carry genuine operational weight for what is effectively a utility subscription arrangement. The full set is presented at a flat level with no prioritization.</div>
+</div><div class="evidence-item">
+  <blockquote>DFARS 252.204-7012 Safeguarding Covered Defense Information and Cyber Incident Reporting
+DFARS 252.204-7008 Compliance with Safeguarding Covered Defense Information Controls
+FAR 52.204-21 Basic Safeguarding of Covered Contractor Information Systems</blockquote>
+  <div class="ev-explanation">While cybersecurity clauses have some relevance given the military installation context, stacking three separate cybersecurity/information safeguarding clauses (DFARS 7012, DFARS 7008, and FAR 52.204-21) for a commercial satellite TV subscription — which involves no contractor access to covered defense information systems — suggests template accumulation rather than targeted compliance curation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial services acquisition for a single cable or satellite television connection at one building on Dugway Proving Ground. The requirement is simple and well-defined: provide a basic TV service package with news and weather channels. The quantity is fixed (one connection), the service is commercially available, and the cost of a subscription service can be estimated with high confidence. Firm-fixed-price is the appropriate contract type under FAR 16.202, which states FFP &#x27;best utilizes the basic profit motive of business enterprise&#x27; and &#x27;shall be used when the risk involved is minimal or can be predicted with an acceptable degree of certainty.&#x27; A cable or satellite TV subscription is exactly the kind of routine commercial service for which FFP is designed. There is no complexity, no uncertain scope, no unpredictable labor content, and no evolving requirements that would suggest T&amp;M or cost-reimbursement would be more appropriate. The five-year ordering structure (base plus four options) is also standard and does not introduce pricing uncertainty, since subscription rates are commercially established and the government used LPTA evaluation to ensure competitive pricing. No square peg concern exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All CLINs will be established on a firm fixed price basis.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states that all CLINs — base year and four option years — will be firm-fixed-price. This is the correct contract type for this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide cable/satellite television service for 1 connection, basic service must include local, national, international news and weather channels at a minimum.</blockquote>
+  <div class="ev-explanation">The requirement is a routine commercial service: a single cable/satellite TV subscription. The scope is narrow, well-defined, and stable. There is no ambiguity about what is being purchased, making FFP the natural fit.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="FA820125Q0020 Combo Synopsis.pdf">FA820125Q0020 Combo Synopsis.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cd813af3aae14954bf66f8f04d48f8a3_FA820125Q0020+Combo+Synopsis.pdf" download="FA820125Q0020 Combo Synopsis.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation FA820125Q0020.pdf">Solicitation FA820125Q0020.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cd813af3aae14954bf66f8f04d48f8a3_Solicitation+FA820125Q0020.pdf" download="Solicitation FA820125Q0020.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SOW_UTTR TV Service %28003%29.pdf">SOW_UTTR TV Service %28003%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cd813af3aae14954bf66f8f04d48f8a3_SOW_UTTR+TV+Service+%28003%29.pdf" download="SOW_UTTR TV Service %28003%29.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guatemala - Satellite Internet Service — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Guatemala - Satellite Internet Service</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 80091ef66ae046ceb3b38cedc2ab0942</span>
+      <a class="sam-link" href="https://sam.gov/opp/80091ef66ae046ceb3b38cedc2ab0942/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-26</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › USEMBASSY GUATEMALA CITY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">5174</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-26</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP) Purchase Order</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12 months from date of service activation (with a 60-day period for activation and configuration)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Approach (TA) and its feasibility, practicability and appropriateness in accomplishing the statement of work</li><li>Lowest priced, technically acceptable (LPTA)</li><li>Past performance that demonstrates relevant experience or current contracts/task orders executed within the past 3 years with comparable (same or similar scope, size, duration) requirements</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes pathology. It is a straightforward commercial services acquisition for satellite internet connectivity (Starlink reseller services). The accountability structure is minimal and appropriate to the scope: there is a single inspection-and-acceptance event tied to service activation and functional verification, a defined 500GB data priority floor as a performance specification, and no ongoing reporting cadences, status report requirements, or QA surveillance plans of any kind. The solicitation does not require weekly reports, monthly progress documentation, plan-adherence tracking, or prescribed report formats. The absence of elaborate reporting is not a gap here — it is appropriate for a commodity internet service purchase. The one documentation artifact required at acceptance (the &#x27;Report stating Certification of all network drops&#x27;) is a singular deliverable tied to a functional milestone, not a recurring compliance exercise. The acceptance criteria, while including some compliance checks (quantities, delivery date), also require &#x27;correct operation of the required components,&#x27; which is outcome-focused. Overall, this solicitation&#x27;s QA structure is lean and proportionate. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The final inspection and acceptance of ALL services shall be performed by the U.S. Government upon the initial configuration of such services. If INL Guatemala officials cannot activate the services on the corresponding devices, will immediately notify the contractor.</blockquote>
+  <div class="ev-explanation">Acceptance is tied to a concrete functional outcome — whether the service actually activates on the devices — rather than whether the contractor submitted documentation or followed a process. This is outcome-focused.</div>
+</div><div class="evidence-item">
+  <blockquote>INL Guatemala will have ten (10) business days to inspect and accept all items after delivery and installation. The designated representative of the U.S. Embassy in Guatemala will be responsible for carrying out acceptance criteria as follows: i. Quantities ii. Compliance with the technical specifications offered iii. Compliance with delivery date iv. Correct operation of the required components v. Report stating Certification of all network drops</blockquote>
+  <div class="ev-explanation">The acceptance criteria are a mix of compliance checks (quantities, delivery date) and functional verification (correct operation of required components). Item iv — &#x27;correct operation&#x27; — is outcome-oriented. Item v — a certification report — is a documentation artifact, but it is singular and tied to a functional milestone, not an ongoing reporting cadence. This is not compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>Local Priority of a minimum of 500GB</blockquote>
+  <div class="ev-explanation">The technical specification includes a quantitative performance floor — a minimum data priority threshold. This is an outcome metric embedded in the service requirement, not a process compliance measure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards. The experience requirements are broadly scoped, accepting commercial customers alongside federal ones and imposing no dollar thresholds or minimum contract counts. The LPTA evaluation methodology eliminates the scoring mechanisms through which incumbency typically gets rewarded. The Q&amp;A amendment further confirms that multiple credential pathways satisfy the certifications requirement. Notably, Amendment 2 confirms this is a new solicitation with no incumbent vendor — so there is no incumbent to protect, and the structural concern of vendor capture does not apply here. The services being procured (Starlink satellite internet subscriptions) are commercially standardized, and the technical requirements are sufficiently specified by reference to Starlink&#x27;s existing plan tiers (confirmed in Q&amp;A #6) that any authorized reseller or channel partner could compete on equal footing. The past performance lookback and scope are reasonable for the contract size and type. There is no stacking of exclusionary criteria. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>PAST PERFORMANCE: A list of contracts within the last two (2) years for the provision of comparable equipment to federal or commercial customers. The list shall include contact information (name, organization, email, and phone) and limited to no more than five (5) references.</blockquote>
+  <div class="ev-explanation">The past performance requirement is broadly scoped — it accepts both federal AND commercial customers, asks only for &#x27;comparable&#x27; services, and sets a reasonable two-year lookback window. There is no dollar threshold, no requirement for a specific number of contracts, and no federal-exclusivity mandate. A vendor with commercial satellite internet reseller experience could satisfy this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>CERTIFICATIONS: The vendor must provide written proof of capabilities related to providing the related internet services.</blockquote>
+  <div class="ev-explanation">The certifications requirement is vague but not exclusionary. Amendment 2 (Q&amp;A #10) clarifies that &#x27;both options are valid&#x27; — meaning either an existing U.S. Government contract for Starlink Business service OR a specific third-party certification or Starlink-issued reseller authorization would satisfy this requirement. This explicitly opens the door to vendors without prior federal contract experience.</div>
+</div><div class="evidence-item">
+  <blockquote>Award will be made to the lowest priced, technically acceptable (LPTA) quoted that is responsive to the Request for Quote (RFQ) requirements.</blockquote>
+  <div class="ev-explanation">The LPTA evaluation methodology means price is the primary differentiator once technical acceptability is established. This structure significantly reduces the advantage an incumbent might hold, since there is no evaluation scoring system that could award bonus points for incumbency proxies.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial services procurement for satellite internet connectivity — specifically, reseller or activation services for 14 Starlink devices the Embassy already owns. The requirement is narrow, well-scoped, and appropriately outcome-oriented for its nature.
+
+The technical specifications (500GB local priority, public IP, network priority, mobile vs. fixed use) are functional requirements tied directly to an existing technical constraint: the Embassy&#x27;s pre-purchased Starlink hardware. These are not prescriptive process mandates but rather compatibility and performance floors. The solicitation uses &#x27;similar or equal to Starlink for Business&#x27; language, explicitly leaving room for equivalent offerings rather than mandating a single vendor&#x27;s product.
+
+The SOW is brief and does not contain the hallmarks of serious requirement sprawl: there are no step-by-step workflow mandates, no prescribed staffing structures, no process sequences that preclude automation. The acceptance criteria (verifying quantities, compliance with specs, correct operation) are reasonable outcome tests.
+
+The C-SCRM questionnaire attachment is extensive, but it is a standard DoS security compliance tool applied to ICT acquisitions — a legitimate regulatory requirement rather than process sprawl in the contracting sense.
+
+The one area that shows mild prescriptiveness is the activation/delivery structure (20-day window, no partial deliveries, 60-day performance period for activation), but these are reasonable constraints on a commercial service engagement, not a blueprint for how the vendor must perform its work.
+
+Overall, this is a competently scoped solicitation for a simple commercial service. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Service is designed to work with Starlink antennas
+• High speed internet service for business
+• Local Priority of a minimum of 500GB
+• Single Country Land User (Guatemala)
+• Reliable fixed use
+• Network priority
+• Public IP and Dashboard
+• 1 year service
+• Prioritized access</blockquote>
+  <div class="ev-explanation">The CLIN specifications list service characteristics rather than pure outcomes, but these are legitimately tied to interoperability constraints: the Embassy already owns 14 Starlink devices and needs compatible service plans. The 500GB threshold is a measurable minimum, and features like Public IP are functional requirements, not process mandates. This is closer to a technical compatibility constraint than prescriptive sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>The services shall be acquired to INL Guatemala to the destination described below no later than 20 calendar days after purchase order is awarded. ... No partial deliveries will be accepted.</blockquote>
+  <div class="ev-explanation">The 20-day activation window and no-partial-deliveries requirement are somewhat prescriptive about timing and delivery structure, but these are reasonable delivery constraints for a straightforward commercial service activation. They do not dictate the vendor&#x27;s implementation method.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools, primarily driven by three factors: (1) template carryover of clauses from a standard overseas commercial items acquisition package without filtering for relevance to a remote connectivity service subscription, (2) the mandatory C-SCRM software attestation attachment whose full SSDF framework is poorly matched to what is functionally a commercial internet service reseller arrangement, and (3) the full reproduction of FAR 52.212-5 with 65 sub-clauses presented without differentiation between activated and contextually relevant provisions.
+
+Important mitigating factors prevent a severity-3 rating. First, the regulatory burden here stems largely from standard FAR commercial items clauses and DOSAR overseas contracting templates — these are not the agency inventing bespoke compliance requirements, but rather failing to trim a standard template. Second, the C-SCRM attachment does provide an escape hatch (&#x27;N/A&#x27; if no critical software), and the questionnaire itself is only 8 substantive questions. Third, there are no glaring contradictions between cited regulations and the solicitation&#x27;s stated purpose (unlike the VA SMS example in the definition). The solicitation does not cite a policy prohibiting satellite internet use while soliciting satellite internet service. Fourth, the total regulatory citation volume, while elevated, is characteristic of State Department overseas acquisitions using commercial items procedures — it is noticeable but not unprecedented or impenetrable.
+
+The net assessment is severity 2: the compliance landscape is elevated beyond what the actual work requires, and a Guatemalan or international vendor new to U.S. federal contracting would face meaningful document-parsing burden before understanding which requirements actually govern their performance. But the list is not egregiously long, the FAR clause structure is standard, and no truly contradictory or absurd inclusions were identified.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.204-9 PERSONAL IDENTITY VERIFICATION OF CONTRACTOR PERSONNEL (JAN 2011) ... 52.225-19 CONTRACTOR PERSONNEL IN A DESIGNATED OPERATIONAL AREA OR SUPPORTING A DIPLOMATIC OR CONSULAR MISSION OUTSIDE THE UNITED STATES (MAY 2020) ... 52.228-3 WORKERS&#x27; COMPENSATION INSURANCE (DEFENSE BASE ACT) (JUL 2014) ... 52.228-4 WORKERS&#x27; COMPENSATION AND WAR-HAZARD INSURANCE OVERSEAS (APR 1984) ... 52.232-40 PROVIDING ACCELERATED PAYMENTS TO SMALL BUSINESS SUBCONTRACTORS (MAR 2023) ... 52.246-26 REPORTING NONCONFORMING ITEMS (AUG 2024)</blockquote>
+  <div class="ev-explanation">The incorporated-by-reference clauses table includes provisions of questionable relevance to this acquisition. FAR 52.228-3 (Defense Base Act workers&#x27; compensation) and 52.228-4 (war-hazard insurance overseas) are typically applicable to construction or personnel-intensive overseas contracts, not to a firm-fixed-price purchase order for satellite internet service subscriptions activated remotely. FAR 52.204-9 (Personal Identity Verification) applies to contractors requiring frequent access to DOS facilities — but Q&amp;A response R5 confirms on-site presence is not required and activation is remote. These clauses appear to be carried forward from a standard overseas commercial items template without filtering for relevance to this specific service acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>52.227-19 COMMERCIAL COMPUTER SOFTWARE LICENSE (DEC 2007)</blockquote>
+  <div class="ev-explanation">This clause addresses licensing terms for commercial computer software acquired by the government. The solicitation is purchasing satellite internet service subscriptions (connectivity service), not acquiring software licenses. The Embassy already owns the Starlink hardware; the contract is for service activation. Citing a software licensing clause in a connectivity service purchase order suggests copy-forward inclusion from a boilerplate list rather than deliberate applicability review.</div>
+</div><div class="evidence-item">
+  <blockquote>The C-SCRM Questionnaire attached shall be completed and submitted with your offer ... [The attached xlsx contains the full NIST SP 800-218 Secure Software Development Framework (SSDF) with dozens of practices, tasks, and reference citations spanning multiple pages, including PO.1 through RV.3.4]</blockquote>
+  <div class="ev-explanation">The C-SCRM attachment (Attachment 1) includes the complete NIST SP 800-218 Software Producer Attestation Form with the entire SSDF framework — covering secure software development lifecycle practices, code review, build pipeline security, vulnerability remediation, and software bill of materials (SBOM) requirements. This framework is designed for software producers developing code, not for internet service providers activating commercial satellite service subscriptions on pre-purchased hardware. The Q&amp;A confirms the contractor&#x27;s primary role is remote account activation using Embassy-provided serial numbers. Requiring software producers to attest to SSDF compliance (PW.5 secure coding, PW.7 code review, PW.8 executable testing, etc.) for a commercial connectivity reseller is a significant mismatch between the regulatory framework and the actual scope of work. The instructions do note vendors may enter &#x27;N/A&#x27; if not providing critical software, which partially mitigates the burden, but the form is included as a mandatory submission requirement regardless.</div>
+</div><div class="evidence-item">
+  <blockquote>52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS-COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (JAN 2025) ... [followed by 65 numbered sub-clauses spanning pages 14-22, the majority of which are unchecked/blank]</blockquote>
+  <div class="ev-explanation">FAR 52.212-5 is reproduced in full text with all 65 sub-clauses listed, the vast majority marked with blank checkboxes (meaning the contracting officer has NOT activated them). Presenting 65 regulatory sub-clauses — covering topics from HUBZone set-asides to aerosol regulations (52.223-20) to ozone-depleting substances (52.223-42, 52.223-43) to foams (52.223-21) — in an overseas satellite internet service purchase order creates a document-parsing burden for offerors. While standard practice requires inclusion of the full clause, no explanatory context distinguishes which of the activated provisions are operationally relevant to this work. An offeror unfamiliar with FAR 52.212-5 structure must parse all 65 sub-clauses to determine their compliance obligations.</div>
+</div><div class="evidence-item">
+  <blockquote>652.225-71 SECTION 8(a) OF THE EXPORT ADMINISTRATION ACT OF 1979, AS AMENDED (if order exceeds simplified acquisition threshold) ... 652.229-71 PERSONAL PROPERTY DISPOSITION AT POSTS ABROAD ... 652.247-71 SHIPPING INSTRUCTIONS</blockquote>
+  <div class="ev-explanation">The DOSAR clauses include 652.247-71 (Shipping Instructions) and 652.229-71 (Personal Property Disposition at Posts Abroad) in a solicitation for satellite internet service — an intangible subscription service with no goods to ship and no personal property being transferred. The delivery section of the SOW references only service activation, not physical shipment. Including shipping instructions clauses in a service-only contract suggests these are standard template carryovers rather than curated selections.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses FFP for the purchase of commercial satellite internet subscription services — a textbook use case for firm-fixed-price contracting. The FAR directs FFP when risk is minimal or can be predicted with acceptable certainty, and commercial subscription services with defined quantities and durations meet that standard exactly. The two CLINs represent 14 Starlink service subscriptions (12 fixed, 2 mobile) for 12 months each, with well-specified technical parameters (500GB Local Priority, business-grade service). Starlink for Business has published pricing tiers, meaning vendors can bid on a known commercial product. There is no labor uncertainty, no evolving requirements, and no research component that would argue for T&amp;M or cost-reimbursement. The FFP structure is entirely appropriate, and the solicitation&#x27;s language reinforcing that no price adjustments will be made for cost escalation or estimation errors is standard and proper for this contract type. No square peg problem exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement will result in the award of a Firm-fixed price (FFP) Purchase Order in accordance with the specifications of this Statement of Work (SOW). No additional sums will be payable due to any escalation in the cost of materials, equipment, or labor, or because of the Contractor&#x27;s failure to properly estimate or accurately predict the prices or difficulty of achieving the results required by this Purchase Order.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly selects FFP as the contract type. This is appropriate here because the requirement is a commercial satellite internet subscription service with well-defined quantities (12 fixed-location units, 2 mobile units), a known performance period (12 months), and specified technical parameters (minimum 500GB Local Priority, Starlink-compatible). The scope is stable and the cost of a commercial subscription service is predictable.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 1: Twelve (12) Satellite Internet Service is similar or equal to Starlink for Business (fixed location) ... CLIN 2: Two (2) Satellite Internet Service is similar or equal to Starlink for Business (mobile location) ... 1 year service</blockquote>
+  <div class="ev-explanation">Both CLINs describe standard commercial subscription services with fixed quantities and a defined duration. This is precisely the scenario where FFP is most appropriate — buying a commercial service at a known market price for a fixed term. There is no ambiguity in scope, no unpredictable labor component, and no research or development element.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment1CSCRMQuestionnaireandCSCRMSoftwareProducerAttestationForm.xlsx">Attachment1CSCRMQuestionnaireandCSCRMSoftwareProducerAttestationForm.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/80091ef66ae046ceb3b38cedc2ab0942_Attachment1CSCRMQuestionnaireandCSCRMSoftwareProducerAttestationForm.xlsx" download="Attachment1CSCRMQuestionnaireandCSCRMSoftwareProducerAttestationForm.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 19GT5026Q0020 Satellite Internet Service Amendment 1 1.pdf">RFQ 19GT5026Q0020 Satellite Internet Service Amendment 1 1.pdf</div></div>
+  <a class="dl-btn" href="../attachments/80091ef66ae046ceb3b38cedc2ab0942_RFQ+19GT5026Q0020+Satellite+Internet+Service+Amendment+1+1.pdf" download="RFQ 19GT5026Q0020 Satellite Internet Service Amendment 1 1.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 19GT5026Q0020 Satellite Internet Service Amendment 2.pdf">RFQ 19GT5026Q0020 Satellite Internet Service Amendment 2.pdf</div></div>
+  <a class="dl-btn" href="../attachments/80091ef66ae046ceb3b38cedc2ab0942_RFQ+19GT5026Q0020+Satellite+Internet+Service+Amendment+2.pdf" download="RFQ 19GT5026Q0020 Satellite Internet Service Amendment 2.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ19GT5026Q0020 - Guatemala - Satellite Internet Service.pdf">RFQ19GT5026Q0020 - Guatemala - Satellite Internet Service.pdf</div></div>
+  <a class="dl-btn" href="../attachments/80091ef66ae046ceb3b38cedc2ab0942_RFQ19GT5026Q0020+-+Guatemala+-+Satellite+Internet+Service.pdf" download="RFQ19GT5026Q0020 - Guatemala - Satellite Internet Service.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

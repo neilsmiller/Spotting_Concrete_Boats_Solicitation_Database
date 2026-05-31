@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R499--Lidar Scanning of NAVAHCS Facility — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>R499--Lidar Scanning of NAVAHCS Facility</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 07b6d1bc4e354f4da3c974b4e756f42d</span>
+      <a class="sam-link" href="https://sam.gov/opp/07b6d1bc4e354f4da3c974b4e756f42d/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-30</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › 262-NETWORK CONTRACT OFFICE 22 (36C262)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541370</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-30</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 days from start to finish</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Past Performance</li><li>Experience</li><li>Technical Requirements</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes problems. The accountability structure is appropriate for a discrete, well-scoped deliverable contract: scan the buildings, produce point cloud data in specified formats at specified resolution, deliver organized in a defined folder structure. The quality standards are outcome-oriented — minimum +/- 4mm resolution, colored 3D point clouds suitable for hyper-realistic viewing, E57 and LAS formats — these tell the vendor what the deliverable must achieve, not just how to go about producing it. The reporting requirements are minimal: a phasing plan and work schedule submitted for COR approval before work begins. There are no recurring status reports, no prescribed report formats with required sections, no weekly/monthly/quarterly reporting cadences, and no overlapping surveillance mechanisms. Payment upon completion (rather than at milestones tied to process documentation) is consistent with outcome-based accountability. The 30-day period of performance and single CLIN structure reinforce that this is a straightforward deliverable contract where the government can simply inspect the output and accept or reject it. The only minor concern is that acceptance criteria beyond technical specifications (resolution, format) are not explicitly stated — the SOW doesn&#x27;t define how the government will evaluate whether the BIM models and CAD plans are acceptable quality — but this is a modest gap, not systematic compliance theater. Overall, this solicitation is better than average on this dimension for a VA acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1. This work shall be completed with minimum disruption to patient/staff operations. Submit a phasing plan to the COR for approval prior to commencement of work.
+3.3. Scanning shall be completed with during a mix of normal business hours, Monday – Friday 6:30am – 4:00pm excluding federal holidays, and off-hours time (including weekends)... Submit a work plan to the COR for approval prior to commencement of work.</blockquote>
+  <div class="ev-explanation">The solicitation requires a phasing plan and work plan submitted for COR approval, which are process/schedule compliance documents. However, these are reasonable coordination tools for an active healthcare campus — not burdensome reporting cadences. There are no overlapping report types, no prescribed report formats with required sections, and no recurring status reports at multiple cadences.</div>
+</div><div class="evidence-item">
+  <blockquote>2.1.6. All scans must have a minimum resolution of +/- 4mm</blockquote>
+  <div class="ev-explanation">This is an outcome-oriented technical specification — it defines a measurable quality threshold for the deliverable rather than a process the vendor must follow. It is the opposite of compliance-over-outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>2.2.1. All collected 3D point cloud data will be included in the submission. This data should be in E57 and LAS format.
+2.2.2. The 3D point cloud data should be able to be used for hyper realistic viewing of areas across the facility. Colored 3D point clouds are required for this purpose.</blockquote>
+  <div class="ev-explanation">Deliverable specifications (format, color, usability for hyper-realistic viewing) define what the output must be and do, which is outcome-focused acceptance criteria. The government is specifying what it needs the data to accomplish, not just that the vendor followed a process.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics. The core issue is the healthcare-environment specificity applied to LiDAR scanning experience. LiDAR scanning is a well-established commercial technology with a broad vendor base; the technical skills required to scan a VA hospital campus are not materially different from those required to scan a university campus, a large commercial facility complex, or a government administrative campus. The requirement for prior contracts specifically in healthcare settings, combined with the specific deliverable types (CAD/BIM), meaningfully narrows the eligible vendor pool beyond what the underlying capability demands justify. However, the solicitation has significant mitigating factors that prevent a severity-3 finding: (1) there are no dollar thresholds specified for the prior contracts — the two required contracts could be small; (2) the &#x27;equivalent services&#x27; language provides some flexibility for evaluators to accept comparable non-healthcare work; (3) there is no short lookback window specified (e.g., no &#x27;within the last 3 years&#x27; constraint); (4) the set-aside to SDVOSB firms is itself a competition-broadening mechanism within that pool; and (5) the scope here is a single, defined deliverable (LiDAR scanning of one campus) rather than an ongoing services contract where institutional knowledge would be deeply entrenched. The solicitation tilts the playing field toward vendors with prior healthcare LiDAR contracts but does not stack enough criteria to constitute a severe incumbent filter. A qualified LiDAR vendor with comparable facility scanning experience could plausibly argue equivalence and compete, particularly on price under the LPTA-style evaluation structure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>File #2: Experience Provide prior contracts as reference. Contracts performed in a healthcare environment providing services of Lidar scanning technology for creating CAD plans and BIM models of similar scope or equivalent services. The contractor shall submit this information as a list of such experience to include contract number, dates of contract service, awarding agency, description of services provided, and a point of contact information to include name, phone number, and email. A minimum of two (2) contracts required.</blockquote>
+  <div class="ev-explanation">This requirement stacks two narrowing criteria simultaneously: (1) the healthcare environment setting, and (2) the specific combination of LiDAR scanning for CAD/BIM deliverables. LiDAR scanning is a broadly-practiced commercial technology used in construction, infrastructure, real estate, and industrial settings. A vendor with extensive LiDAR scanning experience in comparable-complexity environments (e.g., large industrial campuses, university facilities, commercial buildings) would be excluded if their work was not in a healthcare setting. The domain specificity here is narrower than the underlying capability requirement actually demands — the scanning skills transfer directly across facility types.</div>
+</div><div class="evidence-item">
+  <blockquote>Experience – Provide prior contracts as reference. Contracts performed in a healthcare environment providing services of Lidar scanning technology for creating CAD plans and BIM models of similar scope or equivalent services... A minimum of two (2) contracts required.</blockquote>
+  <div class="ev-explanation">The &#x27;similar scope or equivalent services&#x27; language in the evaluation criteria mirrors the requirement language, meaning evaluators will score experience primarily on whether prior contracts were in healthcare AND involved LiDAR for CAD/BIM. Combined with the mandatory minimum of two contracts, this effectively creates an evaluation floor that advantages vendors who have specifically won healthcare facility scanning contracts before. A vendor with strong LiDAR capability and facility management experience outside healthcare would receive a weaker experience score regardless of technical capability.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will award a single contract to the responsible Contractor whose offer conforming to the solicitation is the most advantageous to the Government based on FAR 13.106-2(b)(3) comparative evaluation procedures... Offers will be evaluated in the following manner. The lowest-priced offer will be identified... If the offered price is found to be reasonable, the offeror who submitted this offer will be identified as the &#x27;successful offeror.&#x27;</blockquote>
+  <div class="ev-explanation">The evaluation process is structured as lowest-price-technically-acceptable with a go/no-go on experience. This means the experience threshold — two healthcare LiDAR contracts — functions as a hard gate rather than a scored differentiator. A new entrant with strong technical capability but experience in non-healthcare settings cannot compensate for the experience shortfall through a superior technical approach or price. This amplifies the exclusionary effect of the healthcare-specific experience requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core problem is that the SOW names LiDAR scanning technology by name as the required method throughout, rather than specifying the needed data outputs and quality standards. The government&#x27;s actual need — accurate as-built floor plans, BIM models, and spatial data for ArcGIS Indoors — could potentially be achieved through multiple data collection methodologies. By mandating &#x27;LiDAR scanning technology&#x27; repeatedly (sections 2.1.1 through 2.1.4), the government has prejudged the solution. That said, several features of this solicitation prevent a severity 3 rating. The scope is relatively narrow and well-defined (a campus scanning project with clear deliverables: point clouds, CAD plans, BIM models). The technical specifications such as minimum resolution (+/- 4mm), geo-location collection, colored point clouds, and file naming conventions are legitimate outcome constraints that protect usability of the deliverables. The 30-day performance period and phasing plan requirements are reasonable operational constraints for a healthcare environment. The most significant sprawl indicators are: (1) technology prescription rather than outcome specification, (2) inclusion of inapplicable electrical construction specifications that appear copy-pasted from a different contract type, and (3) asset-level scanning mandates without articulated downstream purpose. The solicitation is competently structured but would benefit from reframing the technology mandate as a data quality and compatibility standard, which would allow vendors to propose the most efficient approach for a 90+ building campus.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Using Lidar scanning technology, scan the entire interior of the buildings for all floors, including mechanical floors and basements (if applicable) to create a 3D point cloud that will be used to create CAD plans, sections, elevations, and sections as well as BIM models for future use in the ArcGIS Indoors Program.</blockquote>
+  <div class="ev-explanation">This requirement mandates a specific technology (LiDAR scanning) as the method rather than specifying the outcome (accurate, as-built spatial data at a defined accuracy level). A vendor using photogrammetry, structured light scanning, or a hybrid approach that could achieve equivalent or superior results for the stated end use (CAD/BIM/ArcGIS Indoors) is effectively excluded by naming the technology rather than the required data quality or fitness-for-purpose standard.</div>
+</div><div class="evidence-item">
+  <blockquote>All collected 3D point cloud data will be included in the submission. This data should be in E57 and LAS format.</blockquote>
+  <div class="ev-explanation">Mandating specific file formats (E57 and LAS) is a borderline case — interoperability with downstream VA systems is a legitimate constraint. However, when combined with the broader pattern of prescribing the scanning technology itself, this reinforces that the solicitation is defining the solution stack rather than the deliverable standard. A format-neutral requirement (e.g., &#x27;deliverable shall be compatible with Autodesk Revit and ArcGIS Indoors&#x27;) would achieve the same interoperability goal while leaving room for vendor judgment.</div>
+</div><div class="evidence-item">
+  <blockquote>For all scans, assets within areas (if applicable) such as faucets, toilets, and AC terminals, must be scanned and if able, labelled (depending on program used for 3D point cloud data).</blockquote>
+  <div class="ev-explanation">This prescribes a specific scanning behavior at the asset level — capturing and labeling individual fixtures — without tying it to a downstream outcome requirement. The government does not specify why asset-level labeling is needed or how it will be used, making this a process mandate rather than an outcome-driven requirement. A vendor optimizing for the end deliverable (usable BIM/ArcGIS model) might achieve the same facility management goal differently.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor must adhere to VA Office of Construction and Facilities Management Specifications including but not limited to: 01 00 00 General Requirements, 01 35 26 Safety Requirements... 26 29 21 Enclosed Switches and Circuit Breakers</blockquote>
+  <div class="ev-explanation">The specification list imported wholesale from construction contracts (divisions 26 05 11 through 26 29 21 cover electrical installation requirements) is plainly inapplicable to a scanning/data collection effort. Including electrical installation specs such as &#x27;Low-Voltage Electrical Power Conductors and Cables,&#x27; &#x27;Grounding and Bonding for Electrical Systems,&#x27; and &#x27;Wireways for Radiology Equipment&#x27; suggests copy-paste from a prior construction SOW without tailoring. This is a classic sprawl indicator — requirements that don&#x27;t apply to the actual work are included because they were in a template, not because they reflect a genuine need.</div>
+</div><div class="evidence-item">
+  <blockquote>All Lidar scans in interior active areas must be done with the least amount of time wasted for staff and patients due to rooms needing to be cleared for scanning.</blockquote>
+  <div class="ev-explanation">While minimizing disruption is a legitimate operational concern, framing it as a scanning process instruction (&#x27;rooms needing to be cleared&#x27;) rather than a performance standard (e.g., &#x27;no clinical area shall be closed for more than X hours without 48-hour advance notice&#x27;) prescribes the scanning workflow. A vendor using faster scanning technology or mobile mapping systems that do not require room clearance has no way to demonstrate that advantage — the requirement assumes a stop-and-clear scanning model.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools, driven primarily by the Section 11.1 specification list in the SOW. That list includes a dozen VA construction specifications, several of which — particularly demolition (02 41 00), radiology wireways (26 05 33.26), and multiple electrical installation specifications — have no plausible connection to a Lidar scanning engagement. The work involves scanning personnel walking through buildings with scanning equipment, not performing electrical work, demolition, or installing conduit. The list reads as a copy-forward from a construction/renovation template that was never curated for this scope.
+
+The regulatory burden does not rise to severity 3 for several reasons. First, the solicitation is actually quite lean in its core SOW — the technical requirements section is focused and reasonably clear about what the deliverables are (point cloud data in E57/LAS format, CAD plans, BIM models). Second, the solicitation explicitly and correctly notes that IT C&amp;A requirements do not apply, showing some active curation. Third, the FAR clause list (52.212-5) is standard boilerplate for commercial services contracts; the checked clauses are a normal feature of this contract type, not a bespoke regulatory dump. Fourth, there is no contradictory regulation of the type seen in worst-case rule pool scenarios (e.g., a policy prohibiting the very thing being purchased).
+
+The Section 11.1 specification list is the clearest evidence of the sin: it cites electrical, demolition, and radiology-specific construction standards for a scanning project, without explaining applicability of any of them. The &#x27;including but not limited to&#x27; language amplifies the burden further — vendors must infer that additional, unstated specifications may also apply. This is the hallmark of passive management: rather than identifying which safety and quality standards actually govern scanning work on a live healthcare campus, the drafter pulled a master construction specification list and inserted it wholesale. Severity 2 is appropriate: the compliance burden is elevated and some inclusions are clearly irrelevant, but the overall document is not an impenetrable wall of regulations, and a competent vendor could reasonably identify which cited specifications actually matter in practice.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>11.1. Contractor must adhere to VA Office of Construction and Facilities Management Specifications including but not limited to:
+01 00 00 General Requirements
+01 35 26 Safety Requirements
+01 40 00 Quality Requirements
+01 57 19 Temporary Environmental Controls
+01 74 19 Construction Waste Management
+02 41 00 Demolition
+26 05 11 Requirements for Electrical Installations
+26 05 19 Low-Voltage Electrical Power Conductors and Cables
+26 05 26 Grounding and Bonding for Electrical Systems
+26 05 33 Raceway and Boxes for Electrical Systems
+26 05 33.26 Wireways for Radiology Equipment
+26 29 21 Enclosed Switches and Circuit Breakers</blockquote>
+  <div class="ev-explanation">This list of VA construction specifications is cited without explanation of how most of them apply to Lidar scanning. Several are patently irrelevant to the scope: &#x27;02 41 00 Demolition&#x27; (no demolition is occurring), &#x27;26 05 33.26 Wireways for Radiology Equipment&#x27; (this is a scanning contract, not an electrical installation), and the electrical installation and grounding specifications (26 05 11, 26 05 19, 26 05 26, 26 05 33, 26 29 21) have no logical connection to a contractor walking through buildings with scanning equipment. These appear to be copy-forwarded from a construction/renovation template without review for relevance to this specific scope.</div>
+</div><div class="evidence-item">
+  <blockquote>The IT security requirements for Certification and Accreditation (C&amp;A) do not apply, and that a Security Accreditation Package is not required.</blockquote>
+  <div class="ev-explanation">The SOW explicitly acknowledges that standard IT security accreditation requirements do not apply, which is appropriate for this scope. However, the main solicitation body still incorporates the full 52.240-91 Security Prohibitions and Exclusions clause (spanning pages 11–20) with extensive definitions and requirements around covered telecommunications equipment, FASCSA orders, Kaspersky Lab, TikTok, drone prohibitions, OFAC restrictions, Sudan, and Iran. While some of these provisions are standard FAR inclusions, the combination of explicitly waiving C&amp;A requirements while simultaneously imposing the full security prohibition framework — without explaining which provisions actually bear on a Lidar scanning engagement — creates an undifferentiated compliance burden.</div>
+</div><div class="evidence-item">
+  <blockquote>C.2 52.217-8 OPTION TO EXTEND SERVICES (NOV 1999)... C.3 52.217-9 OPTION TO EXTEND THE TERM OF THE CONTRACT (MAR 2000)</blockquote>
+  <div class="ev-explanation">Both the option to extend services (52.217-8, up to 6 months) and option to extend the term of the contract (52.217-9, up to 1 year total) are included in a solicitation for a one-time, discrete Lidar scanning project with an estimated period of performance of 30 days. Including bilateral extension options for a finite deliverable scanning project — with no recurring service component — suggests these clauses were included from a template without considering their applicability. This is a modest but telling indicator of copy-forward clause accumulation.</div>
+</div><div class="evidence-item">
+  <blockquote>[X] (55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (MAY 2024) (E.O. 13513)
+[X] (56) 52.229–12, Tax on Certain Foreign Procurements (FEB 2021).</blockquote>
+  <div class="ev-explanation">52.226-8 (text messaging while driving) and 52.229-12 (tax on certain foreign procurements) are checked as applicable in the 52.212-5 clause list. While these are standard FAR clauses activated by checkbox, their inclusion for a domestic Lidar scanning engagement at a VA campus raises the classic rule pool pattern: checked without contextual justification. The foreign procurements tax clause in particular has no obvious connection to a service-disabled veteran-owned small business performing physical scanning at a domestic VA facility.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a well-matched use of Firm-Fixed-Price contracting. The requirement is a classic discrete, bounded deliverable: scan a defined list of buildings on a single campus, produce 3D point cloud data in specified formats, and deliver within 30 days. The scope is fully enumerated (a numbered list of approximately 95 buildings), the technical specifications are concrete (minimum +/-4mm resolution, E57 and LAS formats, organized folder structure), and the deliverable is binary — either the scans are complete and meet spec or they are not. LiDAR scanning firms price this type of work routinely based on square footage and building count, so cost estimation is predictable. The vendor bears the risk of scope creep within the defined building list, which is appropriate since the government has defined that list precisely. There is no evidence of open-ended labor requirements, evolving requirements, or research-like uncertainty that would favor T&amp;M or cost-reimbursement. The 30-day performance window and the one-time delivery structure align naturally with FFP. No mismatch between contract type and requirements is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government contemplates award of a Firm-Fixed-Price contract resulting from this solicitation. (E.2 52.216-1 TYPE OF CONTRACT)</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type is Firm-Fixed-Price (FFP).</div>
+</div><div class="evidence-item">
+  <blockquote>Scanning of the entire interior of NAVAHCS facility for every building. The 3D point cloud data collected will then be used to update CAD drawings and implement the approved space management program, ArcGIS Indoors... ITEM 0001 1.00 JB</blockquote>
+  <div class="ev-explanation">The requirement is a single, discrete deliverable: LiDAR scan the entire campus and produce a 3D point cloud dataset. The output is well-defined (E57 and LAS format files organized by building), the scope is bounded (a specific list of named buildings), and the quantity is expressed as a single job (1.00 JB). This is exactly the kind of requirement where FFP works well — a concrete, bounded deliverable rather than an ongoing or unpredictable service.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a Critical Project and therefore needs to be completed as soon as possible. The estimated period of performance is 30 days from start to finish.</blockquote>
+  <div class="ev-explanation">The short, fixed performance window (30 days) and urgency reinforce that this is a discrete, time-bounded task. The vendor can price the job based on the number of buildings, known square footage, and standard LiDAR scanning rates. Cost estimation is straightforward for an experienced scanning firm.</div>
+</div><div class="evidence-item">
+  <blockquote>All scans must have a minimum resolution of +/- 4mm... All collected 3D point cloud data will be included in the submission. This data should be in E57 and LAS format... The final submission package must be divided into folders that hold data for each separate building.</blockquote>
+  <div class="ev-explanation">Acceptance criteria are objective and measurable: resolution thresholds, specific file formats, and organized folder structures. This enables clear pass/fail evaluation of the deliverable, a hallmark of a contract well-suited to FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C26226Q0544_1.docx">36C26226Q0544_1.docx</div></div>
+  <a class="dl-btn" href="../attachments/07b6d1bc4e354f4da3c974b4e756f42d_36C26226Q0544_1.docx" download="36C26226Q0544_1.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C26226Q0544_2.docx">36C26226Q0544_2.docx</div></div>
+  <a class="dl-btn" href="../attachments/07b6d1bc4e354f4da3c974b4e756f42d_36C26226Q0544_2.docx" download="36C26226Q0544_2.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C26226Q0544_3.docx">36C26226Q0544_3.docx</div></div>
+  <a class="dl-btn" href="../attachments/07b6d1bc4e354f4da3c974b4e756f42d_36C26226Q0544_3.docx" download="36C26226Q0544_3.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="S02 RFQ 36C26226Q0544 Lidar Scanning_NAVAHCS.pdf">S02 RFQ 36C26226Q0544 Lidar Scanning_NAVAHCS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/07b6d1bc4e354f4da3c974b4e756f42d_S02+RFQ+36C26226Q0544+Lidar+Scanning_NAVAHCS.pdf" download="S02 RFQ 36C26226Q0544 Lidar Scanning_NAVAHCS.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="S06 Amendment 36C26226Q0544 0002 Lidar Scanning.docx">S06 Amendment 36C26226Q0544 0002 Lidar Scanning.docx</div></div>
+  <a class="dl-btn" href="../attachments/07b6d1bc4e354f4da3c974b4e756f42d_S06+Amendment+36C26226Q0544+0002+Lidar+Scanning.docx" download="S06 Amendment 36C26226Q0544 0002 Lidar Scanning.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

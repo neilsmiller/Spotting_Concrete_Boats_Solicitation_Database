@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Braillo 600 SR2 Embosser - Library of Congress — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Braillo 600 SR2 Embosser - Library of Congress</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 64594d1d7c5343a7ad6e5790746f00c2</span>
+      <a class="sam-link" href="https://sam.gov/opp/64594d1d7c5343a7ad6e5790746f00c2/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">LIBRARY OF CONGRESS › LIBRARY OF CONGRESS › CONTRACTS SERVICES</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334118</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">08-01-2026 through 10-31-2026</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price (lowest price)</li><li>Technical Acceptability (ability to provide the embosser, including installation, training, and warranty required by the Library in the Statement of Work)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward product procurement solicitation — one unit of a specific braille embosser, with installation, training, and warranty service. The accountability structure is appropriately lean for this type of contract. There is no multi-layered reporting regime, no overlapping status report cadences, no plan-adherence tracking, and no waterfall-style project management documentation requirements. The primary QA mechanism is acceptance at delivery (COR signs the delivery ticket or work order), supplemented by a concrete service-level standard (next-business-day warranty response). The work order requirement records what happened during each service call, which is standard practice for equipment maintenance contracts and serves a legitimate audit purpose. The solicitation does not define success as &#x27;completed documentation.&#x27; It defines success as: the embosser is delivered in factory-new condition, installation is performed per manufacturer specs, training is provided, and warranty service is rendered within 24 hours. These are outcome-oriented criteria appropriate to a one-time equipment purchase. The absence of elaborate outcome metrics (e.g., uptime percentages, braille quality scores) is not a sin here — those would be over-engineering for a firm-fixed-price commercial product buy. Severity 1 is appropriate: the solicitation&#x27;s accountability structure is light, focused on deliverable acceptance, and contains one modest service-level standard. There is no meaningful compliance-over-outcomes problem.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The COR or other authorized individual will indicate acceptance on the equipment delivery ticket or work order.</blockquote>
+  <div class="ev-explanation">Acceptance is tied to a physical artifact (delivery ticket or work order signature) rather than a process compliance checklist. This is deliverable-based acceptance — a reasonable, outcome-adjacent mechanism for a product purchase.</div>
+</div><div class="evidence-item">
+  <blockquote>C.3.8 Response Time: Response time for warranty service requests shall be within 24 hours, excluding Federal holidays... The Contractor shall provide no later than next business day service for parts and labor covered by the manufacturer&#x27;s warranty on equipment purchased under this contract; e.g., a call placed between 7:30 a.m. and 5:30 p.m. (local time) on Monday shall be closed no later than 5:30 p.m. (local time) on Tuesday.</blockquote>
+  <div class="ev-explanation">This is a measurable service level — next-business-day closure of warranty calls — that defines success in terms of an outcome (the repair is completed) within a time window. It is not purely process-focused, though it is modest in scope.</div>
+</div><div class="evidence-item">
+  <blockquote>C.3.10 Work Orders: All warranty service requests performed under this contract shall be accompanied by work orders that contain the following minimum information: Name of Contractor, Date of delivery, Time call was placed by authorized NLS personnel...</blockquote>
+  <div class="ev-explanation">The work order requirement is the most process-documentation-oriented element of the solicitation. It prescribes specific data fields to be recorded. However, this serves a legitimate administrative purpose for a warranty service contract and is not an overlapping reporting cadence or a substitute for outcome measurement — it is the record of a discrete event (a service call).</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brand-name sole-source procurement for a single, specific piece of specialized equipment — the Braillo 600 SR2 braille embosser — supported by a formal Justification and Approval. The competition-limiting element here is the brand-name determination itself, not insider experience requirements. The solicitation does not impose the classic insider-rewards apparatus: there are no dollar-threshold past performance requirements, no federal-specific experience mandates, no narrow lookback windows, no evaluation bonus points for prior similar contracts, and no institutional knowledge requirements that only an incumbent could satisfy. The evaluation is Low Price Technically Acceptable, where technical acceptability is defined simply as the ability to provide the specified embosser with installation, training, and warranty. The authorized-reseller requirement is a supply chain control tied to the sole-source justification and the Library&#x27;s stated policy against gray market products — it is manufacturer-controlled, not government-controlled, and applies equally to all potential offerors. The personnel experience clause (C.3.7) uses capability-oriented language without numeric thresholds or federal contract specificity. Any authorized Braillo reseller — including those who have never previously contracted with the Library of Congress — could realistically compete on price. The competition concern in this solicitation, to the extent one exists, is the brand-name sole-source determination itself, which is analyzed separately and is supported by a documented J&amp;A. Sin #4 (Insider Rewards) is not materially present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The offeror must be an authorized reseller and must submit evidence of their authorization with their quote. The Library may contact the manufacturer to confirm that offeror is an authorized reseller.</blockquote>
+  <div class="ev-explanation">This requires authorized reseller status, which limits the pool to vendors Braillo has authorized. However, this is a direct consequence of the brand-name sole-source justification — it is a supply chain integrity requirement tied to a legitimately justified single-brand procurement, not an incumbency filter. Any authorized reseller can compete, not just the prior contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>C.3.7 Service and Installation Experience: The Contractor shall provide only trained and technically experienced personnel to perform warranty and installation services under this contract. This means the individuals shall possess the level of expertise required for the proper performance of the tasks required under this contract.</blockquote>
+  <div class="ev-explanation">This personnel requirement is stated in general capability terms — &#x27;trained and technically experienced&#x27; and &#x27;level of expertise required&#x27; — without imposing specific contract dollar thresholds, federal experience mandates, or lookback windows. Any authorized Braillo reseller whose technicians are manufacturer-trained would satisfy this. It does not function as an incumbency filter.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the purchase of a single, brand-name piece of capital equipment — a Braillo 600 SR2 embosser — with accompanying installation, training, and warranty services. The brand-name sole-source nature of the requirement is documented and justified separately; that is not a sprawl issue but a competition issue. Within the SOW itself, the vast majority of requirements define WHAT the government needs: one unit, factory-new condition, four-year warranty, next-business-day response, 0.5mm dot height, 600 CPS production capability. These are outcome and standards specifications, not process mandates. The two areas where process prescription appears — training session structure (one hour, two sessions) and the physical check-in/reporting procedure for warranty technicians — are minor. Neither meaningfully removes a vendor&#x27;s ability to propose an efficient approach to the core deliverable. The training specification could have been written as a performance outcome, but given that this is a commodity equipment purchase with a single trained operator audience, the constraint is inconsequential in practice. The work order content requirements (C.3.10) are administrative documentation standards typical of equipment service contracts and do not constitute solution-space constraints. Overall, this solicitation reads as a straightforward equipment procurement with appropriate specificity about the item needed and modest, reasonable administrative procedures for warranty service. Requirement sprawl is not a meaningful issue here; severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>C.3.2 Training: The Contractor shall provide training services to Library staff on use of Braillo 600 SR2 equipment purchased under this contract. Training sessions shall be one (1) hour in length and shall include an overview of all features available for the specific model/configuration. The contractor shall provide a total of two (2) training sessions, one for each division/office within NLS.</blockquote>
+  <div class="ev-explanation">This prescribes the exact format, duration, and count of training sessions rather than stating an outcome (e.g., &#x27;Library staff shall be proficient in operating the equipment&#x27;). A vendor who could achieve the same result with a single combined session, self-paced materials, or remote training cannot propose that alternative. However, this is a minor constraint given the overall simplicity of the procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>C.3.9 Reporting: When arriving for warranty service requests, the Contractor shall report to the National Library Service for the Blind and Print Disabled Receptionist Desk, located in the Library&#x27;s Adams Building, room number LA-303. The Contractor shall provide the National Library Service for the Blind and Print Disabled Receptionist Desk with a status of the repair and a brief description of the resolution before leaving the location.</blockquote>
+  <div class="ev-explanation">This prescribes a specific physical check-in and check-out process rather than stating an outcome such as &#x27;the Government must be informed of repair status.&#x27; For a single-unit equipment purchase with on-site warranty service at a secure federal building, this is a modest operational procedure rather than significant solution constraint, but it does dictate process steps.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward sole-source commercial equipment purchase: one Braillo 600 SR2 braille embosser, delivered and installed, with warranty. The Statement of Work is lean and well-scoped (8 pages), and the solicitation body itself is appropriately focused. The sin is present but not severe.
+
+The primary manifestation of rule pools here is the presentation of the full FAR 52.212-5 clause menu — approximately 65 numbered items spanning seven pages — as the primary regulatory compliance section, with checked and unchecked boxes but no interpretive context. This is a standard federal contracting form, so its presence is not inherently problematic. However, the solicitation makes no effort to explain which of the checked clauses have operational significance for this specific acquisition, and a vendor new to federal contracting would need to independently research each checked provision to understand its implications.
+
+Several of the checked clauses are at least marginally relevant to a commercial equipment purchase (Buy American, foreign purchase restrictions, supply chain security), but no explanatory bridge is provided. The solicitation does not distinguish between clauses that create substantive compliance obligations (e.g., supply chain security prohibitions, trafficking in persons) and those that are effectively administrative formalities for a one-time equipment buy.
+
+This falls short of severity 3 for several reasons: (1) the SOW itself is clean and does not contain a separate &#x27;Applicable Documents&#x27; bulk list; (2) there is no &#x27;Applicable Documents&#x27; section at all beyond the standard FAR 52.212-5 form; (3) the checked clauses, while numerous, are drawn from a standard government-wide form rather than accumulated agency-specific policies; (4) there are no contradictory requirements (no cited policy prohibits braille embossing); and (5) the overall solicitation is clearly scoped and easy to understand in its essentials. The compliance section adds noise but does not meaningfully obscure what the vendor needs to do. Severity 2 is appropriate: elevated regulatory citation volume for the scope, but not an impenetrable or contradictory compliance wall.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>I.2 52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (MAR 2026) ... [followed by approximately 65 numbered clause citations spanning pages 15-22]</blockquote>
+  <div class="ev-explanation">Section I.2 presents the standard FAR 52.212-5 clause with its full menu of potential clauses, many marked unchecked ([]). While this is a standard FAR form, the solicitation presents the entire undifferentiated list — including labor standards, small business subcontracting plans, environmental regulations, food donation promotion, and private security functions outside the US — without any narrative explanation of which ones are operationally significant for a one-time equipment purchase. A vendor new to federal contracting cannot easily distinguish the checked (active) clauses from the unchecked ones without careful parsing.</div>
+</div><div class="evidence-item">
+  <blockquote>[X] (55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (MAY 2024) (E.O. 13513)</blockquote>
+  <div class="ev-explanation">This clause is checked as applicable to the purchase of a single braille embosser with installation and a four-year warranty. While technically applicable to any contract with on-site personnel, its inclusion in a highly focused equipment procurement — where the contractor&#x27;s primary site presence is a one-time delivery and installation — is a marginal-relevance inclusion that illustrates the boilerplate-carryover character of the regulatory list.</div>
+</div><div class="evidence-item">
+  <blockquote>[X] (32) 52.222–19, Child Labor—Cooperation with Authorities and Remedies (MAR 2026) (E.O. 13126) ... [X] (39)(i) 52.222-50, Combating Trafficking in Persons (OCT 2025) ... [X] (31) 52.222-3, Convict Labor (JUN 2003)</blockquote>
+  <div class="ev-explanation">Multiple labor and human trafficking clauses are checked as applicable to what is a straightforward commercial equipment purchase from an authorized reseller of a Norwegian manufacturer&#x27;s braille embosser. While these clauses have supply chain rationale, no context is provided explaining how they apply to this specific transaction — e.g., whether they relate to the embosser&#x27;s manufacturing supply chain, the reseller&#x27;s workforce, or installation labor. The absence of any explanatory context is characteristic of undifferentiated regulatory citation.</div>
+</div><div class="evidence-item">
+  <blockquote>[X] (iii) Alternate II (JAN 2025) of 52.225-3 [Buy American—Free Trade Agreements—Israeli Trade Act]</blockquote>
+  <div class="ev-explanation">The Buy American / Free Trade Agreements clause is checked for a purchase of equipment manufactured by Braillo Norway AS, a Norwegian company. Norway is a designated country under the Trade Agreements Act, so the clause may be technically applicable, but no explanation is provided. A vendor reading this list cannot determine whether this creates a compliance risk, a price evaluation preference issue, or is simply standard boilerplate — illustrating the undifferentiated nature of the regulatory citations.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial product acquisition: the Library of Congress is buying a single, named piece of industrial equipment (Braillo 600 SR2 embosser with compressor) bundled with installation, training, freight, and a four-year manufacturer warranty. All deliverables are discrete, well-defined, and commercially priced. The scope is fixed — one unit, one installation, two training sessions, warranty coverage for a defined period. There is no labor-hour ambiguity, no evolving requirements, and no research or development uncertainty. The quantity of work is entirely predictable. Firm Fixed Price is the textbook-appropriate contract type for this requirement. The government correctly structured the price schedule to capture all cost components as lump-sum line items, which aligns with FFP best practices. There is no mismatch between the contract type and the nature of the requirement. No modifications to the pricing structure are warranted or suggested.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This is a solicitation for a Firm Fixed Price contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm Fixed Price contract type in Section B.3.</div>
+</div><div class="evidence-item">
+  <blockquote>Braillo 600 SR2 with Compressor | 1 | [price] — Installation &amp; Training Sessions | 1 | [price] — Freight Charges | 1 | [price] — Four Year Warranty | 1 | [price]</blockquote>
+  <div class="ev-explanation">The price schedule breaks down all deliverables as discrete, lump-sum line items: hardware, installation, training, freight, and a defined warranty period. Each is a well-scoped, commercially available product or service with predictable cost — precisely the conditions under which FFP is appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="030ADV26Q0117.pdf">030ADV26Q0117.pdf</div></div>
+  <a class="dl-btn" href="../attachments/64594d1d7c5343a7ad6e5790746f00c2_030ADV26Q0117.pdf" download="030ADV26Q0117.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment J-1 - Brand Name Justification_Redacted.pdf">Attachment J-1 - Brand Name Justification_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/64594d1d7c5343a7ad6e5790746f00c2_Attachment+J-1+-+Brand+Name+Justification_Redacted.pdf" download="Attachment J-1 - Brand Name Justification_Redacted.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment J-2 - Price Schedule.xlsx">Attachment J-2 - Price Schedule.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/64594d1d7c5343a7ad6e5790746f00c2_Attachment+J-2+-+Price+Schedule.xlsx" download="Attachment J-2 - Price Schedule.xlsx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

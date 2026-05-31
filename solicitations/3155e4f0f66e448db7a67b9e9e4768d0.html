@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PIT Tag IDIQ — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>PIT Tag IDIQ</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 3155e4f0f66e448db7a67b9e9e4768d0</span>
+      <a class="sam-link" href="https://sam.gov/opp/3155e4f0f66e448db7a67b9e9e4768d0/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Special Notice</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › BUREAU OF RECLAMATION › UPPER COLORADO REGIONAL OFFICE</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334511</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Special Notice</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">07/01/2026 to 06/30/2031</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Past Performance</li><li>Price</li><li>Small Business Participation</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a supply/equipment IDIQ (PIT tags, readers, antennas, and associated equipment) used for fish tracking and wildlife monitoring. It is not a services or IT contract of the type that typically generates compliance-over-outcomes pathology.
+
+The accountability structure is heavily outcome-oriented by design: the primary evaluation mechanism is a detailed physical performance testing protocol (Attachment 3) that requires vendors to demonstrate their products actually meet specific, measurable thresholds — 98% electrical performance pass rate, ≥95% detection efficiency at specific speeds and orientations, minimum read distances of 8&quot; and 6&quot; at 10% noise, physical dimensional tolerances measured to 0.01mm. These are not process requirements; they are product performance outcomes measured empirically under controlled conditions with government witnesses.
+
+The specification requirements (Section 2) define minimum performance characteristics for all product categories — read distance tables, operating temperature ranges, IP67 waterproofing, Bluetooth compatibility, data storage capacity — all of which are outcome-based technical standards.
+
+Critically, this solicitation contains almost none of the features associated with Compliance Over Outcomes: there are no recurring status reports, no weekly/monthly/quarterly reporting cadences, no prescribed report formats, no meeting frequency requirements, no plan-adherence tracking, and no CPMP or waterfall project management structure. The CPARS clause (DOI-AAAP-0050) is standard past performance documentation, not a compliance reporting burden.
+
+The on-ramp/off-ramp mechanism (Section 4.2) — removing contractors who don&#x27;t receive orders within two years — is a market-based accountability mechanism, not process compliance.
+
+The one minor compliance element is the pre-award test report with signed certification, but this serves a legitimate quality assurance function (ensuring testing was conducted according to protocol so results can be compared across vendors) and is directly tied to measurable performance outcomes.
+
+Overall, this solicitation demonstrates strong outcome orientation appropriate to a supply acquisition. Severity 1 is the correct rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Vendors must submit: A complete test report documenting methods, equipment, data, and results; Signed certification that all testing was performed according to this protocol; Identification of any deviations or anomalies observed during testing</blockquote>
+  <div class="ev-explanation">This is pre-award testing documentation, not ongoing contract performance reporting. The test report requirement is tied directly to verifying actual physical performance of the product (read distance, detection efficiency, electrical properties) — it is outcome-focused, not compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>The testing will be at a place of contractors choosing after proposals due date. The testing will be scheduled to allow government personnel be present to verify test results.</blockquote>
+  <div class="ev-explanation">Government witness of physical performance testing is outcome verification — observing whether tags actually meet detection thresholds — not process compliance monitoring. This is the opposite of the sin.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards risk driven primarily by the structural characteristics of the PIT tag market itself rather than egregiously exclusionary language. The PIT tag industry is genuinely narrow — Biomark Inc. is the dominant supplier for DOI agencies, and the solicitation&#x27;s explicit Biomark compatibility requirements across tags, readers, and antennas embed the incumbent vendor&#x27;s ecosystem into the technical specifications. The use of a Biomark reader as the sole testing instrument further entrenches this.
+
+However, several mitigating factors prevent a severity 3 rating. First, the solicitation is an IDIQ with multiple awards anticipated, lowering the stakes for any single competitor to perfectly match all criteria. Second, the &#x27;or equivalent&#x27; language throughout Attachment 2 and the specifications nominally preserves competitive space. Third, the experience requirements, while domain-specific, lack the explicit dollar thresholds, short lookback windows, and federal-only mandates that characterize the most severe insider rewards patterns. Fourth, the partial small business set-aside (CLINs 00010-00170 and 00210) indicates some awareness of competitive access concerns. Fifth, past performance evaluation expressly notes that vendors with no relevant past performance will receive a neutral rating rather than being disqualified.
+
+The core concern is cumulative: the combination of Biomark-specific compatibility requirements, a Biomark reader as the testing standard, domain-specific personnel experience requirements, and evaluation credit for &#x27;similar scope and complexity&#x27; projects tilts the field toward vendors already operating in the DOI PIT tag ecosystem. A capable electronics manufacturer or distributor new to fisheries monitoring would face meaningful structural disadvantages even if their products met the ISO technical specifications. The playing field is tilted but not closed — severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Services Experience - Information provided will be evaluated to assess the offeror&#x27;s experience level on recent contracts for similar work. The greater the extent to which the offeror can demonstrate successful completion of projects similar in scope, complexity and magnitude as the example provided in the instructions to offerors, the more favorably the proposal will be rated.</blockquote>
+  <div class="ev-explanation">This evaluation criterion rewards prior experience on contracts similar in scope, complexity, and magnitude. While not explicitly naming dollar thresholds or federal-specific mandates, the reference to &#x27;scope, complexity and magnitude&#x27; in a specialized niche market (PIT tag systems for fisheries research) effectively advantages vendors who have already supplied these products to federal agencies. The PIT tag market is extremely narrow — there are only a handful of commercial manufacturers — meaning &#x27;similar scope and complexity&#x27; almost inevitably means prior federal fisheries contracts with agencies like DOI, USGS, or USFWS.</div>
+</div><div class="evidence-item">
+  <blockquote>PIT tags shall also be compatible with readers and antenna systems manufactured and sold through Biomark Inc.
+
+All antennas should be compatible with Biomark Inc., Boise, Idaho products, which are installed and used throughout the Colorado and Columbia River basins.
+
+PIT tag readers should also be compatible with antenna systems and PIT tags manufactured and sold through Biomark Inc., Boise, Idaho that have been installed and used throughout the Colorado and Columbia River basins.</blockquote>
+  <div class="ev-explanation">By requiring compatibility specifically with Biomark Inc. products across tags, readers, and antennas, the solicitation anchors the entire technical specification to a single incumbent vendor&#x27;s ecosystem. The First Delivery Order attachment (Attachment 2) further confirms this by explicitly naming &#x27;Biomark or equivalent&#x27; for multiple line items and including &#x27;Biomark BioLogic Web Portal&#x27; subscriptions as specific deliverables. While &#x27;or equivalent&#x27; language softens the brand-specific requirement, the compatibility mandate with Biomark&#x27;s installed infrastructure throughout the Colorado and Columbia River basins creates a significant technical knowledge barrier for vendors who have not previously integrated with this specific installed base.</div>
+</div><div class="evidence-item">
+  <blockquote>All testing will be conducted in the presence of designated Government personnel... All tests will be performed using a Biomark IS1001 reader, the standard reader used by most Department of the Interior agencies for field PIT tag detection.</blockquote>
+  <div class="ev-explanation">Mandating that all testing be performed on a Biomark IS1001 reader — the incumbent vendor&#x27;s own product — as the evaluation standard creates a structural advantage for Biomark and vendors whose tags are optimized for Biomark readers. While the IS1001 is described as the DOI standard, this testing requirement means performance is measured specifically against the incumbent&#x27;s hardware, not a neutral industry standard. Vendors whose products perform well on other ISO 11784/11785-compliant readers but are not optimized for the IS1001 are disadvantaged regardless of actual field performance.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1 SENIOR ENGINEER—This staff member will have experience commensurate with 3+ years of experience with designing, constructing, installing, troubleshooting, and maintaining PIT Tag antennas and associated detection systems (i.e., master controllers, data loggers, modems, antenna nodes, etc.).
+
+3.2 ELECTRONIC TECHNICIAN—This staff member will have experience commensurate with 1+ years of experience with installing, troubleshooting, maintaining and repairing PIT Tag antennas and associated detection systems (i.e., master controllers, data loggers, modems, antenna nodes, etc.).</blockquote>
+  <div class="ev-explanation">The personnel experience requirements are domain-specific to PIT tag systems rather than broader electronics or fisheries monitoring competencies. In a market this narrow — PIT tag detection infrastructure for federal fisheries agencies — personnel with 3+ years of PIT tag antenna system experience will overwhelmingly have that experience through Biomark or the incumbent contractor. While the requirements are not unreasonable on their face, in the context of this extremely specialized market, they function as a soft incumbency filter.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a commercial product supply solicitation (NAICS 334511) for PIT tags and associated detection equipment — a mature, commercially available product category with established ISO standards (ISO 11784/11785). The solicitation is structured around product specifications (physical dimensions, electrical properties, read distances, operating temperatures) and performance thresholds (95% read efficiency, minimum read distances at specified noise levels and orientations), which is the appropriate format for a product acquisition.
+
+The specifications define WHAT the tags must achieve — resonant frequency bands, turn-on voltage thresholds, modulation percentages, read distances under specified conditions — rather than prescribing HOW vendors should manufacture or design their products. Vendors retain full latitude over materials, design, manufacturing processes, and supply chains. The testing protocol in Attachment 3 specifies measurement methodology (sample sizes, test conditions, pass/fail thresholds), which is necessary to ensure consistent, comparable evaluation across competing vendors — not an attempt to dictate manufacturing processes.
+
+The Biomark compatibility requirements are the most potentially prescriptive element, but they reflect a legitimate technical interoperability constraint: the government has extensive existing infrastructure that field-deployed tags must work with. The solicitation does not require vendors to purchase Biomark components or follow Biomark&#x27;s manufacturing processes; it requires that the delivered products function within an existing detection ecosystem.
+
+The professional services labor categories (Senior Engineer, Electronic Technician, Fisheries Specialist) include experience thresholds (3+ years, 1+ years) rather than detailed process mandates, and the scope of these services is narrowly defined as installation support and troubleshooting — appropriate for an ancillary services component of an equipment supply IDIQ.
+
+Overall, this solicitation is competently scoped for a commercial product acquisition. The requirements are predominantly outcome- and performance-oriented, with prescriptive elements that are either legitimate interoperability constraints or necessary testing standardization. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All tests will be performed using a Biomark IS1001 reader, the standard reader used by most Department of the Interior agencies for field PIT tag detection.</blockquote>
+  <div class="ev-explanation">The testing protocol mandates a specific commercial reader model (Biomark IS1001) for vendor qualification testing. However, this is a legitimate interoperability constraint rather than sprawl: the solicitation specifications elsewhere confirm that government-deployed infrastructure uses Biomark equipment throughout the Colorado and Columbia River basins, and tags must be compatible with that installed base. The mandate is about verifying compatibility with the government&#x27;s existing systems, not prescribing how the vendor manufactures tags.</div>
+</div><div class="evidence-item">
+  <blockquote>PIT tags shall also be compatible with readers and antenna systems manufactured and sold through Biomark Inc. ... All antennas should be compatible with Biomark Inc., Boise, Idaho products, which are installed and used throughout the Colorado and Columbia River basins.</blockquote>
+  <div class="ev-explanation">Repeated references to Biomark compatibility could raise sole-source concerns, but in context this reflects a genuine interoperability constraint: the government has an extensive installed base of Biomark detection infrastructure that cannot be replaced under this contract. Compatibility with existing government systems is a legitimate technical constraint, not process prescription. The solicitation does use &#x27;or equivalent&#x27; language in the first delivery order, which mitigates the concern somewhat.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin to any meaningful degree. The regulatory citation landscape is sparse and well-matched to the work. The clause table of contents lists approximately 13-14 clauses, nearly all of which are standard FAR or agency-specific provisions that one would expect in any commercial DOI IDIQ: ordering clauses required by the IDIQ structure, IPP invoicing requirements, CPARS performance reporting, COR authority definitions, a security clause, and a prohibition on information release. None of these appear to be copy-forward accumulations of questionable relevance.
+
+The technical specifications section cites only two standards by name — ISO 11784 and 11785 (the international PIT tag standards) and MIL-STD-810G Method 512.5 (immersion/waterproofness for field-deployed antennas) — and both are directly germane to the products being procured. The solicitation also references the Biomark IS1001 reader as the standard evaluation instrument and the Pacific States Marine Fisheries Commission APTTS for electrical performance testing, providing concrete operational context for why those references matter.
+
+The testing protocol (Attachment 3) cites no additional regulatory framework — it is a procedural document, not a compliance list. The evaluation section references FAR 15.305 and 15.404-1(g) for price analysis, which are appropriate and expected.
+
+There is no &#x27;Applicable Documents&#x27; bulk list, no accumulation of executive orders, no security framework citations beyond what a modest commercial supply contract would warrant, and no contradictory regulations. A prospective vendor can readily understand what compliance obligations exist and why. Severity 1 is the appropriate rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.212-4 CONTRACT TERMS AND CONDITIONS –COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (NOV 2023)
+52.252-2 CLAUSES INCORPORATED BY REFERENCE (FEB 1998)
+DOI-AAAP-0028 ELECTRONIC INVOICING AND PAYMENT REQUIREMENTS-INVOICE PROCESSING PLATFORM (IPP) (FEB 2021)
+DOI-AAAP-0050 CONTRACTOR PERFORMANCE ASSESSMENT REPORTING SYSTEM (DEC 2015)
+52.217-2 CANCELLATION UNDER MULTI-YEAR CONTRACTS (OCT 1997)
+52.242-15 STOP-WORK ORDER (AUG 1989)
+52.216-18 ORDERING (AUG 2020)
+52.216-19 ORDER LIMITATIONS (OCT 1995)
+52.216-22 INDEFINITE QUANTITY (OCT 1995)
+52.216-32 TASK-ORDER AND DELIVERY-ORDER OMBUDSMAN - ALTERNATE I (SEPT 2019)
+WBR 1452.201-80 CONTRACTING OFFICER&#x27;S REPRESENTATIVE&#x27;S AUTHORITIES AND LIMITATIONS
+WBR 1452.209-82 PROHIBITION ON RELEASE OF INFORMATION
+WBR 1452.237-80 SECURITY REQUIREMENTS</blockquote>
+  <div class="ev-explanation">The clause list is modest in length — roughly 13-14 clauses — and all are standard FAR, DIAR, or Bureau of Reclamation provisions appropriate for a commercial IDIQ contract. This is a normal clause complement for a DOI commercial acquisition, not an overwhelming accumulation. Several clauses (52.216-18, 52.216-19, 52.216-22) are specifically required for IDIQ contracts and are directly applicable to the vehicle structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is well-matched to its contract type. The dominant requirement is procurement of commercial products — PIT tags in multiple form factors, readers, antennas, implanters, and accessories — purchased against an IDIQ at tiered bulk unit prices. An IDIQ with firm-fixed-price unit rates is the textbook correct vehicle for this situation: the government knows what it wants (a specific physical product meeting defined technical specifications) but cannot predict annual quantities across multiple DOI agencies. The IDIQ structure with a $10,000 minimum and $40,000,000 maximum ceiling is a standard and appropriate mechanism for managing commodity hardware procurement over a multi-year period. The professional services component (Senior Engineer, Electronic Technician, Fisheries Specialist, Travel) uses fully-burdened hourly rates that feed into firm-fixed-price task orders scoped at the delivery order level. This is also appropriate: installation, maintenance, and troubleshooting services have unpredictable quantity demand across dispersed field sites, but each individual task order can be scoped and priced as FFP once the specific work is defined. The solicitation explicitly states this model. There is no indication of a mismatch — no complex R&amp;D, no undefined scope being purchased on T&amp;M, and no predictable deliverable being forced into cost-reimbursement. The pricing structure fits the nature of the acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>During the life of this contract, the Government shall place orders totaling a minimum of $10,000.00 of the contract – see Contract FAR Clause 52.216-19 Order Limitations, Contract FAR Clause 52-216-22 Indefinite Quantity. During the life of the contract, the total maximum amount for the contract shall not exceed $40,000,000.00.</blockquote>
+  <div class="ev-explanation">The contract is structured as an IDIQ with firm-fixed-price unit rates for commercial products (PIT tags, readers, antennas, implanters). This is an appropriate pricing scheme for commodity hardware purchases where the government cannot predict exact quantities in advance but the per-unit price is determinable through competition.</div>
+</div><div class="evidence-item">
+  <blockquote>The unit price established in the Professional Services CLINs are fully-burdened hourly rates to be used for negotiating firm-fixed price task orders for tasks that are within the scope of the IDIQ. Each task order will establish a level of effort required to complete the description of the service and/or deliverable as stated in the task order.</blockquote>
+  <div class="ev-explanation">The professional services component uses labor-hour rates (loaded hourly rates) that feed into firm-fixed-price task orders. This is a reasonable hybrid: the IDIQ establishes ceiling rates while individual task orders are FFP scoped at the time of order. This is a well-recognized approach for installation and technical support services where the type of work is known but the quantity varies by site.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment_1___Pricing_Schedule_B_1_23.xlsx">Attachment_1___Pricing_Schedule_B_1_23.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/3155e4f0f66e448db7a67b9e9e4768d0_Attachment_1___Pricing_Schedule_B_1_23.xlsx" download="Attachment_1___Pricing_Schedule_B_1_23.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment_2_-_First_Delivery_Order__Pricing_Schedule_B_1_23.xlsx">Attachment_2_-_First_Delivery_Order__Pricing_Schedule_B_1_23.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/3155e4f0f66e448db7a67b9e9e4768d0_Attachment_2_-_First_Delivery_Order__Pricing_Schedule_B_1_23.xlsx" download="Attachment_2_-_First_Delivery_Order__Pricing_Schedule_B_1_23.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment_3_-PIT_Tag_Testing_Protocol_2026_04_16.pdf">Attachment_3_-PIT_Tag_Testing_Protocol_2026_04_16.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3155e4f0f66e448db7a67b9e9e4768d0_Attachment_3_-PIT_Tag_Testing_Protocol_2026_04_16.pdf" download="Attachment_3_-PIT_Tag_Testing_Protocol_2026_04_16.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140R4026R0003.pdf">Sol_140R4026R0003.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3155e4f0f66e448db7a67b9e9e4768d0_Sol_140R4026R0003.pdf" download="Sol_140R4026R0003.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>70--COMPUTER CONSOLE,TA — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>70--COMPUTER CONSOLE,TA</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 3ba162109c6d42f9acc1c3f6049e93c0</span>
+      <a class="sam-link" href="https://sam.gov/opp/3ba162109c6d42f9acc1c3f6049e93c0/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-31</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA AVIATION › DLA AVIATION PHILADELPHIA › DLA AVIATION AT PHILADELPHIA, PA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333998</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-31</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (SPRPA126QZA71) is a brief supply acquisition notice for a computer console (NSN-based, NAICS 333998) from DLA Aviation Philadelphia. The posting consists almost entirely of standard FAR/DFARS clause citations — INSPECTION OF SUPPLIES--FIXED-PRICE, HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT, WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS, BUY AMERICAN provisions, etc. — with no attached Statement of Work, Performance Work Statement, Quality Assurance Surveillance Plan, or detailed requirements document. There are zero attachments noted. The description contains no reporting requirements, meeting cadences, deliverable schedules, or QA surveillance language that would allow a meaningful assessment of compliance-over-outcomes patterns. The &#x27;HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT&#x27; clause references a TBD quality standard, which suggests some QA framework will apply, but no specifics are provided. The solicitation is fundamentally a commercial/supply item purchase order solicitation for a physical product (computer console, classified as a Critical Application Item), not a services contract where compliance-over-outcomes dynamics typically manifest. Without an attached PWS, SOW, or QASP containing substantive performance and reporting requirements, there is insufficient content to assess this sin.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation lacks sufficient content to assess insider rewards (Sin #4). The posting is a bare-bones simplified acquisition solicitation for a physical supply item (Computer Console, TA; NSN-based, NAICS 333998, Classification 7B22) with no attached Statement of Work, Performance Work Statement, or evaluation criteria document. The description consists almost entirely of standard FAR/DFARS clause references and boilerplate (e.g., WIDE AREA WORKFLOW, BUY AMERICAN, EQUAL OPPORTUNITY) with no articulated experience requirements, past performance evaluation criteria, key personnel qualifications, or domain-specific knowledge expectations. There are no attachments (0 attachments noted). Because the solicitation is a product procurement (a physical console item) rather than a services contract, complex experience layering of the type that constitutes insider rewards is inherently unlikely in any case. Without evaluation criteria, technical requirements, or qualification standards to analyze, there is no basis on which to detect or score insider rewards. Severity is set to 1 by default.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (SPRPA126QZA71) is a simplified acquisition notice for a computer console (NSN/classification 7B22, NAICS 333998) issued by DLA Aviation Philadelphia. The posting consists almost entirely of standard FAR/DFARS clause citations with fill-in values, boilerplate procurement clauses (Buy American, Wide Area Workflow, inspection of supplies, equal opportunity, etc.), and a brief note that no drawings are available. There is no Statement of Work, Performance Work Statement, Statement of Objectives, technical specification, or any substantive description of what the vendor is expected to deliver beyond the item title &#x27;COMPUTER CONSOLE, TA.&#x27; The text contains no task descriptions, process requirements, staffing mandates, workflow procedures, or tool prescriptions — the elements that would constitute requirement sprawl. Because the solicitation lacks sufficient substantive content to assess whether it dictates HOW work should be done versus WHAT outcome is needed, a meaningful evaluation of Sin #1 cannot be performed. This appears to be a supply-item procurement (a physical product buy) rather than a services contract, and the relevant technical requirements would typically be embedded in a referenced specification or drawing — neither of which is attached or described here.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. The description is almost entirely composed of cited FAR/DFARS/DFARS deviation clauses — roughly 20 in total — rendered in a raw pipe-delimited format with no explanatory text, no scope description, and no prioritization. For a supply procurement of a single computer console under NAICS 333998, several clauses appear to be boilerplate carryovers rather than deliberately curated requirements: Transportation of Supplies by Sea (relevant only if ocean transport is expected), Small Business Subcontracting Plan (threshold-dependent), and Value Engineering (rarely meaningful for a commodity supply buy). The Higher-Level Contract Quality Requirement with &#x27;TBD&#x27; fields and the Critical Application Item designation suggest quality requirements that matter, but no explanation is provided for how they interact with each other or with the cited regulations. That said, this solicitation does not rise to severe (3): the clause list, while uncontextualized, is not unusually long by DLA supply procurement standards, most clauses have at least a plausible connection to defense supply procurement generally, and there are no glaring contradictions between cited policies and the solicitation&#x27;s purpose. The absence of drawings and a minimal scope description amplify the opacity of the compliance landscape, but the core problem is one of standard DLA boilerplate accumulation rather than egregious regulatory dumping. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ITEM UNIQUE IDENTIFICATION AND VALUATION (JAN 2023)|19|||||||||||||||||||| INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)|2||| HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT|8|||x|TBD|N/A|||| WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023)|16|... VALUE ENGINEERING (JUN 2020)|3|||| INTEGRITY OF UNIT PRICES (NOV 2021)|1|| EQUAL OPPORTUNITY FOR VETERANS (DEV 2026-O0040)(FEB 2026)|4||||| SMALL BUSINESS SUBCONTRACTING PLAN (DEV 2026-O0037)(FEB 2026)|4||||| EQUAL OPPORTUITY FOR WORKERS WITH DISABILITIES (DEV 2026-O0040)(FEB 2026)|4||||| TRANSPORTATION OF SUPPLIES BY SEA (OCT 2024)|2||| BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11|||||||||||| REQUIREMENTS FOR CERTIFIED COST OR PRICING DATA...SECURITY PROHIBITIONS AND EXCLUSIONS...ROYALTY INFORMATION (APR 1984)|1||</blockquote>
+  <div class="ev-explanation">The solicitation presents approximately 20 regulatory clauses and contract requirements in a dense, unparsed list format. No context is provided explaining how each clause applies to the specific item being procured (a computer console). All citations are presented at the same level without prioritization or explanatory text.</div>
+</div><div class="evidence-item">
+  <blockquote>SMALL BUSINESS SUBCONTRACTING PLAN (DEV 2026-O0037)(FEB 2026)|4|||||</blockquote>
+  <div class="ev-explanation">Subcontracting plan requirements typically apply to contracts above the simplified acquisition threshold, often $750,000 or more (or $1.5M for construction). For a simplified acquisition or small supply purchase of a computer console, this clause&#x27;s applicability is questionable without any dollar threshold context or explanation of why it is included.</div>
+</div><div class="evidence-item">
+  <blockquote>TRANSPORTATION OF SUPPLIES BY SEA (OCT 2024)|2|||</blockquote>
+  <div class="ev-explanation">The Transportation of Supplies by Sea clause (DFARS 252.247-7023) applies specifically when supplies may be transported by ocean vessel. For a single computer console procured domestically, this clause appears to be a boilerplate carryover with unclear relevance — no explanation is offered for why ocean transportation is a consideration for this item.</div>
+</div><div class="evidence-item">
+  <blockquote>VALUE ENGINEERING (JUN 2020)|3||||</blockquote>
+  <div class="ev-explanation">Value Engineering clauses (FAR 52.248-1) are generally appropriate for contracts with significant performance or design flexibility. For a supply procurement of a specific computer console (likely to a specification or part number), value engineering has limited practical applicability. Its inclusion without explanation suggests copy-forward boilerplate rather than deliberate curation.</div>
+</div><div class="evidence-item">
+  <blockquote>No drawings are available for this Request for Quotations.</blockquote>
+  <div class="ev-explanation">The absence of drawings or technical specifications — combined with the notation that this is a Critical Application Item (CAI) — makes the compliance burden of the cited clauses even more opaque. Vendors must interpret a substantial list of regulatory clauses without the technical context that would clarify which requirements are operationally meaningful for this specific item.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the acquisition of a computer console (NSN/classification 7B22, NAICS 333998 — &#x27;All Other Miscellaneous General-Purpose Machinery Manufacturing&#x27;), which is a tangible, physical supply item. The contract type is fixed-price, as evidenced by the inclusion of FAR 52.246-2 (Inspection of Supplies — Fixed-Price). A fixed-price contract is entirely appropriate here: the requirement is a defined, deliverable physical product; the scope is stable and well-understood; quantity and specification are set in advance; and competition among suppliers will help keep prices honest. There is no indication of uncertain scope, evolving requirements, or unpredictable labor content that would argue for T&amp;M or cost-reimbursement. The &#x27;CRITICAL APPLICATION ITEM&#x27; designation adds quality scrutiny but does not change the fundamental nature of the procurement — it remains a supply buy. Fixed-price is the correct and standard contract type for this type of acquisition. No square peg exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)|2|||</blockquote>
+  <div class="ev-explanation">This clause (FAR 52.246-2) is specifically applicable to fixed-price supply contracts, confirming the contract is structured as a fixed-price arrangement for the acquisition of a physical supply item.</div>
+</div><div class="evidence-item">
+  <blockquote>BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11||||||||||||||</blockquote>
+  <div class="ev-explanation">The inclusion of Buy American and trade agreements clauses, combined with the supply-oriented nature of the solicitation, reinforces that this is a straightforward procurement of a commercial or manufactured product under a fixed-price structure.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

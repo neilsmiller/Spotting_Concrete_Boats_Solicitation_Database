@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>70--IDE DRIVE ASSY — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>70--IDE DRIVE ASSY</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c1d8c6cde40241a8b298721a0c186614</span>
+      <a class="sam-link" href="https://sam.gov/opp/c1d8c6cde40241a8b298721a0c186614/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-03</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333998</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-03</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Delivery Lead Time</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simple hardware supply solicitation for two units of an IDE Drive Assembly (NSN 7025-01-571-1831) for naval use. The solicitation is a standard NAVSUP fixed-price purchase order template with minimal QA requirements. There are no weekly status reports, no prescribed report formats, no overlapping reporting cadences, no plan-adherence tracking, and no meeting frequency mandates. The quality assurance section (Section 4) is brief and conventional: it assigns inspection responsibility to the contractor, requires an ISO 9001-compliant quality system, mandates record retention for four years, and requires compliance with contract requirements. The accountability structure for this procurement is fundamentally outcome-oriented in the most basic sense — the contractor either delivers conforming hardware or it does not. The warranty clause (one year after delivery, defect reporting within 45 days) reinforces outcome accountability. ISO 9001 has some process-compliance character, but for a manufactured hardware item at this scale, it serves as a reasonable quality baseline rather than compliance theater. There are no elements of the reporting burden, overlapping cadences, or waterfall-style plan-adherence tracking that characterize Sin #2. This solicitation scores severity 1 — minimal — with no meaningful compliance-over-outcomes problem.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein. Except as otherwise specified in the contract/purchase order, the Contractor may use his own or any other facilities suitable for the performance of the inspection requirements specified herein, unless disapproved by the Government. The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">This is standard FAR inspection language for a supply contract. It delegates inspection responsibility to the contractor but reserves government rights. It focuses on whether supplies conform to requirements — an outcome-oriented standard — rather than prescribing process compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>4.2 Quality System Requirements - The supplier shall provide and maintain a quality system acceptable to the Government. The quality system requirements shall be in accordance with ISO 9001.</blockquote>
+  <div class="ev-explanation">Requiring ISO 9001 is a process-based quality system standard, which has some compliance-over-outcomes character. However, for a hardware supply contract of this nature (two units of a legacy IDE drive assembly), ISO 9001 certification is a reasonable proxy for manufacturing quality assurance rather than an elaborate reporting burden. No overlapping reporting cadences or prescribed format requirements accompany this.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards concern, primarily driven by the combination of two structural constraints: (1) the requirement that offerors be authorized distributors of the specific original manufacturer (CAGE 28199), and (2) the requirement to supply exactly the design represented by that CAGE code and part number with no open specification alternative. Together, these requirements narrow the competitive field to vendors who already have a commercial distribution relationship with one specific OEM — a relationship that cannot be quickly or easily established in response to a solicitation. This is partially defensible for a military-grade hardware component destined for submarine/surface ship use, where supply chain traceability and OEM authorization have genuine safety and quality justifications. The mercury contamination requirements, IUID requirements, and ISO 9001 quality system requirements all reflect real operational constraints rather than artificial barriers. However, the authorized distributor restriction goes beyond ensuring quality — it outsources the competitor screening function to the OEM itself, giving a private manufacturer effective veto power over who can compete for a government contract. The past performance evaluation factor, while standard in isolation, compounds the incumbency advantage in this narrow vendor pool. The solicitation stops short of severity 3 because: the evaluation criteria are relatively lightweight (best value with price approximately equal to non-price factors), the quantity is only 2 units (a small buy), and the authorized distributor restriction is a recognized practice in spare parts procurement with a plausible quality rationale. Nonetheless, the solicitation tilts the playing field toward established distributors rather than testing capability in vendor-neutral terms.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.2 Notice To Distributors/Offerors - Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement limits competition to authorized distributors of the original manufacturer (CAGE 28199, reference B-3130). While this may be defensible for supply chain integrity on a specific NSN hardware item, it functions as a structural barrier that excludes any vendor who is not already in an authorized distribution relationship with that specific OEM. A company that could otherwise supply a functionally equivalent or interchangeable item cannot compete unless it has a pre-existing commercial relationship with the named manufacturer.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1 Cage Code/Reference Number Items - The IDE DRIVE ASSY furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. ;28199 B-3130;</blockquote>
+  <div class="ev-explanation">The requirement to supply specifically the design represented by a single CAGE code and part number, combined with the authorized distributor restriction in 6.2, effectively limits the competitive pool to vendors who have a pre-existing relationship with one specific manufacturer. There is no open technical specification that would allow alternative manufacturers or equivalent designs to compete.</div>
+</div><div class="evidence-item">
+  <blockquote>Past Performance. The offeror&#x27;s past performance on related contracts will be evaluated to determine, as appropriate, successful performance of contract requirements, quality and timeliness of delivery of goods and services, cost management, communications between contracting parties, proactive management, and customer satisfaction.</blockquote>
+  <div class="ev-explanation">While past performance evaluation is standard and appropriate, in combination with the authorized distributor requirement, this further advantages incumbents. A vendor already holding distribution agreements and prior Navy supply contracts for this NSN will have directly relevant past performance to cite, whereas a new entrant — even if technically capable — would lack this specific performance history. The evaluation factors do not articulate any alternative means by which a new distributor could demonstrate equivalent capability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a spare parts buy — two units of an IDE Drive Assembly (NSN 7025-01-571-1831) for Navy systems. The solicitation is fundamentally a commercial/catalog item procurement, not a services contract or complex development effort. Requirement sprawl in the Sin #1 sense — prescribing HOW work should be done rather than WHAT outcome is needed — is largely inapplicable here because there is no work process being specified. The requirements are almost entirely outcome-oriented and constraint-based: deliver the correct item (identified by CAGE code and reference number 28199 B-3130), mark it per MIL-STD-129, package it per MIL-STD-2073, meet ISO 9001 quality system requirements, and ensure mercury-free materials. These are legitimate technical constraints appropriate for military hardware procurement — they define what must be delivered and what standards must be met, not how a vendor should organize their manufacturing operations. The mercury-free requirement is detailed but exists because of genuine safety and material compatibility concerns specific to submarine/surface ship environments, which is a documented operational constraint rather than arbitrary process prescription. The quality system requirement (ISO 9001) is a standard industry baseline, not a prescriptive workflow mandate. The change notification codes (1-6) define categories of acceptable substitution and notification procedures, which are reasonable supply chain integrity controls for an NSN-tracked military component. There are no staffing prescriptions, no step-by-step task lists, no tool mandates, and no workflow procedures that would prevent a manufacturer or authorized distributor from applying their own production methods. The solicitation leaves the vendor full latitude to manufacture or source the item as they see fit, provided the output meets the specified form, fit, function, and quality standards. This is a competently scoped spare parts solicitation with no meaningful requirement sprawl.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin. The &#x27;Applicable Documents&#x27; section lists only two standards — MIL-STD-129 and ISO 9001 — and both are explicitly connected to specific requirements in the body of the solicitation. MIL-STD-129 is invoked for marking/identification requirements (Section 3.2), and ISO 9001 is invoked for quality system requirements (Section 4.2). The solicitation also includes standard FAR/DFARS clauses incorporated by reference (WAWF payment instructions, Buy American, inspection of supplies, warranty, etc.), which are normal features of Navy spares procurement and not indicators of rule pooling. The regulatory footprint is proportionate to the scope: this is a simple acquisition of two IDE drive assemblies (NSN-identified spare parts) for naval use. The mercury contamination section and changes-in-design codes, while verbose, are standard boilerplate for Navy submarine/surface ship components and directly relevant to the item&#x27;s intended use environment. There is no evidence of bulk undifferentiated regulatory citation, no irrelevant or contradictory policies, and no indication of copy-forward accumulation. A prospective vendor can readily understand the compliance landscape from this document.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DOCUMENT REF DATA=MIL-STD-129 | | |R |180524|A| |03|
+DOCUMENT REF DATA=ISO9001 | | | |150901|A| | |</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s &#x27;Applicable Documents&#x27; section cites exactly two standards: MIL-STD-129 (military marking/labeling) and ISO 9001 (quality management). Both are directly tied to stated requirements — MIL-STD-129 governs the marking requirement in Section 3.2, and ISO 9001 governs the quality system requirement in Section 4.2. This is a curated, minimal citation list, not a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the purchase of two units of a specific, identified spare part (IDE Drive Assembly, NSN 1HM 7025 015711831) for Navy use. The contract type is implicitly firm-fixed-price, which is entirely appropriate for this type of procurement. The requirements are fully defined: a specific NSN, a specific cage code and reference number, a defined quantity, and clear quality and packaging standards. There is no ambiguity about scope, no variable labor component, and no reason to expect cost uncertainty that would warrant a different contract type. Fixed-price is the correct and standard vehicle for spares procurement of this nature. The FAR explicitly endorses FFP when risk is minimal and can be predicted with certainty — a named spare part with a known part number is the paradigmatic case. There is no square peg issue here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>1.This is an EAF spares requirement is for quantity 2 IDE DRIVE ASSY (NSN 1HM 7025 015711831).</blockquote>
+  <div class="ev-explanation">The requirement is for a discrete, tangible, commercially-identifiable supply item — two units of a specific IDE Drive Assembly. Purchasing physical goods with a defined part number and quantity is precisely the scenario where fixed-price contracting is most appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>WARRANTY OF SUPPLIES OF A NONCOMPLEX NATURE (JUNE 2003)|6|1 YEAR AFTER DATE OF DELIVER|45 DAYS AFTER DISCOVERY OF DEFECT|||||</blockquote>
+  <div class="ev-explanation">The inclusion of a standard warranty clause for supplies of a noncomplex nature reinforces that this is a straightforward product purchase. Fixed-price contracts are the standard and correct vehicle for such acquisitions.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

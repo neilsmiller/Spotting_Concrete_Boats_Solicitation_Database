@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D--UPDATED SERVER/RECORDER REPLACEMENT — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>D--UPDATED SERVER/RECORDER REPLACEMENT</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 db8115f4daf8408c990488b7b2130d80</span>
+      <a class="sam-link" href="https://sam.gov/opp/db8115f4daf8408c990488b7b2130d80/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › BUREAU OF INDIAN AFFAIRS › INDIAN EDUCATION ACQUISITION OFFICE</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DJ10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561621</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Product Availability</li><li>Product Specifications</li><li>Delivery Lead Time</li><li>Set-aside</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, discrete installation project — replacing a security camera server at a single school — not a complex ongoing IT services contract. The accountability structure is appropriately lean. The SOW includes concrete outcome metrics (24/7 recording, 30-day retention, specified resolution), deliverable acceptance testing (all cameras online and recording), and a defined final deliverable (project closeout document with serial numbers, network diagrams, and credentials). There is no multi-layered reporting regime: no weekly status reports, no overlapping cadences, no prescribed report formats, no plan-adherence tracking documents. The COR oversight language is standard boilerplate that appears in most DOI contracts. The solicitation&#x27;s primary QA mechanism — physical verification that the installed system works — is outcome-focused by nature. The absence of elaborate process-compliance machinery is appropriate for the scope. This solicitation does not exhibit the compliance-over-outcomes pattern in any meaningful way; severity 1 is the correct assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Metrics: Ensure continuous 24/7 recording and minimum 30-day retention of video archives.</blockquote>
+  <div class="ev-explanation">The SOW states a concrete, measurable outcome: the system must record continuously and retain 30 days of footage. This is an outcome-focused requirement, not a process compliance check — it defines what success looks like for the end user.</div>
+</div><div class="evidence-item">
+  <blockquote>Verification: Confirm all cameras are online and recording at the specified resolution (e.g., 1080p or 4K).</blockquote>
+  <div class="ev-explanation">The testing and integration section requires verification of actual system performance (cameras online, recording at specified resolution). This is deliverable acceptance testing — outcome evaluation, not compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>Monitoring of Contractor&#x27;s performance shall be demonstrated through administrative and physical reviews. The Contracting Officer Representative (COR) will be responsible for verifying contract compliance and shall designate appropriate personnel to monitor services.</blockquote>
+  <div class="ev-explanation">The COR oversight language is generic and leans toward compliance monitoring (&#x27;verifying contract compliance&#x27;) without specifying outcome metrics for ongoing performance. However, given this is a one-time installation project rather than an ongoing services contract, administrative and physical review of completed work is appropriate rather than a sin.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a small, straightforward commercial purchase: replacement of a security camera server (NVR) and associated licenses at a single school site (Beclabito Day School). The evaluation criteria listed in FAR 52.212-2 are: Price, Product Availability, Product Specifications, Delivery Lead Time, and Set-aside. None of these are experience-based factors. There are no past performance requirements, no dollar-threshold experience mandates, no federal-specific experience requirements, no lookback windows, and no key personnel qualifications that would favor an incumbent. The solicitation explicitly states award will go to the &#x27;responsible contractor whose quote conforms to the solicitation requirements, is determined acceptable and provides the lowest price&#x27; — a straightforward lowest-price-technically-acceptable structure focused on product specs and availability, not vendor history. The product specifications reference specific AXIS hardware (AXIS S3016 recorder and ACS Pro Core Device licenses), which does narrow the product field to a single manufacturer&#x27;s ecosystem, but this reflects a legitimate technical decision to maintain compatibility with existing AXIS cameras already deployed at the school (confirmed in the Q&amp;A: &#x27;Current AXIS cameras are updated and recently installed&#x27;). This is a brand specification justified by an existing infrastructure investment, not an experience requirement that advantages an incumbent vendor. Any ISBEE-certified reseller capable of supplying and installing AXIS equipment could compete. No insider rewards pattern is present in this solicitation.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The SOW reads as a procedural checklist covering pre-installation, installation, testing, and training in step-by-step format, dictating specific methods (rackmounting, RAID configuration, NTP sync, static IP assignment, hands-on training) rather than limiting itself to outcomes and constraints. The core desired outcome — a functioning NVR system with 24/7 recording and 30-day retention — is stated, which is a positive. However, that outcome statement is then surrounded by prescriptive implementation steps that remove meaningful vendor discretion over how to achieve it.
+
+Mitigating factors prevent a severity 3 rating. This is a small, discrete procurement (one recorder, ten camera licenses, installation at a single school) where some process specificity is operationally reasonable for a small agency with limited IT oversight capacity. The background investigation requirement and COR monitoring provisions are legitimate compliance mandates, not sprawl. The specific product naming (AXIS S3016) has a defensible basis given that the existing cameras are already AXIS and integration compatibility is a real constraint — though it still forecloses competition. The total scope of prescriptive language is limited to about one page of SOW, not a multi-section operating manual.
+
+The primary sprawl signal is that the SOW was clearly written as an implementation guide rather than a performance requirement. Someone drafted what the technician should do on installation day and published it as the statement of work. This is a classic pattern for small IT replacement contracts at agencies without dedicated acquisition staff: the technical SME writes a how-to list, and it becomes the requirement. The result is moderate constraint on vendor approach without being pervasively prescriptive. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Hardware Setup: Rackmount the new server, install high-capacity surveillance-grade hard drives, and connect power and network cables.
+System Configuration:
+Initialize the OS and set strong administrative passwords.
+Synchronize system time with an NTP server for accurate legal evidence.
+Configure RAID settings for storage redundancy.
+Camera Migration: Reconnect all existing cameras, assigning static IP addresses and configuring motion detection zones.</blockquote>
+  <div class="ev-explanation">The SOW prescribes the installation sequence step by step — rackmounting, OS initialization, NTP synchronization, RAID configuration, static IP assignment. These are implementation choices, not outcomes. A qualified vendor might use DHCP reservations instead of static IPs, a different time synchronization approach, or a cloud-managed configuration workflow. By specifying these steps, the solicitation removes the vendor&#x27;s ability to propose a more efficient or modern approach.</div>
+</div><div class="evidence-item">
+  <blockquote>Inventory Audit: Document current server configurations, including IP addresses, camera port assignments, and camera-specific passwords.
+Network Check: Verify that existing cabling (Cat6/Coaxial) and network switches can support the new server&#x27;s bandwidth requirements.
+Data Backup: Extract and back up critical footage from the old server before decommissioning.</blockquote>
+  <div class="ev-explanation">The pre-installation tasks are enumerated as discrete procedural steps rather than as a pre-installation readiness standard. The legitimate outcome here is &#x27;ensure the environment is ready for installation and no critical footage is lost.&#x27; The solicitation instead prescribes exactly which assessment activities must occur, in what form, removing the vendor&#x27;s latitude to structure the assessment phase according to their methodology.</div>
+</div><div class="evidence-item">
+  <blockquote>User Training: Provide a hands-on session for staff on how to search, playback, and export video clips.
+Final Deliverables: Hand over a project closeout document containing serial numbers, network diagrams, and administrative credentials</blockquote>
+  <div class="ev-explanation">The training format (hands-on session) and closeout document contents are specified in prescriptive detail. While requiring training and documentation as deliverables is legitimate, dictating the format (hands-on) and the exact contents of the closeout document constrains how the vendor delivers these. A vendor might propose video tutorials, a web-based training module, or a different documentation structure — none of which are foreclosed by the outcome but all of which are precluded by this language.</div>
+</div><div class="evidence-item">
+  <blockquote>AXIS S3016 32 TB, AXIS S3016 32 RB RECORDER IS A 1U RACK RECORDER WITH AN INTEGRATED POE SWITCH... ACS PRO CORE DEVICE 5-YEAR LICENSE</blockquote>
+  <div class="ev-explanation">The solicitation specifies an exact manufacturer and model number (AXIS S3016) and a brand-specific license (ACS Pro Core). While a Q&amp;A response confirmed the agency prefers the AXIS server because their existing server is outdated, and the existing cameras are already AXIS, this brand lock-in eliminates competition from functionally equivalent NVR solutions. The legitimate outcome — reliable 24/7 recording with 30-day retention — could potentially be met by other platforms, but the solicitation forecloses that possibility entirely by naming specific products rather than specifying performance requirements.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. The core work is straightforward: procure and install one AXIS S3016 rack recorder with 10 camera licenses at a single small school, migrate existing cameras, and provide user training. The compliance apparatus appended to this simple procurement is notably disproportionate. The FAR clause table lists approximately 34 clauses by reference with no explanatory context. The wage determination attachment spans 12 of 29 pages and lists over 200 occupation codes — including Nuclear Medicine Technologists, Aircraft Mechanics, and Unexploded Ordnance Technicians — that bear no conceivable relationship to the work. The text-messaging-while-driving clause is a clear boilerplate carryover. Two Buy American clauses are cited without guidance on which controls. However, the severity does not reach 3 for several reasons: most of the FAR clauses, while numerous, are at least generically applicable to any commercial service contract of this type (SCA, small business, payment, whistleblower); the solicitation does not exhibit the contradictory-citation pathology seen in the most severe cases; the actual SOW (Attachment 1) is focused and sensible; and the background investigation clause, while multi-statutory and operationally underspecified, is legitimately required for work at a school serving Indian children. The primary problem is the wage determination padding and the absence of any curation or contextual explanation — this is passive accumulation, not active management, but it is not at the most extreme end of the spectrum.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CLAUSES INCORPORATED BY REFERENCE: 52.202-1 Definitions, 52.203-5 Covenant Against Contingent Fees, 52.203-11 Certification and Disclosure Regarding Payments to Influence Certain Foreign Transactions, 52.203-17 Contractor Employee Whistleblower Rights, 52.204-9 Personal Identity Verification of Contractor Personnel, 52.204-13 System for Award Management Maintenance, 52.204-18 Commercial and Government Entity Code Maintenance, 52.204-19 Incorporation by Reference of Representations and Certifications, 52.204-21 Basic Safeguarding of Covered Contractor Information Systems, 52.209-2 Prohibition on Contracting with Inverted Domestic Cooperation-Representation, 52.219-6 Notice of Total Small Business Set Aside, 52.219-14 Limitations on Subcontracting, 52.219-28 Postaward Small Business Program Rerepresentation, 52.212-4 Contract Terms and Conditions Commercial Products and Services, 52.212-4 Contract Terms and Conditions Commercial Products and Service Alternative I, 52.222-3 Convict Labor, 52.222-19 Child Labor, 52.222-35 Equal Opportunities for Veterans, 52.222-36 Equal Opportunities for Workers with Disabilities, 52.222-41 Service Contract Labor Standards, 52.222-42 Statement of Equivalent Rates of Federal Hires, 52-222-43 Fair Labor Standards Act and Service Contract Labor Standards-Price Adjustment, 52.222-50 Combating Trafficking in Persons, 52.222-55 Minimum Wage for Contractor Workers Under Executive Order 14026, 52.222-62 Paid Sick Leave Under Executive Order 13706, 52.222-90 Addressing DEI Discrimination by Federal Contractors, 52.224-3 Privacy Training, 52.225-1 Buy American-Supplies, 52.225-3 Buy American-Free Trade Agreements-Israeli Trade Act, 52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving, 52.232-18 Availability of Funds, 52.232-33 Payments by Electronic Funds Transfer, 52.232-40 Providing Accelerated Payment to Small Business Subcontractors, 52-240-91 Security Prohibition and Exclusions</blockquote>
+  <div class="ev-explanation">The solicitation lists approximately 34 FAR clauses by reference in a single undifferentiated table with no explanation of how each applies to this specific work — a one-time hardware installation and configuration of a security camera NVR system at a rural day school. While many are standard boilerplate, the sheer volume relative to the simplicity of the procurement (buy a rack recorder, install it, train staff) creates an elevated compliance interpretation burden.</div>
+</div><div class="evidence-item">
+  <blockquote>52.222-41 Service Contract Labor Standards | Aug 2018 ... 52.222-42 Statement of Equivalent Rates of Federal Hires | May 2014 ... 52-222-43 Fair Labor Standards Act and Service Contract Labor Standards-Price Adjustment (Multiple Year and Option Contracts).</blockquote>
+  <div class="ev-explanation">Three separate Service Contract Act clauses are cited, and the solicitation devotes roughly 12 pages (pages 11–24 of 29) to reproducing the full Department of Labor wage determination listing over 200 occupation codes — including Ambulance Driver, Dental Hygienist, Nuclear Medicine Technologist, Aircraft Mechanic, Unexploded Ordnance Technician, Weather Forecaster, Carnival Equipment Operator, and Embalmer. None of these occupational categories have any plausible relevance to a one-time security camera server installation and user training engagement at a small school. The wage determination is wholesale copied rather than curated to the actual labor classifications needed.</div>
+</div><div class="evidence-item">
+  <blockquote>52.225-1 Buy American-Supplies | Oct 2022 ... 52.225-3 Buy American-Free Trade Agreements-Israeli Trade Act | Nov 2023</blockquote>
+  <div class="ev-explanation">Two separate Buy American clauses are cited without any explanation of which applies or how they interact with the procurement of a commercial off-the-shelf AXIS recorder manufactured abroad. The solicitation provides no guidance on whether the hardware must be domestic, whether TAA compliance suffices, or how these two clauses reconcile — leaving vendors to interpret the compliance burden themselves.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving | May 2024</blockquote>
+  <div class="ev-explanation">A clause discouraging text messaging while driving is cited in a solicitation for a security camera server installation. While this clause appears in many commercial service contracts, its inclusion without any contextual note is a textbook boilerplate carryover — it has no meaningful operational connection to rackmounting a network video recorder and configuring cameras at a school.</div>
+</div><div class="evidence-item">
+  <blockquote>52.224-3 Privacy Training | Jan 2017 ... BACKGROUND INVESTIGATION (Revised 04/01/2020): In accordance with 25 U.S.C. § 3201 et seq. (Pub. L. 101-630), the Indian Child Protection and Family Violence Prevention Act; 34 U.C.C. § 20351, et seq. (Pub. L. 101-647), the Crime Control Act of 1990, as amended; and 441 Departmental Manual, Personnel Security and Suitability Requirements...</blockquote>
+  <div class="ev-explanation">Three separate statutory citations (25 U.S.C. § 3201, 34 U.C.C. § 20351, and 441 DM) govern the background investigation requirement, plus FAR 52.224-3 Privacy Training is cited separately. No explanation is provided for how privacy training applies to a hardware installation vendor, or whether the background investigation requirement applies to all installer personnel or only those with child contact. The multi-statute background investigation clause is appropriate in principle but is presented without operational guidance, leaving vendors uncertain about compliance scope.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a clear square peg situation that the government itself recognized and partially corrected. The original contract type designation (T&amp;M) was wrong for the requirement, and Amendment 0002 changed it to Firm Fixed Price. While the correction is appropriate and the final contract type (FFP) fits the work, the original mismatch warrants a severity 3 finding because: (1) the requirements are about as well-defined as they can be — a single commercial hardware unit, ten software licenses, installation at one school, with fully enumerated installation steps and measurable performance outcomes; (2) T&amp;M is only appropriate when the extent or duration of work cannot be estimated, which is plainly not the case here; (3) the solicitation&#x27;s own instructions to offerors required FFP pricing even while the contract type section said T&amp;M, revealing the designation was an error rather than a judgment call; and (4) the need for a corrective amendment itself consumed time in a solicitation with only a 4-day response window (originally posted April 27, response due May 1, later extended to May 7). The FFP designation in the amendment is the right call — commercial, well-scoped hardware procurement and installation is a canonical FFP use case — but the initial T&amp;M error demonstrates the kind of pricing scheme mismatch that this sin is designed to flag. The severity is 3 rather than 2 because there is no plausible justification for T&amp;M here: the incumbent system is known, the replacement hardware is specified by model number, the site is a single school, and the installation steps are fully documented in the SOW.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Department of the Interior (DOI), Bureau of Indian Education (BIE), Division of Acquisitions anticipates awarding a single &quot;Time and Material (including Labor Hour)&quot; type purchase order as a result of this opportunity.</blockquote>
+  <div class="ev-explanation">The original solicitation designated a Time and Materials contract type for what is, at its core, a well-scoped hardware procurement and installation project. T&amp;M is only appropriate when the extent or duration of work cannot be estimated. Here, the scope is clearly defined: one AXIS S3016 recorder, ten ACS Pro Core Device licenses, and installation at a single school.</div>
+</div><div class="evidence-item">
+  <blockquote>Amendment Two (00002)...To remove Contract Type FROM: Time and Material (including Labor) and REPLACE with &quot;Firm Fix Price Contract&quot;, the purchase order will be issued as a Firm Fix Price Contract.</blockquote>
+  <div class="ev-explanation">The government corrected the contract type mid-solicitation via amendment, which itself is evidence that the original designation was wrong. The amendment is responsive, but the fact that the agency originally designated T&amp;M for a straightforward product purchase and installation reveals a fundamental misjudgment about contract type selection.</div>
+</div><div class="evidence-item">
+  <blockquote>AXIS S3016 32 TB...1 EA | ACS PRO CORE DEVICE 5-YEAR LICENSE...10 EA | LABOR, TRAVEL, TAXES, ETC....1 EA | GRAND TOTAL COST:</blockquote>
+  <div class="ev-explanation">The line items reveal a clearly bounded scope: one hardware unit, ten software licenses, and a single lump-sum labor line. The quantities are fixed, the products are commercially available and specified by model number, and the installation is at a single site. This is a textbook FFP scenario — scope, deliverables, and quantities are all known in advance.</div>
+</div><div class="evidence-item">
+  <blockquote>Goal: Replace the outdated security camera server with a modern NVR/VMS platform to improve reliability, resolution, and storage capacity. Performance Metrics: Ensure continuous 24/7 recording and minimum 30-day retention of video archives.</blockquote>
+  <div class="ev-explanation">The SOW defines concrete, measurable outcomes: 24/7 recording and 30-day retention. The installation steps are fully enumerated (inventory audit, hardware setup, camera migration, testing, training, documentation handover). This level of specificity supports FFP, not T&amp;M — there is no ambiguity in scope that would justify paying for hours worked regardless of outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>Price: The contractor shall submit an all-inclusive firm fixed price quote in response to this solicitation.</blockquote>
+  <div class="ev-explanation">Even the instructions to offerors required a firm fixed price quote from the outset, while Section B simultaneously designated T&amp;M. This internal contradiction within the original solicitation — asking vendors for FFP pricing under a T&amp;M contract vehicle — confirms that the T&amp;M designation was an error rather than a deliberate choice based on requirements analysis.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140A2326Q0119.pdf">Sol_140A2326Q0119.pdf</div></div>
+  <a class="dl-btn" href="../attachments/db8115f4daf8408c990488b7b2130d80_Sol_140A2326Q0119.pdf" download="Sol_140A2326Q0119.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140A2326Q0119_Amd_0001.pdf">Sol_140A2326Q0119_Amd_0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/db8115f4daf8408c990488b7b2130d80_Sol_140A2326Q0119_Amd_0001.pdf" download="Sol_140A2326Q0119_Amd_0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140A2326Q0119_Amd_0002.pdf">Sol_140A2326Q0119_Amd_0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/db8115f4daf8408c990488b7b2130d80_Sol_140A2326Q0119_Amd_0002.pdf" download="Sol_140A2326Q0119_Amd_0002.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

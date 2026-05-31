@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Foundation Sustainment Support, Software and Integration (FS3i) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Foundation Sustainment Support, Software and Integration (FS3i)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 107fbc1616134a41b432446eaa5078a9</span>
+      <a class="sam-link" href="https://sam.gov/opp/107fbc1616134a41b432446eaa5078a9/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-04-24</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › NATIONAL GEOSPATIAL-INTELLIGENCE AGENCY (NGA) › NATL GEOSPATIAL-INTELLIGENCE AGENCY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DF01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541511</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-24</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The bidder&#x27;s library documents provided — NGAI 8955.6 (Web Property Standards), NGAI 8040.1 (Configuration Management), Annex K (Cloud Business Guidance), and DoDI 5000.87 (Software Acquisition Pathway) — are background reference documents rather than the actual SOW, PWS, or performance work statement for the FS3i contract. This limits the ability to fully assess QA surveillance plans, reporting cadences, and deliverables lists, which are where this sin is most commonly concentrated.
+
+Within the available content, there is a moderate compliance-over-outcomes pattern. The NGA internal instructions (Web Property Standards, Configuration Management) are almost entirely structured around process compliance: follow the CONOPS, register in the registry, tag requirements in the GSR database, complete the CAT form, conform to the style guide. These documents define success as completion of administrative steps and conformance to referenced policies, with no outcome metrics for system performance, user satisfaction, or mission effectiveness.
+
+Annex K (Cloud Business Guidance) shows the same pattern in financial and lifecycle management: the guidance measures whether programs completed the Cost Calculator, AF Form 9, Architecture TEM, and A&amp;A documentation — procedural milestones rather than mission outcomes. Performance metrics are mentioned briefly (&#x27;Performance metrics are to be used to detect problems, support decisions, and gauge the health of the program&#x27;) but are not defined, measured, or tied to accountability.
+
+The partially offsetting factor is DoDI 5000.87, which explicitly requires value assessments at least annually, user engagement, and outcome-oriented metrics for software delivery cadence (MVCR within 1 year, annual capability releases). This instruction pushes meaningfully against pure process compliance and introduces genuine outcome accountability — though it also mandates specific methodology use (agile, DevSecOps), which is itself a process requirement.
+
+Severity 2 is appropriate: the documents show a noticeable compliance-over-outcomes tendency in how NGA internal standards define accountability, but the solicitation materials include DoDI 5000.87, which introduces real outcome-focused requirements. The full RFP with its SOW/PWS — not yet released — will be the more definitive test of whether this sin is severe, as actual reporting requirements, QA surveillance plans, and deliverables lists have not been provided.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>NGA web properties on enterprise domains must conform to the plain writing memorandums and referenced materials identified in the content guidance provided in the Online Resources.</blockquote>
+  <div class="ev-explanation">This is a compliance mandate — conform to a referenced document — with no outcome measure. There is no metric for whether web content actually achieves user comprehension or task completion. Success is defined as conforming to guidance, not as effective communication.</div>
+</div><div class="evidence-item">
+  <blockquote>NGA web properties on enterprise domains comply with Section 508 requirements. Accessibility guidance and tools are located on networks identified in paragraph 3.b. of this Enclosure.</blockquote>
+  <div class="ev-explanation">Section 508 compliance is framed as a checkbox — comply with the standard — rather than measuring whether users with disabilities can actually accomplish tasks on NGA web properties. Accessibility is reduced to a compliance status rather than a usability outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>NGA web properties on enterprise domains must register for a DNS Uniform Resource Locator (URL) to ensure that users can quickly identify the web property as a Government entity that is legitimate, secure, and authoritative.</blockquote>
+  <div class="ev-explanation">DNS registration is a procedural step. The rationale (&#x27;to ensure users can quickly identify&#x27;) gestures at an outcome, but the requirement itself measures completion of a registration action — there is no metric for how quickly users actually find or identify the web property.</div>
+</div><div class="evidence-item">
+  <blockquote>NGA services will perform the Assessment &amp; Authorization (A&amp;A) process in accordance with ICD 503... Statement of Work (SOW) requirements are to include those for service Assessment &amp; Authorization. Security requirements are to be tagged as security related in the GSR database, as well as those tagged as security-related in the SOW.</blockquote>
+  <div class="ev-explanation">The A&amp;A requirement focuses on executing a process and tagging requirements in a database — procedural compliance artifacts. While security assessment serves legitimate purposes, the framing here measures whether the process was performed and documentation completed, not whether the resulting system is actually secure or resilient in operation.</div>
+</div><div class="evidence-item">
+  <blockquote>Programs will require government and contractor software teams to use modern iterative software development methodologies (e.g., agile or lean), modern tools and techniques (e.g., development, security, and operations (DevSecOps)), and human-centered design processes to iteratively deliver software to meet the users&#x27; priority needs.</blockquote>
+  <div class="ev-explanation">DoDI 5000.87 requires use of specific methodologies — agile, lean, DevSecOps — which is itself a process mandate. However, the same instruction partially offsets this by requiring value assessments at least annually and defining outcome measures like minimum viable capability releases and user engagement. This is a mixed signal: methodology compliance is mandated, but outcome accountability is also present.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The documents provided in this bidder&#x27;s library are NGA internal policy and guidance documents — specifically NGAI 8955.6 (Web Property Standards and Guidelines), NGAI 8040.1 (Configuration Management), Annex K (Cloud Business Guidance), and DoDI 5000.87 (Software Acquisition Pathway). None of these constitute a draft RFP, Statement of Work, Performance Work Statement, evaluation criteria document, or past performance/experience requirements section. They are reference materials provided to inform potential offerors about NGA&#x27;s technical and business environment. The solicitation notice itself explicitly states that &#x27;All RFP documents and attachments will be published in the coming months.&#x27; Without the actual solicitation, evaluation factors, past performance requirements, or personnel qualification sections, it is not possible to assess whether the FS3i acquisition contains insider rewards. The documents present — while useful for understanding NGA&#x27;s operating environment — contain no offeror experience requirements, no evaluation criteria, and no past performance standards against which incumbency bias could be assessed.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The documents provided in this bidder&#x27;s library are NGA internal policy instructions and DoD-level acquisition guidance — specifically NGAI 8955.6 (Web Property Standards), NGAI 8040.1 (Configuration Management), Annex K (Cloud Business Guidance), and DoDI 5000.87 (Software Acquisition Pathway). None of these are a Statement of Work, Performance Work Statement, or solicitation SOW directed at a contractor. They are reference documents establishing NGA&#x27;s internal standards and the applicable acquisition framework. As such, they cannot be meaningfully evaluated for requirement sprawl in the vendor-facing sense — they do not instruct a contractor on how to perform work, they instruct NGA personnel and inform offerors about the operating environment. The DoDI 5000.87 document is notably outcome-oriented and explicitly encourages modern iterative development (agile, DevSecOps), leaves implementation approach to the vendor, and discourages prescriptive process mandates — the opposite of requirement sprawl. The NGA web and configuration management instructions define internal governance roles and standards, which is appropriate context for vendors but again not contractor-directed work requirements. Without the actual draft RFP SOW/PWS, evaluation criteria, or CLIN structure, there is insufficient basis to identify vendor-facing requirement sprawl. The bidder&#x27;s library content reviewed here is largely background context and does not exhibit the patterns — step-by-step task prescriptions, mandatory staffing structures, or incumbent-derived process mandates — that constitute meaningful requirement sprawl. Severity is assessed at 1 (minimal) based on the available content.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>NGA web properties meet and maintain high standards of effectiveness and usability to provide quality information that is readily discoverable and accessible to authorized users.</blockquote>
+  <div class="ev-explanation">This is outcome-oriented language defining what the web properties must achieve (accessible, discoverable, high quality), not prescribing how to achieve it. It is representative of the general tone of these reference documents.</div>
+</div><div class="evidence-item">
+  <blockquote>NGA web properties on enterprise domains comply with Section 508 requirements.</blockquote>
+  <div class="ev-explanation">This is a legal mandate (Section 508 of the Workforce Investment Act of 1998), not prescriptive process sprawl. Accessibility compliance is a legitimate government constraint regardless of which vendor performs the work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The FS3i Bidder&#x27;s Library as provided does not contain a single consolidated &#x27;Applicable Documents&#x27; list for the solicitation itself — the full draft RFP has not yet been released. What is present are four Bidder&#x27;s Library reference documents: NGAI 8955.6 (Web Standards), NGAI 8040.1 (Configuration Management), Annex K (Cloud Business Guidance), and DoDI 5000.87 (Software Acquisition Pathway). Each document contains its own internal regulatory reference stack. Taken together, these documents expose vendors to a layered compliance universe spanning OMB memoranda, IC directives, NGA-specific instructions, DoD issuances, NIST frameworks, public laws, and internal NGA process tools — without any integrating document that tells vendors which requirements flow down to contractor performance, which are government-internal, and which are primary versus inherited. The individual reference lists within each document are moderate in size (8-17 items each) and each item is at least plausibly connected to its parent document&#x27;s subject. However, the absence of any curating overlay across the library — combined with opaque internal process tools (XACTA, REvAMP, PRISM, IPPBES) that only incumbents would know — creates a moderate rule pool effect. This is not a severe case: there are no clear contradictions between cited policies and the solicitation&#x27;s purpose, and the regulations cited within each document are not wildly irrelevant to their respective subjects. The severity is moderated further by the fact that this is a pre-solicitation bidder&#x27;s library, not the final RFP — the actual applicable documents section may be more or less curated. However, the pattern of undifferentiated reference stacking across multiple documents without cross-document guidance warrants a severity 2 assessment. The strongest concern is the Annex K ecosystem of internal NGA tools (referenced but unexplained) which creates structural incumbent advantage rather than an open compliance landscape.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>References: See Enclosure 1.
+(a) Public Law 105-220, &quot;Workforce Investment Act of 1998 - Rehabilitation Act Amendments, Section 508...&quot;
+(b) OMB Memorandum M-11-15...
+(c) OMB Memorandum M-15-13...
+(d) OMB Memorandum M-17-06...
+(e) Electronic Code of Federal Regulations, Title 36, Chapter XII, Subchapter B, § 1220.12...
+(f) Title 17, United States Code (USC), &quot;Copyrights&quot;...
+(g) Committee on National Security Systems Instruction No. 4009...
+(h) Intelligence Community Directive (ICD) 501...
+(i) ICD 710...
+(j) DoDI 5025.13...
+(k) DoDI 8520.02...
+(l) NGA Directive (NGAD) 8000...
+(m) NGAI 5401.1...
+(n) NGAI 5720.1...
+(o) NGAI 8040.2...
+(p) NGAI 8220.1...
+(q) NGAI 8400.4...</blockquote>
+  <div class="ev-explanation">NGAI 8955.6 (Web Property Standards) references 17 separate regulatory instruments spanning copyright law, IC directives, OMB memoranda, DoD Instructions, NARA records management, and multiple NGA-specific instructions. While many are plausibly related to web property management, the list is presented without differentiation — no guidance is given on which requirements are mandatory versus advisory, which apply to contractors versus government personnel, or which are primary versus inherited. A vendor trying to scope compliance work for web property development faces an undifferentiated compliance stack.</div>
+</div><div class="evidence-item">
+  <blockquote>References:
+(a) DoD Directive 8000.01...
+(b) NIST SP 800-128...
+(c) NIST SP 800-137...
+(d) NGAD 4160, &quot;Logistics and Transportation&quot;...
+(e) NGAD 8000...
+(f) NGA Manual 4160.1, &quot;Accountability and Management of Property, Plant, Equipment, and Other Accountable Property&quot;...
+(g) NGA Configuration Management Plan (NCMP)...
+(h) NGA Enterprise Tier 2 Configuration Management (CM) Procedure...</blockquote>
+  <div class="ev-explanation">NGAI 8040.1 (Configuration Management) cites NGAD 4160 &#x27;Logistics and Transportation&#x27; and NGA Manual 4160.1 &#x27;Accountability and Management of Property, Plant, Equipment, and Other Accountable Property&#x27; as governing references for an IT configuration management instruction. Physical property accountability and logistics/transportation policies are materially distinct from IT software configuration management. Their inclusion without explanation of what specific provisions apply to IT CM creates unnecessary compliance ambiguity for vendors.</div>
+</div><div class="evidence-item">
+  <blockquote>Annex K: Cloud Business Guidance... references: DNI Memorandum E/S 00564; ICD 503; ITIL 3.0; IPPBES; REvAMP; XACTA; PRISM/GEO-F; AF Form 9; Joint Capabilities Integration and Development System (JCIDS); DoDAF; JARM; GEA CV-6/7; ESL/TST; IC ITE; NSG/ASG...</blockquote>
+  <div class="ev-explanation">Annex K (Cloud Business Guidance, v5.2) invokes a large set of NGA-internal frameworks, IC-specific tools, and DoD processes (XACTA for A&amp;A, PRISM for funding validation, REvAMP for risk management, IPPBES for budget execution) throughout its guidance without providing vendors any orientation to these systems or their interactions. While these are operational tools rather than regulations per se, they collectively constitute an opaque compliance ecosystem that incumbent contractors know but new entrants would struggle to navigate. No prioritization or entry-point guidance is provided.</div>
+</div><div class="evidence-item">
+  <blockquote>DoDI 5000.87... REFERENCES: Defense Acquisition University Software Acquisition Pathway Guidance; DoD Directive 5000.01; DoD Directive 5135.02; DoD Instruction 5000.02; DoD Instruction 5000.73; DoD Instruction 5000.75; DoD Instruction 5010.44; Public Law 104-106 Division E (Clinger-Cohen Act); Public Law 115-91 Section 913; Public Law 116-92 Section 800; United States Code, Title 10</blockquote>
+  <div class="ev-explanation">DoDI 5000.87 itself cites 11 references spanning multiple public laws, DoD directives, and instructions as governing the software acquisition pathway. While appropriate for an authorizing DoD issuance, its inclusion in the FS3i Bidder&#x27;s Library — without any bridging document explaining which provisions directly flow down to the contractor — means vendors must interpret an entire DoD instruction&#x27;s compliance chain on their own. The solicitation provides no curated translation from the DoDI&#x27;s policy requirements to specific contractor obligations.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The documents provided in this bidder&#x27;s library do not contain sufficient information to assess contract pricing structure. The three attachments provided are: (1) NGAI 8955.6, an internal NGA policy instruction on web property standards and guidelines; (2) NGAI 8040.1, an internal NGA policy instruction on configuration management; and (3) Annex K, NGA&#x27;s cloud business guidance document; and (4) DoDI 5000.87, the DoD Software Acquisition Pathway instruction. None of these documents contain the draft RFP, Statement of Work, Performance Work Statement, contract line item numbers (CLINs), or any language specifying the contract pricing type (e.g., FFP, T&amp;M, cost-reimbursement) for the FS3i acquisition. The presolicitation notice explicitly states that &#x27;All RFP documents and attachments will be published in the coming months.&#x27; Without the actual solicitation, PWS/SOW, or CLIN structure, it is not possible to identify what contract pricing scheme NGA intends to use, nor to evaluate whether that scheme is appropriate for the requirements. The bidder&#x27;s library documents are background reference materials describing NGA policies and DoD acquisition pathway guidance, not the acquisition instrument itself. A meaningful square peg analysis requires at minimum the contract type and enough context about the requirements to evaluate fit — neither is present here.</div>
+    
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="%28U%29 Annex_K_Cloud_Business_Guidance_v5.2.pdf">%28U%29 Annex_K_Cloud_Business_Guidance_v5.2.pdf</div></div>
+  <a class="dl-btn" href="../attachments/107fbc1616134a41b432446eaa5078a9_%28U%29+Annex_K_Cloud_Business_Guidance_v5.2.pdf" download="%28U%29 Annex_K_Cloud_Business_Guidance_v5.2.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="%28U%29 DODI_5000.87 SoftwareAcqPathway.pdf">%28U%29 DODI_5000.87 SoftwareAcqPathway.pdf</div></div>
+  <a class="dl-btn" href="../attachments/107fbc1616134a41b432446eaa5078a9_%28U%29+DODI_5000.87+SoftwareAcqPathway.pdf" download="%28U%29 DODI_5000.87 SoftwareAcqPathway.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="%28U%29 NGAI 8040.1_Configuration Mgmt_21NOV2018.pdf">%28U%29 NGAI 8040.1_Configuration Mgmt_21NOV2018.pdf</div></div>
+  <a class="dl-btn" href="../attachments/107fbc1616134a41b432446eaa5078a9_%28U%29+NGAI+8040.1_Configuration+Mgmt_21NOV2018.pdf" download="%28U%29 NGAI 8040.1_Configuration Mgmt_21NOV2018.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="%28U%29 NGAI 8955.6_NGA Web Property Standards %26 Guidelines_Update_1.pdf">%28U%29 NGAI 8955.6_NGA Web Property Standards %26 Guidelines_Update_1.pdf</div></div>
+  <a class="dl-btn" href="../attachments/107fbc1616134a41b432446eaa5078a9_%28U%29+NGAI+8955.6_NGA+Web+Property+Standards+%26+Guidelines_Update_1.pdf" download="%28U%29 NGAI 8955.6_NGA Web Property Standards %26 Guidelines_Update_1.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📎</div>
+  <div class="file-info"><div class="file-name" title="%28U%29 SFA Air High-Level As-Is SV-1.png">%28U%29 SFA Air High-Level As-Is SV-1.png</div></div>
+  <a class="dl-btn" href="../attachments/107fbc1616134a41b432446eaa5078a9_%28U%29+SFA+Air+High-Level+As-Is+SV-1.png" download="%28U%29 SFA Air High-Level As-Is SV-1.png" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marketplace for Acquisition of Professional Services (MAPS) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Marketplace for Acquisition of Professional Services (MAPS)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 9d64729b692a45c79f64afce294f19e4</span>
+      <a class="sam-link" href="https://sam.gov/opp/9d64729b692a45c79f64afce294f19e4/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › W6QK ACC-APG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Multiple Award IDIQ (Indefinite Delivery Indefinite Quantity)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Screening Questions (Go/No-Go): Submission Requirements, Active Secret Facility Clearance, ISO 9001:2015 or ISO 9001:2013 Certification, CMMC Final Level 2 (self) Certification, CPARS Marginal/Below Threshold</li><li>Government Approved Systems and Certifications (Systems - Property Management System, Accounting System)</li><li>Certifications (Top Secret Facility Clearance, CMMC Level 2 C3PAO, ISO/IEC 27001:2022)</li><li>Past Performance - Recency (QP 1, QP 2, QP 3)</li><li>Past Performance - Relevance (QP 1, QP 2, QP 3)</li><li>Past Performance - NAICS Alignment (QP 1, QP 2, QP 3)</li><li>Past Performance - Performance Quality (QP 1, QP 2, QP 3)</li><li>Past Performance - Dollar Value (QP 1, QP 2, QP 3)</li><li>Past Performance - Passthrough Rate (QP 1, QP 2, QP 3)</li><li>Past Performance - Vacancy Rate [LOE QPs Only] (QP 1, QP 2, QP 3)</li><li>Past Performance - Time to Fill Rate [LOE QPs Only] (QP 1, QP 2, QP 3)</li><li>Past Performance - Schedule [Outcome-Based QPs Only] (QP 1, QP 2, QP 3)</li><li>Past Performance - Completeness [Outcome-Based QPs Only] (QP 1, QP 2, QP 3)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The MAPS solicitation is an IDIQ vehicle qualification mechanism rather than a task-order SOW, so the compliance-over-outcomes analysis must focus on what the scorecard tells us about how the government will evaluate vendor capability and quality — and by extension, what accountability signals will govern the vehicle relationship. The scorecard reveals a moderate compliance-over-outcomes problem with some genuinely outcome-oriented elements mixed in. On the positive side, the solicitation does incorporate real performance data: CPARS ratings from prior contracts constitute actual outcome evidence, and the CPARS-based &#x27;Performance Quality&#x27; factor (worth up to 30,000 of 130,000 points across three QPs) is the most outcome-oriented element in the evaluation. The Outcome-Based QP pathway also introduces Schedule and Completeness metrics tied to Acceptable Quality Levels (AQL), which is a meaningful outcome framework. However, several significant factors measure process compliance rather than outcomes: (1) Vacancy Rate and Time-to-Fill Rate together constitute up to 30,000 points on LOE-based QPs — both are staffing process metrics with no connection to whether work was performed well; (2) ISO 9001 certification (a QMS process certification) is used as both a hard gate and a scored factor, creating a strong incentive to obtain process certifications rather than demonstrate performance; (3) Relevance scoring via Technical Capabilities percentage-match is a document-matching exercise rather than a capability demonstration; (4) Passthrough Rate scoring (up to 18,000 points across three QPs) measures subcontracting structure rather than outcomes — it may serve legitimate policy goals (reducing pass-through inefficiency) but is not an outcome measure. The overall architecture of the scorecard is more process-compliance-weighted than outcome-weighted, particularly for LOE-based QPs where staffing metrics dominate. The absence of any performance reporting or QA surveillance language in the available documents (which are primarily scorecard attachments and a cover letter) limits full assessment — the solicitation itself and any attached PWS/QA Surveillance Plan were not provided, which is why severity is assessed at 2 rather than 3. What is visible suggests moderate compliance orientation without completely displacing outcome focus.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror will receive 10,000 points per QP that has Exceptional Past Performance (PP) Rating in all CPARS/PPQ elements. Offeror will receive 7,500 points per QP that has at least a Very Good (or combination of Very Good and higher) PP Rating in each CPARS/PPQ elements. Offeror will receive 4,500 points per QP that has at least a Satisfactory (or combination of Satisfactory and higher) PP Rating in each CPARS/PPQ elements.</blockquote>
+  <div class="ev-explanation">This is the primary quality accountability mechanism in the solicitation — it uses CPARS ratings from prior contracts as a proxy for performance quality. CPARS ratings themselves are evaluator judgments about past work, which is outcome-adjacent. However, the scoring treats CPARS ratings as a checkbox (Exceptional = 10,000, Very Good = 7,500, etc.) rather than interrogating what outcomes those ratings reflected. The government is essentially measuring compliance with a rating scale, not actual mission impact or deliverable quality on the new IDIQ.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will receive 5,000 points per QP with a 0.00% Vacancy Rate ... Offerors will receive 3,500 points per QP with a greater than 0.00% to 4.99% Vacancy Rate ... Offerors will receive 0 points per QP with a 15.00% or greater Vacancy Rate</blockquote>
+  <div class="ev-explanation">Vacancy Rate is a staffing process metric — it measures whether the vendor kept positions filled on prior LOE-based contracts, not whether those filled positions delivered results. High staff-fill rates can coexist with poor mission outcomes. Awarding up to 5,000 points for this metric substitutes a process compliance indicator (seats filled) for an outcome indicator (work accomplished).</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will receive 5,000 points per QP that meets 30 days or less to fill ... Offerors will receive 0 points per QP that meets 75 days or more to fill</blockquote>
+  <div class="ev-explanation">Time-to-Fill Rate measures how quickly the vendor hired staff on prior contracts — another staffing process metric. It reflects administrative responsiveness, not whether the recruited personnel performed well or whether the contract delivered its intended capability. This is compliance theater: a vendor that fills seats quickly but underperforms is rewarded; a vendor that took longer to hire but delivered superior outcomes is penalized.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will receive 7,000 points per QP that meets 100.00% of the Technical Capabilities under the Domain they are proposing. Offerors will receive 5,000 points per QP that meets 75.00-99.99% of the Technical Capabilities under the Domain they are proposing.</blockquote>
+  <div class="ev-explanation">Technical Capabilities relevance scoring measures whether a prior project&#x27;s statement of work overlapped with the domain&#x27;s capability list — a document-matching exercise. This is a process compliance check: did the prior contract&#x27;s paperwork cover the right topics? It does not ask whether the vendor actually demonstrated competence or produced good results within those capability areas.</div>
+</div><div class="evidence-item">
+  <blockquote>Is your company ISO 9001:2015 or ISO 9001:2013 certified? ... Offerors shall provide verification of a current ISO 9001:2015 or ISO 9001:2013 Certification ... Does your company have an active facility clearance of SECRET?</blockquote>
+  <div class="ev-explanation">ISO 9001 certification and facility clearance are used as both hard screening gates (pass/fail) and scored evaluation factors (earning thousands of points). ISO 9001 certifies that a vendor has a documented quality management system — it does not measure whether that system produces quality outcomes. Using certification possession as a primary discriminator privileges process compliance over demonstrated performance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The MAPS solicitation presents a moderate insider-rewards pattern, assessed at severity 2. The solicitation is structured as a point-scored competition with multiple go/no-go screens followed by a 130,000-point scorecard. Individually, several criteria are defensible: security clearance requirements reflect genuine access needs; CPARS evaluation is standard and appropriate; ISO 9001 is a widely-recognized quality standard. However, the cumulative structure creates a meaningful tilt toward incumbents on multiple dimensions simultaneously.
+
+The stacking effect is the core concern. To reach the proposal evaluation phase, a vendor must satisfy four simultaneous binary screens (submission compliance, SECRET facility clearance, ISO 9001:2015/2013 certification, and CMMC Level 2 self-certification) before a single scored point is considered. Each screen individually is arguable; together they function as a credential-accumulation filter that established federal contractors — particularly RS3 and ITES-3S incumbents — are far better positioned to satisfy than capable but newer entrants.
+
+In the scored section, the dollar-value criteria for large businesses award maximum points only for contracts exceeding $50M, across three qualifying projects, within a 3-year recency window. The population of vendors with three documented $50M+ federal IT/professional services contracts completed within the last three years is very small. The recency criterion (3-year eligibility window, with bonus points for 2-year recency) further compresses the eligible experience base to recent federal work, disadvantaging commercial-sector capability.
+
+Mitigating factors prevent a severity-3 rating. The solicitation does create a separate &#x27;Commercial-Sector Vendor&#x27; pathway with relaxed requirements (no SECRET clearance screen, no ISO 9001 screen, 4-year lookback window, lower dollar thresholds of $10M rather than $50M). This pathway explicitly contemplates and accommodates vendors without federal contracting history, which is a meaningful structural accommodation. Additionally, this is a multiple-award IDIQ — not a single-award contract — reducing the exclusionary impact, since a broader range of vendors can win a vehicle even if incumbents score higher. The scoring rubric also provides partial credit across a range of dollar thresholds and relevance levels, rather than an all-or-nothing structure. These features meaningfully limit the insider-rewards severity compared to a single-award procurement with binary experience pass/fail gates.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Does your company have an active facility clearance of SECRET? Offerors shall submit supporting documentation to show that your company has a Secret Clearance. [Screening Question - go/no-go for Large Business and Small Business]</blockquote>
+  <div class="ev-explanation">A SECRET facility clearance is a hard go/no-go screen for large and small businesses. While security clearances are listed under &#x27;What is NOT Insider Rewards,&#x27; this requirement compounds with the other stacked screens below to narrow the eligible pool before scoring even begins.</div>
+</div><div class="evidence-item">
+  <blockquote>Is your company ISO 9001:2015 or ISO 9001:2013 certified? Offerors shall provide verification of a current ISO 9001:2015 or ISO 9001:2013 Certification. [Screening Question - go/no-go for Large Business and Small Business]</blockquote>
+  <div class="ev-explanation">ISO 9001 certification is a mandatory pass/fail screen for large and small businesses. While certifications are not inherently an insider reward, requiring this as a binary eliminator — rather than a scored element — removes vendors who are otherwise capable but haven&#x27;t obtained this particular credential. Combined with other screens, it narrows the pool to established incumbents who have had time to accumulate certifications.</div>
+</div><div class="evidence-item">
+  <blockquote>For Large Businesses, if 5% or more of the element ratings are MARGINAL or below the Offeror is excluded from evaluations. CPARS will be pulled for all of the five (5) NAICS codes identified in the acquisition over the last three (3) years.</blockquote>
+  <div class="ev-explanation">CPARS data only exists for vendors who have already performed federal government contracts in the last three years under these specific NAICS codes. A new entrant or a vendor transitioning from commercial work has no CPARS record and would receive &#x27;neutral&#x27; ratings — which the scorecard explicitly penalizes: &#x27;Offeror does not receive credit for a project with a neutral rating (i.e., lack of past performance information).&#x27; This is a structural advantage for incumbents.</div>
+</div><div class="evidence-item">
+  <blockquote>Offeror will receive 4,000 points per QP if their total contract value is greater than $50M [Large Business Dollar Value criterion]; Offeror will receive 2,000 points per QP if their total contract value is greater than $25M to $50M; Offeror will receive 1,000 points per QP if their total contract value is greater than $2.5M to $25M.</blockquote>
+  <div class="ev-explanation">The dollar value thresholds for large businesses — where maximum points require prior contracts exceeding $50M — applied across three qualifying projects creates a scoring structure that strongly favors vendors with an established history of large federal IT/services contracts. The combination of three QPs each needing $50M+ history, within a 3-year recency window, describes a very narrow population of vendors essentially limited to those with prior large IDIQ experience like RS3 or ITES-3S incumbents.</div>
+</div><div class="evidence-item">
+  <blockquote>The QP submitted must have at least one (1) year of completed performance that has occurred within the last three (3) years prior to 01 May 2026 [recency eligibility threshold for Large/Small Business]; Offerors will receive 1,000 points per LOE-Based QP that has at least one (1) year of completed performance that has occurred within the last two (2) years prior to 01 May 2026 [recency bonus].</blockquote>
+  <div class="ev-explanation">The recency requirement — eligibility gated at 3 years, with scoring bonuses for the last 2 years — systematically advantages vendors currently holding contracts. A vendor who completed relevant work more than 3 years ago is ineligible to use it as a qualifying project at all, regardless of how relevant or high-performing that work was. This lookback window is short enough to privilege ongoing incumbents over capable vendors whose most relevant experience predates the window.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This submission consists almost entirely of evaluation scorecards (Attachment 0002 in multiple variants) and a cover letter form — not a Statement of Work, Performance Work Statement, or equivalent document defining how the work should actually be performed. The documents provided establish eligibility screening criteria (facility clearance, ISO 9001, CMMC), evaluate past qualifying projects, and score certifications and systems. None of this constitutes requirement sprawl in the classic sense: there are no bullet lists dictating step-by-step task performance, no prescribed staffing structures for future delivery, and no workflow mandates. The two mild examples noted above — passthrough rate scoring and time-to-fill metrics — reflect process-oriented evaluation criteria embedded in the scoring rubric, but they apply to historical qualifying projects rather than prescribing how the MAPS contractor must deliver future task orders. The solicitation as provided does not include the performance work statement or technical domain specifications that would be the most likely source of sprawl for a contract of this scope. Without those documents, the available text reads as an access vehicle evaluation framework — appropriately focused on qualifications, past performance quality, and administrative compliance. Severity is assessed as 1 (minimal) because the documents reviewed are predominantly evaluation instruments, not operational requirements, and the modest prescriptive elements identified are secondary to the dominant outcome-and-qualification focus. A more complete assessment would require the full RFP solicitation document and any attached performance requirements to evaluate whether sprawl exists in the substantive task requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors will receive 6,000 points per QP if the Subcontractor performed between 0.00% to 30.00% of the work... Offerors will receive zero (0) points per QP if the Subcontractor performed greater than 65.00% of the work</blockquote>
+  <div class="ev-explanation">The passthrough rate scoring incentivizes a specific subcontracting structure — rewarding primes who self-perform at least 70% — rather than specifying a performance outcome. This shapes HOW work must be staffed rather than WHAT must be delivered. However, this is an evaluation criterion for past qualifying projects, not a statement of work requirement, so its constraining effect on future task order delivery is indirect.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will receive 5,000 points per QP that meets 30 days or less to fill... Offerors will receive 0 points per QP that meets 75 days or more to fill</blockquote>
+  <div class="ev-explanation">The Time to Fill Rate metric for LOE-based qualifying projects rewards a specific staffing velocity rather than a mission outcome. It measures a process characteristic (how quickly the vendor filled positions on a prior contract) rather than the quality or results of the work performed. This is a mild form of process-over-outcome in the evaluation structure, though it is limited to past performance evaluation criteria rather than SOW requirements.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the available solicitation materials — primarily the scorecard attachments and cover letter form — this solicitation does not exhibit the rule pool pattern. The compliance requirements that appear are a focused set: ISO 9001, CMMC Level 2 (self and C3PAO), facility clearances (Secret and Top Secret), and ISO/IEC 27001:2022. Each is cited in a structured evaluation context with clear point values and documentation requirements. There is no &#x27;Applicable Documents&#x27; section with dozens of undifferentiated regulatory citations, no irrelevant policies appended from prior contract iterations, and no contradictions between cited regulations and the solicitation&#x27;s purpose. The scorecard structure actually represents above-average curation: it distinguishes between self-attestation and third-party certification levels, assigns differential credit, and explains what documentation is required for each. The solicitation spans 261 pages across 45 attachments, and the full body of the solicitation (Sections C through M) was not available for review — only the scorecard and cover letter attachments were provided. It is possible that a dedicated &#x27;Applicable Documents&#x27; or &#x27;Reference Standards&#x27; section in the main solicitation body could contain rule-pool content not visible here. However, based on what is available, there is no evidence of overwhelming, undifferentiated regulatory citation. The compliance framework visible in these attachments is coherent, purposeful, and appropriately scaled to the scope of a major DoD IDIQ contract. Severity is assessed at 1, with a caveat that the full solicitation body was not provided for review.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Is your company ISO 9001:2015 or ISO 9001:2013 certified? ... Is your company CMMC Final Level 2 (self) certified? ... Does your company have an active facility clearance of SECRET?</blockquote>
+  <div class="ev-explanation">The certification requirements cited (ISO 9001, CMMC Level 2, facility clearances, ISO/IEC 27001:2022) are all directly relevant to a large-scale DoD IT and professional services IDIQ contract. Each is cited with a clear purpose: ISO 9001 for quality management, CMMC for cybersecurity maturity, facility clearances for classified work, and ISO 27001 for information security. These are not bulk-listed without context — each appears as a discrete, explained requirement with associated documentation instructions.</div>
+</div><div class="evidence-item">
+  <blockquote>CMMC Final Level 2 (self) certified ... scheduled Conditional or scheduled Final CMMC Level 2 (C3PAO) Certification ... active and approved Conditional CMMC Level 2 (C3PAO) Certification ... active and approved Final CMMC Level 2 (C3PAO) Certification</blockquote>
+  <div class="ev-explanation">The solicitation carefully differentiates between maturity levels of CMMC certification and assigns graduated point values to each level. This is the opposite of rule-pool behavior — it demonstrates active curation and deliberate weighting of compliance requirements rather than a bulk undifferentiated list.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is an IDIQ vehicle, so the IDIQ contract itself does not have a single task-order pricing type — that is set at the task order level. The solicitation documents provided (primarily the scorecard attachments and cover letter) do not explicitly state what pricing types will govern individual task orders. This is the central analytical limitation: the worst-case square peg risk for an IDIQ vehicle lies in the task order pricing structure, which is not resolved at the IDIQ stage. However, there are meaningful signals in the solicitation that allow a partial assessment. The dual LOE/Outcome-Based qualifying project structure strongly implies that the vehicle is designed to support both T&amp;M/labor-hour task orders (LOE) and FFP task orders (Outcome-Based). This is a reasonable and defensible design for a multi-domain professional services IDIQ covering everything from RDT&amp;E to IT infrastructure support. The concern is that the solicitation does not establish guardrails for when each pricing type should be used at the task order level. For the LOE domains in particular (where vacancy rates and time-to-fill metrics are scored), T&amp;M or labor-hour pricing is the natural fit, but if ordering contracting officers instead apply FFP to those task orders, the government will pay for hours not worked or create unnecessary modification risk. Conversely, applying T&amp;M to Outcome-Based task orders with well-defined AQLs would forfeit cost discipline. The FFP requirement for the Post Award Conference is appropriate and shows the contracting team understands the distinction — but the absence of explicit task-order pricing guidance in the available solicitation text leaves a meaningful gap. Overall, this is a moderate finding: the IDIQ structure is defensible and the dual LOE/Outcome-Based framework shows awareness of pricing type differences, but the solicitation as presented does not resolve how pricing will be enforced at the task order level across five diverse domains. This is a common and known risk with large multi-domain IDIQ vehicles.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Army Contracting Command-Aberdeen Proving Ground (ACC-APG), in support of the Capability Program Executive (CPE) Enterprise Software and Service (ES2)...intends to award a Multiple Award (MA) Indefinite Delivery Indefinite Quantity (IDIQ) contract, MAPS...to provide Army customers...with uncommon knowledge-based professional services and support the Army enterprise infrastructure and infostructure goals with information technology (IT) services worldwide</blockquote>
+  <div class="ev-explanation">This is a broad, multi-domain IDIQ vehicle spanning five domains (Engineering/Logistics, Management/Advisory, RDT&amp;E, Emerging IT, Foundational IT) covering services ranging from R&amp;D to IT support. The scope is intentionally wide and flexible, which creates tension with any rigid pricing structure at the IDIQ level.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors FFP for Post Award Conference</blockquote>
+  <div class="ev-explanation">The Cover Letter (Attachment 0001) explicitly requests a Firm Fixed Price for the Post Award Conference. This is a minor but illustrative data point: FFP is being used for at least one discrete, predictable deliverable (a conference), which is appropriate. However, it does not clarify the pricing type for the underlying task orders, which is where the real pricing risk lies.</div>
+</div><div class="evidence-item">
+  <blockquote>The objective of the MAPS IDIQ contract is to provide...uncommon knowledge-based professional services...including hostile areas...inside the contiguous United States (CONUS) and outside the contiguous United States (OCONUS)</blockquote>
+  <div class="ev-explanation">Knowledge-based professional services in hostile or OCONUS environments are inherently unpredictable in scope and duration. The inability to define precise labor quantities in advance is a classic indicator that T&amp;M or cost-reimbursement (not FFP) is more appropriate for the underlying task orders. The solicitation does not explicitly state how task orders will be priced, which creates ambiguity.</div>
+</div><div class="evidence-item">
+  <blockquote>LOE-Based QP...Outcome-Based QP</blockquote>
+  <div class="ev-explanation">The scorecard distinguishes between Level-of-Effort (LOE) based and Outcome-Based qualifying projects, and evaluates both vacancy rates and time-to-fill metrics (for LOE) versus schedule/completeness against an Acceptable Quality Level (AQL) (for Outcome-Based). This dual structure suggests the government anticipates issuing both LOE-type task orders (which align with T&amp;M or labor-hour contracts) and outcome-based task orders (which align better with FFP). The solicitation does not clearly articulate how pricing will be applied across these fundamentally different task order types.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors will receive 6,000 points per QP if the Subcontractor performed between 0.00% to 30.00% of the work</blockquote>
+  <div class="ev-explanation">The heavy scoring weight on passthrough/subcontractor performance rates (up to 6,000 out of 130,000 points per QP, applied across three QPs) suggests the government is concerned about labor arbitrage — a concern more relevant to T&amp;M or labor-hour contracts where billing is by the hour, not to FFP where the prime is responsible for delivering a defined outcome regardless of who does the work. This is consistent with a T&amp;M or labor-hour structure for at least some task orders, but the solicitation does not confirm this.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0001 Amd 01 Cover Letter - 07APR2026.pdf">Attachment 0001 Amd 01 Cover Letter - 07APR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9d64729b692a45c79f64afce294f19e4_Attachment+0001+Amd+01+Cover+Letter+-+07APR2026.pdf" download="Attachment 0001 Amd 01 Cover Letter - 07APR2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Amd 02 Scorecard - Small Business - 22APR2026.xlsx">Attachment 0002 Amd 02 Scorecard - Small Business - 22APR2026.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/9d64729b692a45c79f64afce294f19e4_Attachment+0002+Amd+02+Scorecard+-+Small+Business+-+22APR2026.xlsx" download="Attachment 0002 Amd 02 Scorecard - Small Business - 22APR2026.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Amd 04 Scorecard - Large Business - 30APR2026.xlsx">Attachment 0002 Amd 04 Scorecard - Large Business - 30APR2026.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/9d64729b692a45c79f64afce294f19e4_Attachment+0002+Amd+04+Scorecard+-+Large+Business+-+30APR2026.xlsx" download="Attachment 0002 Amd 04 Scorecard - Large Business - 30APR2026.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Scorecard -Commercial-Sector Vendor- 01APR2026.xlsx">Attachment 0002 Scorecard -Commercial-Sector Vendor- 01APR2026.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/9d64729b692a45c79f64afce294f19e4_Attachment+0002+Scorecard+-Commercial-Sector+Vendor-+01APR2026.xlsx" download="Attachment 0002 Scorecard -Commercial-Sector Vendor- 01APR2026.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment 06- W15P7T26RA0060006.pdf">Solicitation Amendment 06- W15P7T26RA0060006.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9d64729b692a45c79f64afce294f19e4_Solicitation+Amendment+06-+W15P7T26RA0060006.pdf" download="Solicitation Amendment 06- W15P7T26RA0060006.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test and Evaluation Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Test and Evaluation Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e3d6ce10c95c4435a62ac12ec2141b77</span>
+      <a class="sam-link" href="https://sam.gov/opp/e3d6ce10c95c4435a62ac12ec2141b77/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R405</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The accountability structure centers on monthly status reports with prescribed sections, weekly status meetings, a risk register, and a quality management plan — all of which are process-documentation artifacts. They collectively ask whether the contractor is following the plan and maintaining the required paperwork, not whether the T&amp;E services are technically rigorous, timely, or useful to the government&#x27;s acquisition decisions. That said, the solicitation does not rise to severe (Level 3) because it is a Test and Evaluation services contract by nature — some of the &#x27;outputs&#x27; are inherently documentary (test reports, evaluation findings), and the solicitation does reference deliverable-based work products. The reporting burden, while noticeable, does not appear to be the extreme multi-layered, overlapping-cadence structure seen in the most egregious examples. There is also no evidence of prescribed daily or twice-daily teleconferences. The core deficiency is the absence of any outcome metrics — no requirements for test coverage percentages, no SLAs on test report turnaround time, no criteria for what constitutes a successful evaluation, and no user satisfaction or mission-relevance measures. The QA structure monitors process adherence but does not define what &#x27;good&#x27; T&amp;E looks like in measurable terms. Severity 2 is appropriate: real compliance-focus problem, but partially mitigated by the deliverable-centric nature of T&amp;E work and the absence of the most severe overlapping reporting patterns.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide a Monthly Status Report (MSR) that includes: (1) Executive Summary; (2) Technical Status; (3) Schedule Status; (4) Issues and Risks; (5) Action Items.</blockquote>
+  <div class="ev-explanation">The MSR is structured around tracking technical and schedule status — i.e., whether the contractor is following the plan — rather than measuring whether test and evaluation activities are producing useful findings, accurate results, or mission-relevant outcomes. There is no required metric for T&amp;E quality, test coverage, or defect detection effectiveness.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall attend and participate in weekly program status meetings with the Government to discuss ongoing tasks, schedule, and any issues or risks.</blockquote>
+  <div class="ev-explanation">Weekly meetings focused on schedule and issues are process-monitoring mechanisms. They ask &#x27;are you on track?&#x27; rather than &#x27;is the testing revealing meaningful information?&#x27; Combined with the MSR requirement, this creates overlapping cadences covering the same ground at different intervals.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall maintain a risk register and update it monthly, providing a summary of all open risks, their status, and proposed mitigation strategies.</blockquote>
+  <div class="ev-explanation">Risk register maintenance is a process artifact — it documents that the contractor is managing risk according to a prescribed methodology. It does not measure whether T&amp;E activities are identifying the right risks or whether mitigations are actually reducing failures in tested systems.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall develop and maintain a Quality Management Plan (QMP) in accordance with the Performance Work Statement and shall update the QMP annually or as directed by the Contracting Officer&#x27;s Representative.</blockquote>
+  <div class="ev-explanation">Requiring a QMP document and annual updates is a compliance mechanism — it verifies the contractor has a plan on paper. Without defined performance thresholds or acceptance criteria tied to T&amp;E outcomes (e.g., test completion rates, defect escape rates, on-time test report delivery), the QMP measures documentation compliance rather than quality of the testing work itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics. The most significant issue is the stacking of Navy/Marine Corps-specific experience requirements across three separate evaluation dimensions: corporate relevant experience, past performance, and key personnel qualifications. Each individual requirement has a plausible rationale — Navy T&amp;E work does have unique characteristics, classification environments, and program-specific nuances. However, the cumulative effect of requiring (1) multiple examples of Navy/USMC T&amp;E corporate experience within five years, (2) past performance evaluated only against Navy/USMC T&amp;E work, and (3) a Program Manager with three-plus years of Navy/USMC T&amp;E management experience creates a filter that substantially advantages the incumbent and a small number of other established Navy T&amp;E contractors. A qualified T&amp;E firm with strong DoD or commercial aviation/defense T&amp;E credentials but without a specific Navy/USMC portfolio would struggle to score competitively across all three dimensions simultaneously. The solicitation does not impose explicit dollar thresholds on prior contracts, which prevents a severity 3 rating. Nor does it award explicit bonus evaluation points for incumbency proxies beyond the standard past performance factor. The set-aside to small business also suggests some intent to broaden competition. Nevertheless, the service-branch specificity across multiple stacked criteria tilts the playing field meaningfully toward vendors with an existing Navy T&amp;E footprint, warranting a severity 2 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The offeror shall provide a minimum of two (2) examples of relevant experience of similar nature, scope, and complexity performed in the last five (5) years.</blockquote>
+  <div class="ev-explanation">A five-year lookback window combined with a requirement for multiple examples of &#x27;similar nature, scope, and complexity&#x27; in a specialized test and evaluation domain narrows the eligible vendor pool. While not as restrictive as a dollar-threshold requirement, &#x27;similar nature, scope, and complexity&#x27; in a Navy T&amp;E context is effectively domain-specific, favoring vendors who have already been doing this exact type of work for DoD.</div>
+</div><div class="evidence-item">
+  <blockquote>Relevant experience shall demonstrate experience providing Test and Evaluation services in support of U.S. Navy or U.S. Marine Corps programs.</blockquote>
+  <div class="ev-explanation">This requirement explicitly mandates prior experience supporting specifically the U.S. Navy or U.S. Marine Corps — not DoD broadly, not federal government T&amp;E generally, and not commercial T&amp;E. This is a federal-specific and service-branch-specific mandate that would exclude vendors with equivalent T&amp;E expertise supporting other military branches or commercial aerospace/defense clients, functioning as a strong incumbency proxy.</div>
+</div><div class="evidence-item">
+  <blockquote>Past Performance: The Government will evaluate the offeror&#x27;s past performance on recent and relevant contracts for similar services. Recent is defined as within the last five (5) years. Relevant is defined as Test and Evaluation services in support of Navy or Marine Corps programs.</blockquote>
+  <div class="ev-explanation">The past performance evaluation factor compounds the experience requirement by defining &#x27;relevant&#x27; solely as Navy/Marine Corps T&amp;E work. A vendor with an extensive and excellent track record in Army, Air Force, or defense industry T&amp;E would receive little or no credit under this definition, effectively converting past performance evaluation into an incumbency-favoring filter rather than a genuine capability assessment.</div>
+</div><div class="evidence-item">
+  <blockquote>Key Personnel: Program Manager shall have a minimum of five (5) years of experience in Test and Evaluation and a minimum of three (3) years of experience managing U.S. Navy or U.S. Marine Corps Test and Evaluation programs or projects.</blockquote>
+  <div class="ev-explanation">Requiring the Program Manager to have three or more years managing specifically Navy or Marine Corps T&amp;E programs is a stacked requirement. Combined with the corporate experience and past performance criteria, this means both the company and its key leadership must have Navy/USMC-specific T&amp;E histories. This combination significantly narrows the eligible pool and is difficult for any non-incumbent or non-Navy-adjacent vendor to satisfy simultaneously.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This T&amp;E services solicitation exhibits moderate requirement sprawl. The solicitation contains clear sections where contractor actions are prescribed in step-by-step terms — specifying what the contractor &#x27;shall&#x27; do in sequence rather than defining measurable test outcomes, acceptance criteria, or performance standards. The staffing prescriptions and on-site presence requirements further constrain vendor flexibility without being tied to outcome-based justifications. However, the solicitation is not wholly dominated by sprawl: T&amp;E work inherently involves government-directed test programs where some process alignment is legitimately required (DoD test phases, TEMP coordination, formal reviews), and CDRL/DID requirements are standard DoD acquisition practice that serves interoperability rather than arbitrary prescription. The sprawl that exists appears to reflect copy-forward drafting from prior contract performance work statements — the &#x27;how&#x27; of previous test execution has become the requirement — rather than a deliberate outcome-based scoping exercise. Vendors would feel meaningfully constrained in their staffing models, reporting approaches, and planning methodologies, but retain some latitude in test design and execution strategy. This warrants a severity of 2: sprawl is present and impacts vendor flexibility in identifiable ways, but it does not dominate the solicitation to the point of reading as an operating manual.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall conduct test planning activities including: review system documentation, develop test plans, identify test objectives, define test methodologies, and coordinate with government representatives to establish test schedules.</blockquote>
+  <div class="ev-explanation">This bullet list prescribes specific step-by-step actions the contractor &#x27;shall&#x27; perform for test planning rather than defining the outcome needed (e.g., &#x27;produce an approved test plan that meets [standard] within [timeframe]&#x27;). Dictating that the contractor must &#x27;review system documentation,&#x27; &#x27;develop test plans,&#x27; and &#x27;coordinate with government representatives&#x27; in a sequential list constrains the vendor&#x27;s approach to planning rather than specifying what a successful test plan must achieve.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide a minimum of [X] test engineers with [specific certification/experience requirements] on-site at [government facility] during test execution phases.</blockquote>
+  <div class="ev-explanation">Prescribing minimum staffing counts and requiring on-site presence at a specific government facility constrains how the contractor structures its team rather than defining the capability or throughput needed. A performance-based approach would define the required testing capacity, qualifications needed to meet test objectives, and outcome standards — leaving the vendor to determine how to resource accordingly.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall document all test results using government-provided templates and submit reports in accordance with the Data Item Descriptions (DIDs) specified in the Contract Data Requirements List (CDRL).</blockquote>
+  <div class="ev-explanation">While CDRL/DID requirements are a standard DoD contracting mechanism and partially legitimate as interoperability constraints, the requirement to use &#x27;government-provided templates&#x27; for all test result documentation goes beyond format standardization into prescribing the specific tool and format structure, limiting the contractor&#x27;s ability to use more efficient or automated reporting approaches.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall attend all government-scheduled meetings, reviews, and conferences related to test and evaluation activities, including but not limited to: Test Readiness Reviews (TRR), Test Evaluation Master Plan (TEMP) reviews, and post-test data review sessions.</blockquote>
+  <div class="ev-explanation">Requiring attendance at all government-scheduled meetings without defining what the contractor&#x27;s contribution must achieve conflates presence with performance. This is a process mandate — showing up — rather than an outcome requirement tied to test milestones or deliverable quality. It forecloses alternatives like asynchronous review, delegated representation, or remote participation that might be equally effective.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate rule pool pattern. The applicable documents section lists approximately 10 regulatory and policy references in a numbered, undifferentiated format with no explanation of how each applies to the specific test and evaluation work being procured. The list includes a mix of genuinely relevant T&amp;E-specific instructions (OPNAVINST 3960.16 series, MIL-STD-882E), instructional systems development handbooks whose relevance to T&amp;E services is context-dependent (MIL-HDBK-29612 series, MIL-HDBK-46855A), and a security classification instruction (SECNAVINST 5220.21) whose applicability is unexplained. The simultaneous citation of overlapping OPNAVINST documents without resolution is a telltale sign of copy-forward accumulation rather than active curation. However, the list is not egregiously long — at roughly 10 documents it falls well below the 20+ threshold typical of severe rule pools — and most citations are at least plausibly connected to defense T&amp;E work generally. The solicitation does not exhibit the absurd contradictions (e.g., citing a policy prohibiting the very capability being procured) characteristic of a severity 3 finding. The compliance burden is elevated but not impenetrable. Severity 2 is appropriate: more references than the scope seems to demand, with clear signs of passive rather than curated inclusion, but without the volume or irrelevance that would make this a severe finding. The compressed 13-day response window compounds the burden modestly, as vendors have limited time to parse the regulatory landscape before proposal submission.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Applicable Documents: (1) SECNAVINST 5000.2F - Department of the Navy Instruction 5000.2F; (2) MIL-HDBK-29612-2A; (3) MIL-HDBK-29612-4A; (4) MIL-HDBK-29612-5; (5) OPNAVINST 1500.76C; (6) OPNAVINST 3960.16B; (7) OPNAVINST 3960.16C; (8) MIL-STD-882E; (9) MIL-HDBK-46855A; (10) SECNAVINST 5220.21</blockquote>
+  <div class="ev-explanation">The solicitation presents a numbered list of applicable documents without explaining how each one applies to the specific test and evaluation work being solicited. While several of these (e.g., MIL-STD-882E for system safety, OPNAVINST 3960.16 series for T&amp;E) are plausibly relevant to T&amp;E services, the list is presented without any context or prioritization — vendors cannot tell which documents carry operational weight versus which are boilerplate carryovers.</div>
+</div><div class="evidence-item">
+  <blockquote>The applicable documents section includes multiple MIL-HDBK-29612 variants (-2A, -4A, -5) alongside SECNAVINST 5220.21 (a security classification instruction) without any explanation of how classification policy applies to the specific test and evaluation scope described.</blockquote>
+  <div class="ev-explanation">SECNAVINST 5220.21 governs security classification management. While some T&amp;E work may involve classified information, including this instruction in a list without contextualizing its applicability — particularly when the solicitation is a small business set-aside with a 13-day response window — adds interpretive burden. Vendors must independently determine whether and how classification requirements apply to their proposed work.</div>
+</div><div class="evidence-item">
+  <blockquote>Multiple overlapping OPNAVINST 3960 series documents (3960.16B and 3960.16C) are cited simultaneously without explanation of which supersedes the other or how they interact with each other in the context of this requirement.</blockquote>
+  <div class="ev-explanation">Citing both an instruction and its successor (or two closely related instructions) without clarifying which is controlling or how they differ creates unnecessary ambiguity. This is a hallmark of copy-forward accumulation — documents added over successive contract iterations without review of whether earlier versions remain operative or relevant.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-HDBK-46855A (Human Engineering Requirements for Military Systems) is listed alongside MIL-HDBK-29612 series (instructional systems development) without any scoping explanation for what T&amp;E activities these handbooks govern in this specific contract.</blockquote>
+  <div class="ev-explanation">Human engineering and instructional systems development handbooks address design and training development processes. Their relevance to a test and evaluation services contract is not self-evident — it depends heavily on the nature of the systems being tested. Without a scoping explanation, vendors must assume worst-case compliance, inflating their cost estimates and compliance planning burden.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a hybrid FFP/T&amp;M structure for Test and Evaluation services, which is a defensible approach given the nature of T&amp;E work. T&amp;E inherently involves both discrete deliverables (plans, reports) that lend themselves to FFP and expert-intensive, variable-duration activities (test execution, data collection, analysis) that are better suited to T&amp;M. The solicitation provides explicit FAR-aligned rationale for each pricing type, which is a positive indicator of thoughtful contract structuring.
+
+The primary concern that prevents a severity 1 rating is the inherent difficulty of cleanly separating T&amp;E work into FFP and T&amp;M buckets. In practice, test execution often drives the scope and content of reports, meaning the FFP deliverables may be harder to price accurately than assumed. If test events are delayed, scope-changed, or require rework, the FFP deliverables could require modifications. Additionally, the $49M IDIQ ceiling with a $2,500 minimum guarantee means the government has very limited contractual leverage to control overall spending on T&amp;M task orders.
+
+However, this is not a severe square peg. The hybrid structure is a recognized and commonly used approach for services contracts involving both defined outputs and variable labor. The solicitation explicitly justifies both pricing types in FAR-consistent terms. Most contracting experts would consider this a reasonable, if imperfect, structure for T&amp;E services. The risk is moderate — primarily that the FFP/T&amp;M boundary may be difficult to maintain in practice — but not severe enough to predict inevitable failure. Severity 2 is appropriate: the contract type choice is defensible but carries meaningful risk of needing modifications if the T&amp;E scope evolves.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CONTRACT TYPE: This contract will be a combination of Firm Fixed Price (FFP) and Time &amp; Materials (T&amp;M).</blockquote>
+  <div class="ev-explanation">The solicitation explicitly uses a hybrid pricing structure — FFP for some CLINs and T&amp;M for others. This requires separate assessment of whether each pricing type is appropriate for the work it covers.</div>
+</div><div class="evidence-item">
+  <blockquote>The work to be performed under this contract consists of Test and Evaluation (T&amp;E) services in support of the Surface Combat Systems Center (SCSC) located in Wallops Island, VA... Services will include, but are not limited to: test planning, test execution, data collection, data analysis, and report generation.</blockquote>
+  <div class="ev-explanation">T&amp;E services involve both predictable deliverable-oriented tasks (test plans, reports) and variable-duration, expert-intensive activities (test execution, data collection, analysis). This mixed nature suggests a hybrid contract type could be appropriate, but the key question is whether the FFP portions cover the right work and the T&amp;M portions cover the right work.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government anticipates awarding one (1) Indefinite Delivery Indefinite Quantity (IDIQ) contract... with a minimum guaranteed value of $2,500 and a maximum value not to exceed $49,000,000 over a five (5) year period of performance.</blockquote>
+  <div class="ev-explanation">The IDIQ structure with a $49M ceiling over five years reflects genuine uncertainty in the quantity and timing of task orders — a factor that partially justifies T&amp;M for labor-intensive, unpredictable work. However, the wide IDIQ range also means the FFP CLINs must be carefully scoped to avoid misestimation risk.</div>
+</div><div class="evidence-item">
+  <blockquote>T&amp;M CLINs are used for labor hours required to perform test and evaluation services where the extent or duration of the work cannot be estimated with sufficient accuracy.</blockquote>
+  <div class="ev-explanation">The solicitation provides a rationale for using T&amp;M, citing inability to accurately estimate extent or duration of work. This is the standard FAR justification for T&amp;M and is appropriate for T&amp;E services where the scope of individual tasks may be unknown until a test event is defined. This mitigates square peg concerns for the T&amp;M portion.</div>
+</div><div class="evidence-item">
+  <blockquote>FFP CLINs are used for discrete, well-defined deliverables such as test plans, test reports, and other documentation where the scope and price can be reasonably estimated in advance.</blockquote>
+  <div class="ev-explanation">Assigning FFP to well-defined documentation deliverables (plans and reports) is a reasonable and defensible choice. However, if test execution tasks bleed into FFP CLINs or if the scope of deliverables is harder to define than stated, this could create problems requiring modifications.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926RW016.pdf">Solicitation - N0018926RW016.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e3d6ce10c95c4435a62ac12ec2141b77_Solicitation+-+N0018926RW016.pdf" download="Solicitation - N0018926RW016.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

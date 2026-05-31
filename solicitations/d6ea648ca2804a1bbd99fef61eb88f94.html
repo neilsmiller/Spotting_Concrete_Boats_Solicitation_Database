@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title> ABAQUS (Simulia) software suite — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1> ABAQUS (Simulia) software suite</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d6ea648ca2804a1bbd99fef61eb88f94</span>
+      <a class="sam-link" href="https://sam.gov/opp/d6ea648ca2804a1bbd99fef61eb88f94/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-02-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › ACC-CTRS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-02-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This document is a pre-solicitation notice and a Justification and Approval (J&amp;A) for a sole source acquisition of ABAQUS (Simulia) software licenses, maintenance, and updates. The 9-page document consists almost entirely of the sole source justification — explaining why DS Government Solutions is the only viable vendor, documenting procurement history, and summarizing market research. There is no Statement of Work (SOW), Performance Work Statement (PWS), Quality Assurance Surveillance Plan (QASP), deliverables schedule, reporting requirements, or any other contractual performance accountability mechanism present in the provided text. The solicitation explicitly states it &#x27;does not constitute a request for quote/request for proposal,&#x27; and the attachment is the J&amp;A document rather than a PWS or SOW. Without these elements, there is no basis on which to assess whether the accountability structure measures compliance versus outcomes. A meaningful analysis of Sin #2 requires visibility into reporting cadences, QA surveillance plans, performance metrics, and deliverable acceptance criteria — none of which appear in this pre-solicitation package.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents a severity 3 insider rewards case, though it operates through sole-source justification rather than evaluation criteria — the most extreme form of the pattern. Rather than merely tilting the playing field through experience thresholds or federal-specific mandates, the J&amp;A formally eliminates competition entirely on the basis of the incumbent&#x27;s accumulated institutional knowledge and product ownership. The combination of factors is conclusive: 20+ years of unbroken sole-source awards, explicit citation of the incumbent&#x27;s Army-specific knowledge as a unique qualification, no history of competitive procurement, and boilerplate &#x27;actions to increase competition&#x27; language recycled unchanged across multiple procurement cycles. The government has allowed itself to become structurally dependent on a single vendor to the point where it cannot articulate requirements in vendor-neutral terms. The proprietary software argument has partial legitimacy — ABAQUS is a specific commercial product with genuine IP constraints — but the J&amp;A extends this beyond software licensing into support services and institutional knowledge, areas where competition could theoretically be structured. The procurement history shows values ranging from ~$918K to ~$1.59M per award with consistent escalation, consistent with a vendor that faces no competitive pressure. This is precisely the self-reinforcing cycle the insider rewards pattern describes: sole-source award → deeper agency dependence → next cycle&#x27;s justification becomes even more entrenched.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>For over 20 years, DS Government Solutions alone has been responsible for all of DEVCOM-AC&#x27;s ABAQUS (SIMULIA) software support and is the only source that can satisfy the Government&#x27;s current requirement in the timeframe necessary to meet the Army&#x27;s analytical requirements for mission needs.</blockquote>
+  <div class="ev-explanation">The J&amp;A explicitly enshrines 20 years of incumbent-only history as a justification for sole source. This is the ultimate expression of insider rewards: not merely a preference for prior experience, but a formal exclusion of all other vendors based entirely on the incumbent&#x27;s accumulated relationship with the agency.</div>
+</div><div class="evidence-item">
+  <blockquote>DS Government Solutions alone has the required knowledge and familiarization with the existing Abaqus (SIMULIA) software as well as the background and knowledge of Army requirements and projects utilizing ABAQUS (SIMULIA) software.</blockquote>
+  <div class="ev-explanation">The J&amp;A cites the incumbent&#x27;s &#x27;knowledge and familiarization&#x27; with Army-specific requirements and projects as a unique qualifying attribute. This is institutional knowledge that can only be acquired by having held the contract — a textbook insider reward criterion that no new entrant could satisfy regardless of technical capability.</div>
+</div><div class="evidence-item">
+  <blockquote>No prior contracts for this requirement have been accomplished using Full and Open Competition.</blockquote>
+  <div class="ev-explanation">Stated explicitly in both procurement history entries, this confirms that the insider rewards dynamic has been self-reinforcing across the entire history of the program. No qualified competitor has ever had a realistic path to win this work, and the procurement structure has never been designed to provide one.</div>
+</div><div class="evidence-item">
+  <blockquote>No actions can be taken to increase competition due to the manufacturer, DS Government Solutions, being the sole developer, and distributor of ABAQUS (SIMULIA) software support, and the only provider that has access to the source codes and patent rights for ABAQUS (SIMULIA) software.</blockquote>
+  <div class="ev-explanation">While the proprietary software argument has some technical legitimacy, the J&amp;A conflates the software vendor (DS Government Solutions as manufacturer) with the support and services relationship. The government treats these as inseparable, meaning the incumbent&#x27;s product ownership is used to permanently exclude any alternative service provider — locking in not just the software but the entire support relationship indefinitely.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will continue to conduct market research on an annual basis in an effort to find viable competition... If other authorized ABAQUS sellers are found, or an alternate software application has emerged with the capability to meet the Government&#x27;s finite analysis software needs, competition will be provided to the greatest extent possible.</blockquote>
+  <div class="ev-explanation">This language, repeated verbatim across multiple procurement cycles dating to at least 2018, demonstrates that the &#x27;actions to increase competition&#x27; commitment is performative rather than substantive. The same boilerplate appears in every J&amp;A with no evidence of changed outcomes, confirming the self-reinforcing cycle of incumbent lock-in.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This document is a presolicitation notice and Justification &amp; Approval (J&amp;A) for a sole source award — not a solicitation with a Statement of Work or Performance Work Statement. The attached PDF (9 pages total) contains the J&amp;A narrative justifying why DS Government Solutions is the only viable source for ABAQUS (Simulia) software licenses, maintenance, and updates. The document addresses the statutory basis for sole source procurement, market research findings, procurement history, and efforts to obtain competition — but it does not contain task-level requirements, deliverable specifications, staffing structures, workflow mandates, or any of the process-prescriptive language that would constitute requirement sprawl. There is simply no SOW or PWS present against which to assess Sin #1. The nature of the requirement itself (commercial software license renewal) is also inherently not prone to requirement sprawl, since the &#x27;how&#x27; is determined by the software product itself rather than by contract language. Assessment of requirement sprawl cannot be meaningfully performed on this document.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a pre-solicitation notice accompanied by a Justification and Approval (J&amp;A) document for a sole-source award of ABAQUS (Simulia) software licenses and maintenance. The document does not contain an &#x27;Applicable Documents&#x27; section, a &#x27;Referenced Standards&#x27; list, or any bulk regulatory citation section. The only regulatory citations present are: (1) 41 U.S.C. 1901 as implemented by FAR Part 13.501(a), which is the specific statutory authority cited to justify the sole-source action — directly relevant and appropriately explained; (2) FAR 5.201 and FAR 5.201(b), cited in the context of synopsizing requirements and publishing competitive notices — directly relevant to the J&amp;A&#x27;s competition analysis; (3) FAR 2.101 and 3.104-4, cited in source selection sensitivity markings — standard protective notations; and (4) FAR Subpart 13.5, cited in the procurement history as the previously-used authority. Each citation is contextual, purposeful, and directly tied to the specific legal or procedural point being made. There is no &#x27;master list&#x27; of regulations dumped onto vendors, no accumulation of policy documents of questionable relevance, and no contradictions between cited policies and the solicitation&#x27;s purpose. The document is structurally a J&amp;A, which by nature focuses on competition law justifications rather than technical compliance requirements. The absence of a performance work statement or statement of work in the provided pages means there is no opportunity for rule pools in the technical requirements section — but the available content shows disciplined, curated regulatory citation. This solicitation scores at severity 1: minimal. No meaningful evidence of rule pools is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for annual renewal of commercial software licenses and maintenance for the ABAQUS (Simulia) finite element analysis suite — a well-defined, commercially available product with a stable and predictable annual cost. The government has purchased this product under sole-source FFP arrangements for over a decade, and the pricing history is consistent year over year. FFP is the correct contract type for this requirement: the deliverable (software licenses plus maintenance/updates) is clearly defined, the quantity and duration are fixed (annual), and there is no ambiguity about what will be delivered. There is no meaningful mismatch between the contract type and the requirements. The choice of FFP is standard and appropriate for commercial software license renewals under FAR Part 13. Severity is 1 — no square peg issue identified.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ACC-NJ intends to issue a sole source solicitation to DS Government Solutions...to provide annual software licenses, maintenance and updates for the ABAQUS (Simulia) software suite.</blockquote>
+  <div class="ev-explanation">The requirement is for annual software licenses — a well-defined commercial product with predictable annual pricing. This is a textbook use case for firm-fixed-price contracting.</div>
+</div><div class="evidence-item">
+  <blockquote>the U.S. Army, Army Contracting Command, New Jersey (ACC-NJ) on behalf of the U.S. Army Combat Capabilities Development Command - Armaments Center (DEVCOM-AC)...intends to award a firm fixed price contract</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states firm-fixed-price (FFP) as the contract type. FFP is well-suited here because the deliverable (software licenses, maintenance, and updates for a known commercial product) is clearly scoped and annually recurring, with predictable costs evidenced by the consistent procurement history.</div>
+</div><div class="evidence-item">
+  <blockquote>Contract Number: W15QKN25PA024; award date: 18 March 2025; Value: $1,589,951.68</blockquote>
+  <div class="ev-explanation">The procurement history shows a stable, recurring annual purchase with consistent pricing over multiple years (ranging from roughly $918K to $1.59M per year). This predictability in scope and cost further validates the appropriateness of FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="JA FAR Part 13-5_ABAQUS_Redacted.pdf">JA FAR Part 13-5_ABAQUS_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6ea648ca2804a1bbd99fef61eb88f94_JA+FAR+Part+13-5_ABAQUS_Redacted.pdf" download="JA FAR Part 13-5_ABAQUS_Redacted.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

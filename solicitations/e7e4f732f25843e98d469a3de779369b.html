@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVID Technology Inc. Edit Suite — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>AVID Technology Inc. Edit Suite</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e7e4f732f25843e98d469a3de779369b</span>
+      <a class="sam-link" href="https://sam.gov/opp/e7e4f732f25843e98d469a3de779369b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-04-16</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">HEALTH AND HUMAN SERVICES, DEPARTMENT OF › NATIONAL INSTITUTES OF HEALTH › NATIONAL INSTITUTES OF HEALTH OLAO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-16</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Purchase Order (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">5/1/2026 – 4/30/2027 (approximately 12 months)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>past performance</li><li>special features required for effective program performance</li><li>trade-in considerations</li><li>probable life of the item selected as compared with that of a comparable item</li><li>warranty considerations</li><li>maintenance availability</li><li>environmental and energy efficiency considerations</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brief combined synopsis/solicitation (notice of intent) for a brand-name commercial item renewal — specifically an annual support and subscription package for Avid Technology editing software and hardware. The posting contains no Statement of Work (SOW), Performance Work Statement (PWS), Quality Assurance Surveillance Plan (QASP), deliverables list, reporting requirements, or any accountability/oversight mechanisms whatsoever. Section (xiii) explicitly states &#x27;NONE&#x27; under additional contract requirements. There is no content from which to evaluate whether quality assurance mechanisms focus on process compliance versus outcomes — because there are no QA mechanisms described at all. The solicitation is a simplified acquisition threshold procurement using FAR Part 12 commercial item procedures, and the notice functions primarily as a justification for a non-competitive sole-source award. Without an attached SOW, PWS, or QASP, there is insufficient content to assess this sin meaningfully.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most severe manifestation of insider rewards: a pre-determined, named sole-source award to the incumbent vendor with no meaningful opportunity for any other provider to compete. The severity is 3. The agency has not merely tilted evaluation criteria or imposed narrow experience thresholds — it has bypassed competition entirely, naming Avid Technology, Inc. as the sole intended awardee before solicitation responses are even received. The three justifications offered (OEM repair exclusivity, proprietary data, brand-name necessity) are the standard suite of rationalizations for incumbent lock-in. Notably, the underlying requirement — annual software subscriptions, hardware support, and professional services for a media editing suite — is a commercial market. Avid Media Composer and related products have authorized reseller networks; the claim that only the OEM can provide support is contestable. The &#x27;continuing annual renewal&#x27; framing reveals that this is not an isolated procurement decision but an institutionalized dependency relationship. Each renewal deepens the agency&#x27;s reliance on Avid&#x27;s proprietary ecosystem, reducing the plausibility of future competition. This is textbook vendor capture: the agency cannot articulate its requirements in vendor-neutral terms because its operational knowledge is entirely bound up in Avid&#x27;s proprietary platform. The correct analytical response is to note that while FAR 6.302-3 provides a legal pathway for this award, the pattern of annual renewals under brand-name justification reflects a structural acquisition failure — the absence of a competition strategy at initial procurement that has now foreclosed it indefinitely.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>THIS IS A NON-COMPETITIVE (NOTICE OF INTENT) COMBINED SYNOPSIS SOLICITATION TO AWARD A CONTRACT OR PURCHASE ORDER WITHOUT PROVIDING FOR FULL OR OPEN COMPETITION (INCLUDING BRAND-NAME). The National Institutes of Health Office of the Director … intends to negotiate and award a Purchase Order without providing for full and open competition (Including brand-name) to Avid technology, Inc., 75 Blue Sky Drive, Burlington, MA 01803.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly names Avid Technology, Inc. as the sole intended awardee. This is the most extreme form of insider rewards: not merely tilting the playing field toward an incumbent, but entirely foreclosing competition. No other vendor — regardless of capability — is being considered.</div>
+</div><div class="evidence-item">
+  <blockquote>Brand Name only: Avid Technology, Inc., as the developer and provider of the editing system hardware and software is the sole vendor able to provide the required support.</blockquote>
+  <div class="ev-explanation">By specifying brand-name only and identifying the OEM as the exclusive capable provider, the solicitation institutionalizes incumbent capture. The justification conflates &#x27;preferred vendor&#x27; with &#x27;only capable vendor,&#x27; which is a hallmark of insider rewards: the agency cannot articulate requirements in vendor-neutral terms because its systems are fully dependent on a single supplier.</div>
+</div><div class="evidence-item">
+  <blockquote>Equipment upgrade/repair: Equipment can only be repaired by the original manufacturer. This is a continuing annual support renewal.</blockquote>
+  <div class="ev-explanation">The phrase &#x27;continuing annual support renewal&#x27; reveals that this is a recurring sole-source award to the same vendor. The annual renewal structure perpetuates incumbency indefinitely — each year&#x27;s award makes the next year&#x27;s competition even less likely, as the agency&#x27;s reliance deepens. This is the self-reinforcing cycle characteristic of severe insider rewards.</div>
+</div><div class="evidence-item">
+  <blockquote>Proprietary data: Only the manufacturer can provide the follow-on service or maintenance because of proprietary data.</blockquote>
+  <div class="ev-explanation">Citing proprietary data as a justification for sole-source award is a recognized insider-capture mechanism. The agency has procured systems whose support is locked to a single vendor by design, and is now using that lock-in as justification to avoid competition. A competent acquisition strategy would have addressed interoperability and competition at the time of initial procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>This acquisition is conducted as non-competitive for a commercial item or service and is conducted under the authority of the authority of 41 U.S.C. 1901 and the statutory authority of FAR 6.302-3(a)(2)(ii).</blockquote>
+  <div class="ev-explanation">FAR 6.302-3 authorizes sole-source awards only when there is only one responsible source and no other supplies or services will satisfy agency requirements. By invoking this authority for commercial software subscriptions and professional services — categories with competitive markets — the agency is using a narrow statutory exception to entrench an incumbent relationship that has structural, rather than purely legal, origins.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a combined synopsis/solicitation Notice of Intent (NOI) for a non-competitive, brand-name procurement below the simplified acquisition threshold. The document does not contain an attached Statement of Work (SOW), Performance Work Statement (PWS), or detailed technical requirements. The description of the requirement is limited to a brief enumeration of specific Avid product line items (subscriptions, hardware support, professional services, learning licenses) that represent an annual renewal of a named vendor&#x27;s proprietary ecosystem. There is no process-level specification, no staffing structure, no workflow description, and no step-by-step task definition that could constitute requirement sprawl as defined. The solicitation&#x27;s specificity is entirely attributable to the brand-name, sole-source justification — naming Avid products is the legal predicate for the non-competitive award, not an instance of the government prescribing how work should be done rather than what outcome is needed. Without an attached SOW/PWS containing substantive technical or performance requirements, there is insufficient content to meaningfully assess requirement sprawl. The sin cannot be evaluated from a procurement notice that is, by design, a short administrative vehicle for a proprietary renewal.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows no evidence of rule pools. It is a simplified acquisition (below the simplified acquisition threshold) for a brand-name software support subscription, and the regulatory framework is minimal and appropriate. The solicitation cites three standard FAR commercial items clauses (52.212-3, 52.212-4, 52.212-5), incorporates provisions by reference through the applicable FAC, and — critically — explicitly states &#x27;NONE&#x27; when asked to identify any additional contract requirements. There is no &#x27;Applicable Documents&#x27; section, no bulk regulatory citation list, no agency-specific policy appendix, and no irrelevant or contradictory regulations. The compliance landscape is entirely legible to any vendor familiar with basic federal contracting. This is precisely what a properly scoped, appropriately lean commercial item solicitation should look like. Severity 1 is the correct rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The solicitation document and incorporated provisions and clauses are those in effect through Federal Acquisition Circular 2026-01 dated 03/13/2026.</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR clauses by reference through the applicable FAC, which is the normal and expected approach for a simplified acquisition. There is no supplemental list of agency-specific regulations piled on top.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR clause at 52.212-5, Contract Terms and Conditions Required to Implement Statutes or Executive Orders	efCommercial Items, applies to this acquisition. (xiii) The following additional contract requirement(s) or terms and conditions as determined by the contracting officer are necessary for this acquisition and consistent with customary commercial practices. NONE</blockquote>
+  <div class="ev-explanation">The contracting officer explicitly states &#x27;NONE&#x27; for additional contract requirements beyond the standard FAR commercial items clauses. This is the opposite of a rule pool — the agency has actively confirmed no additional regulatory burden is being imposed.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward annual renewal of commercial software subscriptions and manufacturer hardware support plans from Avid Technology — products and services that are catalog-priced, well-defined in scope, and offered commercially on standard terms. The contract vehicle implied is a firm-fixed-price purchase order under FAR Part 12 and the simplified acquisition threshold, which is entirely appropriate. There is no ambiguity in scope, no unpredictable labor quantity, and no complex technical uncertainty that would call for T&amp;M or cost-reimbursement pricing. The one element that could theoretically raise a flag is &#x27;Avid Professional Services, System Commissioning Daily Rate Expenses Included&#x27; and &#x27;Project Management, Without Expenses,&#x27; which are described at daily rates — a structure that resembles T&amp;M or labor-hour pricing. However, for commercial professional services from a sole-source manufacturer procured as part of an integrated support package, this is standard practice and does not represent a pricing mismatch. The scope of the commissioning and project management work is bounded and ancillary to the main subscription renewal. There is no indication of open-ended labor with uncontrolled billing risk. Overall, the contract pricing structure is well-matched to the requirements, and this solicitation does not exhibit the Square Peg sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The purchase is for Avid Technology, Inc – Edit Suite Support contract... Avid Media Composer Ultimate 1-Year Subscription, Artist | DNxIQ Extended Hardware Support, Avid Advantage, Avid NEXIS | E4 200TB, ExpertPlus with Hardware, Media Central | PM Base Package, 1Y, Avid Learning Central, Enterprise Individual User, 1 Year Subscription/User, Avid Professional Services, System Commissioning Daily Rate Expenses Included, and Avid Professional Services, Project Management, Without Expenses</blockquote>
+  <div class="ev-explanation">The requirement consists almost entirely of commercial software subscriptions, hardware support plans, and named service tiers with fixed annual pricing — exactly the kind of well-defined, catalog-priced commercial items for which a fixed-price purchase order is the standard and appropriate vehicle.</div>
+</div><div class="evidence-item">
+  <blockquote>This acquisition is for a commercial item or service and is conducted under the authority of the FAR Part 12–Acquisition of Commercial Items, and is not expected to exceed the simplified acquisition threshold.</blockquote>
+  <div class="ev-explanation">FAR Part 12 acquisitions of commercial items are specifically designed for purchase orders against catalog prices. A firm-fixed-price purchase order is the canonical contract vehicle here, and the solicitation correctly identifies this as a commercial item acquisition.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

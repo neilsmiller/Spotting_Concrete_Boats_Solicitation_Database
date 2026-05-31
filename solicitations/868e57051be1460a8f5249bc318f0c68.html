@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IXI Circuit Cards — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>IXI Circuit Cards</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 868e57051be1460a8f5249bc318f0c68</span>
+      <a class="sam-link" href="https://sam.gov/opp/868e57051be1460a8f5249bc318f0c68/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NSWC DAHLGREN</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334419</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable</li><li>Authorized reseller/distributor documentation (Letter of Authorization)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial item procurement under FAR Part 12 using simplified acquisition procedures. It is a brand-name purchase of specific IXI Technology circuit cards and associated cables — discrete hardware items with defined part numbers and quantities. The solicitation contains no performance work statement, no quality assurance surveillance plan, no reporting requirements, no meeting cadences, and no deliverable documentation requirements beyond the hardware itself. The accountability structure is entirely product-based: the government receives specific part numbers, and acceptance is implicitly tied to receipt of the correct items from an authorized reseller. Award is on a Lowest Price Technically Acceptable basis with the only &#x27;technical&#x27; requirement being proof of authorized reseller status. There is no QA framework at all, let alone one that measures compliance over outcomes. The absence of any reporting or surveillance language means this sin simply does not apply. The solicitation is lean and appropriate for what it is — a simplified acquisition of commercial off-the-shelf hardware. Severity is 1 (minimal) because there are no compliance-over-outcomes mechanisms present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a straightforward brand-name commercial parts purchase for IXI Technology circuit cards. The agency has justified the brand-name restriction on compatibility grounds — the cards must work with existing systems, and no substitutes are technically equivalent. This is a procurement of discrete hardware items, not a complex services contract. There are no experience requirements, no past performance evaluation criteria, no dollar thresholds, no federal-specific experience mandates, no key personnel qualifications, and no lookback windows that would disadvantage non-incumbent vendors. The only meaningful restriction is the OEM authorization letter requirement, which is a standard supply-chain-integrity measure appropriate for brand-name hardware buys. Award is on a Lowest Price Technically Acceptable basis, which further reduces the risk of incumbency bias — any authorized small business reseller of IXI Technology products can submit a competitive quote. The Insider Rewards sin is essentially not applicable to this type of transaction: there is no incumbent services contractor whose accumulated knowledge would give them a scoring advantage, and no evaluation rubric rewarding prior contract history. Severity is assessed at 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The offeror shall provide documentation from the Original Equipment Manufacturer (OEM) confirming the offeror is an authorized reseller or distributor of the brand-name item(s) quoted. Quotations submitted without such documentation may not be considered for award.</blockquote>
+  <div class="ev-explanation">This requirement restricts award to OEM-authorized resellers. While this does limit the vendor pool, it is a standard and defensible constraint for brand-name procurements — it ensures product authenticity and supply chain integrity, not incumbency. Any reseller who obtains OEM authorization can compete, regardless of prior contract history with this agency.</div>
+</div><div class="evidence-item">
+  <blockquote>Basis for award: X Brand Name - FAR 6.103-1(d) ... X Total Small Business Set Aside - FAR 19.104-1</blockquote>
+  <div class="ev-explanation">The brand-name justification (IXI Technology products) inherently limits competition to authorized resellers of a specific manufacturer. However, this is a brand-name acquisition under FAR 6.302-1, not an experience-based exclusion. The limitation flows from a documented technical requirement (system compatibility), not from past-performance or experience criteria that favor an incumbent service contractor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brand-name commercial item purchase for specific IXI Technology circuit cards and cables — seven part numbers with defined quantities. The solicitation does not prescribe HOW work should be performed in any meaningful sense. It defines WHAT is needed: specific part numbers, specific quantities, delivery to a specific location (Dam Neck, VA 23459), and a firm-fixed-price basis. The only process-related requirements are vendor eligibility conditions (SAM registration, Letter of Authorization from OEM as authorized reseller) and pricing transparency expectations — both of which are standard FAR/DFARS compliance requirements, not prescriptive workflow mandates. The justification for brand-name restriction is clearly stated: the circuit cards must be compatible with existing systems, and introducing other manufacturers&#x27; hardware would require significant system modifications. This is a legitimate interoperability constraint, not requirement sprawl. There is no SOW dictating step-by-step processes, no staffing structure prescribed, no workflow procedures, and no incumbent operations being codified as requirements. The solicitation is appropriately scoped for a straightforward commercial item buy under simplified acquisition procedures. Requirement sprawl is essentially absent from this solicitation.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool behavior. It is a simplified acquisition (SAP) procurement for specific commercial circuit card products from a brand-name manufacturer (IXI Technology). The regulatory framework cited is minimal and appropriate: standard FAR Part 12 commercial item procedures, FAR Part 5 publicizing requirements, FAR 6.103-1(d) brand name justification, FAR 19.5 small business set-aside, Buy American/Trade Agreements applicability noted conditionally, and a single DFARS clause (252.225-7013) cited with explicit conditionality. There is no &#x27;Applicable Documents&#x27; bulk list, no wall of agency directives, no undifferentiated regulatory citations, and no apparent copy-forward accumulation of outdated policies. The solicitation is appropriately lean for its scope — a straightforward commercial product buy using simplified procedures. The absence of attachments with SOW content limits visibility into whether any compliance sections exist there, but based on the description this is a hardware reseller procurement where extensive regulatory frameworks would be anomalous. Severity 1 is appropriate: this solicitation presents a clear and focused compliance landscape that any vendor can readily understand.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Where applicable, DFARS 252.225-7013, Duty-Free Entry, will be incorporated.</blockquote>
+  <div class="ev-explanation">The only specific regulatory citation beyond standard FAR/DFARS framework references is this single DFARS clause, cited conditionally and with a clear rationale (international sourcing/tariff concerns). This represents curated, contextual regulatory citation, not a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a textbook FFP acquisition. The government is purchasing a defined set of commercial circuit cards and cables from a specific manufacturer (IXI Technology, Inc.), with exact part numbers, exact quantities, and a clear delivery destination (Dam Neck, VA). There is no ambiguity in scope, no evolving requirements, and no labor-intensity or research uncertainty that would argue for T&amp;M or cost-reimbursement. FAR guidance is clear that FFP is the preferred vehicle when requirements are well-defined and risk can be estimated with certainty — both conditions are fully satisfied here. The brand-name justification explains why only one manufacturer&#x27;s products are acceptable, but that speaks to competition policy, not contract type. FFP is the correct and standard pricing structure for a discrete commercial product purchase, and there is no mismatch between the pricing scheme and the requirements. Severity is 1 — no square peg issue exists.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government will utilize Simplified Acquisition Procedures, and the order will be issued on a firm fixed-price basis.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a firm-fixed-price contract structure, which is the appropriate choice for this procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>SE-02108-01 SWIFT PCIe,ABCH,120-PIN HDC,STD FP,CYC10 5 / CA-P0303-HDC-072 CA PVC 120P HDC, ST TO ST 6 FT LG 5 / AM-SP012-HDC-00 ADAPTER, MIL, M28840 TO 120-PIN HDC 5 ...</blockquote>
+  <div class="ev-explanation">The requirement is a straightforward purchase of specific, commercially available circuit cards and cables from a named manufacturer (IXI Technology, Inc.) with defined part numbers and quantities. This is a classic commercial product buy where price, scope, and deliverables are entirely predictable — exactly the use case for FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

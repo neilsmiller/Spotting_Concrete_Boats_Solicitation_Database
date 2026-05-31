@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2026 TRIMBLE R980 RECEIVER — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>2026 TRIMBLE R980 RECEIVER</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e1174c68b39641c0966b4b7195e0c2d3</span>
+      <a class="sam-link" href="https://sam.gov/opp/e1174c68b39641c0966b4b7195e0c2d3/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › BUREAU OF RECLAMATION › UPPER COLORADO REGIONAL OFFICE</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334511</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Delivery</li><li>Warranty</li><li>Extended Service</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simple commercial product acquisition — a Request for Quotation for a single Trimble R980 GNSS Receiver Kit at a firm-fixed price. The solicitation contains no meaningful QA framework, reporting requirements, surveillance plans, or ongoing performance accountability structures to analyze for compliance-over-outcomes patterns. The acquisition is a straightforward commercial purchase: the vendor ships the equipment, the government receives it. The only &#x27;accountability&#x27; mechanism is delivery by June 30, 2026, FOB destination, which is an outcome criterion (did the equipment arrive on time?). There are no weekly status reports, no monthly progress reports, no required meetings, no prescribed report formats, no plan-adherence tracking, and no QA surveillance plan. The evaluation criteria are simply price (with secondary consideration of delivery, warranty, and extended service), which are outcome-relevant factors. The invoice submission process via IPP is administrative contract management, not compliance theater. Because this is a one-time product delivery with no ongoing services component, the absence of elaborate QA reporting is entirely appropriate — there is nothing to report on beyond receipt of goods. This solicitation does not exhibit the Compliance Over Outcomes sin, and severity is assessed at 1 (minimal).</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product purchase — a single Trimble R980 GNSS Receiver Kit. There are no experience requirements, past performance evaluation criteria, personnel qualifications, or institutional knowledge mandates anywhere in the solicitation. Award is based solely on price (with minor consideration of delivery and warranty terms under FAR 13.106-2). The solicitation specifies a brand-name product, which does restrict the vendor pool to authorized resellers of Trimble equipment, but this reflects a legitimate technical compatibility requirement (&#x27;Equipment will integrate with existing Trimble surveying equipment with no additional training or additional issues&#x27;) rather than an incumbency-favoring experience requirement. Any small business that is an authorized Trimble dealer or reseller could compete on equal footing. There is no incumbent contractor relationship being protected, no prior contract dollar thresholds, no federal-specific experience mandates, and no institutional knowledge requirements. This is a minimal-complexity commercial product acquisition with no insider rewards characteristics present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial product acquisition for a specific piece of survey equipment — the Trimble R980 GNSS Receiver Kit. The solicitation is appropriately concise and outcome-oriented: it specifies what product must be delivered (a named commercial item with defined accessories), when it must arrive (by 30 June 2026), where it must be delivered, and at what price basis (FFP, price-only evaluation). There are no prescriptive process requirements, staffing mandates, or workflow dictates because this is a product purchase, not a services contract. The brand-name specification is consistent with FAR 11.104 brand-name justification rationale — the agency has an existing Trimble equipment pool and requires interoperability — which is a legitimate technical constraint rather than process sprawl. The clause list is standard boilerplate appropriate for a small commercial acquisition. No requirement sprawl is present in any meaningful sense.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Trimble R980 GNSS Receiver Kit. Equipment will integrate with existing Trimble surveying equipment with no additional training or additional issues with integrating a different piece of equipment into existing Trimble survey equipment pools.</blockquote>
+  <div class="ev-explanation">This language specifies the exact product (Trimble R980) by brand and model. However, for a commercial product acquisition of specialized survey equipment, specifying the exact brand/model is a legitimate interoperability constraint — the agency has an existing Trimble equipment pool and requires compatibility. This is not requirement sprawl; it is a reasonable technical constraint defining what must be delivered.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product purchase — a single Trimble GNSS Receiver Kit delivered FOB destination — yet it incorporates a clause list of approximately 20+ provisions and clauses assembled from what appears to be a standard DOI/Bureau of Reclamation template. The core sin here is moderate rather than severe: most of the cited FAR clauses (52.212-4, 52.209-6, 52.219-6, 52.225-3, 52.233-4, 52.240-90/91, 52.244-6) are at least plausibly appropriate for a small business set-aside commercial product acquisition. The solicitation does not present a catastrophic rule pool of 88 items with zero relevance screening. However, several clauses are clearly inapplicable to a one-time hardware purchase: the Service Contract Labor Standards, the text-messaging driving policy, the accelerated subcontractor payments clause, and cybersecurity information system safeguarding. The simultaneous citation of both 52.222-50 and its Alternate I without differentiation suggests the list was not actively curated. There is no &#x27;Applicable Documents&#x27; section per se — the compliance burden comes from an undifferentiated clause list rather than a separate regulatory appendix. The list grew from a template and was not trimmed to fit a simple product purchase. This is a textbook moderate case: the compliance burden is elevated beyond what the scope warrants, but a competent vendor could parse it, and there are no outright contradictions with the solicitation&#x27;s purpose. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.222-41, Service Contract Labor Standards (MAR 2026)
+52.222-42, Statement of Equivalent Rates for Federal Hires (MAY 2014)</blockquote>
+  <div class="ev-explanation">The Service Contract Labor Standards (SCA) and associated Statement of Equivalent Rates apply to service contracts involving the employment of service workers. This solicitation is for a one-time commercial product purchase — a Trimble R980 GNSS Receiver Kit. SCA wage requirements have no logical application to the sale of a piece of hardware, suggesting these clauses were carried forward from a master template without review for applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024)</blockquote>
+  <div class="ev-explanation">This clause applies to contracts where employees drive as part of contract performance. For a simple commercial product purchase with delivery via FOB destination, there is no contract-related driving by contractor employees that would be regulated. This is a textbook boilerplate carryover with no relevance to a hardware purchase order.</div>
+</div><div class="evidence-item">
+  <blockquote>52.232-40, Providing Accelerated Payments to Small Business Subcontractors (MAR 2026)</blockquote>
+  <div class="ev-explanation">This clause addresses payment flows to small business subcontractors. For a simple product purchase from a small business vendor, the existence of subcontractors is implausible — a seller of a Trimble receiver kit is unlikely to have subcontractors performing work under this purchase order. The clause appears to be a template carryover rather than a considered inclusion.</div>
+</div><div class="evidence-item">
+  <blockquote>52.240-93, Basic Safeguarding of Covered Contractor Information Systems (MAR 2026)</blockquote>
+  <div class="ev-explanation">This cybersecurity clause governs contractor information systems that process, store, or transmit federal contract information. For a commercial product sale involving delivery of hardware, there is no ongoing information system management by the contractor. Including this clause suggests regulatory accumulation without scoping to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>52.222-50, Combating Trafficking in Persons (MAR 2026)
+52.222-50 with Alt I, Combating Trafficking in Persons, with its Alternate I (MAR 2026)</blockquote>
+  <div class="ev-explanation">Both the base clause and its Alternate I are cited simultaneously. Alternate I adds compliance plan requirements and applies only to contracts performed outside the United States or contracts above the simplified acquisition threshold involving certain services. A domestic hardware delivery below simplified acquisition thresholds would not typically trigger Alternate I. Citing both versions without explanation is duplicative and suggests the clause list was not reviewed for which version actually applies.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a single unit of a specific commercial product — a Trimble R980 GNSS Receiver Kit — at a fixed quantity with a defined delivery date (no later than 30 June 2026) and a specified delivery location. This is precisely the scenario for which firm-fixed-price contracting is designed. The requirement is fully defined, the commercial market provides pricing transparency, competition keeps prices honest, and the deliverable is entirely measurable (either the product is delivered or it isn&#x27;t). There is no scope uncertainty, no variable labor component, and no technical ambiguity that would suggest cost-reimbursement or T&amp;M would be preferable. The contract type is well-matched to the requirement. Severity is 1 — no square peg issue exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The government will award a firm-fixed price (FFP) contract resulting from this combined synopsis/solicitation to the responsible offeror whose offer, conforming to the synopsis/solicitation, will be most advantageous to the government.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states FFP pricing, which is the appropriate contract type for a straightforward commercial product purchase.</div>
+</div><div class="evidence-item">
+  <blockquote>00010 | Trimble R980 GNSS Receiver Kit ... | 1 Each (EA)</blockquote>
+  <div class="ev-explanation">The requirement is for a single, well-defined commercial off-the-shelf hardware kit with a fixed quantity, making FFP the textbook-appropriate contract type. There is no ambiguity in scope, quantity, or deliverable.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="022516-681C_TrimbleR980_SpecSheet_USL_1125_LR_SEC.pdf">022516-681C_TrimbleR980_SpecSheet_USL_1125_LR_SEC.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e1174c68b39641c0966b4b7195e0c2d3_022516-681C_TrimbleR980_SpecSheet_USL_1125_LR_SEC.pdf" download="022516-681C_TrimbleR980_SpecSheet_USL_1125_LR_SEC.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Combined_Synopsis_Solicitation_Trimble_May_2026.pdf">Combined_Synopsis_Solicitation_Trimble_May_2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e1174c68b39641c0966b4b7195e0c2d3_Combined_Synopsis_Solicitation_Trimble_May_2026.pdf" download="Combined_Synopsis_Solicitation_Trimble_May_2026.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>36C78626Q50127 -- R499 — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>36C78626Q50127 -- R499</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 fa02c628e6fb4b97a405a3e5ea8f884f</span>
+      <a class="sam-link" href="https://sam.gov/opp/fa02c628e6fb4b97a405a3e5ea8f884f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › NATIONAL CEMETERY ADMIN (36C786)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">562991</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (06/01/2026 - 05/31/2027) plus 1 option year (06/01/2027 - 05/31/2028)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, warranting a severity 2. The QASP is the primary accountability mechanism, and it is structured almost entirely around process verification: does the contractor have a license, did approved personnel show up, was documentation submitted on time, was calibrated equipment used. These are all proxy measures for the real outcome — that the septic systems at a national cemetery are properly maintained, do not overflow or contaminate grounds, and remain functional for cemetery operations.
+
+That said, this is not a severe case. Important mitigating factors keep it from severity 3. First, the contract scope is extremely narrow: nine discrete pumping events and one inspection per year at three small tanks. The simplicity of the work means that process compliance and outcomes are more tightly coupled than in a complex IT or professional services contract. If the contractor shows up, pumps the tank, and submits a disposal receipt, the outcome (an emptied, functioning tank) is substantially confirmed by the process. Second, the QASP does include two rows — Environmental Protection (&#x27;No spills, leaks or contamination of grounds&#x27;) and Site Restoration (&#x27;site returned to pre-service condition&#x27;) — that describe actual physical outcomes rather than paper trails, even if the surveillance method (on-site observation) is still somewhat process-oriented. Third, the SOW itself at Section 8 reserves government rights to observe operations and reject noncompliant services, which is a lightweight outcome-based backstop.
+
+The compliance tilt is real but constrained by the simplicity of the work. The bigger structural issue — that the QASP prioritizes documentation submission and credential checks over measuring whether the septic systems are actually functioning well — represents a moderate but not dominant problem for a contract of this type and scale.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SOW Requirement: Proper Licensing and certification | Performance Standard: Contractor and personnel possess all required state and local licenses and certifications | Surveillance Method: Document review | Frequency: Prior to service and annually | AQL: 100%</blockquote>
+  <div class="ev-explanation">This QASP row measures whether the contractor holds a license — a credential check — not whether the work was performed well. License possession is a precondition, not an outcome. A contractor could hold every required license and still pump the wrong tank or damage the site.</div>
+</div><div class="evidence-item">
+  <blockquote>SOW Requirement: Authorized Personnel Only | Performance Standard: Work performed by approved contractor personnel; no unauthorized subcontracting | Surveillance Method: On-site observation | Frequency: Each service | AQL: 100%</blockquote>
+  <div class="ev-explanation">This measures personnel authorization status — a process compliance check — not whether the pumping was done correctly. It tracks who performed the work, not the quality or effectiveness of what they did.</div>
+</div><div class="evidence-item">
+  <blockquote>SOW Requirement: Timely Submission of reports | Performance Standard: Complete service documentation submitted within required timeframe | Surveillance Method: Document review | Frequency: Each service | AQL: 100%</blockquote>
+  <div class="ev-explanation">This is a pure process metric: did the contractor submit paperwork on time? It says nothing about the accuracy, completeness, or usefulness of the report content. Timely submission of an incorrect or incomplete report would still satisfy this standard.</div>
+</div><div class="evidence-item">
+  <blockquote>SOW Requirement: Volume measurement and documentation | Performance Standard: Pumped volume measured using calibrated equipment and documented | Surveillance Method: Report Review | Frequency: Each service | AQL: 100%</blockquote>
+  <div class="ev-explanation">This measures whether documentation was produced and whether calibrated equipment was used — process compliance — rather than measuring the outcome (e.g., whether the tank was actually maintained at healthy operating levels, or whether over- or under-pumping occurred). Documenting a number is not the same as the septic system functioning properly.</div>
+</div><div class="evidence-item">
+  <blockquote>12. QUALITY CONTROL: The contractor shall develop and maintain an effective quality control program to ensure services are performed in accordance with this SOW... The contractor&#x27;s quality control program is the means by which he assures himself that his work complies with the requirement of the contract. After acceptance of the quality control plan the contractor shall receive the contracting officer&#x27;s acceptance in writing of any proposed change to his QC system. Contractor shall submit quality control plan 10 days post award date.</blockquote>
+  <div class="ev-explanation">The QC requirement is entirely plan-and-compliance oriented: develop a plan, submit it, get it accepted, notify the CO of changes. There is no mention of what outcomes the QC plan is expected to produce or how contractor self-assessment will be judged against functional results (e.g., no spills over the contract period, systems remaining operational).</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for straightforward septic tank pumping and inspection services at Tahoma National Cemetery — a recurring, commodity-type maintenance service with a small dollar value (base year plus one option year covering roughly 9 service visits annually across three tanks). After reading the full solicitation including the Statement of Work, QASP, and all contract clauses, I find no evidence of insider rewards as defined by Sin #4.
+
+The SOW contains no past performance requirements, no prior contract dollar thresholds, no federal-specific experience mandates, and no evaluation criteria that would advantage an incumbent. The only experience-adjacent requirement is Section 4.1: &#x27;The contractor shall perform pumping and inspection services using properly licensed personnel and equipment.&#x27; This is a generic, capability-focused requirement referencing state and local licensing — a standard, externally-verifiable credential that any legitimate septic services company in the Kent, Washington area would possess. It does not require prior federal contracts, specific dollar amounts of prior work, or any form of institutional knowledge about the agency.
+
+The solicitation is structured as an RFQ under FAR Part 12 (commercial services), set aside for SDVOSBs. The evaluation methodology is not detailed in the text provided, but no evaluation factors favoring incumbency — no bonus points for prior similar contracts, no requirements for familiarity with agency-specific systems, no transition plan scoring that would reward insider knowledge — appear anywhere in the document.
+
+The service itself is simple and widely performed commercially: pump and inspect septic tanks on a fixed schedule, document volumes, dispose of waste at approved facilities. Any licensed septic service company operating in King County, Washington could realistically compete without ever having held a federal contract. The 7-day response window is short but applies equally to all competitors and does not require incumbent-specific knowledge to respond.
+
+In summary, this solicitation presents no material insider rewards concerns. The experience requirements are minimal, reasonable, and capability-focused. A qualified vendor new to federal contracting could compete on equal footing.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward, small-dollar septic pumping and inspection contract for a fixed facility with three tanks. After reviewing the full solicitation and SOW, the requirements are overwhelmingly outcome- and constraint-oriented rather than prescriptive about HOW the vendor must work. The CLIN structure defines what must be done (pump these tanks on this schedule, inspect annually, report findings) and the SOW defines acceptable outputs (no spills, tanks fully evacuated, documentation submitted within 5 business days, no over-pumping). The QASP is structured around outcomes and measurable standards with 100% AQL, which is appropriate for this type of discrete service. The two mildly prescriptive elements — calibrated equipment for measurement and the service window requirement — are both defensible constraints grounded in legitimate government interests (anti-fraud measurement accuracy and cemetery operations protection), not arbitrary process mandates inherited from an incumbent. The subcontracting restriction (Section 4.2) and the quality control plan requirement (Section 12) add some administrative burden but are standard boilerplate for a VA service contract and do not meaningfully constrain how a licensed pumping firm would approach the core work. There is no evidence of copy-paste from an incumbent&#x27;s operating procedures, no staffing mandates, no technology prescriptions, and no step-by-step workflow requirements. The solicitation correctly identifies what the government needs (functioning septic systems maintained, documented, and in compliance with environmental regulations) and leaves the &#x27;how&#x27; largely to industry. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall measure and document the volume removed from each tank at the site using calibrated equipment.</blockquote>
+  <div class="ev-explanation">This specifies that calibrated equipment must be used for measurement, which could be read as prescribing a method. However, in context this is better understood as a quality/accuracy standard — the government needs verifiable volume data to prevent billing fraud and over-pumping. The requirement protects a legitimate government interest (accurate measurement and anti-fraud) rather than foreclosing contractor innovation. A septic pumping firm has no meaningful alternative to physical measurement anyway.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall perform all services during normal business hours of Monday through Friday, 8:00am to 4:00pm (preferably early morning) and be accompanied by the Contracting Officer Representative (COR) or designated cemetery personnel.</blockquote>
+  <div class="ev-explanation">This prescribes a service window and requires COR accompaniment, which constrains contractor scheduling flexibility. However, it is defensible as a site operations constraint — a national cemetery with active burial services has legitimate reasons to restrict when and how contractors move on grounds. The &#x27;8am to 4pm&#x27; window and escort requirement are site access controls, not process mandates. This is the closest thing to prescriptive sprawl in the document, but it is mild.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate Rule Pools concern, not a severe one. The core issue is the mismatch between contract scope and the volume and character of boilerplate clause inclusions — particularly the full-text reproduction of FAR 52.240-91 (Security Prohibitions and Exclusions), which is an 8-page clause addressing Chinese telecommunications equipment, TikTok, Kaspersky software, drone procurement, OFAC sanctions, Sudan, and Iran. None of these regulatory domains have any plausible connection to pumping septic tanks at a national cemetery in Washington State. The clause appears to have been included as a default government-wide clause without any assessment of whether it applied to this specific work. Similarly, the Buy American Supplies clause and references to Associated General Contractors safety standards suggest copy-forward accumulation from other contract templates. That said, this solicitation does not rise to severity 3. The SOW itself is focused and well-structured, with a clear CLIN structure, a reasonable QASP, and specific technical requirements tailored to septic tank pumping. The regulatory clause burden, while elevated relative to the contract scope, is not an &#x27;overwhelming list&#x27; in the classic Rule Pools sense — there is no dedicated &#x27;Applicable Documents&#x27; section with 20-88 entries, and most FAR clauses are incorporated by reference rather than reproduced in full. The one egregious outlier is the full-text Security Prohibitions clause, which dominates the contract clauses section disproportionately. The core problem is disproportionality rather than volume: a small, simple maintenance services contract carrying enterprise-level technology security and supply chain compliance language that a septic pumping SDVOSB would need to parse and certify compliance with. Severity 2 is appropriate — the compliance burden is elevated and some inclusions are clearly irrelevant, but the solicitation is not an impenetrable wall of regulations and the SOW itself is competently curated.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.240-91 (DEV) Security Prohibitions and Exclusions (NOV 2025) (DEVIATION NOV 2025)</blockquote>
+  <div class="ev-explanation">This clause spans approximately 8 pages of the solicitation and covers TikTok bans, Kaspersky Lab prohibitions, Huawei/ZTE telecommunications equipment restrictions, drone procurement prohibitions, OFAC sanctions, Sudan restrictions, Iran sanctions, and FASCSA supply chain security orders. The actual work is pumping septic tanks at a cemetery in Kent, Washington — a physically discrete, low-tech service with no IT infrastructure, no network equipment, no telecommunications systems, and no supply chain complexity. The entire clause is effectively inapplicable to this work but is reproduced in full text, consuming roughly 20% of the solicitation&#x27;s page count.</div>
+</div><div class="evidence-item">
+  <blockquote>52.225-1 (DEV) Buy American-Supplies (OCT 2022) (DEVIATION NOV 2025)</blockquote>
+  <div class="ev-explanation">The Buy American Act clause governs the acquisition of supplies. This contract is for a service — septic pumping and inspection — with no meaningful supply acquisition component. The septic pumping truck and equipment are contractor-owned assets, not supplies being delivered to the government. Including this clause without any explanation of how it applies to a pure service contract is a boilerplate carryover without evident relevance.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 Encouraging Contractor Policies To Ban Text Messaging While Driving (May 2024)</blockquote>
+  <div class="ev-explanation">While nominally applicable to any contract where employees might drive, this clause is standard boilerplate with no specific relevance to septic pumping services. Its inclusion without context is consistent with a pattern of undifferentiated clause accumulation rather than curated applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>7.5 Contractor shall also guard all hazards in accordance with the safety provisions of the latest manual of accident prevention published by the Associated General Contractors of America and OSHA.</blockquote>
+  <div class="ev-explanation">The Associated General Contractors of America manual is a construction industry document. This is a septic pumping service contract, not a construction contract. Citing an Associated General Contractors safety manual — without explanation of why a construction industry standard applies to septic service technicians — suggests regulatory language was carried forward from a different contract type without review.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is structured as a firm-fixed-price contract with discrete, fully-defined line items — a highly appropriate pricing scheme for the work described. The requirements are routine commercial septic services (pumping and inspection) performed on a fixed schedule at a single location, with known tank sizes, predetermined service frequencies, and specific calendar triggers (Memorial Day, Veterans Day, first Wednesday of every other month). There is no ambiguity in scope, no unpredictable labor quantity, and no evolving requirements. The government knows exactly what it wants: pump these three tanks this many times per year at these prices. Fixed-price is the correct vehicle. A T&amp;M structure would be inappropriate here because the labor content per service visit is predictable and bounded by the physical capacity of the tanks (indeed, the SOW explicitly prohibits over-pumping). A cost-reimbursement structure would be wildly disproportionate for a simple recurring maintenance service. The only minor structural note is that CLIN 0002 is listed with a &#x27;Max. Qty&#x27; designation on the schedule page, which is consistent with an indefinite-delivery fixed-price ordering arrangement, but this is a minor formatting observation and does not indicate a mismatch between contract type and requirements. Overall, this is a well-matched pricing structure for a straightforward, predictable service contract.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>0001 | Pumping of the 1750-gallon septic tank at Site A and B semi-annually – 3 to 7 business days prior to Memorial Day and Veterans Day. [...] | 2 | EA
+0002 | Pumping of the 1000-gallon septic tank at Site C every other month on the first Wednesday. [...] | 6 | EA
+0003 | Inspection of the septic systems at sites A, B and C on an annual basis [...] | 1 | EA</blockquote>
+  <div class="ev-explanation">All three CLINs are priced as discrete, countable units (each/EA) with fixed quantities. The services are routine, repetitive, and fully defined: specific tanks, specific schedules, specific deliverables. This is a textbook fixed-price structure for a well-scoped requirement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="P07 WD 2015-5535.pdf">P07 WD 2015-5535.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fa02c628e6fb4b97a405a3e5ea8f884f_P07+WD+2015-5535.pdf" download="P07 WD 2015-5535.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="P09 FY 26 TNC 919 Septic SOW.pdf">P09 FY 26 TNC 919 Septic SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fa02c628e6fb4b97a405a3e5ea8f884f_P09+FY+26+TNC+919+Septic+SOW.pdf" download="P09 FY 26 TNC 919 Septic SOW.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="QSE 36C78626Q50127.pdf">QSE 36C78626Q50127.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fa02c628e6fb4b97a405a3e5ea8f884f_QSE+36C78626Q50127.pdf" download="QSE 36C78626Q50127.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation.pdf">Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fa02c628e6fb4b97a405a3e5ea8f884f_Solicitation.pdf" download="Solicitation.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SolicitationAmendment0001.pdf">SolicitationAmendment0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/fa02c628e6fb4b97a405a3e5ea8f884f_SolicitationAmendment0001.pdf" download="SolicitationAmendment0001.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

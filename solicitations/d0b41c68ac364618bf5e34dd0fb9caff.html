@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mobile Telephone Service for the U.S. Embassy Riga, Latvia — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Mobile Telephone Service for the U.S. Embassy Riga, Latvia</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d0b41c68ac364618bf5e34dd0fb9caff</span>
+      <a class="sam-link" href="https://sam.gov/opp/d0b41c68ac364618bf5e34dd0fb9caff/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-03-20</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › US EMBASSY RIGA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DE11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517112</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-20</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 option years (total not to exceed 5 years)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>C-SCRM Go/No-Go Evaluation Factor</li><li>Technical</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes dysfunction. The PWS and QASP are oriented around measurable service outcomes: uptime percentages, data allowances, billing timeliness, and customer support response rates. These are the right kinds of accountability mechanisms for a commodity telecommunications services contract — they ask whether the service is working, not whether the vendor attended meetings or filed reports on schedule.
+
+The QASP surveillance methods (direct observation, user feedback, test calls, document review) are appropriately varied and include empirical testing. The complaint threshold in Section 11.2, while simple, is outcome-driven. Reporting requirements are minimal — invoices with usage detail, on-request reports, and written confirmations of line activations — none of which create overlapping cadences or prescribe elaborate formats.
+
+There is no waterfall-style project management reporting, no required weekly status reports, no plan-deviation tracking, and no prescribed report structures. The AI and cybersecurity clauses (DOSAR 652.239-800, 652.239-801, 652.239-803) are boilerplate State Department inclusions that apply broadly regardless of contract type; they do not introduce compliance theater into the QA structure for this specific service.
+
+The solicitation&#x27;s accountability structure is appropriate for what it is: a commercial mobile telephone service contract for 150-185 lines. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Metric Standard / Acceptable Quality Level (AQL)
+Service Availability ≥99% uptime per month
+Roaming Data in EEA ≥10 GB per line/month at fixed price
+Roaming Data in United States ≥1 GB per line/month at fixed price
+Roaming Data in Other Countries ≥1 GB per line/month at fixed price
+Billing/Reporting Timeliness 100% by 10th calendar day each month
+Customer Support Response ≥98% within 1 business day
+Regulatory Compliance 100% at all times</blockquote>
+  <div class="ev-explanation">The solicitation defines explicit, quantifiable performance standards — uptime percentages, data minimums, response rate thresholds — that are outcome-focused rather than process-focused. These AQLs measure whether the service actually works, not whether the vendor submitted paperwork. This is a meaningful counterweight to any compliance-oriented language elsewhere in the document.</div>
+</div><div class="evidence-item">
+  <blockquote>The performance standard requires that the Government receive no more than two (2) customer complaints per month or identify no more than two (2) performance deficiencies per month.</blockquote>
+  <div class="ev-explanation">While the complaint threshold is a relatively blunt instrument, it is fundamentally outcome-oriented: it triggers action based on user experience, not plan adherence. It does lean toward reactive compliance monitoring, but it still orients oversight around actual service quality rather than documentation delivery.</div>
+</div><div class="evidence-item">
+  <blockquote>Reports on service usage, network incidents, and emergency response actions as requested by the Government.</blockquote>
+  <div class="ev-explanation">The deliverables list includes usage and incident reports, but these are on-demand rather than requiring multiple fixed cadences. There is no prescribed format, no mandatory weekly/monthly/quarterly stacking of overlapping report types, and no requirement to track deviations from a project plan. The reporting burden is light and tied to operational events rather than process compliance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for mobile telephone services at the U.S. Embassy Riga presents very limited insider-rewards risk. The core test — could a qualified vendor who has never held this specific contract realistically compete? — is clearly yes here. The past performance requirements are modest: a three-year lookback with no specified dollar thresholds, no minimum number of contracts, and an explicit accommodation for international experience if Latvia-specific experience is unavailable. There are no federal-government-specific experience mandates; a commercial telecom operator with a strong track record serving large enterprise clients would qualify. The evaluation framework uses FAR 13 comparative evaluation, which by design allows for direct comparison of technical capability, past performance, and price without rigid scoring rubrics that award points for specific contract types or dollar values. The technical evaluation discriminators focus on functional capabilities (5G/4G coverage, eSIM support, WiFi calling, roaming coverage, account management platform) that any established telecom carrier could demonstrate through documentation and technical submissions. The C-SCRM go/no-go filter — requiring all &#x27;Yes&#x27; answers on a supply chain questionnaire or a recognized third-party certification (ISO 27001, SOC II, FedRAMP) — is a security baseline, not an incumbency proxy. The language requirement for an Account Manager fluent in both Latvian and English is operationally necessary for a contract in Latvia and is a narrow staffing requirement, not an experience barrier. In sum, the experience requirements are capability-focused and reasonably scoped. The solicitation is structured to allow any qualified Latvian telecom provider (or international provider with local capability) to compete on a relatively level playing field. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>List of clients over the last three (3) years, demonstrating prior experience with relevant past performance information in providing cellular communication services of similar size and complexity and references (provide dates of contracts, places of performance, value of contracts, contact names, telephone and fax numbers and email addresses). If the offeror has not performed comparable services in Latvia, then the offeror shall provide its international experience.</blockquote>
+  <div class="ev-explanation">This past performance requirement asks for a list of clients over three years in cellular communications of &#x27;similar size and complexity.&#x27; Critically, the solicitation explicitly accommodates vendors without Latvia-specific experience by accepting international experience. There is no dollar threshold, no minimum number of contracts, and no federal-government-specific mandate. This is a capability-focused requirement that does not function as an incumbency filter.</div>
+</div><div class="evidence-item">
+  <blockquote>Evidence that the offeror/quoter operates an established business with a permanent address and telephone listing in Latvia or plans to establish an office within 30 days of contract award.</blockquote>
+  <div class="ev-explanation">This requires either existing presence in Latvia or a credible plan to establish one within 30 days. While this does narrow the field to entities capable of operating in Latvia, it is a legitimate operational requirement for a local telecommunications services contract — not an insider reward. Any established telecom operator in Latvia or an entity willing to stand up a local presence can compete. It does not require prior federal contract experience.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a competently drafted commercial services acquisition for enterprise mobile telephone services. The overwhelming majority of requirements are outcome-oriented: coverage percentages, uptime thresholds (≥99%), data allowances (10 GB EEA roaming), billing timeliness (100% by 10th calendar day), response times (≥98% within 1 business day), and activation/deactivation windows (24 hours). These are SLAs and AQLs — they define WHAT the government needs, not HOW the carrier must deliver it. The QASP reinforces this pattern by specifying measurable surveillance methods tied to outcomes rather than process checkpoints.
+
+The technical requirements section (Section 2) reads largely as a capabilities specification — support for 5G/4G/LTE, eSIM, WiFi calling, voicemail in English, number portability, NDAA Section 889 compliance. These are interoperability constraints and legal/security mandates, not process prescriptions. NDAA Section 889 is a statutory obligation. The requirement for English-language voicemail interface reflects a legitimate operational need for embassy staff. The requirement for static IP on dedicated internet lines is a technical specification, not a workflow mandate.
+
+The one area with mild prescriptive flavor is the account management/customer support section, which specifies bilingual (Latvian/English) capability, a dedicated account manager, live human reception after hours, and a direct support line for preferred clients. These elements describe staffing and service channel characteristics rather than pure outcomes. However, in the context of a commercial telecom contract for a diplomatic mission in a non-English-speaking country, these constraints are grounded in genuine operational necessity and are consistent with how enterprise telecom contracts are commonly structured in the commercial marketplace. They do not read as incumbent-capture or consensus-driven accretion.
+
+The invoicing requirements (Section 3) specify invoice content and format with some detail, but these are standard billing administration specifications that appear throughout federal contracts and are necessary for proper payment processing — not process sprawl.
+
+Overall, this solicitation does not exhibit meaningful requirement sprawl. It is focused on defining desired service characteristics and measurable performance standards for a commercially available service. Vendors would recognize the requirements as standard enterprise mobile service terms and would not be constrained from proposing their best network approach. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Assign a dedicated account manager, fluent in Latvian and English, as a single point of contact for all contract matters.</blockquote>
+  <div class="ev-explanation">This prescribes a specific staffing structure (dedicated account manager, bilingual) rather than simply requiring responsive account management. However, for a 150-185 line corporate account at a diplomatic mission, a single named point of contact is a reasonable and common commercial practice, and the language aligns with standard enterprise telecom service contracts. It constrains vendor org structure marginally but does not prevent operational optimization.</div>
+</div><div class="evidence-item">
+  <blockquote>Enable the Government to add new cellular lines at any time during the contract period, with activation and service readiness for each new line achieved within twenty-four (24) hours of receiving a written request.</blockquote>
+  <div class="ev-explanation">This is primarily an SLA (WHAT — 24-hour activation) rather than a prescription of HOW to achieve it. It is outcome-oriented and does not dictate the vendor&#x27;s provisioning process. Cited here only to note that it approaches specificity but remains on the legitimate side of the line.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit a severe rule pool problem. It lacks the hallmark of a severe case: there is no single &#x27;Applicable Documents&#x27; list of 20+ regulations dumped without context. The FAR and DOSAR clauses are organized into logical sections, the PWS is well-structured, and the core regulatory citations for NDAA Section 889 and telecommunications prohibitions are genuinely applicable to the work and explained with reasonable clarity.
+
+However, the solicitation does exhibit a moderate rule pool pattern driven primarily by boilerplate clause inflation. Three State Department deviation clauses — the AI Governance clause (652.239-803), the AI Disclosure clause (652.239-801), and the Vendor Lock-in provision (652.239-802) — appear to have been inserted as standard contract templates without evaluation of applicability to a commodity mobile telephone procurement. The AI clauses impose quarterly performance evaluations, rollback procedures, NIST AI Risk Management Framework compliance, and incident reporting requirements that have no operational meaning for a Latvian mobile carrier selling SIM cards and data plans. These clauses are not irrelevant in all contexts, but their application here without any conditioning language or contextual explanation is the signature of copy-forward accumulation.
+
+Additionally, the full-text reproduction of FAR 52.240-91 (Security Prohibitions and Exclusions) — spanning nearly eight pages — includes extensive drone procurement prohibitions, Sudan business operation certifications, Iranian petroleum sanctions representations, and FASCSA order monitoring obligations. Some of these (Huawei/ZTE prohibitions, covered telecommunications equipment) are directly relevant. Others (drone delivery prohibitions, Sudan/Iran certifications, Kaspersky Lab provisions) are at best tangential to the procurement of commercial mobile service in Latvia.
+
+The burden is elevated but not impenetrable. Most of the genuinely applicable requirements — network coverage, NDAA 889 compliance, roaming, billing — are clearly explained in the PWS. A competent Latvian carrier could navigate this solicitation, though they would need to work through multiple pages of AI governance and sanctions language that does not apply to their services. The severity is 2: noticeable regulatory inflation with identifiable boilerplate carryovers, but no glaring contradictions between cited regulations and the solicitation&#x27;s purpose, and no single overwhelming undifferentiated list.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS... [spans pages 24-31, covering definitions for: American Security Drone Act-covered foreign entity, Backhaul, Covered application, Covered article, Covered foreign country, Covered telecommunications equipment or services, Critical technology, FASC-prohibited unmanned aircraft system, FASCSA order, Information technology, Intelligence community, Interconnection arrangements, Kaspersky Lab-covered article, Kaspersky Lab-covered entity, National security system, Roaming, Sensitive compartmented information, Sensitive compartmented information system, Source, Subsidiary, Substantial or essential component, Unmanned aircraft, Unmanned aircraft system]</blockquote>
+  <div class="ev-explanation">This clause is reproduced in full text across nearly eight pages and includes extensive definitions and prohibitions relating to unmanned aircraft systems (drones), Sudan business operations, Iran sanctions, and OFAC restrictions. For a solicitation procuring commercial mobile telephone service for ~150-185 lines at a single embassy, the drone provisions (paragraphs (c)(1)-(c)(3) on FASC-prohibited unmanned aircraft systems) and the Sudan/Iran prohibitions are tangential at best. A Latvian mobile carrier is not delivering drones or conducting restricted business in Sudan. These provisions appear to be a boilerplate dump of the entire clause rather than a curated citation.</div>
+</div><div class="evidence-item">
+  <blockquote>652.239-803 ARTIFICIAL INTELLIGENCE CLAUSE (DEVIATION) (SEPT 2025)... (e) Evaluation and Monitoring of AI System Performance. The Contractor shall allow the agency to perform quarterly or biannual evaluations of AI system performance, risks, and effectiveness... (f) Performance Monitoring and Remediation Requirements. The Contractor shall regularly: 1. Monitor the AI system&#x27;s performance in operational environments; 2. Identify and rectify unacceptable system behavior; 3. Ensure any new AI version meets predefined performance thresholds before deployment; 4. Rollback to a previous version if performance degradation is detected.</blockquote>
+  <div class="ev-explanation">This extensive AI governance clause — requiring quarterly performance evaluations, rollback procedures, AI incident reporting to CIRT@state.gov and RAIO@state.gov, NIST AI Risk Management Framework compliance, and disclosure of whether AI was developed within the United States — is applied wholesale to a contract for commercial mobile telephone service. Nothing in the PWS involves AI development, AI-enabled decision systems, or AI-generated outputs. The clause appears to have been applied as a standard template without assessment of whether it has any operational relevance to purchasing cell phone subscriptions from a Latvian carrier.</div>
+</div><div class="evidence-item">
+  <blockquote>652.239-802 VENDOR LOCK-IN PROVISION (DEVIATION) (SEP 2025)... The Government requires that offers submitted in response to this solicitation that incorporate AI technologies include terms that reduce vendor lock-in risk, such as requirements regarding knowledge transfer, clear data and model portability practices, clear licensing terms, and pricing transparency.</blockquote>
+  <div class="ev-explanation">A vendor lock-in provision focused on AI technology portability, model licensing, and data portability is cited in a solicitation for commodity mobile telecommunications service. The provision&#x27;s applicability is purely conditional (&#x27;offers that incorporate AI technologies&#x27;), making it irrelevant for any carrier responding to this RFQ. Its inclusion signals copy-forward drafting rather than deliberate curation.</div>
+</div><div class="evidence-item">
+  <blockquote>THE FOLLOWING FEDERAL ACQUISITION REGULATIONS (FAR) CLAUSES ARE INCORPORATED BY REFERENCE: 52.203-17 CONTRACTOR EMPLOYEE WHISTLEBLOWER RIGHTS (NOV 2023) / 52.204-13 SYSTEM FOR AWARD MANAGEMENT MAINTENANCE (OCT 2018) / 52.204-18 COMMERCIAL AND GOVERNMENT ENTITY CODE MAINTENANCE (AUG 2020) / 52.204-25... / 52.204-27 / 52.222-19 CHILD LABOR-COOPERATION WITH AUTHORITIES AND REMEDIES (JAN 2025) / 52.225-14 INCONSISTENCY BETWEEN ENGLISH VERSION AND TRANSLATION OF CONTRACT (FEB 2000) / 52.228-4 WORKER&#x27;S COMPENSATION AND WAR-HAZARD INSURANCE OVERSEAS (APR 1984) / 52.229-6 TAXES-FOREIGN FIXED-PRICE CONTRACTS (FEB 2013) / 52.232-39 UNENFORCEABILITY OF UNAUTHORIZED OBLIGATIONS (JUNE 2013) / 52.244-6 SUBCONTRACTS FOR COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025)</blockquote>
+  <div class="ev-explanation">FAR 52.222-19 (Child Labor) is incorporated by reference in a contract for commercial mobile telephone service in Latvia. While this clause is standard for certain international procurements, its inclusion alongside clauses governing war-hazard insurance and subcontracts for commercial services — with no explanatory context for any of them — illustrates the undifferentiated nature of the clause list. A Latvian telecom carrier receiving this solicitation must parse each clause individually to determine applicability, with no guidance from the agency.</div>
+</div><div class="evidence-item">
+  <blockquote>52.240-90 SECURITY PROHIBITIONS AND EXCLUSIONS REPRESENTATIONS AND CERTIFICATION... (e) Sudan certification. By submission of its offer, the offeror certifies, after conducting a reasonable inquiry... that the offeror does not conduct any restricted business operations in Sudan. (f) Iran Representation and Certifications. (1)... (ii) Certifies that the offeror, or any person... does not engage in any activities for which sanctions may be imposed under section 5 of the Act. These sanctioned activities are in the areas of development of the petroleum resources of Iran, production of refined petroleum products in Iran, sale and provision of refined petroleum products to Iran...</blockquote>
+  <div class="ev-explanation">A Latvian mobile telephone carrier responding to an embassy RFQ for cell service is required to certify it does not conduct petroleum resource development activities in Iran or restricted business operations in Sudan. These representations are pulled from a standard clause template and applied without any assessment of relevance to the procurement. No context or explanation is provided for why a Baltic telecom would face sanctions exposure related to Iranian petroleum or Sudanese mineral extraction.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a fixed-price IDIQ contract structure for mobile telephone and data services — a straightforward commercial service with well-defined, standardized offerings. The contract type is appropriate for the requirement. Mobile carrier services are commodity purchases: pricing is set per line per month, service tiers are standard commercial products, and the quantity (150-185 lines) is knowable in advance with only modest variability. The pricing schedule reflects exactly how commercial mobile carriers sell their services. There is no uncertainty in scope that would necessitate T&amp;M or cost-reimbursement; there are no unpredictable labor categories or ambiguous deliverables. The IDIQ structure sensibly accommodates fluctuation in the number of active lines and occasional roaming usage without requiring the overhead of a cost-reimbursement vehicle. The &#x27;Uncommon Fees&#x27; CLINs (roaming overages, satellite calls) are priced on a per-unit basis, which is the correct approach for variable but commercially standard charges. This is a clean fit between contract type and requirement — no square peg issue is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contract will be for a one-year period from the date of the contract award, with four (4) option years to renew... The Government will pay the Contractor on a monthly basis for Standard Services that have been satisfactorily performed.</blockquote>
+  <div class="ev-explanation">The solicitation uses a fixed-price, indefinite-quantity contract structure with unit prices per line/month for defined service tiers. Monthly fixed rates per line are the standard and appropriate commercial model for mobile telecommunications services, which is a commodity service with predictable pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>INDEFINITE DELIVERY/INDEFINITE QUANTITY CONTRACT... During this contract period, the Government shall place orders totaling a minimum of Euro 2,000.00... The total amount of all orders shall not exceed EUR 50,000.00.</blockquote>
+  <div class="ev-explanation">The IDIQ structure with defined min/max is well-suited here: the quantity of lines (150-185) is known within a reasonable range, the service offerings are commercially standard, and the per-unit pricing can be established competitively. The IDIQ structure accommodates the modest variability in line count without requiring a T&amp;M or cost-reimbursement approach.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 19G7526Q0002.pdf">RFQ 19G7526Q0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d0b41c68ac364618bf5e34dd0fb9caff_RFQ+19G7526Q0002.pdf" download="RFQ 19G7526Q0002.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Invitation Letter.pdf">Solicitation Invitation Letter.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d0b41c68ac364618bf5e34dd0fb9caff_Solicitation+Invitation+Letter.pdf" download="Solicitation Invitation Letter.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

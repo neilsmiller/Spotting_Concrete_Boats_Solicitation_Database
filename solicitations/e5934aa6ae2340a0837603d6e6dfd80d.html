@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRINTER,AUTOMATIC D — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>PRINTER,AUTOMATIC D</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e5934aa6ae2340a0837603d6e6dfd80d</span>
+      <a class="sam-link" href="https://sam.gov/opp/e5934aa6ae2340a0837603d6e6dfd80d/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA MARITIME › DLA MARITIME MECHANICSBURG › SPRMM1 DLA MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333998</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward DLA supply solicitation for a manufactured hardware item — a lightweight color printer assembly for the AEGIS Weapons System. The solicitation is a purchase order for a physical product, not a services or IT development contract. In this context, the compliance-over-outcomes sin applies very differently: for a supply contract, conformance to technical specifications and drawings IS the outcome. The QA section (Section 4) is brief and standard — it assigns inspection responsibility to the contractor, reserves government oversight rights, and requires records retention for one year. There are no weekly status reports, no overlapping reporting cadences, no prescribed report formats, no meeting requirements, and no process surveillance mechanisms. The accountability structure is entirely appropriate: the government will inspect the delivered printer assemblies against drawing 8430917 and ISO9001/ISO9002 standards. That is outcome-focused accountability for a hardware procurement. If anything, the solicitation&#x27;s brevity on QA reflects the simplicity of the requirement: one source-controlled part (RITEC CAGE 09BZ2, PN 2006900-009), inspected at source per DLA Procurement Note E06. No compliance-over-outcomes problem exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein. Except as otherwise specified in the contract/purchase order, the Contractor may use his own or any other facilities suitable for the performance of the inspection requirements specified herein, unless disapproved by the Government. The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">This is a standard fixed-price supply contract inspection clause. It delegates inspection responsibility to the contractor with government oversight rights, which is appropriate for a manufactured hardware item. It references conformance to &#x27;prescribed requirements&#x27; — but in the context of a physical product (a printer assembly), conformance to specifications IS the outcome measure. There is no compliance theater here.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3 Records - Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">A records retention requirement is a minimal process requirement, but it is proportionate and standard for supply contracts. It does not constitute an elaborate compliance-over-outcomes structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits the most severe form of Insider Rewards: it is not merely tilted toward incumbents, it is structurally closed to non-incumbents by design. The combination of source control item status, a single named approved supplier (RITEC, CAGE 09BZ2), unavailable technical data, an acknowledged approval timeline that precludes new sources from competing in the current award cycle, and an additional authorized-distributor gate creates an airtight incumbent lock. A qualified vendor who has never worked this contract cannot realistically compete — not because of experience thresholds or evaluation scoring, but because participation is legally restricted to a pre-approved source pool that currently contains one company. The solicitation does invite new sources to submit qualification data for future procurements, which is the correct procedural remedy, but it explicitly states that the current award will not be delayed for that purpose. This is severity 3 by any measure. The sin here is not subtle stacking of experience criteria — it is explicit, acknowledged single-source restriction dressed in competitive solicitation format. The defense for this structure (source control items for military weapon systems like the AEGIS Weapons System require rigorous qualification) is real and partially legitimate, but the consequence is identical to the most extreme form of insider rewards: only one vendor can win.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Source Control Item - Previous delivery of the specified National Stock Number or similar item manufactured to technical procurement specifications and/or drawings supplied by a Government activity or Price Contractor does not in itself qualify a supplier as a Government approved source. Only those sources for this item previously approved by the Government have been solicited.</blockquote>
+  <div class="ev-explanation">This language explicitly states that only pre-approved government sources were solicited. Any vendor that has not previously been approved cannot compete on this solicitation without first going through a separate qualification process — effectively an incumbent filter by design.</div>
+</div><div class="evidence-item">
+  <blockquote>The time required for approval of a new supplier is normally such that award cannot be delayed pending approval of the new source.</blockquote>
+  <div class="ev-explanation">This sentence is a direct admission that the qualification timeline is incompatible with the award timeline. Even if a new vendor could theoretically qualify, they are structurally excluded from this procurement because approval takes too long. This is institutional incumbency lock-in explicitly acknowledged by the government.</div>
+</div><div class="evidence-item">
+  <blockquote>The only currently approved item of supply is RITEC (CAGE 09BZ2) part number 2006900-009.</blockquote>
+  <div class="ev-explanation">A single vendor (RITEC) and a single part number are identified as the only approved item of supply. This is not merely a preference or evaluation advantage — it is a complete exclusion of all other vendors absent a separate approval process that cannot be completed in time for this award.</div>
+</div><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">Even distributors are restricted to those authorized by the original manufacturer (RITEC). This layers a second exclusionary gate on top of the source approval requirement: a vendor must both be government-approved and be an authorized RITEC distributor. Any competitor offering an alternative solution is excluded by definition.</div>
+</div><div class="evidence-item">
+  <blockquote>Drawings or technical data are not available for this item.</blockquote>
+  <div class="ev-explanation">The government acknowledges it cannot provide technical data. This means a new entrant cannot independently develop or qualify an alternative solution — the only path to competition runs through RITEC or its authorized distributors. The absence of available technical data institutionally entrenches the incumbent manufacturer.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a Defense Logistics Agency (DLA) purchase order for a specific, identified spare part — a Lightweight Color Printer Assembly (NSN-based item) for the AEGIS Weapons System. The solicitation&#x27;s structure and content are appropriate for this type of procurement and do not exhibit meaningful requirement sprawl.
+
+The requirements in this solicitation are largely of three types: (1) identification and sourcing constraints (Source Control Item with a single approved supplier — RITEC CAGE 09BZ2, PN 2006900-009; referenced drawing 8430917), (2) quality and inspection requirements (MIL-STD-130 marking, ISO 9001/9002, contractor-responsible inspection with government oversight), and (3) administrative and process clauses that are standard FAR/DFARS boilerplate (WAWF payment instructions, IUID, packaging per MIL-STD-2073).
+
+None of these constitute requirement sprawl in the meaningful sense. The &#x27;how&#x27; vs. &#x27;what&#x27; distinction that drives this sin analysis applies to service and systems contracts where agencies prescribe vendor operational methods. For a manufactured spare part procurement, specifying the exact approved part number and drawing is not sprawl — it is the entire point of a source-controlled item. There is only one approved item of supply, and the government has legitimate configuration control reasons (weapons system integration, safety, interoperability) for that restriction. Similarly, the quality assurance provisions define contractor responsibility for inspection rather than prescribing a step-by-step manufacturing process.
+
+The solicitation does include a moderately lengthy Section 3.4 on design change codes and Section 3.5 on waiver/deviation procedures, but these are standard supply chain control mechanisms for defense spare parts, not process prescriptions that constrain a service vendor&#x27;s operational approach.
+
+In summary, this is a competently scoped supply solicitation for a controlled spare part. The specificity present is appropriate to the procurement type and does not exhibit the organizational dysfunction or solution-constraining characteristics that define requirement sprawl.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool characteristics. The Applicable Documents section cites only three standards (MIL-STD-130, ISO 9001, ISO 9002), all of which are plausibly applicable to a manufactured hardware component. MIL-STD-130 is explicitly linked to a specific requirement (Section 3.3 Marking). The ISO quality standards are standard references for defense hardware manufacture. The solicitation also incorporates standard FAR/DFARS clauses by reference (ITEM UNIQUE IDENTIFICATION AND VALUATION, INSPECTION OF SUPPLIES--FIXED-PRICE, WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS, FEDERAL ACQUISITION SUPPLY CHAIN SECURITY ACT) — these are normal, expected contract clauses for a DLA procurement, not evidence of regulatory dumping. The total regulatory footprint is minimal and appropriate for a relatively simple supply solicitation for a specific hardware item (a lightweight color printer assembly for the AEGIS Weapons System). There is no indication of accumulated, unreviewed, or irrelevant regulatory citations. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DOCUMENT REF DATA=MIL-STD-130 | | |K |000115|A| | |
+DOCUMENT REF DATA=ISO9001 | | | |010417|A| | |
+DOCUMENT REF DATA=ISO9002 | | | |010417|A| | |</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s entire &#x27;Applicable Documents&#x27; section contains only three citations: MIL-STD-130 (marking/identification standard), ISO 9001 (quality management systems), and ISO 9002 (quality assurance in production). All three are plausibly relevant to a manufactured hardware item for the AEGIS Weapons System. MIL-STD-130 is directly called out in Section 3.3 (Marking). ISO 9001/9002 are standard quality requirements for defense hardware manufacturing. This is a minimal, focused list — not a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward supply procurement — a firm-fixed-price contract for manufacture and delivery of a specific hardware item (a lightweight color printer assembly for the AEGIS Weapons System). The requirement is well-defined: there is a specific drawing, a single approved part number, a known manufacturer, and established quality standards (MIL-STD-130, ISO9001). The FAR clearly supports fixed-price contracting when requirements are well-defined and the deliverable is a tangible product with measurable acceptance criteria. There is no ambiguity in scope, no labor-hour uncertainty, and no research or development dimension that would argue for cost-reimbursement or T&amp;M. The presence of source control and a sole-approved supplier actually strengthens the case for fixed-price, since the technical baseline is locked. No mismatch exists between the contract type and the requirements. Severity is 1 — the pricing structure is appropriate for this procurement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)|2|||</blockquote>
+  <div class="ev-explanation">This clause explicitly indicates the contract is fixed-price in nature, consistent with the purchase of a physical supply item.</div>
+</div><div class="evidence-item">
+  <blockquote>1.1 This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the PRINTER,AUTOMATIC D , part of the ;AEGIS WEAPONS SYSTEM;</blockquote>
+  <div class="ev-explanation">The requirement is for manufacture and delivery of a specific, identified hardware item — a lightweight color printer assembly for the AEGIS Weapons System. This is a well-defined deliverable with a known part number (2006900-009) and drawing reference (8430917), making fixed-price appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>3.2.1 ;The only currently approved item of supply is RITEC (CAGE 09BZ2) part number 2006900-009.;</blockquote>
+  <div class="ev-explanation">There is a single approved source with a known part number and specification. The scope is fully defined: manufacture and deliver a specific, identified item. Fixed-price is the standard and appropriate vehicle for this type of procurement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

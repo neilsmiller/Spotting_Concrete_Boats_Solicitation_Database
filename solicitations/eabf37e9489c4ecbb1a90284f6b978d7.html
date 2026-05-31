@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local voice and data circuits for the White Sands Missile Range, NM. — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Local voice and data circuits for the White Sands Missile Range, NM.</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 eabf37e9489c4ecbb1a90284f6b978d7</span>
+      <a class="sam-link" href="https://sam.gov/opp/eabf37e9489c4ecbb1a90284f6b978d7/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-03-31</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › ACC-CTRS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-31</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year only (no option years stated; installation/cut-over period plus base year)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Technical Capability</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal evidence of the compliance-over-outcomes sin. The dominant accountability structure is outcome-focused: tiered service restoration SLAs with specific time windows (4 hours for catastrophic, 8 for emergency, 24 for serious, 48 for routine), post-installation circuit testing with written results provided to the COR, and specific functional service requirements (dial tone, DID, E911 ANI/ALI, 24/7 outage POC). These are performance standards that ask &#x27;did the service work?&#x27; not &#x27;did the contractor follow the process?&#x27;
+
+The reporting burden is minimal. There is no weekly status report requirement, no monthly progress report with prescribed sections, no overlapping reporting cadences, and no plan-adherence tracking machinery. The Customer Service Record and Communications Service Record deliverables (SLINs A-A and A-B) are standard telecom industry records rather than elaborate compliance documentation.
+
+The SOW&#x27;s reference to dozens of Bellcore/Ericsson GR standards (Section 2.1) might superficially appear to be process compliance, but these are technical interoperability standards for telecommunications equipment — they define what the service must do technically, not how the contractor must document activities. They are functional baselines, not reporting requirements.
+
+The one area where compliance-over-outcomes thinking appears mildly is the record-update requirement (10 working days after activation/deactivation) and the requirement to coordinate with the COR before installing, removing, or changing equipment. These are administrative process requirements, but they are lightweight and appropriate for a utility services contract on a military installation.
+
+Overall, this is a straightforward commercial telecom services acquisition with appropriate performance standards and minimal documentation overhead. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall test circuits after installation and provide test results to the COR in writing. The Contractor shall document the circuit characteristics in the Customer Service Records.</blockquote>
+  <div class="ev-explanation">This is an outcome-oriented acceptance requirement — the contractor must demonstrate circuits actually work to specification and document the results. It measures whether the service functions, not just whether a process was followed.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall respond to and correct service outages within the time limits specified... 3.1.9.1 Catastrophic Outage. Restore service within four (4) hours... 3.1.9.2 Emergency Outage. Restore service within eight (8) hours... 3.1.9.3 Serious Outage. Restore service within twenty-four (24) hours... 3.1.9.4 Routine Outage. Restore service within two (2) calendar days...</blockquote>
+  <div class="ev-explanation">These are explicit, time-bound performance standards — the opposite of compliance theater. They measure actual service restoration outcomes with defined windows, and they differentiate by severity. This is the kind of accountability structure that focuses on results.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall update Customer and Communications service records not later than 10 working days after a service has been activated or deactivated.</blockquote>
+  <div class="ev-explanation">This is a process/documentation requirement (update records within 10 days) without a corresponding outcome metric for record accuracy or completeness. It is a mild compliance requirement, though not unusual for telecom contract administration.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards problem driven primarily by legitimate regulatory and technical constraints that happen to also function as incumbency filters. The facilities-based carrier requirement is legally defensible — the government cannot realistically procure local exchange services from a carrier without physical infrastructure — and reflects the regulatory structure of the telecommunications industry rather than arbitrary preference for the incumbent. Similarly, State of New Mexico certification is a genuine legal prerequisite, not an invented barrier. However, the combination of factors creates a tilted playing field: (1) facilities-based infrastructure requirement in a geographically constrained area; (2) all-or-none award requiring simultaneous coverage across multiple cities and a military installation; (3) explicit identification of the incumbent (CenturyLink) in the solicitation itself, with circuit A-end locations terminating at CenturyLink&#x27;s own central office; (4) past performance evaluation favoring recent, directly relevant prior contracts. The solicitation is not at Severity 3 because the restrictions flow primarily from the nature of the telecommunications market — facilities-based local exchange is a regulated, infrastructure-intensive industry where the pool of competitors is inherently small, and these requirements reflect genuine operational needs rather than manufactured barriers. The government is not requiring &#x27;$25M+ prior federal telecom contracts within 3 years&#x27; as an artificial screen; it is requiring what the technical service actually demands. The past performance evaluation is also relatively benign — binary Acceptable/Unacceptable rather than a scoring rubric that awards extra points for incumbency proxies. A qualified CLEC with New Mexico certification and the necessary infrastructure could realistically compete, even if the incumbent holds structural advantages. Severity 2 is appropriate: the playing field is tilted toward the incumbent by the nature of the market and some solicitation design choices, but competition is not formally closed to qualified challengers.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Quotations will only be accepted from facilities-based incumbent and competitive local exchange carriers certified by the State of New Mexico to provide local exchange services.</blockquote>
+  <div class="ev-explanation">This requirement restricts competition to a very narrow class of carriers — specifically those with physical network infrastructure (&#x27;facilities-based&#x27;) certified by New Mexico&#x27;s regulatory authority. While this reflects a legitimate technical constraint for local exchange services (you cannot provide POTS/PRI services without physical facilities), it effectively limits the pool to a handful of carriers in the Las Cruces/WSMR area. The incumbent (CenturyLink, explicitly named in Appendix 10) almost certainly meets this criterion, while alternative vendors would need both state certification and existing physical infrastructure in a geographically constrained area around a federal military installation.</div>
+</div><div class="evidence-item">
+  <blockquote>Proof the Offeror is a facilities-based carrier certified to provide local exchange services within the State of New Mexico.</blockquote>
+  <div class="ev-explanation">This submission requirement operationalizes the facilities-based restriction. Vendors must affirmatively demonstrate regulatory certification, not just technical capability to deliver the service. A carrier that could technically deliver equivalent services through resale or interconnection arrangements is categorically excluded — even if their service quality would be identical.</div>
+</div><div class="evidence-item">
+  <blockquote>Centurylink currently provides the local exchange access services to WSMR.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly identifies the incumbent by name in Appendix 10. Combined with the facilities-based carrier restriction and the geographic specificity of the requirement (circuits terminating at CenturyLink/Las Cruces C.O., 272 Griggs, Las Cruces, NM per Table 10.2), the solicitation openly acknowledges a single incumbent whose infrastructure is already embedded in the required service delivery architecture.</div>
+</div><div class="evidence-item">
+  <blockquote>This award shall be made on an all or none basis. Offerors must provide a quotation to provide ALL of the circuits in the Statement of Work, Appendix 10. Quotations that do not include all of the circuits required in the Statement of Work will not be considered.</blockquote>
+  <div class="ev-explanation">The all-or-none requirement, combined with the geographic and technical specificity (27,080 DID numbers across specific NXX prefixes, 7 PRIs, E911 trunks terminating at a specific central office), means a vendor must already have infrastructure capable of serving this entire footprint simultaneously. This further narrows the field to carriers with an existing, established presence across Alamogordo, Socorro, Las Cruces, and the WSMR service area — requirements that functionally favor the incumbent.</div>
+</div><div class="evidence-item">
+  <blockquote>Past performance shall be evaluated based on how recent, relevant and the quality of services rendered. For purposes of this evaluation, recent is defined as contracts performed within the past three (3) years from the issuance date of the solicitation.</blockquote>
+  <div class="ev-explanation">While a 3-year lookback window is not unusually restrictive in isolation, when combined with the facilities-based carrier requirement and the all-or-none geographic scope, it narrows relevant past performance to carriers who have delivered comparable local exchange services at a military installation scale. The incumbent&#x27;s existing contract is the most directly &#x27;relevant&#x27; reference by the solicitation&#x27;s own logic, giving it a scoring advantage over competitors who may have equivalent capability but less perfectly matching prior contracts.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core procurement — local voice and data circuits for a military installation — is inherently a commodity telecommunications service with well-understood outcomes. The solicitation appropriately defines demarcation points, circuit quantities, service areas, and tiered outage restoration times (catastrophic/emergency/serious/routine), which are genuine outcome-based performance standards. However, several sections cross from outcome definition into process and method prescription. The most significant pattern is the exhaustive citation of over 80 legacy Bellcore/Ericsson GR-series documents in Section 2.1, which effectively mandates a TDM-era technical architecture rather than defining interoperability and performance outcomes that modern infrastructure must meet. This has hallmarks of incumbent-capture drafting — the existing CenturyLink/Lumen infrastructure (explicitly named in Appendix 10) almost certainly conforms to these legacy GR documents, and requiring compliance with them constrains challengers using modern IP-based local exchange technology. The installation sequencing in Section 3.1.1, the granular feature-blocking list in Section 3.1.2.2, the physical wiring specificity in Section 3.1.8, and the on-site availability mandate in Section 3.4.1 add to the prescriptive burden. Mitigating factors: the solicitation does define clear outcome-oriented performance standards (restoration time windows, 24/7 POC availability, number portability requirements, service area definitions), and many of the prescriptive elements reflect legitimate operational constraints for a military installation with specific legacy switching equipment (CS-2100 host, noted in Appendix 10.0). The all-or-none award requirement and facilities-based carrier restriction further narrow the competitive pool, but those are market structure decisions rather than sprawl per se. On balance, the solicitation is functional and not dominated by sprawl, but the legacy technical standards library and the procedural installation sequence impose meaningful constraints that go beyond defining what outcomes must be achieved — warranting a severity 2 rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide the Contracting Officer (KO) with an installation and cutover plan on the first day of the cut-over performance period (CLIN 0001). The Contractor shall not commence on-site installation and cutover until the Contractor receives notice that the Government has accepted the service installation and cutover plan. Installation and cutover shall be completed no later than 120 calendar days after Government acceptance of the cut-over plan. The Contractor will be responsible for issuing disconnect orders to the incumbent provider after successful activation and testing of each circuit.</blockquote>
+  <div class="ev-explanation">This prescribes a specific sequencing and approval workflow for installation rather than simply defining a cutover deadline and success criteria. A vendor cannot propose an alternative process — e.g., parallel activation, phased cutover with earlier partial cutover — without conflicting with the mandated sequence. The requirement to issue disconnect orders only &#x27;after successful activation and testing of each circuit&#x27; is a procedural mandate, not an outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1.2.2 Commercial Subscriber Line Basic Services. Basic services of a line, as a minimum, shall include the following: dial tone, direct inward dialing, direct outward dialing, Dual Tone Multi-Frequency (DTMF) capability for local exchange and long distance access, equal access, call blocking for Numbering Area Plan (NPA) 900 and NPA 976, Block Operator Assistance (0+ &amp; 00+), E911/911 services in all cases and 311 services where available, non-published directory number, service disconnect with referral service of at least three (3) months after a customer&#x27;s number has been changed or disconnected, block Directory Assistance Call Completion (DACC) and Directory Assistance, block third-party billing, block 10-10 dialing, block Collect Calls, block Automatic Call Return Feature</blockquote>
+  <div class="ev-explanation">This is a detailed prescriptive feature list specifying individual call-blocking configurations and specific signaling behaviors rather than defining the outcome (e.g., &#x27;lines shall be provisioned to prevent unauthorized use, toll fraud, and unsanctioned call types&#x27;). While some items reflect legitimate security or operational needs, the granular enumeration of specific blocking features constrains vendors to a particular configuration rather than allowing them to propose equivalent or superior security postures through different technical means.</div>
+</div><div class="evidence-item">
+  <blockquote>Section 2.1 and its subsections (2.1.1 through 2.1.19) list over 80 specific Bellcore/Ericsson Generic Requirements (GR-series) and ANSI/BELLCORE technical references that the contractor &#x27;must obtain and follow,&#x27; including GR-505, GR-506, GR-507, GR-508... GR-253, GR-496, GR-2842, TR-TSY-000009, ANSI T1.105-1991, BELLCORE TR-TSY-000020, etc.</blockquote>
+  <div class="ev-explanation">Mandating compliance with over 80 specific legacy Bellcore/Ericsson GR documents goes well beyond establishing interoperability constraints. Many of these are decades-old specifications for legacy TDM switching architectures. A carrier using modern IP-based or next-generation infrastructure may achieve equivalent or superior performance outcomes through different technical standards (e.g., ITU-T, IETF, MEF) but would be precluded from doing so by this exhaustive reference list. This is a classic pattern of copying the incumbent&#x27;s technical approach into the requirements, locking out vendors who use modern alternatives.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1.8 Contractor Equipment and Cable Installation. The Contractor shall provide and install all transmission equipment and cables to provide services to the demarcations. The Contractor shall coordinate with the COR for equipment and cable installation. The Contractor shall install equipment and cables in accordance with all applicable safety codes. The Contractor shall be responsible for wiring and connecting to Government power connection points, ground master connection points, and termination frames for terminal blocks.</blockquote>
+  <div class="ev-explanation">While safety code compliance is a legitimate constraint, specifying that the contractor must wire directly to &#x27;Government power connection points, ground master connection points, and termination frames for terminal blocks&#x27; prescribes the physical installation method rather than defining the functional outcome (e.g., &#x27;contractor equipment shall be properly powered, grounded, and terminated at the demarcation point&#x27;). This constrains vendors who might propose pre-terminated or pre-configured equipment deployments that achieve the same result differently.</div>
+</div><div class="evidence-item">
+  <blockquote>3.4.1 Meetings. The Contractor&#x27;s project manager shall be available Monday to Friday, between 7:00 a.m. to 5:00 p.m. local time, to meet the COR on-site for technical interchange discussions. The Contractor&#x27;s project manager shall have full authority to effect service changes requested by the Government.</blockquote>
+  <div class="ev-explanation">Requiring the project manager to be available for on-site meetings during a fixed daily window prescribes a staffing and availability model rather than defining a responsiveness or decision-making outcome. A vendor who uses virtual collaboration tools, regional NOC staff, or a distributed support model with equivalent responsiveness would be technically non-compliant even if outcomes were identical or superior.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a clear and severe instance of rule pools, concentrated in SOW Section 2.0 through 2.1.19, which lists well over 100 individual technical standards, Generic Requirements documents, ANSI standards, Bellcore Technical References, and regulatory codes. The list spans 18 sub-sections covering everything from SONET multiplexing to Broadband-ISDN to ATM signaling — topics of questionable relevance to what is fundamentally a solicitation for local voice and data circuit access services (DID numbers, E911 trunks, and 7 ISDN PRIs) at a single military installation. 
+
+The solicitation&#x27;s actual service scope is narrow and well-defined in Appendix 10: 27,080 DID directory numbers, 2 E911 DS1 trunks, and 7 ISDN PRIs, all terminating to Building 123 at WSMR. The contracting vehicle is FAR Parts 12 and 13 (commercial item, simplified acquisition). The vendor pool is further restricted to facilities-based CLECs certified by the State of New Mexico — meaning the actual competitors are likely Lumen/CenturyLink (the incumbent) and perhaps one or two others. Yet the SOW imposes a regulatory burden more appropriate for a facilities engineering and switching procurement than a commercial local exchange access contract.
+
+Section 2.0 compounds the problem by stating: &#x27;The contractor must obtain and follow all the latest revision(s) and/or addition(s) to the referenced documents and/or all other applicable regulations.&#x27; This is a blanket compliance mandate with no differentiation — all 100+ documents carry equal weight by this instruction.
+
+Specific concerns include: (1) Standards like GR-2842 (ATM Service Access Multiplexer), GR-253 (SONET Transport Systems), GR-496 (SONET Add-Drop Multiplex), and the ATM/B-ISDN Bellcore documents cited in sections 2.1.18-2.1.19 have no evident connection to the DID/PRI services being solicited; (2) The OSHA, EPA, ANSI, and NFPA citations in Section 2.1.20 include items like &#x27;EPA CFR Parts 261, 262, 263 Hazardous Waste Generation and Transportation&#x27; and the &#x27;National Environmental Protection Act, Title 40 CFR Parts 1500-1508&#x27; — environmental statutes applicable to major facility construction or hazardous operations, not to a telecom circuit cutover; (3) DODI 5000-2 Part 6 (System Safety, Health Hazards and Environment Impact) is an acquisition management policy for major defense acquisition programs, not a local exchange carrier service contract; (4) The dozens of CLASS feature Generic Requirements (GR-219, GR-218, GR-31, GR-391, GR-567, etc.) describe specific optional telephone switching features the carrier&#x27;s switch may or may not support, but are listed without any indication of which, if any, are actually required for WSMR&#x27;s CS-2100 switch interface.
+
+Mitigating factors are minimal. The SOW does provide a preamble in Section 2.0 noting the documents are &#x27;commercial and industrial references for the purpose of developing a baseline of performance,&#x27; which slightly softens the mandate. And some standards — particularly those governing ISDN PRI signaling, DS1 interfaces, and E911 ANI/ALI — are genuinely applicable. But the framing &#x27;the contractor must obtain and follow all the latest revision(s)&#x27; eliminates any practical benefit from that preamble. There is no curation, no prioritization, and no contextual explanation for any individual document in the 100+ item list. The list has the hallmarks of copy-forward accumulation from a template used across many similar local exchange contracts, never reviewed for applicability to this specific, narrow procurement. Severity 3 is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SR-3065 LSSGR Guide
+GR-505 Call Processing
+GR-1364 Switch Processing Time GRs, Section 5.6
+GR-506 Signaling for Analog Interfaces
+GR-606 Common Channel Signaling
+GR-317 Switching System GRs for Call Control Using ISDN User Part (ISDNUP)
+GR-507 Transmission
+GR-508 Automatic Message Accounting (AMA)
+GR-2932 Database Functionalities
+GR-478 Measurements and Data Generation
+GR-2963 OTGR Sec 2.2 Network Element Configuration Mgmt - Software Mgmt
+GR-510 System Interfaces
+GR-782 SONET Digital Switch Trunk Interface Criteria
+GR-518 Synchronization
+GR-511 Service Standards
+GR-512 Reliability
+GR-513 Power
+GR-63 NEBS Requirements: Physical Protection
+GR-1089 Electromagnetic Compatibility and Electrical Safety...
+GR-477 Network Traffic Management
+GR-517 Traffic Capacity and Environment
+GR-815 GRs for Network Element/Network System (NE/Ns) Security
+GR-454 Generic Requirements for Supplier-Provided Documentation
+GR-839 Generic Requirements for Supplier-Provided Training
+GR-840 Supplier Support Generic Requirements
+GR-540 Tandem Supplement</blockquote>
+  <div class="ev-explanation">Section 2.1.1 alone lists 26 Bellcore/Ericsson Generic Requirements documents under &#x27;Functional Requirements (Common Sections)&#x27; with zero explanation of how each applies to the specific WSMR local exchange services being procured. The solicitation provides no prioritization, no context for which of these are mandatory versus aspirational, and no guidance on how a competitive local exchange carrier bidding on DID numbers and PRI circuits should interpret obligations under, for example, GR-454 (supplier documentation) or GR-839 (supplier training). A carrier cannot determine from the face of the document which of these 26 standards will be enforced or how.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for local voice and data circuits at White Sands Missile Range — a well-defined, commercially available telecommunications utility service from a facilities-based local exchange carrier. The requirements are specified with precision: 27,080 DID directory numbers, 7 ISDN PRIs, 2 E911 DS1 trunks, all with defined demarcation points and technical specifications in Appendix 10. The scope is stable, the services are commercially tariffed, and the quantities are enumerated. This is exactly the scenario FAR envisions for firm-fixed-price contracting: &#x27;minimal risk&#x27; that &#x27;can be predicted with an acceptable degree of certainty.&#x27; Monthly recurring charges for telecom circuits are essentially utility bills — the carrier knows its cost structure, the government knows what it needs, and competition (even if limited to certified NM LECs) can keep pricing honest. The non-recurring charges for installation and cutover are similarly predictable for an experienced carrier. There is no mismatch between the FFP contract type and the nature of these requirements. This is a severity 1 finding — the contract type is well-matched to the procurement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government will award a firm-fixed price contract to the responsible Offeror whose offer conforming to the solicitation will be most advantageous to the Government, price and other factors considered.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly awards a firm-fixed-price contract. For local exchange carrier services — a utility-like commodity with well-defined, stable monthly recurring charges and predictable non-recurring installation costs — FFP is the standard and appropriate contract vehicle.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 2 - NON RECURRING ... CLIN 3 - MONTHLY RECURRING ... Total Monthly Recurring Charges (MRC) ... x 12</blockquote>
+  <div class="ev-explanation">The pricing structure is organized into one-time non-recurring charges (installation/cutover) and stable monthly recurring charges multiplied by 12 for the base year. This is the canonical pricing model for telecommunications utility services, where rates are tariff-based or commercially established and highly predictable — precisely the conditions under which FFP is most appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="26QA014 Quotation.xlsx">26QA014 Quotation.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/eabf37e9489c4ecbb1a90284f6b978d7_26QA014+Quotation.xlsx" download="26QA014 Quotation.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="26QA014 Statement of Work.pdf">26QA014 Statement of Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/eabf37e9489c4ecbb1a90284f6b978d7_26QA014+Statement+of+Work.pdf" download="26QA014 Statement of Work.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

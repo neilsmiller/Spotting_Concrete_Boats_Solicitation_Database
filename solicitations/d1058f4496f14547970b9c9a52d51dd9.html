@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontron Processor, Elma Chassis, Chassis NRE, and SWIFT PMC — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Kontron Processor, Elma Chassis, Chassis NRE, and SWIFT PMC</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d1058f4496f14547970b9c9a52d51dd9</span>
+      <a class="sam-link" href="https://sam.gov/opp/d1058f4496f14547970b9c9a52d51dd9/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-30</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NUWC DIV NEWPORT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334112</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-30</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Quote the Brand Name specified in their required quantities; submit detailed specs with quote</li><li>Provide proof of Brand Name original equipment manufacturer (OEM) authorized reseller status</li><li>Price (item prices, shipping costs, delivery terms)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a 4-page combined synopsis/solicitation for a straightforward commercial item purchase (brand-name electronic components: processors, chassis, and PMC cards). It is a firm-fixed-price supply order, not a services contract. The entire accountability structure consists of: (1) delivery of specified brand-name items in new condition from OEM-authorized channels, (2) provision of a Unique Item Identifier (UID) for items over $5,000, and (3) standard commercial item terms and conditions under FAR 52.212-4. There are no reporting requirements, no performance work statements, no quality assurance surveillance plans, no status reports, no meeting cadences, and no process documentation requirements of any kind. The solicitation&#x27;s &#x27;QA&#x27; mechanism is effectively acceptance upon delivery of correct, new, OEM-authorized items — which is outcome-focused (did the right product arrive in acceptable condition?) rather than process-focused. There is nothing in this solicitation that resembles compliance-over-outcomes. The sin requires a mismatch between process monitoring and outcome measurement, and here there is simply no process monitoring at all — it is a supply purchase. Severity 1 is appropriate: reporting requirements are absent, and the implicit accountability mechanism (delivery of conforming goods) is inherently outcome-oriented.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics, though the mechanism is channel-partner capture rather than the classic experience-requirement form. The requirement is structured around four specific part numbers from three specific manufacturers, with a mandatory OEM authorized reseller credential check. This effectively limits competition to vendors already embedded in the distribution networks of IXI Technology, Elma, and Kontron. A qualified small business electronics reseller without pre-existing OEM authorization from all three companies cannot compete, regardless of their general capability or even their ability to source the physical parts.
+
+The brand name justification compounds this by invoking prior integration investments and program continuity as the rationale — a pattern consistent with vendor capture, where system architecture decisions made in the past permanently constrain future competition. The &#x27;urgency&#x27; framing (1-day response window, &#x27;will not be extended&#x27;) further advantages vendors already familiar with the requirement, who can respond immediately.
+
+Mitigating factors: This is a relatively small commercial-items procurement (specific hardware parts, not a services contract), brand name justifications are expressly permitted under FAR 11.105 when technically justified, and the 100% small business set-aside does provide at least some competitive structure. The solicitation accepts partial quotes, which partially reduces the stacking effect. However, the OEM authorized reseller requirement is a meaningful structural barrier that goes beyond simply specifying a brand name — it requires a formal pre-existing business relationship with specific manufacturers. Severity 2 is appropriate: the playing field is meaningfully tilted toward established channel partners, but the small business set-aside and partial quote acceptance mean competition is not entirely foreclosed.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide proof of Brand Name original equipment manufacturer (OEM) authorized reseller status. Status will be verified by the Government prior to award. NOTE: Items shall be sourced directly from the OEM and/or OEM authorized channels only. Grey market items are unacceptable.</blockquote>
+  <div class="ev-explanation">Requiring proof of OEM authorized reseller status for four specific manufacturers (IXI Technology, Elma, Kontron) narrows the eligible vendor pool to those who have already established formal reseller relationships with these specific companies. A small business that is a general electronics distributor or systems integrator but not specifically authorized by these OEMs cannot compete, regardless of their general capability. This is a form of insider advantage favoring vendors already in established distribution channels.</div>
+</div><div class="evidence-item">
+  <blockquote>Quote the Brand Name specified in their required quantities. The offeror shall submit detailed specs with quote.</blockquote>
+  <div class="ev-explanation">Combined with the brand name sole-source justification, this requirement restricts competition to resellers of four specific part numbers from three specific manufacturers. While brand name justifications are permitted under FAR 11.105, the combination of brand name restriction plus OEM authorized reseller requirement effectively limits competition to a very small set of pre-established channel partners, which functions similarly to an incumbent-capture mechanism.</div>
+</div><div class="evidence-item">
+  <blockquote>This justification is based entirely on technical necessity and the critical importance of maintaining the program schedule to meet urgent operational commitments, as the specified make and models are the only components that can satisfy the mission requirements. The specified components are foundational to this baseline, having been originally selected for unique and proprietary integration characteristics that remain essential for the system&#x27;s evolution to the program.</blockquote>
+  <div class="ev-explanation">The brand name justification explicitly frames the requirement around prior selection decisions and accumulated integration investments. This locks future procurements into the same vendor ecosystem indefinitely, as any substitution would require &#x27;complete non-recurring engineering effort for interface redesign, custom software driver development, and full regression testing.&#x27; This is a classic vendor capture narrative: the agency has structured its systems so deeply around specific commercial products that competition is structurally foreclosed.</div>
+</div><div class="evidence-item">
+  <blockquote>However if all four (4) can be submitted as one quote they will be considered before partial quotes.</blockquote>
+  <div class="ev-explanation">The preference for vendors who can supply all four CLINs simultaneously (from three different manufacturers — IXI Technology, Elma, and Kontron) further narrows the pool to distributors who have established authorized reseller relationships with all three OEMs concurrently. This stacks the channel-partner requirement across multiple manufacturers, making it harder for any single small business to qualify for the preferred evaluation pathway.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brand-name commercial item purchase for specific electronic components (IXI Technology Swift PMC, Elma chassis, Kontron processor, and Kontron dual PMC carrier) at defined part numbers and quantities. It is essentially a supply procurement, not a services contract — so the conceptual framework of &#x27;how vs. what&#x27; applies very differently here.
+
+The solicitation specifies exact manufacturer part numbers and quantities, but this is not requirement sprawl in the meaningful sense. The brand-name justification explicitly states these specific components are required because of proprietary integration characteristics in a mission-critical baseline system. Specifying exact part numbers for hardware that must slot into an existing system architecture is analogous to a technical interoperability constraint — the government is not dictating how a vendor should perform a service, it is identifying exactly which physical components are needed.
+
+The administrative requirements (OEM authorized reseller status, new condition items, sourced from OEM or authorized channels, UID for items over $5,000, SAM registration, delivery terms) are standard procurement controls, not process mandates. They protect the government from counterfeit or grey market parts — a legitimate concern under DFARS 252.246-7008 (Sources of Electronic Parts) which is explicitly cited.
+
+The one-day response window and urgency language are procurement timeline concerns but do not constitute requirement sprawl.
+
+There is no SOW, PWS, or performance work statement describing services to be performed. There are no bullet lists prescribing how a vendor must execute tasks, no staffing structure mandates, no workflow procedures. The document is simply a commercial item purchase at specific part numbers with standard FAR/DFARS clauses. Requirement sprawl as a sin is not meaningfully applicable to this type of solicitation, and no evidence of it is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simple commercial hardware procurement — four line items of COTS processors, chassis, and PMC cards from named manufacturers, to be fulfilled by an authorized reseller. The compliance section lists approximately 18 FAR and DFARS clauses without any explanation of applicability. The severity does not reach a 3 because: (1) the overall list length is moderate, not extreme; (2) most FAR 52.212-5 flow-downs are standard and their inclusion, while unexplained, is a normal feature of commercial item contracting; and (3) several DFARS cybersecurity clauses (7012, 7019, 7020) may reflect DoD-wide policy mandates rather than purely careless drafting. However, the solicitation earns a moderate severity 2 for several reasons: the cluster of DFARS 252.204-7008 through 7020 cybersecurity clauses applied to a reseller transaction with no CUI context is disproportionate; the text-messaging-while-driving clause is a textbook copy-forward carryover with no logical connection to hardware procurement; and the flat presentation with zero applicability guidance forces vendors to independently parse every citation. The list shows no evidence of active curation — it reads as a standard template applied wholesale to a transaction that warranted a much more focused compliance section.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>252.204‐7008, Compliance with Safeguarding Covered Defense Information Controls; 252.204‐7009, Limitations on the Use or Disclosure of Third‐Party Contractor Reported Cyber Incident Information; 252.204‐7012, Safeguarding Covered Defense Information and Cyber Incident Reporting; 252.204‐7015, Notice of Authorized Disclosure of Information for Litigation Support; 252.204‐7018, Prohibition on the Acquisition of Covered Defense Telecommunications Equipment or Services; 252.204-7019 Notice of NIST SP 800-171 DoD Assessment Requirements; 252.204-7020 NIST SP 800-171 DoD Assessment Requirements</blockquote>
+  <div class="ev-explanation">Seven DFARS cybersecurity and information-handling clauses are cited for what is essentially a commercial off-the-shelf hardware purchase (processors, chassis, and PMC cards). NIST SP 800-171 assessment requirements and cyber incident reporting obligations are designed for contractors handling Covered Defense Information in performance of a contract. A small business reseller shipping catalog hardware to Newport, RI is unlikely to be handling CUI in any meaningful way. No explanation is provided for why these clauses apply to this transaction.</div>
+</div><div class="evidence-item">
+  <blockquote>52.222‐3, Convict Labor (June 2003); 52.222‐21, Prohibition of Segregated Facilities: (Apr 2015); 52.222‐26, Equal Opportunity (Sep 2016) (E.O.11246); 52.222‐36, Equal Opportunity for Workers with Disabilities (Jun 2020) (29 U.S.C. 793); 52.222‐50, Combating Trafficking in Persons (Oct 2020)</blockquote>
+  <div class="ev-explanation">Five labor and employment clauses are cited for a small-dollar commercial hardware procurement. While some of these (e.g., 52.222-26 Equal Opportunity) are required by FAR 52.212-5 for contracts above certain thresholds, no context is provided distinguishing which are legally mandated versus which are carryover boilerplate. A small business reseller filling a purchase order for a handful of circuit boards faces the same listed burden as a major service contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>52.223‐18, Encouraging Contractor Policies to Ban Text Messaging while Driving (Jun 2020) (E.O. 13513)</blockquote>
+  <div class="ev-explanation">The text-messaging-while-driving clause is cited in a solicitation for computer hardware components. This clause is aimed at contractors whose employees drive in the performance of the contract. A vendor processing a purchase order for chassis and processor cards has no meaningful &#x27;driving in performance&#x27; activity. Its inclusion reflects copy-forward compliance rather than considered applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>52.204‐10, Reporting Executive Compensation and First‐Tier Subcontract Awards (Jun 2020) (Pub. L. 109‐282)</blockquote>
+  <div class="ev-explanation">Executive compensation reporting is cited without context. This clause applies to contracts above $30,000 and requires reporting on first-tier subcontract awards. For a simple commercial hardware order where the vendor is expected to source directly from OEM authorized channels, subcontract reporting obligations add compliance overhead with unclear relevance to the transaction.</div>
+</div><div class="evidence-item">
+  <blockquote>Full text of incorporated FAR/DFARS clauses and provisions may be accessed electronically at https:// acquisition.gov/far and https://www.acq.osd.mil/dpap/dars/dfarspgi/current/index.html. The following provisions and clauses apply reference to this RFQ: [list follows]</blockquote>
+  <div class="ev-explanation">No context or applicability explanation is provided for any cited clause. The solicitation presents a flat, undifferentiated list of approximately 18 FAR/DFARS provisions and clauses across two pages, with no guidance on which carry operational weight, which are legally mandated pass-throughs, or how any specifically relates to the purchase of COTS hardware components. Vendors must independently research each citation to understand its implications.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial item purchase of specific electronic hardware components (processors, chassis, PMC cards) at fixed quantities, from named manufacturers with specific part numbers. The requirements could not be more well-defined: exact quantities, exact part numbers, FOB destination delivery. There is no labor, no services, no uncertain scope, and no evolving requirements. Firm Fixed Price is precisely the correct contract type for this procurement — it matches the FAR guidance that FFP &#x27;shall be used when the risk involved is minimal or can be predicted with an acceptable degree of certainty.&#x27; A vendor quoting on these items knows exactly what they are delivering and can price it accurately. No square peg problem exists here. The only observation worth noting is that the 1-day response window is extraordinarily short, but that is a competition issue, not a pricing structure issue. The contract type itself is entirely appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>NUWCDIVNPT intends to award a single Firm Fixed price order for the requirement identified below in the CLIN structure below on a Brand Name basis</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm Fixed Price contract type. This is the appropriate pricing structure for this acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001 Swift PMC NTDS Serial D/E Manufacturer IXI Technology Part No. SP-04102-000 Qty 6 / CLIN 0002 cPSB 2.16 4 Slot Manufacturer Elma Part No. 107PS11604-0157R Qty 8 / CLIN 0003 Processor Manufacturer Kontron Part No. 1069-9318 Qty 3 / CLIN 0004 Dual PMC Carrier Manufacturer Kontron Part No. 1053-1149 Qty 6</blockquote>
+  <div class="ev-explanation">All four CLINs are for specific commercial hardware items with known part numbers and defined quantities. The scope, deliverables, and quantities are entirely well-defined — exactly the circumstances where FFP is the correct contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="II.D.ii. RFQ SAM Posting Summary N6660426Q0324.pdf">II.D.ii. RFQ SAM Posting Summary N6660426Q0324.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d1058f4496f14547970b9c9a52d51dd9_II.D.ii.+RFQ+SAM+Posting+Summary+N6660426Q0324.pdf" download="II.D.ii. RFQ SAM Posting Summary N6660426Q0324.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

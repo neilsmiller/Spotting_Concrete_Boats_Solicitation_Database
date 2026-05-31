@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SINGLE BOARD COMP — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SINGLE BOARD COMP</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b0b629f572a249c684cfa07af422206c</span>
+      <a class="sam-link" href="https://sam.gov/opp/b0b629f572a249c684cfa07af422206c/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price (Firm-Fixed or Not-To-Exceed basis)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward depot repair purchase order for a single board computer (NSN 7021 016785873) intended for submarine use, awarded on a firm-fixed-price basis. The solicitation&#x27;s quality assurance structure is lean and outcome-oriented by nature: acceptance is tied to conformance with the original manufacturer&#x27;s specifications and drawings (Section 4.4), not to process documentation or report submission. There are no recurring status reports, no prescribed report formats or sections, no meeting cadence requirements, and no plan-adherence tracking mechanisms. The record-keeping requirement in 4.3 is a single, reasonable traceability provision appropriate for safety-critical submarine electronics. The IUID/CAV reporting clauses incorporated by reference are asset visibility tools serving legitimate inventory management purposes, not QA surveillance mechanisms that substitute for outcome measurement. The accountability structure here is appropriately simple for the transaction type: the vendor repairs the item, it either meets the OEM spec or it doesn&#x27;t, and the government accepts or rejects it. This is the opposite of compliance-over-outcomes — it is essentially pure outcome evaluation. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein... The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">This is standard inspection language for a fixed-price supply/repair contract. It allocates responsibility but does not impose process-compliance reporting burdens — it is oriented toward conformance of the end item, which is an outcome measure.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4 Inspection/Testing Repaired Items - The Contractor shall perform all inspection and testing requirements as specified in the original manufacturer&#x27;s specifications and drawings.</blockquote>
+  <div class="ev-explanation">This ties quality assurance directly to functional/technical standards — the item must meet manufacturer specifications. This is outcome-focused (does the repaired board work?) rather than process-compliance-focused (did you fill out the right forms?). The reference to manufacturer specs and drawings anchors acceptance to performance criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3 Records - Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">A record-keeping requirement that could superficially resemble compliance theater. However, for a depot-level repair of a submarine single board computer, maintaining inspection records is a legitimate traceability and safety requirement, not a substitute for outcome measurement. It is a single, proportionate requirement with no overlapping cadences or prescribed format burdens.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward repair solicitation for a specialized submarine single board computer (NSN 7HH 7021 016785873, reference EB-5356-V2) issued by NAVSUP WSS. The solicitation contains no experience requirements, no past performance evaluation criteria, no dollar threshold mandates, no lookback windows, and no federal-specific experience demands of the type that constitute insider rewards. The solicitation is essentially a request for a repair quote on a not-to-exceed basis, with work to be performed by or through Electric Boat Corporation (CAGE 96169) as the designated repair depot. The restriction to authorized distributors is a supply chain control measure appropriate for defense-critical submarine components, not an incumbent protection scheme. There are no evaluation criteria sections, no personnel qualification requirements, and no past performance scoring rubrics present in this document. The solicitation lacks the structural elements where insider rewards typically manifest — it is a simple repair purchase order, not a complex services contract. Severity is 1: a qualified vendor capable of functioning as an authorized distributor of this proprietary component could realistically compete.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement restricts competition to authorized distributors of the original manufacturer (Electric Boat Corporation, CAGE 96169). While this functions as a limiting criterion, it is a supply chain integrity requirement tied to the specific nature of the item — a specialized single board computer for submarines — rather than an experience-based insider reward. Any vendor who can obtain authorized distributor status could theoretically compete. It limits the pool but does so on legitimate product authenticity grounds, not on prior contract history.</div>
+</div><div class="evidence-item">
+  <blockquote>Repair depot CAGE Code: 96169 applies for subject NSN. ELECTRIC BOAT CORPORATION (CAGE Code: 96169), POC: Anne-Marie Luce...</blockquote>
+  <div class="ev-explanation">The solicitation explicitly identifies Electric Boat Corporation as the designated repair depot. For a repair solicitation, directing work to a specific CAGE code is a sole-source-like channeling mechanism, but this is disclosed openly and appears to reflect technical/proprietary repair authority rather than a hidden experience barrier designed to reward incumbency.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a routine Navy repair purchase order for a single board computer component (NSN 7021-01-678-5873) directed to a sole-source repair depot (Electric Boat Corporation, CAGE 96169). The solicitation text is largely composed of standard FAR/DFARS clauses, administrative instructions (WAWF payment, IUID, CAV reporting), and a brief four-section SOW covering scope, applicable documents, requirements, and quality assurance. There is virtually no prescriptive process language dictating HOW the contractor must perform the repair. The core requirement in Section 3.1 correctly references the contractor&#x27;s own repair/overhaul standard practices and the OEM reference number, leaving the repair methodology to the contractor&#x27;s expertise. The quality assurance section (Section 4) establishes standard inspection responsibilities and recordkeeping without mandating specific inspection workflows. The mercury-free requirement and marking requirements (MIL-STD-130) are legitimate material safety and identification constraints, not process prescriptions. The packaging requirement references MIL-STD-2073 but that is a standard military packaging specification, not a novel process mandate. This solicitation does not exhibit requirement sprawl — it is a competently scoped, outcome-oriented repair order that tells the contractor WHAT to achieve (a serviceable, mercury-free, properly marked and packaged unit meeting OEM specifications) without dictating HOW to perform the repair. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures.</blockquote>
+  <div class="ev-explanation">This language defers to the contractor&#x27;s own standard repair practices and documentation rather than prescribing a specific step-by-step process. It defines the standard of conformance (the contractor&#x27;s own approved methods, plus government-approved documents) without dictating the exact repair methodology — this is a constraint on quality and traceability, not a prescription of how the work must be done.</div>
+</div><div class="evidence-item">
+  <blockquote>The material supplied under this contract/purchase order is intended for use on submarines/surface ships and therefore shall contain no metallic mercury and shall be free from mercury contamination.</blockquote>
+  <div class="ev-explanation">The mercury-free requirement is a legitimate safety and material constraint appropriate for submarine/surface ship applications. While the clause is lengthy in explaining the rationale and testing method, it defines a material outcome requirement (no mercury contamination) rather than prescribing how the contractor performs the repair work itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a narrow, directed repair solicitation for a single item (Single Board Computer, NSN 7021-01-678-5873) to be repaired by a named OEM at a specific depot (Electric Boat, CAGE 96169). The scope is tightly defined: repair, inspect, package per MIL-STD-2073, and deliver. Despite this narrow scope, the solicitation incorporates a notable volume of regulatory and administrative clauses — including multiple overlapping Buy American instruments, a CMMC notice with no level specified, a subcontracting plan clause for what appears to be a sole-source OEM action, and Contractor Purchasing System Administration requirements — without any explanatory text connecting these requirements to the actual work. The clauses appear to be a standard NAVSUP WSS template applied wholesale to this purchase order rather than curated for the specific transaction. This is a textbook moderate rule pool: the list is not as extreme as the most egregious examples (there is no 88-document appendix, and no obviously contradictory policies), but the solicitation shows clear signs of copy-forward template application without active review of which requirements genuinely govern a single-item OEM repair. A vendor new to NAVSUP WSS repair contracts would need to independently interpret each clause&#x27;s applicability. The severity is 2 rather than 3 because: (1) the total number of clauses, while elevated for the scope, is not overwhelming in absolute terms; (2) most clauses are at least plausibly connected to DoD contracting generally even if their specific applicability here is unexplained; and (3) there are no outright contradictions between cited regulations and the solicitation&#x27;s purpose.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11||||||||||||</blockquote>
+  <div class="ev-explanation">The Buy American / FTA / Balance of Payments clause is included with 11 fill-in fields left blank, followed separately by both a certificate version and a standalone Balance of Payments certificate version. Three distinct but overlapping Buy American instruments appear in the solicitation, with no explanation of which trade agreement exceptions apply to a single-board computer repair action or why all three variants are necessary.</div>
+</div><div class="evidence-item">
+  <blockquote>NOTICE OF CYBERSECURITY MATURITY MODEL CERTIFICATION LEVEL REQUIREMENTS (NOV 2025))|1||</blockquote>
+  <div class="ev-explanation">CMMC certification requirements are cited for a repair purchase order on a single board computer. While defense contractors generally must address CMMC, no level is specified (the single fill-in field is blank), and no context is provided explaining how CMMC applies to a narrow depot-level repair action performed by a named OEM (Electric Boat, CAGE 96169) at their own facility using their own drawings and procedures.</div>
+</div><div class="evidence-item">
+  <blockquote>SMALL BUSINESS SUBCONTRACTING PLAN (DOD CONTRACTS)-BASIC (DEV 2026-O0037)(FEB 2026))|2|||</blockquote>
+  <div class="ev-explanation">A small business subcontracting plan clause is included for what appears to be a sole-source repair order directed to a specific OEM repair depot (CAGE 96169, Electric Boat Corporation). Subcontracting plan requirements typically apply to contracts above the simplified acquisition threshold awarded to large businesses; citing this clause without explanation of its applicability — or acknowledging that Electric Boat is a large defense prime — adds unexplained compliance burden.</div>
+</div><div class="evidence-item">
+  <blockquote>CONTRACTOR PURCHASING SYSTEM ADMINISTRATION-BASIC (DEVIATION 2026-O0015)|1||</blockquote>
+  <div class="ev-explanation">Contractor Purchasing System Administration (CPSA) requirements, which govern how large contractors manage their purchasing systems across a broad portfolio, are cited without explanation in a focused repair purchase order. No context is provided for why purchasing system administration oversight is relevant to a single-item repair quote.</div>
+</div><div class="evidence-item">
+  <blockquote>NAVY USE OF ABILITYONE SUPPORT CONTRACTOR - RELEASE OF OFFEROR INFORMATION (3-18))|1|| MANDATORY USE OF WORKFLOW PRO (WFP) MOD ASSIST MODULE|1||</blockquote>
+  <div class="ev-explanation">Two administrative/process clauses — one governing release of offeror information to an AbilityOne support contractor and one mandating use of an internal Navy workflow tool — appear with no explanatory text. Vendors unfamiliar with NAVSUP internal processes cannot determine what information will be shared with whom or what system access is required.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward Navy depot repair solicitation for a single spare part (NSN 7021-016785873, Single Board Computer, CAGE 96169, Electric Boat Corporation). The solicitation requests quotes on a Firm-Fixed unit price or Not-To-Exceed basis, which are both appropriate pricing structures for this type of requirement. Repair of a defined electronic component at a designated depot is a well-understood task: the OEM performs the repair to its own drawings and standards, the item is fully identified, and the repair scope — while not always perfectly predictable upfront — is bounded by the monetary limit and the NTE option. The NTE option is a standard mitigation for the inherent uncertainty in repair work (unknown damage extent), allowing the contractor to flag if costs will exceed the estimate before proceeding. The combination of FFP/NTE pricing with a monetary ceiling and a specific repair depot is a textbook, appropriate approach for this class of acquisition. There is no mismatch between the contract type and the requirements. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Request repair quote on a Not-To-Exceed (estimated) or Firm-Fixed unit price basis.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly requests quotes on either a Not-To-Exceed (NTE) or Firm-Fixed unit price basis. For a depot repair action on a defined spare part (a Single Board Computer), both NTE and FFP unit pricing are standard and appropriate contract pricing approaches. The repair scope is defined by the OEM&#x27;s technical standards and the item&#x27;s reference number.</div>
+</div><div class="evidence-item">
+  <blockquote>MONETARY LIMITATION REPAIR PURCHASE ORDERS|1|24,020.00</blockquote>
+  <div class="ev-explanation">The monetary ceiling of $24,020 is consistent with a discrete, bounded repair purchase order. This is a low-dollar, well-scoped repair action, not an open-ended services contract, reinforcing that a fixed or NTE unit price structure is appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

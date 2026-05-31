@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DA10--Brillians - CHIO (VA-26-00023343) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DA10--Brillians - CHIO (VA-26-00023343)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e4bd2c47761b411b93f0c1e33eba01c5</span>
+      <a class="sam-link" href="https://sam.gov/opp/e4bd2c47761b411b93f0c1e33eba01c5/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-02-12</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › TECHNOLOGY ACQUISITION CENTER NJ (36C10B)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-02-12</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12-month base period with four 12-month option periods</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a combined synopsis/solicitation for a sole-source, firm-fixed-price procurement of a commercial software license (Brillians/SupraVISTA CSS), technical support, and end user training. The documents provided — the combined synopsis and the J&amp;A — are extremely brief (6 total pages) and contain almost no performance management, QA surveillance, or reporting language whatsoever. There are no weekly status reports, no prescribed report formats, no overlapping reporting cadences, no meeting frequency mandates, and no QA surveillance plan language of any kind visible in the solicitation text. The nature of the procurement (a commercial software license with vendor-provided technical support and training) inherently limits the complexity of the accountability structure. The J&amp;A focuses on justifying the sole-source basis and the market research conducted; it says nothing about how performance will be measured post-award. The combined synopsis similarly provides only the solicitation basics: NAICS code, period of performance, competition basis, and points of contact. There is insufficient solicitation content to identify a compliance-over-outcomes problem — but the absence of reporting requirements also means the sin is simply not present in the visible text. It is worth noting that the absence of any outcome metrics (e.g., uptime SLAs, user satisfaction measures, support response time targets) could be a concern in a fuller solicitation, but for a commercial software license purchase of this scale and nature, the lack of elaborate QA machinery is actually appropriate and does not constitute a sin. The solicitation is minimal in scope and appropriately streamlined for what is essentially a commodity software licensing action. Severity is rated 1 — the accountability structure is thin, but that is proportionate to the procurement type.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most severe form of insider rewards: a formal sole-source award with no competition, justified entirely by incumbent lock-in. The sin here is not a subtle tilting of evaluation criteria — it is the complete elimination of competition through a combination of proprietary software dependency, VistA integration requirements, TRM approval status, and circular market research. The J&amp;A acknowledges that VHA has been using Brillians since 2006 across nearly 28 medical centers. Nearly two decades of incumbency have produced exactly the self-reinforcing dependency cycle described in the insider rewards framework: the agency&#x27;s clinical workflows are built on a proprietary system whose source code is legally inaccessible to competitors, whose VA-specific approval (TRM) only the incumbent holds, and whose switching costs have grown large enough to appear in a cost justification. Each of these factors individually might support a reasonable procurement decision at some point in history. Together, and after 20 years, they represent a procurement failure: the government has lost all bargaining power with this vendor, cannot articulate its requirements in vendor-neutral terms, and must now perpetually sole-source because it cannot afford to compete. The severity is 3 — this is not a tilted playing field, it is a closed one.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This solicitation is issued on an other than full and open competition basis in accordance with 41 U.S.C.253(c)(1) as implemented by the Federal Acquisition Regulation (FAR) Subpart 6.302-1 entitled, &#x27;Only One Responsible Source and No Other Supplies or Services Will Satisfy Agency Requirements.&#x27; The intended source is SupraVISTA Medical DSS LLC, as they are the owner of the license and support required.</blockquote>
+  <div class="ev-explanation">The solicitation is structured as a sole-source award to the incumbent software vendor. There is no competition whatsoever — the &#x27;experience requirement&#x27; is total incumbency capture. Not only does this tilt the playing field, it eliminates the playing field entirely.</div>
+</div><div class="evidence-item">
+  <blockquote>Brillians is the only CSS software that can provide the necessary functionality as annotated above and also integrate with VistA and CPRS... The use of any other CSS software would require the redevelopment of interfaces to integrate with VistA and CPRS. The redevelopment of these interfaces are estimated to require up to three years and cost at least [redacted].</blockquote>
+  <div class="ev-explanation">The J&amp;A frames the redevelopment cost and timeline as a barrier to any competitor. These switching costs are a direct product of institutional lock-in — the agency has built its clinical workflow around a proprietary system, and now treats that dependency as a legal justification for non-competition. This is the classic insider-rewards cycle: prior contract → deep integration → prohibitive switching costs → sole source award.</div>
+</div><div class="evidence-item">
+  <blockquote>VA requires a solution that has the ability to interface with Vista and has a VA approved Technical Resource Manual (TRM)... Brillians is the only solution that currently has a Technical Resource Manual approved for use in the VA.</blockquote>
+  <div class="ev-explanation">The TRM approval requirement is a procedural insider credential that only the incumbent possesses. While TRM approval is a legitimate VA security/interoperability process, citing it as a sole-source justification is circular: the incumbent has TRM approval because they have been the incumbent, and now that approval is used to exclude all others. Any competitor would need to go through the TRM process — but the solicitation treats the absence of current TRM approval as disqualifying rather than addressable.</div>
+</div><div class="evidence-item">
+  <blockquote>With respect to the required technical support, only Brillians has access to the proprietary source code necessary to provide the required software updates, security patches and technical support. Since the software is proprietary, a legal restriction is placed on access to the software code that is required to develop updates and patches to the software.</blockquote>
+  <div class="ev-explanation">The proprietary source code argument is the purest form of institutional lock-in: the agency has adopted a software product whose architecture legally prevents any other vendor from providing maintenance or support. This is not a capability test — it is a legal monopoly created by the agency&#x27;s own historical procurement choices, now used to justify perpetual sole-source awards.</div>
+</div><div class="evidence-item">
+  <blockquote>Market research was conducted in November 2025 by reviewing similar software to ascertain if other brands could meet VA&#x27;s requirements. Specifically, the Government&#x27;s technical experts conducted web-based research on EvidenceCare Platform, Premier Inc., and TruBridge. None of which work with the VistA systems.</blockquote>
+  <div class="ev-explanation">The market research is defined entirely around the requirement to work with VistA — a system the incumbent is uniquely integrated with. By making VistA integration the primary filter, the market research is designed to confirm the sole-source conclusion rather than explore whether the underlying clinical decision support need could be met another way. This is requirement-writing that circles back to justify the incumbent rather than genuinely testing the market.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a sole-source combined synopsis/solicitation for a brand-name software license, technical support, and end user training. The document is brief — six total pages spanning a J&amp;A and a short combined synopsis — and contains very limited prescriptive language about how work must be performed.
+
+The solicitation is almost entirely structured around WHAT is needed: a specific named software product (Brillians/SupraVISTA), an annual license for unlimited users, technical support covering bug reports and security patches, and end user training resources. The J&amp;A is focused on justifying the sole-source determination, not on dictating operational procedures.
+
+The nature of this acquisition actually limits the applicability of the requirement sprawl analysis. Because this is a brand-name, sole-source procurement for a specific proprietary software product, the &#x27;how&#x27; is inherently defined by the product itself — not by the solicitation. The government is buying a COTS software solution, not directing a vendor to perform a service using prescribed methods. There are no staffing structures dictated, no step-by-step workflow procedures, and no task lists specifying how support must be rendered.
+
+The one area with slight specificity — training delivery modalities — is a minor and conventional statement that does not meaningfully constrain the vendor&#x27;s approach. The vendor (SupraVISTA) is the sole source and presumably already delivers training in these forms.
+
+Overall, this solicitation does not exhibit meaningful requirement sprawl. It is appropriately scoped for what it is: a short-form sole-source order for a named commercial software product. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>For end user training, the Contractor shall provide extensive help and training resources in the form of written documentation, training videos, and various resources at Contractor&#x27;s website.</blockquote>
+  <div class="ev-explanation">This specifies delivery modalities for training (written documentation, training videos, website resources), which leans slightly prescriptive. However, these are broadly defined categories that still leave the vendor significant latitude in how to design, structure, and deliver those resources. This is a minor constraint, not meaningful sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brief combined synopsis/solicitation for a sole-source software license procurement (Brillians/SupraVISTA). The document is only 6 pages total across two attachments: a Justification &amp; Authorization (J&amp;A) and the combined synopsis itself. Neither document contains an &#x27;Applicable Documents&#x27; list, a &#x27;Referenced Standards&#x27; section, or any bulk regulatory citation section. The only regulatory citations present are: (1) the sole-source authority — 41 U.S.C. 3304(a)(1) / FAR 6.302-1 — which is the directly applicable competition statute and regulation for a J&amp;A; (2) a reference to Federal Acquisition Circular 2025-03 for clause currency; and (3) the NAICS code citation. These citations are minimal, contextually appropriate, and directly tied to the specific procurement action. There is no evidence of a rule pool: no bulk list of directives, no irrelevant regulations, no copy-forward accumulation, and no undifferentiated compliance burden imposed on vendors. The solicitation is short and focused — its primary deficiencies, if any, lie elsewhere (e.g., the adequacy of the sole-source justification or the 6-day response window), not in regulatory overload. A vendor reading this solicitation would face no meaningful compliance interpretation burden from regulatory citations. Severity 1 is appropriate.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses FFP pricing for a software license renewal with bundled technical support and end user training from a sole-source proprietary vendor. FFP is the appropriate contract type here. The core deliverable — an annual software license for a defined product (Brillians/SupraVISTA) serving an unlimited number of users — is a standard commercial procurement with no ambiguity about what is being purchased. The scope is stable and well-defined: one license period, software updates, bug support, and training resources via documentation and videos. There is no open-ended labor component, no uncertain quantity of work, and no evolving requirements that would make FFP risky. The vendor knows exactly what it costs to maintain and license its own proprietary software, and the government has historical pricing data to validate reasonableness (as noted in Section 11 of the J&amp;A). The technical support component is bounded — it covers updates, security patches, and bug resolution tied to a known codebase — and is bundled into a fixed annual fee rather than billed by the hour. This is analogous to a standard commercial software maintenance agreement, which is routinely priced on a fixed-fee basis across industry. There is no indication that the volume of support incidents, training requests, or update complexity would vary in ways that make cost estimation unreliable. FFP appropriately places performance risk on the vendor (SupraVISTA), which is the party with full knowledge of its own product&#x27;s support burden. T&amp;M would be inappropriate here because the work is not labor-hour-based and billable hours are not the relevant cost driver. Cost-reimbursement would be inappropriate because the requirement is not technically uncertain or exploratory. FFP is the correct contract type for this acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The proposed action is on a Firm-Fixed-Price basis, and the period of performance shall be one 12-month base period from date of award and four 12-month option periods, if exercised.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states FFP pricing. This is the contract type to evaluate against the requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>The proposed sole source contract is for a Firm-Fixed Price (FFP) contract for the procurement of brand name Brillians (SupraVISTA) Cognitive Support System (CSS) software license, technical support, and end user training.</blockquote>
+  <div class="ev-explanation">The three components being procured are: (1) a software license, (2) technical support, and (3) end user training. All three are well-characterized commercial offerings from a single proprietary vendor, making cost estimation highly predictable.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C10B26Q0113_1.docx">36C10B26Q0113_1.docx</div></div>
+  <a class="dl-btn" href="../attachments/e4bd2c47761b411b93f0c1e33eba01c5_36C10B26Q0113_1.docx" download="36C10B26Q0113_1.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="COMBINED SYNOPSIS_Brillians 36C10B26Q0113.pdf">COMBINED SYNOPSIS_Brillians 36C10B26Q0113.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e4bd2c47761b411b93f0c1e33eba01c5_COMBINED+SYNOPSIS_Brillians+36C10B26Q0113.pdf" download="COMBINED SYNOPSIS_Brillians 36C10B26Q0113.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="JA Brillians - Redacted.pdf">JA Brillians - Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e4bd2c47761b411b93f0c1e33eba01c5_JA+Brillians+-+Redacted.pdf" download="JA Brillians - Redacted.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

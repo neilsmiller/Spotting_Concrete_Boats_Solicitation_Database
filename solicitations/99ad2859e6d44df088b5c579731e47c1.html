@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SL500 Hardware and Install — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SL500 Hardware and Install</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 99ad2859e6d44df088b5c579731e47c1</span>
+      <a class="sam-link" href="https://sam.gov/opp/99ad2859e6d44df088b5c579731e47c1/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-28</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NASA SHARED SERVICES CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DE01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334513</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-28</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">05/13/26 – 07/30/26</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simple commercial item procurement for specialized environmental monitoring hardware and installation services. The solicitation consists of a brief synopsis and a two-page Statement of Work covering equipment specifications, installation scope, place of performance, and period of performance. There are no reporting requirements whatsoever — no weekly status reports, no progress reports, no prescribed meeting cadences, no QA surveillance plans, no compliance documentation mandates. The SOW defines deliverables (hardware, installation by a YSI Field Engineer, channel survey, custom shipping crate, one-year warranty) and a timeline (05/13/26–07/30/26), but imposes no accountability structure beyond the work itself. Because there are no QA or reporting mechanisms at all, the compliance-over-outcomes sin simply cannot manifest here. The absence of reporting burden is appropriate for a small, discrete procurement of this nature — the deliverables are tangible and self-evident (equipment installed, survey completed). There is nothing to flag.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most extreme form of insider rewards: it is written around a single named vendor&#x27;s proprietary products and branded personnel, and the government has declared that vendor the sole source. The SOW explicitly requires &#x27;YSI Field Engineers&#x27; — a proprietary designation that only YSI employees hold — and the parts list is composed entirely of YSI and SonTek-branded components with manufacturer part numbers. The combination of brand-specific hardware, proprietary installation knowledge, and OEM-only personnel qualifications structurally precludes any other vendor from competing, regardless of their general capability in instrumentation installation or environmental monitoring systems. This is severity 3, but it is worth noting that this pattern — sole-source OEM installation of proprietary scientific equipment — is not necessarily inappropriate on its merits. The real analytical question is whether the government&#x27;s prior procurement decision (selecting proprietary SL500/EXO hardware) was itself justified, and whether that decision has now created a locked-in dependency on YSI for all future installation and maintenance work. The solicitation is the downstream consequence of an earlier specification decision that locked the government into YSI&#x27;s ecosystem. The insider rewards sin here is structural and self-reinforcing: the agency has no path to competitive procurement for this work without first making a different hardware selection upstream.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requires the expertise of one experienced YSI Field Engineer on site for 5-8 days.</blockquote>
+  <div class="ev-explanation">The SOW explicitly names a &#x27;YSI Field Engineer&#x27; — an employee of YSI Inc., the sole-source awardee. This is not a capability requirement for a qualified engineer; it is a requirement that only YSI&#x27;s own employees can satisfy. No competing vendor could field a &#x27;YSI Field Engineer&#x27; because that title refers to YSI&#x27;s internal workforce.</div>
+</div><div class="evidence-item">
+  <blockquote>NASA/NSSC intends to issue a sole source contract to YSI Inc under the authority of FAR 12.102(a). It has been determined that YSI Inc 1725 Brannum LN Yellow Springs Ohio 45387 is the sole provider of SL500 Hardware and Install</blockquote>
+  <div class="ev-explanation">The government has formally declared YSI the sole provider, citing FAR 12.102(a) (commercial items authority) rather than the standard sole-source justification authorities under FAR 6.302. This framing forecloses competition entirely, and the stated rationale — that YSI is the &#x27;sole provider&#x27; — is grounded in proprietary product and brand-specific installation knowledge that no competitor can replicate.</div>
+</div><div class="evidence-item">
+  <blockquote>One YSI Field Engineer on site for up to 5 days to install EXO2 and SonTek SL real-time system.</blockquote>
+  <div class="ev-explanation">The line item in the parts list explicitly calls out a &#x27;YSI Field Engineer&#x27; as the deliverable, meaning the SOW is written around a named vendor&#x27;s branded personnel. This institutionalizes incumbency: the requirement cannot be met by any entity other than YSI, because &#x27;YSI Field Engineer&#x27; is a proprietary designation.</div>
+</div><div class="evidence-item">
+  <blockquote>1 | 599008-33 | EXO 33-m Flying Lead Cable ... 1 | 36-0003-040 | 40-m power and RS232/SDI-12 communications cable ... YSI will also provide an M9 and Surfbee to provide channel survey</blockquote>
+  <div class="ev-explanation">The bill of materials and scope of work reference specific YSI and SonTek proprietary part numbers and branded equipment (M9, Surfbee, EXO sonde, SL500). The installation expertise required is specific to these proprietary systems, meaning only the OEM (YSI) or an authorized service partner could realistically perform the work. No generic experience requirement could substitute for this brand-specific knowledge.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a minimal, two-page combined synopsis/solicitation for a sole-source hardware purchase and installation. The SOW is brief and largely describes WHAT is needed: installation of a real-time monitoring system with specific hardware components, a channel survey, replacement cables, a shipping crate, and a one-year warranty, to be completed within a defined period of performance at a specific remote Alaskan location. The document does not contain long bullet lists prescribing step-by-step processes, does not dictate organizational workflows, and does not mandate staffing structures beyond what is inherent to a specialist installation job. The prescriptive elements that do exist — specific part numbers, named personnel type (YSI Field Engineer), named instruments (M9, Surfbee) — are artifacts of the sole-source nature of the procurement, not organizational dysfunction. When buying proprietary equipment from its sole manufacturer and having that manufacturer install it, specifying the manufacturer&#x27;s own tools and personnel is not sprawl; it is the logical description of the deliverable. The solicitation is appropriately scoped for its purpose and severity is rated 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requires the expertise of one experienced YSI Field Engineer on site for 5-8 days.</blockquote>
+  <div class="ev-explanation">This prescribes a specific staffing structure (one YSI Field Engineer) and duration (5-8 days), but in context this is not sprawl — it is a direct consequence of a sole-source acquisition for proprietary equipment installation. Only YSI-certified personnel can install and calibrate YSI/SonTek equipment, making this a legitimate technical constraint rather than an arbitrary process mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>One YSI Field Engineer on site for up to 5 days to install EXO2 and SonTek SL real-time system. Includes all necessary travel and living expenses for travel to Nuiqsut, AK. YSI will also provide an M9 and Surfbee to provide channel survey for entry into SL500.</blockquote>
+  <div class="ev-explanation">This specifies particular instruments (M9, Surfbee) for the channel survey. Again, in the context of a sole-source procurement for proprietary YSI/SonTek equipment, specifying YSI&#x27;s own tools is a natural byproduct of the vendor&#x27;s product ecosystem rather than arbitrary process prescription. A different vendor could theoretically use different survey instruments, but there is only one vendor here.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward two-page combined synopsis/solicitation for commercial hardware and installation services. The solicitation contains no &#x27;Applicable Documents&#x27; list, no bulk regulatory citations, and no undifferentiated compliance framework dump. The only regulatory reference is the FAR authority cited in the synopsis itself (FAR 12.102(a) for commercial items, and the NASA FAR Supplement clause 1852.215-84 for the Ombudsman requirement), both of which are entirely appropriate and standard for this type of acquisition. The SOW is brief and focused: it describes the physical equipment to be procured, the installation services required, the place of performance, and the period of performance. There is no compliance section, no referenced standards list, and no policy citations beyond what is legally required for the procurement mechanism itself. A vendor reading this solicitation faces no regulatory interpretation burden beyond the standard terms of a commercial item acquisition under FAR Part 12. This is a well-scoped, simple purchase of specialized hydrological monitoring hardware and installation services — and the solicitation&#x27;s regulatory footprint matches that simplicity. No rule pool pattern is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a small, sole-source commercial item acquisition under FAR Part 12, implying a firm-fixed-price structure. The requirement is well-defined: specific named hardware components (SL500, EXO sonde, cables, mounting hardware), a field engineer engagement of known scope (5 days with a defined 3-day contingency option), a channel survey, a custom shipping crate, and a one-year warranty. The vendor is proprietary and the deliverables are concrete and enumerable. While there is modest schedule uncertainty (5–8 days depending on environmental conditions at a remote Alaska site), this is handled through a defined contingency provision rather than open-ended T&amp;M billing. For a commercial sole-source purchase of this nature — essentially a bundled product-and-installation package — FFP under FAR Part 12 is the standard and appropriate vehicle. The pricing structure aligns with the requirement: the government is buying a defined outcome (a functioning real-time monitoring system installed and deployed) at a negotiated price, not paying for unbounded labor hours. There is no meaningful mismatch between contract type and requirements here. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>One YSI Field Engineer on site for 5 days (+ 3 additional days, if needed) to work on the installation of Real-time system with SonTek SL500 and YSI EXO sonde.</blockquote>
+  <div class="ev-explanation">The SOW acknowledges schedule variability (5–8 days depending on conditions), which is a signal that some T&amp;M or fixed-price-with-options structure is needed. The solicitation appears to use a fixed-price commercial item structure (FAR Part 12), with discrete line items for parts and a defined field engineer engagement. This is consistent with buying a bundled commercial service package from a sole-source vendor at a negotiated price, which is a reasonable fit.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government intends to acquire Commercial items or services using the provisions, clauses and procedures prescribed in FAR Part 12 for Commercial</blockquote>
+  <div class="ev-explanation">FAR Part 12 commercial item acquisitions are typically structured as firm-fixed-price. For a well-scoped, sole-source procurement of proprietary installation hardware and a defined field engineer engagement from a specific vendor (YSI Inc), FFP under FAR Part 12 is a defensible and standard approach. The deliverables are concrete: specific hardware, cables, installation, and a channel survey.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0040973 Tab 04 4 SOW.pdf">SATPC0040973 Tab 04 4 SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/99ad2859e6d44df088b5c579731e47c1_SATPC0040973+Tab+04+4+SOW.pdf" download="SATPC0040973 Tab 04 4 SOW.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schneider Programmable Logic Controller (PLC) Upgrade Hardware — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Schneider Programmable Logic Controller (PLC) Upgrade Hardware</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e4fcc5a2050640e3bc46dd04a4cef97f</span>
+      <a class="sam-link" href="https://sam.gov/opp/e4fcc5a2050640e3bc46dd04a4cef97f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NASA SHARED SERVICES CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334513</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 days ARO</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li><li>Technical Acceptability (ability to meet all requirements listed in the solicitation, including Schneider Electric Alliance Industrial Automation Distributor (IAD) program authorization)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product purchase — a hardware buy for specific Schneider Electric PLC components to be delivered to NASA Glenn Research Center within 30 days ARO. The accountability structure is entirely appropriate for a commercial goods procurement of this nature.
+
+The solicitation contains no reporting requirements, no status report cadences, no prescribed format documents, no QA surveillance plans, and no meeting mandates. The SOW is essentially a bill of materials with delivery instructions. The evaluation criteria are LPTA-based: technically acceptable (authorized reseller, brand-compliant, new/unrefurbished hardware) at the lowest price. Acceptance is implicitly tied to delivery of the correct items in original packaging from an authorized distributor — which is an outcome-oriented acceptance criterion appropriate to a hardware purchase.
+
+The only &#x27;performance&#x27; requirement is &#x27;30 days ARO&#x27; delivery, which is a concrete, measurable outcome. There is no process compliance theater here because there is no complex service being delivered — there is no plan to adhere to, no development activities to report, and no ongoing work to monitor.
+
+This solicitation does not exhibit the compliance-over-outcomes sin in any meaningful way. The sin is simply not applicable to a hardware commodity purchase at this scale. The absence of outcome metrics beyond delivery time and product conformance is appropriate and proportionate — not a deficiency. Severity 1 is assigned.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards pattern, though the mechanism is somewhat unusual — rather than rewarding prior contract experience with the government, it rewards membership in a private manufacturer&#x27;s authorized distributor network. The IAD certification requirement is a go/no-go filter that limits competition to a defined set of Schneider Electric channel partners. This is functionally similar to an insider rewards structure: a qualified small business that has not previously established an IAD relationship (or whose relationship is with a different Schneider channel program) cannot compete, regardless of technical capability.
+
+Mitigating factors prevent this from reaching severity 3. First, the brand name justification is documented and substantively reasoned — NASA Glenn has standardized on Schneider PLCs across aerospace test facilities, invested heavily in training, and has legitimate interoperability and safety concerns. This is not a pretextual brand name justification. Second, the IAD requirement has a plausible supply chain integrity rationale: genuine PLC hardware for safety-critical aerospace applications carries real counterfeit and warranty risks. Third, the IAD program is publicly verifiable (the solicitation provides a URL), and membership is presumably open to small businesses willing to pursue certification — it is not a closed club with a single member.
+
+However, the requirement still represents a moderate insider rewards problem because: (1) IAD certification is controlled by a private party, not the government; (2) the eligibility pool is defined by Schneider Electric&#x27;s commercial distribution strategy, not by demonstrated capability; and (3) any qualified vendor who has not yet pursued IAD certification — or who distributes through a non-IAD channel — is disqualified categorically. The 7-day response window further compounds this: a vendor who might otherwise pursue IAD certification cannot do so in time to compete. The solicitation does not include any alternative demonstration of supply chain integrity for non-IAD vendors, even though such alternatives (e.g., manufacturer letters of authorization, gray market screening certifications) exist. On balance, this is a tilted playing field rather than a closed one, warranting severity 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The vendor shall be Authorized/Certified through the Schneider Electric Alliance Industrial Automation Distributor (IAD) program. Verification in SE&#x27;s IAD and verification as an authorized distributor can be confirmed at https://www.se.com/us/en/partners/distributors/industrial-automation/. The vendor submitting the quote is not Authorized/Certified through the Schneider Electric Alliance Industrial Automation Distributor (IAD) program will be deemed unacceptable.</blockquote>
+  <div class="ev-explanation">This requirement gates participation on membership in a specific manufacturer&#x27;s authorized distributor program. While framed as a supply chain integrity measure, it functionally limits competition to vendors who have an established business relationship with Schneider Electric&#x27;s IAD program. A capable small business that distributes industrial automation hardware but has not yet pursued SE IAD certification — or whose application is pending — is categorically excluded regardless of their ability to source and deliver the exact parts required. The IAD program is a private commercial channel program controlled by Schneider Electric, not a government-defined qualification standard.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a Brand Name requirement for Schneider Programmable Logic Controller (PLC) AUTHORIZED RESELLERS ONLY Upgrade Hardware Equipment.</blockquote>
+  <div class="ev-explanation">The combination of brand name restriction AND authorized reseller restriction is a double gate. The brand name justification is documented and plausibly defensible given the standardization rationale. However, layering an &#x27;authorized resellers only&#x27; restriction on top of a brand name restriction narrows the eligible pool to only those vendors who have been certified by a private third party (Schneider Electric). This is not a government-defined competency test — it is a private manufacturer&#x27;s channel program. Vendors outside that program, even if capable of sourcing genuine Schneider equipment through other legitimate means, are excluded.</div>
+</div><div class="evidence-item">
+  <blockquote>Hardware purchased must be identical to the make and model of equipment currently in use, is new (never used) in the original packaging and not refurbished. Schneider Electric only sells PLC automation hardware through authorized distributors who can guarantee the source, condition, safety, security and warranty of the PLC automation hardware.</blockquote>
+  <div class="ev-explanation">The justification for the IAD requirement is embedded in this language — that only IAD distributors can &#x27;guarantee the source, condition, safety, security and warranty.&#x27; This assertion treats Schneider Electric&#x27;s private channel program as the sole mechanism for supply chain assurance. In practice, it incorporates a manufacturer&#x27;s commercial distribution policy directly into the government&#x27;s eligibility criteria, effectively delegating the determination of who can compete to a private company rather than the government itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward commercial hardware purchase — a specific list of Schneider Electric PLC components with exact part numbers. The &#x27;requirements&#x27; consist almost entirely of: (1) a bill of materials with specific part numbers, (2) a requirement that hardware be new, unused, and in original packaging, (3) a requirement that the vendor be an authorized Schneider Electric IAD distributor, and (4) a 30-day ARO delivery window with FOB Destination terms.
+
+None of this constitutes requirement sprawl under the applicable definition. The solicitation does not prescribe HOW the vendor should perform work — there is no work to perform in the process sense. This is a product procurement, not a services contract. The outcome is simple and clearly defined: deliver specific hardware components to a specific address within 30 days.
+
+The brand name restriction and part number specificity are the most &#x27;prescriptive&#x27; elements, but these are legitimate interoperability constraints explicitly justified in the Brand Name Justification. NASA GRC has standardized on Schneider Electric PLCs throughout aerospace test facilities, has invested in staff training for these systems, maintains a common spares pool, and requires interchangeability with existing installed equipment. These are genuine technical compatibility constraints, not process mandates. The FAR authorizes brand name justifications precisely for this scenario (FAR 11.104).
+
+The authorized distributor requirement (IAD certification) is similarly a legitimate constraint — it ensures supply chain integrity, warranty validity, and product authenticity for safety-critical industrial automation hardware used in aerospace test facilities. This protects the government&#x27;s interests rather than prescribing a solution approach.
+
+There is no incumbent &#x27;how&#x27; being copied forward, no detailed process mandates, no staffing prescriptions, and no step-by-step workflow requirements. The solicitation reads exactly as it should for a commercial hardware buy: here are the parts we need, here is where to deliver them, here is when we need them. Severity is 1.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin at any meaningful severity level. The compliance section is notably lean for a federal hardware procurement: roughly 10 FAR/NFS clauses incorporated by reference, two provisions in full text (52.225-8 and 52.225-18), and a handful of standard commercial item terms. There is no &#x27;Applicable Documents&#x27; bulk list, no agency-specific policy stack, and no undifferentiated regulatory dump. The clauses cited are the standard complement for a small business commercial item order — SAM registration, FOB destination, identity verification, payment terms, export controls, and a firm-fixed-price structure. The solicitation&#x27;s compliance burden is further reduced by its narrow scope: this is a brand-name hardware resale procurement with a 30-day delivery window, not a complex services contract where regulatory complexity might accumulate. The 52.225-8 Duty-Free Entry clause in full text adds some length but is at least plausibly applicable given that Schneider Electric industrial automation hardware is frequently manufactured outside the US. The NFS Export Licenses clause (1852.225-70) is similarly appropriate for hardware going to a NASA research facility. No regulations cited are clearly irrelevant, contradictory, or suggestive of copy-forward accumulation from prior iterations. A vendor reading this solicitation can readily understand the compliance landscape without interpretive burden. Severity 1 is the correct assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR CLAUSES INCOPORATED BY REFERENCE:
+☒52.204-9 Personal Identity Verification of Contractor Personnel (JAN 2011)
+☒52.204-13 System for Award Management Maintenance (APR 2026)(DEVIATION)
+52.222-90 Addressing DEI Discrimination by Federal Contractors (APR 2026)(DEVIATION)
+☒52.223-23 Sustainable Products and Services (APR 2026)(DEVIATION)
+☒52.232-39 Unenforceability of Unauthorized Obligations (JUN 2013)
+☒52.232-40 Providing Accelerated Payments to Small Business Subcontractors (MAR 2023)
+☒52.247-34 F.o.b. Destination (NOV 1991)</blockquote>
+  <div class="ev-explanation">The solicitation incorporates a modest set of FAR clauses by reference — roughly 7-8 checked clauses plus a few NFS clauses. This is a lean, appropriate list for a commercial item hardware purchase. None of these clauses are obviously irrelevant to the acquisition type (small business set-aside, commercial hardware purchase with delivery), and all are standard operational or compliance clauses routinely attached to commercial item orders. The list is not overwhelming and does not exhibit the bulk-dump pattern that defines rule pools.</div>
+</div><div class="evidence-item">
+  <blockquote>☒52.225-8 Duty-Free Entry (OCT 2010)
+[Full clause text covering 10 sub-paragraphs on customs procedures, shipping documentation, contractor notification requirements, etc.]</blockquote>
+  <div class="ev-explanation">FAR 52.225-8 (Duty-Free Entry) is included in full text and is fairly detailed given the context. For a straightforward domestic hardware purchase from an authorized Schneider Electric distributor shipping to Cleveland, Ohio, the duty-free entry clause is at minimum an edge case — the items are most likely manufactured outside the US (industrial automation hardware commonly is), making the clause technically applicable. This is a minor observation rather than a true rule pool finding; the clause is plausibly relevant even if its operational impact is likely minimal.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the purchase of specific, brand-name commercial hardware components — Schneider Electric PLC modules, racks, power supplies, I/O cards, and accessories — all identified by exact part numbers (e.g., BMEXBP1002, BMXCPS4002, BMENUA0100). The scope is fully defined: a fixed bill of materials, a 30-day delivery requirement, FOB Destination, and a single delivery location at NASA Glenn Research Center. There is no ambiguity about what is being purchased, no labor component, no evolving requirements, and no technical uncertainty that would make cost estimation difficult. A Firm-Fixed-Price contract is precisely the right instrument for this type of acquisition. The vendor knows exactly what items to price, the government knows exactly what it is buying, and competitive pricing from authorized distributors provides market discipline. FFP places appropriate risk on the vendor to deliver the specified items at the agreed price and within the stated lead time. There is no misalignment between contract type and requirements here — this is a textbook appropriate use of FFP for a commercial product purchase.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>☒1852.216-78 FIRM FIXED PRICED (DEC 2025)(DEVIATION)
+The total firm-fixed-price of this contract is $[Insert the appropriate amount].</blockquote>
+  <div class="ev-explanation">The solicitation explicitly uses a Firm-Fixed-Price contract structure, which is the stated pricing type for this procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a Brand Name requirement for Schneider Programmable Logic Controller (PLC) AUTHORIZED RESELLERS ONLY Upgrade Hardware Equipment.</blockquote>
+  <div class="ev-explanation">The requirement is for the purchase of specific, commercially available hardware items identified by exact part numbers. This is a straightforward product acquisition with no labor ambiguity, making FFP the natural and appropriate contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041067 Tab 04 4 SOW.pdf">SATPC0041067 Tab 04 4 SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e4fcc5a2050640e3bc46dd04a4cef97f_SATPC0041067+Tab+04+4+SOW.pdf" download="SATPC0041067 Tab 04 4 SOW.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041067 Tab 10 BNJ_Redacted.pdf">SATPC0041067 Tab 10 BNJ_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e4fcc5a2050640e3bc46dd04a4cef97f_SATPC0041067+Tab+10+BNJ_Redacted.pdf" download="SATPC0041067 Tab 10 BNJ_Redacted.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041067 Tab 10 RFQ Open Market.pdf">SATPC0041067 Tab 10 RFQ Open Market.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e4fcc5a2050640e3bc46dd04a4cef97f_SATPC0041067+Tab+10+RFQ+Open+Market.pdf" download="SATPC0041067 Tab 10 RFQ Open Market.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

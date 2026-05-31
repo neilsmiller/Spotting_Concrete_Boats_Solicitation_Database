@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNSP Financial Analyst Support - SEAPORT — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>CNSP Financial Analyst Support - SEAPORT</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 5357da6fed5443d5bcc71ac735916e6f</span>
+      <a class="sam-link" href="https://sam.gov/opp/5357da6fed5443d5bcc71ac735916e6f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-03</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC SAN DIEGO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-03</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP (Firm-Fixed-Price) for labor CLINs with Cost Reimbursable (CR) travel CLINs</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year (Oct 1, 2026 – Sep 30, 2027) + 4 Option Years (through Sep 30, 2031), with a potential 6-month extension under FAR 52.217-8</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents limited content for a full compliance-over-outcomes assessment. The primary documents available are a DD254 security form (which failed to render) and a price format template. The SOW/PWS, which would contain the actual reporting requirements, QA surveillance plan, and deliverable specifications, is not meaningfully extractable from the available text. 
+
+However, the price format template does reveal structurally significant information. The contract is priced purely on labor categories and hours (7 FTEs across four labor categories), with no deliverable-based CLINs, no performance metrics embedded in the pricing structure, and no outcome-based payment mechanisms. This is a labor-hour/FFP-labor structure — the government is buying people&#x27;s time, not results. This is a foundational indicator of compliance-over-outcomes orientation: when you pay for hours, you measure hours.
+
+The absence of any performance standards, SLAs, or outcome metrics in the pricing structure — combined with the fact that this is financial analyst support work spanning a 5-year base+options period — suggests the accountability model is built around staff augmentation (process compliance: are the right people present?) rather than deliverable achievement (outcomes: did the financial analysis produce actionable results?).
+
+I am assigning severity 2 rather than 3 because: (1) the full SOW/PWS is not available to confirm whether outcome metrics exist elsewhere in the contract structure; (2) financial analyst support services inherently involve some degree of advisory/staff augmentation work where labor-based pricing is defensible; and (3) the limited content prevents confident identification of the full reporting burden. A severity 3 finding would require direct evidence of overlapping report cadences, prescribed formats, and plan-adherence tracking with no outcome counterweight — which may well exist in the missing SOW but cannot be confirmed from the available text. The structural indicators present (labor-hour pricing, no deliverable CLINs, no embedded performance standards) are sufficient to flag a moderate concern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Senior Financial Analyst III (Project Manager) (KEY) | 1 | Financial Analyst III (Accounting Analyst) (KEY) | 2 | Financial Analyst III | 2 | Financial Analyst II | 2</blockquote>
+  <div class="ev-explanation">The price format template structures accountability around labor categories and FTE counts rather than deliverables or outcomes. The entire pricing mechanism is built around staffing levels and hours — a classic input-based accountability structure. There is no linkage between labor categories and specific performance targets or measurable results.</div>
+</div><div class="evidence-item">
+  <blockquote>FFP Labor CLINS | CR Travel CLINS | FFP &amp; CR</blockquote>
+  <div class="ev-explanation">The contract structure uses Firm Fixed Price for labor and Cost Reimbursement for travel. FFP-for-labor (as opposed to FFP-for-deliverables) is a process-compliance pricing model: the government pays for people showing up, not for results achieved. This inherently shifts accountability toward presence and activity rather than outcomes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows moderate insider-reward characteristics, though the limited visibility into the full PWS/SOW qualifications and evaluation criteria prevents a severe rating. The most significant red flag is the 1-day response window for a 102-page, 11-attachment solicitation — this is functionally exclusionary for any vendor not already deeply familiar with the requirement, which in practice means anyone except the incumbent. The key personnel designations (two of four categories) compound this: the incumbent can propose existing staff who already know the systems, while a new entrant must recruit qualifying personnel before award. The granular labor category hierarchy (Analyst II, III, Senior III) is consistent with patterns where qualifications are written around incumbent staff profiles, though this cannot be confirmed without the full qualification language from the PWS. The 5.5-year potential duration reinforces incumbency lock-in over time. Mitigating factors: the WOSB set-aside does introduce some competitive tension within that pool; the price template is relatively straightforward and does not impose past-contract-value thresholds; and without the full evaluation criteria document visible, it is possible that technical evaluation factors are capability-focused rather than incumbency-proxied. The solicitation is rated severity 2 — the playing field is meaningfully tilted toward the incumbent, primarily through the response window and key personnel structure, but the full evaluation apparatus is not visible enough to confirm a severity 3 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Senior Financial Analyst III (Project Manager) (KEY) | 1
+Financial Analyst III (Accounting Analyst) (KEY) | 2</blockquote>
+  <div class="ev-explanation">Two of the four labor categories are designated as KEY personnel. While key personnel designations are not inherently problematic, they often accompany specific experience qualifications in the PWS/SOW (not fully visible here). Key personnel requirements can function as insider rewards when the qualifications are narrowly tailored to match the incumbent&#x27;s actual staff — the incumbent can simply propose their existing personnel, while a new entrant must recruit and retain individuals who meet potentially bespoke criteria before contract award.</div>
+</div><div class="evidence-item">
+  <blockquote>NAICS Code: 541330
+Set-Aside: Women-Owned Small Business
+Response Window: 1 days</blockquote>
+  <div class="ev-explanation">The combination of a highly restrictive 1-day response window with an 11-attachment solicitation of 102 pages effectively limits competition to vendors already familiar with the requirement — i.e., the incumbent or its close associates. A vendor without pre-existing knowledge of the requirement would be unable to develop a meaningful technical proposal, price it accurately, and assemble required documentation within 24 hours. This functions as a de facto insider filter even if no explicit experience threshold is stated.</div>
+</div><div class="evidence-item">
+  <blockquote>Financial Analyst III (Accounting Analyst) (KEY) | 2
+Financial Analyst III | 2
+Financial Analyst II | 2</blockquote>
+  <div class="ev-explanation">The labor category structure specifies highly granular role titles tied to an internal labor category hierarchy (Analyst II, III, Senior III). Without the full PWS qualification requirements visible, this structure is consistent with solicitations that define minimum qualifications in terms that precisely match the incumbent&#x27;s existing staff profiles — making it easy for the incumbent to slot existing personnel and difficult for new entrants to map their workforce to the required categories.</div>
+</div><div class="evidence-item">
+  <blockquote>Period of Performance: Base Year 2026-2027, Option Years 1-4 through 2030-2031, plus FAR 52.217-8 6-Month Extension</blockquote>
+  <div class="ev-explanation">A 5-year base + option structure with a potential 6-month extension means the incumbent could hold this contract for up to 5.5 years. Long contract durations combined with key personnel requirements and narrow labor categories deepen incumbency lock-in over time, as the agency&#x27;s institutional knowledge increasingly resides in the incumbent&#x27;s staff rather than in government personnel — making future recompetes even more heavily insider-rewarding.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl primarily through its staffing structure prescriptions. The price template — which is the most substantive technical document available, as the DD254 attachment failed to render and no PWS/SOW text was recoverable — mandates exact headcounts and labor categories across all five performance periods plus the FAR 52.217-8 extension period. This is a classic indicator of sprawl: the government has decided HOW the work will be staffed rather than defining WHAT outcomes are required and letting vendors propose the appropriate team. The fixed 7-FTE structure with two KEY personnel designations is particularly constraining. However, the severity is assessed at 2 rather than 3 for several reasons. First, the primary SOW/PWS content did not render (the DD254 PDF failed), so the full scope of prescriptive task-level requirements — which could push this to severity 3 — cannot be evaluated. Second, the staffing prescriptions visible here are a common (if suboptimal) practice in professional services contracts and represent a moderate rather than severe constraint on vendor approaches. The 1-day response window and 11 attachments suggest this is likely a SeaPort task order competed among pre-qualified vendors, which somewhat mitigates the competitive harm of the staffing prescription. The evidence available supports a finding of moderate sprawl — the solicitation shows clear process-over-outcome tendencies in its staffing model, but insufficient content is visible to assess whether task-level requirements compound this into a severe finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Senior Financial Analyst III (Project Manager) (KEY) | 1 ... Financial Analyst III (Accounting Analyst) (KEY) | 2 ... Financial Analyst III | 2 ... Financial Analyst II | 2</blockquote>
+  <div class="ev-explanation">The price template prescribes an exact staffing structure: 7 FTEs across four specific labor categories with fixed headcounts (1 PM, 2 Accounting Analysts, 2 Financial Analyst IIIs, 2 Financial Analyst IIs). This locks vendors into a specific organizational model rather than allowing them to propose the staff mix best suited to deliver the required outcomes. A vendor with more experienced staff who could accomplish the same work with fewer FTEs, or one who could leverage automation to reduce labor intensity, is effectively precluded from proposing that approach.</div>
+</div><div class="evidence-item">
+  <blockquote>Financial Analyst III (Accounting Analyst) (KEY) | 2 ... Senior Financial Analyst III (Project Manager) (KEY) | 1</blockquote>
+  <div class="ev-explanation">Two of the four labor categories are designated as KEY personnel, meaning specific individuals must be proposed and approved. Combined with the fixed FTE counts, this doubly constrains vendor staffing flexibility — not only must the team be structured a specific way, but specific named roles must be committed upfront. This pattern is characteristic of requirements copied from an incumbent&#x27;s current contract structure, essentially mandating &#x27;staff it as it was staffed before.&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>FFP Labor CLINS ... CR Travel CLINS</blockquote>
+  <div class="ev-explanation">The solicitation separates labor (FFP) from travel (cost-reimbursable) across all periods, which is a legitimate contract structure choice, but when combined with the prescribed headcounts and labor categories, it further constrains how vendors can structure their delivery model — e.g., a vendor who might propose a hybrid remote/on-site approach with different travel assumptions cannot reshape the labor mix to reflect that tradeoff.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the available document content, this solicitation does not exhibit meaningful Rule Pools behavior. The price format template — the primary substantive document available — shows a tightly scoped contract structure: four defined labor categories (Senior Financial Analyst III PM, Financial Analyst III Accounting Analyst, Financial Analyst III, Financial Analyst II), standard fringe/OH/G&amp;A/fee structure, and a simple two-CLIN framework (labor and travel). The only regulatory instrument visible is the DD254, which is a standard DoD security classification specification appropriately used for a Navy financial analyst support contract. There is no evidence of an undifferentiated bulk list of applicable documents, irrelevant regulatory citations, or accumulated compliance requirements without context. The DD254 PDF unfortunately did not render (Adobe Reader placeholder), so it is possible that document contains a lengthy list of security requirements — but DD254s are inherently security-focused documents and any regulatory content within them would likely be contextually appropriate for a DoD financial analyst support role. It is worth noting that the full SOW/PWS is among the 11 attachments referenced but the text of those documents was not fully rendered in the provided content. An &#x27;Applicable Documents&#x27; section could exist in those unrendered attachments. However, based on the available evidence, there is no basis to flag this solicitation for Rule Pools at severity 2 or 3. The structural indicators — lean CLIN structure, small defined team of 7 FTEs, standard contract architecture — suggest a straightforward acquisition without the regulatory accumulation pattern characteristic of rule pools. Severity assessed at 1 (Minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CLIN 1000 (Labor), CLIN 3000 (Travel) — Base Year; Option Year CLINs structured identically</blockquote>
+  <div class="ev-explanation">The price format template reveals a lean, focused contract structure: four labor categories, one travel ODC line, and a straightforward CLIN architecture. This structural simplicity suggests the solicitation is not attempting to layer on an overwhelming compliance framework.</div>
+</div><div class="evidence-item">
+  <blockquote>DD254 (Department of Defense Contract Security Classification Specification) attached as a separate document</blockquote>
+  <div class="ev-explanation">The DD254 is a standard security classification document routinely required for Navy/DoD contracts. Its presence as a standalone attachment is appropriate and expected, not evidence of regulatory overreach. It represents a single, contextually appropriate compliance instrument rather than a bulk list.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a hybrid pricing structure: FFP for labor CLINs and Cost-Reimbursement for travel CLINs. The labor component is structured as a firm-fixed-price, level-of-effort term contract — the government is buying a defined set of 7 FTEs (Senior Financial Analyst III, Financial Analyst III, Financial Analyst II) for defined periods of performance across a base year and four option years.
+
+For financial analyst support services of the kind implied here (budgeting support for CNSP, per the DD254 title), the choice of FFP level-of-effort is not unreasonable. The government knows it needs a certain number of analysts on-site performing recurring financial management tasks. If the workload is stable and predictable — routine budget cycle support, accounting analysis, financial reporting — then fixing the staffing level and price per period is a defensible approach. FAR 16.207 explicitly provides for firm-fixed-price, level-of-effort term contracts, and they are appropriate when the government is acquiring analyst-hours in a relatively predictable cadence.
+
+However, there is a moderate concern. Financial analyst advisory support is inherently variable in intensity — budget cycles, audits, and program changes can dramatically shift workload. A fixed 7-FTE structure over 5+ years provides no mechanism for the government to scale effort to actual need. If the workload diminishes, the government still pays for all 7 FTEs. If it increases, the government must either absorb the shortfall with existing staff or execute a contract modification. A T&amp;M or labor-hour contract with estimated not-to-exceed hours would give the government more flexibility to right-size consumption of contractor effort.
+
+On balance, this is a severity 2. The FFP level-of-effort structure is a recognized and legally appropriate contract type for staff augmentation, and the government may have good reasons to prefer cost predictability over flexibility. The FTE counts are small (7 total) and the scope — financial analyst support for a Navy command — is reasonably well-understood. The mismatch is real but not severe: the government is not using a cost-reimbursement contract for something that should be fixed-price, nor is it using T&amp;M for something with a clearly defined deliverable. The concern is more about flexibility than fundamental misalignment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Labor | 1000 | Cost | Fee | Total ... Travel | 3000 | Cost | Fee | Total (Base Year sheet, CLIN structure showing Cost + Fee columns for labor CLINs)</blockquote>
+  <div class="ev-explanation">The CLIN structure uses a Cost + Fee format for labor (CLIN 1000 in the base year, CLIN 5000 in option years), indicating a cost-reimbursement vehicle for the labor component. The price template breaks out Fringe, Overhead, G&amp;A, and Fee separately, which is characteristic of cost-reimbursement pricing rather than FFP or T&amp;M.</div>
+</div><div class="evidence-item">
+  <blockquote>FFP Labor CLINS | CR Travel CLINS (Summary sheet column headers)</blockquote>
+  <div class="ev-explanation">The Summary sheet explicitly labels the labor CLINs as &#x27;FFP Labor CLINS&#x27; and the travel CLINs as &#x27;CR Travel CLINS.&#x27; This reveals a hybrid structure: labor is priced as Firm-Fixed-Price while travel is Cost-Reimbursement. This is an unusual combination that warrants scrutiny.</div>
+</div><div class="evidence-item">
+  <blockquote>Senior Financial Analyst III (Project Manager) (KEY) | 1 | [Labor Hours blank] ... Financial Analyst III (Accounting Analyst) (KEY) | 2 ... Financial Analyst III | 2 ... Financial Analyst II | 2 ... Subtotals | 7 | 0</blockquote>
+  <div class="ev-explanation">The price template fixes 7 FTEs across all periods of performance with no mechanism to adjust labor hours up or down. Labor hours are left blank for offerors to fill in, but the FTE counts are fixed at 7 across all years including option years, suggesting the government is buying a set staffing level rather than a defined output or a variable quantity of hours.</div>
+</div><div class="evidence-item">
+  <blockquote>TOTAL FFP Price | Fringe | 0 | Overhead | 0 | G&amp;A Onsite | 0 | Fee | 0 (Summary sheet)</blockquote>
+  <div class="ev-explanation">The Summary sheet aggregates all labor into a single &#x27;TOTAL FFP Price&#x27; with separately broken-out indirect cost rates. This structure — fixed FTE counts priced at burdened rates over defined periods — is effectively a level-of-effort FFP term contract. For financial analyst advisory support work, where the actual volume of tasks and priorities can shift significantly across a 5-year period, a rigid level-of-effort FFP structure may not give the government flexibility to scale effort up or down based on actual need.</div>
+</div><div class="evidence-item">
+  <blockquote>Far 52.217-8 6-Month Extension (separate sheet with identical 7-FTE structure)</blockquote>
+  <div class="ev-explanation">The solicitation explicitly prices a FAR 52.217-8 extension period, which extends the contract at the same staffing level. While this is standard practice, combined with the fixed FTE structure across 5+ years of financial analyst support, it reinforces that the government is buying a fixed headcount rather than measurable outcomes — a pattern that can lead to paying for underutilized staff if workload decreases, or scope creep if workload increases beyond what 7 FTEs can handle at the fixed price.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="DD254 CNSP Budgeting Solicitation.pdf">DD254 CNSP Budgeting Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/5357da6fed5443d5bcc71ac735916e6f_DD254+CNSP+Budgeting+Solicitation.pdf" download="DD254 CNSP Budgeting Solicitation.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Price Format Template.xlsx">Price Format Template.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/5357da6fed5443d5bcc71ac735916e6f_Price+Format+Template.xlsx" download="Price Format Template.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0024426RS005.pdf">Solicitation - N0024426RS005.pdf</div></div>
+  <a class="dl-btn" href="../attachments/5357da6fed5443d5bcc71ac735916e6f_Solicitation+-+N0024426RS005.pdf" download="Solicitation - N0024426RS005.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment N0024426RS0050002 SF 30.pdf">Solicitation Amendment N0024426RS0050002 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/5357da6fed5443d5bcc71ac735916e6f_Solicitation+Amendment+N0024426RS0050002+SF+30.pdf" download="Solicitation Amendment N0024426RS0050002 SF 30.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment N0024426RS0050003 SF 30.pdf">Solicitation Amendment N0024426RS0050003 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/5357da6fed5443d5bcc71ac735916e6f_Solicitation+Amendment+N0024426RS0050003+SF+30.pdf" download="Solicitation Amendment N0024426RS0050003 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

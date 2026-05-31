@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USDA-ARS-NEA Qiagin Ingenuity Pathway Analysis (IPA), Limited Concurrent License — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>USDA-ARS-NEA Qiagin Ingenuity Pathway Analysis (IPA), Limited Concurrent License (LCL) software licenses</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b68484dde2b8471c8a0233c8aa8d566b</span>
+      <a class="sam-link" href="https://sam.gov/opp/b68484dde2b8471c8a0233c8aa8d566b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">AGRICULTURE, DEPARTMENT OF › AGRICULTURAL RESEARCH SERVICE › USDA ARS AFM APD</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP) Purchase Order</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (05/08/2026 to 05/07/2027) + 4 one-year option periods, total not to exceed 5 years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Technical Approach</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward commercial software license — five concurrent seats of Qiagen IPA, delivered electronically. The accountability structure is correspondingly minimal: one deliverable due within 10 days of award, one one-time pricing data submission required by OMB policy, and standard FAR 52.212-4 commercial terms. There are no weekly status reports, no prescribed report formats, no required meetings, no project management plan tracking, and no QA surveillance plan. The Section 508 and IPv6 compliance language is boilerplate carried over from standard USDA IT acquisition templates and represents legitimate legal mandates rather than process compliance theater. The absence of outcome metrics (e.g., uptime SLAs, user satisfaction) is unremarkable for a pure software license acquisition where the &#x27;performance&#x27; of the vendor is simply delivering and maintaining access to a commercial product. The solicitation does not exhibit the hallmarks of the compliance-over-outcomes sin: there is no reporting burden, no overlapping cadences, and no accountability structure that measures plan adherence over results. Severity 1 is appropriate — the reporting requirements are light and commensurate with the nature of the acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Deliverable | Submitted to: | Due Date: QIAGEN IPA (Ingenuity Pathway Analysis) Analysis Match Explorer LCL Subscriptions and Support | | Within 10 Days of Award</blockquote>
+  <div class="ev-explanation">The single deliverable table specifies only a delivery deadline. There are no prescribed report formats, activity logs, or status reports required — the accountability structure is minimal and focused on delivery of the licensed product, not process documentation.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide line-item pricing data on all software licenses provided to USDA at award and/or during performance of the contract/order. The attachment entitled &#x27;Software Template Line-Item Pricing&#x27; must be completed and provided to the Contracting Officer&#x27;s Representative within 10 days of award, or within 10 days of activation for licenses provided after the award date.</blockquote>
+  <div class="ev-explanation">This is a one-time administrative data submission tied to a legal requirement (OMB M-16-12 software license inventory), not a recurring process-compliance reporting mechanism. It is narrow and purposeful rather than reflective of a surveillance-heavy QA structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the insider rewards sin in the structural sense the rubric describes. The solicitation is a combined synopsis/solicitation for a named commercial software product — Qiagen Ingenuity Pathway Analysis (IPA), Limited Concurrent License — and it explicitly announces its intent to award sole source to Qiagen, LLC, the sole rights-holder of that product. There are no evaluation criteria requiring prior contracts at specific dollar thresholds, no federal-specific experience mandates, no short lookback windows, and no personnel qualification requirements that would function as incumbent filters in a competitive environment. The technical evaluation is purely product-compliance: can the offeror deliver the named product? The restriction of competition flows from the proprietary nature of the software itself (a legitimate basis for sole source under FAR 6.302-1), not from experience criteria designed to screen out non-incumbents. The sole source declaration and the attached J&amp;A are the appropriate transparency mechanisms for this type of procurement. The insider rewards sin applies to competitive solicitations where structural criteria disadvantage new entrants while appearing neutral. This solicitation does not fit that pattern — it is simply a sole source procurement for a proprietary commercial software license. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>USDA-ARS-NEA intends to make an award on a sole source basis to Qiagen, LLC. See Attachment 2 – J&amp;A Restriction of Competition.</blockquote>
+  <div class="ev-explanation">The solicitation openly declares its intent to award sole source to Qiagen, LLC. This is not a hidden insider rewards pattern — it is an explicit, disclosed restriction of competition. The J&amp;A (Justification and Approval) is the formal mechanism for this. Sole source awards are a separate procurement phenomenon from the structural insider rewards sin, which concerns how competitive solicitations are written to exclude non-incumbents through experience criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>Ability to meet requirements Attachment 1 – Statement of Work, including verification that the proposed item fully complies with those Statement of Work.</blockquote>
+  <div class="ev-explanation">The only stated technical acceptability criterion is whether the offeror can provide the specified product (Qiagen IPA). There are no experience thresholds, dollar minimums, lookback windows, federal experience mandates, or personnel qualification requirements. This is a product-matching test, not an incumbent-favoring experience screen.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward commercial software license — Qiagen IPA, a bioinformatics tool — acquired on a sole-source basis from the software&#x27;s developer/publisher. The scope is narrow and well-defined: acquire 5 LCL subscriptions, receive updates, and access 24x7 technical support. This is not a services contract where process prescription would typically emerge.
+
+The SOW is brief and outcome-oriented. The three core deliverables (licenses, updates, technical support) define WHAT is needed without specifying HOW Qiagen must provision, staff, or operate its product. There are no staffing structures prescribed, no workflow mandates, and no step-by-step operational procedures.
+
+The bulk of the attachment content is boilerplate: Section 508 accessibility compliance requirements (legal mandate under 29 U.S.C. 794d), IPv6 compliance (OMB M-05-22), Privacy Act compliance, and software line-item pricing data requirements for inventory management (OMB M-16-12). These are all regulatory compliance obligations — legitimate constraints that protect government interests, not prescriptive process choices that constrain vendor solution design.
+
+The Section 508 language is extensive and detailed, but its length reflects the complexity of federal accessibility law rather than organizational dysfunction or process prescription. Requiring an Accessibility Conformance Report (ACR) and a VPAT is a standard outcome verification mechanism, not a mandate on how Qiagen must build or configure its product.
+
+The AGAR 452.203-72 clause regarding unenforceable supplier terms is similarly boilerplate — it governs the legal relationship with the vendor, not how the work must be performed.
+
+In summary, this solicitation exhibits minimal requirement sprawl. It is a competently scoped commercial item acquisition where the &#x27;how&#x27; is essentially left to the vendor (Qiagen, the product&#x27;s own developer), and the requirements focus on what must be delivered (licenses, access, support availability) and what legal/regulatory standards must be met. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall perform all work described in this Statement of Work in accordance with all applicable Federal, State, and local laws, regulations, codes, technical specifications, manufacturers guidelines, USDA, REE, and the ARS mission.</blockquote>
+  <div class="ev-explanation">This is a general compliance obligation, not a prescriptive process mandate. It does not tell the vendor how to deliver the software licenses.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide 24x7 technical support by virtual meeting, email, and/or phone.</blockquote>
+  <div class="ev-explanation">This specifies support channels, which is mildly prescriptive, but it is actually outcome-oriented (24x7 availability) with reasonable channel options listed. It does not dictate how Qiagen must staff or structure its support operations — only that multiple contact modes must be available. Given this is a sole-source software license acquisition, such a specification is appropriate and proportionate.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. The core regulatory accumulation issue is concentrated in the Statement of Work&#x27;s Section 508 compliance section, which runs approximately four pages and repeats nearly identical citation blocks — including the same five-citation header stack and multiple 36 CFR 1194 subpart lists — across seven separate product-type subsections. The product being procured is a commercial off-the-shelf bioinformatics software license (Ingenuity Pathway Analysis) with five concurrent seats. It is not custom ICT development, not a telecommunications product, not a desktop computer, and not a multimedia authoring tool. Yet the SOW imposes Section 508 compliance obligations for all of those categories without distinguishing which apply. This is textbook copy-forward accumulation: a boilerplate IT SOW template has been applied wholesale without pruning inapplicable sections.
+
+The problem does not rise to severity 3 for several reasons. First, the total number of distinct regulatory instruments cited is not enormous — the bulk comes from repeated citation of the same Section 508 framework, not from an 88-item &#x27;Applicable Documents&#x27; dump. Second, Section 508 itself is genuinely applicable to federal IT software procurement, so the core citation is legitimate; the sin is in the undifferentiated repetition and failure to scope it to the actual product. Third, the FAR clauses incorporated in the main solicitation body are standard commercial item clauses (52.212-4, 52.212-1, etc.) listed in a conventional and expected format — these are not rule pools. Fourth, there are no outright contradictions between cited regulations and the solicitation&#x27;s purpose of the type seen in the most egregious examples.
+
+The severity 2 rating reflects that the compliance section is notably more voluminous than the scope warrants, that several cited regulatory categories (telecommunications, desktop hardware, video/multimedia) are facially inapplicable to a software subscription, that the IPv6 OMB memorandum is cited without context or apparent relevance, and that a vendor new to this agency would need to invest non-trivial effort to determine which of the repeated Section 508 subpart citations actually carry operational weight for this specific product. However, a sophisticated vendor in the bioinformatics software space would likely recognize the boilerplate nature of the SOW template and not be seriously misled about their actual compliance obligations.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Section 508 Accessibility Standards
+1) 29 U.S.C. 794d (Rehabilitation Act as amended)
+2) 36 CFR 1194 (Section 508 standards)
+3) http://www.access-board.gov/sec508/508standards.htm (Section 508 standards)
+4) FAR 39.2 (Section 508)
+5) http://www.ocio.usda.gov/document/departmental-regulation-4030-001 (USDA standards, policies, and procedures for Section 508)</blockquote>
+  <div class="ev-explanation">The SOW repeats this same five-item Section 508 citation block at least seven times across successive subsections (software applications, web-based applications, telecommunication products, video/multimedia, self-contained products, desktop computers, help desk services). Each iteration is nearly identical. Rather than stating once that Section 508 applies to all ICT deliverables and then distinguishing which specific CFR subparts apply to which product category, the document copy-pastes the full citation stack for every conceivable product type — including categories (telecommunications products, desktop computers) that are plainly inapplicable to a software license subscription procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>• 36 CFR Part 1194.21 provisions a-l
+• 36 CFR Part 1194.22 provisions a-p
+• 36 CFR Part 1194.23 provisions a-k[4]
+• 36 CFR Part 1194.24 provisions a-e
+• 36 CFR Part 1194.25 provisions a-j[4]
+• 36 CFR Part 1194.26 provisions a-d
+• 36 CFR Part 1194.31 provisions a-f
+• 36 CFR Part 1194.41 provisions a-c</blockquote>
+  <div class="ev-explanation">This undifferentiated list of eight 36 CFR Part 1194 subparts is presented as a single block applying collectively to the SOW without explanation of which subparts actually govern a commercial software analytics license. Subpart 1194.23 (telecommunications products) and 1194.24 (video/multimedia) are cited without any explanation of how they relate to Ingenuity Pathway Analysis bioinformatics software. No prioritization or scoping guidance is provided.</div>
+</div><div class="evidence-item">
+  <blockquote>For telecommunication products and services the Contractor/Developer shall comply with the following standards, policies, and procedures: Section 508 Accessibility Standards... 36 CFR Part 1194.23 provisions a-k</blockquote>
+  <div class="ev-explanation">IPA is a commercial bioinformatics pathway analysis software tool — not a telecommunications product or service. Citing telecommunications accessibility standards (36 CFR 1194.23) for a software license subscription is irrelevant on its face. This is a classic copy-forward inclusion: a template SOW has been applied to a procurement without reviewing whether all cited regulatory categories are applicable.</div>
+</div><div class="evidence-item">
+  <blockquote>For desktop and portable computers, the Contractor/Developer shall comply with the following standards, policies, and procedures: Section 508 Accessibility Standards: 1) 29 U.S.C. 794d... 36 CFR Part 1194.26 provisions a-d</blockquote>
+  <div class="ev-explanation">The SOW imposes desktop and portable computer accessibility standards (36 CFR 1194.26) on what is explicitly a software license subscription. USDA is not procuring hardware. Applying hardware accessibility standards to a software analytics license reflects boilerplate accumulation rather than curated applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall adhere to the Privacy Act, Title 5 of the U.S. Code, Section 52a and applicable agency rules and regulations... This contract involves the acquisition of Information Technology (IT) that uses Internet Protocol (IP) Technology. In order to comply with OMB Memorandum M-05-22, Transition Planning for Internet Protocol Version 6 (IPv6) issued on August 2, 2005...</blockquote>
+  <div class="ev-explanation">OMB M-05-22 is a 2005 memorandum on IPv6 transition planning, referenced here without explanation of how it applies to a commercial off-the-shelf bioinformatics software subscription. No context is provided for why IPv6 interoperability is a material concern for IPA pathway analysis software used internally by USDA researchers, nor what deliverable would require IPv6 compliance certification. This appears to be a standard IT SOW template clause inserted without review of relevance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial software license procurement for Qiagen IPA (Ingenuity Pathway Analysis), a named, commercially available bioinformatics software product. The government is buying a fixed number of annual concurrent licenses (5 subscriptions) with associated vendor support, deliverable within 10 days of award. The requirement is fully defined, the product has a catalog part number, the quantity is fixed, and the period of performance is a clean one-year base with four option years. Firm-fixed-price is the textbook appropriate contract type for this situation: FAR Part 12 commercial item acquisitions of software licenses are almost universally FFP because the price, scope, and deliverable are all known in advance. There is no meaningful risk of scope creep, no variable labor component, and no technical uncertainty that would warrant T&amp;M or cost-reimbursement. The sole-source justification (Qiagen, LLC as the only vendor) does not affect the pricing structure analysis — it affects competition, not contract type. FFP is the correct and expected instrument here. No square peg issue exists.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>It is anticipated that a single firm-fixed price purchase order consisting of one (1) one-year base period and four (4) one-year option periods shall be awarded as a result of this synopsis/solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states firm-fixed-price (FFP) as the contract type. FFP is the standard and appropriate pricing structure for commercial software license subscriptions, which have a known, predictable annual cost.</div>
+</div><div class="evidence-item">
+  <blockquote>IPA Analysis Match Explorer LCL, 836507 ... Period of Performance: 05/08/2026 to 05/07/2027 ... 1 YR</blockquote>
+  <div class="ev-explanation">The requirement is a single annual software license (quantity 1, unit YR) for a named commercial product with a known catalog part number (836507). The scope is entirely predictable: the government receives a defined license for a defined period at a defined price. There is no labor component, no evolving scope, and no ambiguity about what is being delivered.</div>
+</div><div class="evidence-item">
+  <blockquote>The United States Department of Agriculture (USDA), Agriculture Research Service (ARS), National Center for Cool and Cold Water Aquaculture (NCCCWA), Beltsville Human Nutrition Research Center (BHNRC), Animal Biosciences and Biotechnology Laboratory (ABBL), and Animal Genome Improvement Laboratory (AGIL) requires contractor assistance: 1. Acquire software licenses for 5 subscriptions. 2. Provide updates and access to new software versions. 3. Provide 24x7 technical support by virtual meeting, email, and/or phone.</blockquote>
+  <div class="ev-explanation">The three stated tasks — license access, software updates, and vendor support — are all standard components of a commercial SaaS/software subscription bundle. These are well-defined, routine deliverables with no variable labor or uncertain scope that would argue for T&amp;M or cost-reimbursement pricing.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="1232SA26Q0528.pdf">1232SA26Q0528.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b68484dde2b8471c8a0233c8aa8d566b_1232SA26Q0528.pdf" download="1232SA26Q0528.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - Statement of Work.pdf">Attachment 1 - Statement of Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b68484dde2b8471c8a0233c8aa8d566b_Attachment+1+-+Statement+of+Work.pdf" download="Attachment 1 - Statement of Work.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 - JA Restriction of Competition_Redacted.pdf">Attachment 2 - JA Restriction of Competition_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b68484dde2b8471c8a0233c8aa8d566b_Attachment+2+-+JA+Restriction+of+Competition_Redacted.pdf" download="Attachment 2 - JA Restriction of Competition_Redacted.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

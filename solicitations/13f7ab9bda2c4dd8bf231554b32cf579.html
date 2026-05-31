@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>USGS Wildlife Satellite Tags  — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>USGS Wildlife Satellite Tags </h1>
+    <div class="notice-meta">
+      <span class="pill">📋 13f7ab9bda2c4dd8bf231554b32cf579</span>
+      <a class="sam-link" href="https://sam.gov/opp/13f7ab9bda2c4dd8bf231554b32cf579/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › US GEOLOGICAL SURVEY › OFC OF ACQUSITION  GRANTS-NATIONAL</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334220</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 days after receipt of order</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technically Acceptable</li><li>Lowest Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial item purchase order for 20 COTS wildlife satellite tags and one reader. The accountability structure is minimal and appropriate for that scope. There are no reporting requirements whatsoever — no weekly status reports, no monthly progress reports, no QA surveillance plans, no meeting cadences. The entire &#x27;QA&#x27; mechanism is a binary acceptable/unacceptable evaluation at the quotation stage based on whether the proposed product meets eight defined technical specifications (weight, GPS capability, Argos compatibility, duty cycle customization, harness attachment style, waterproofing, solar power, and thermal tolerance). Delivery within 30 days is the only post-award performance metric. The Technical Specifications are outcome-oriented: they define what the tags must do (e.g., 6.6g or less, GPS-enabled, Argos-compatible) rather than specifying how the vendor must manufacture or document them. The Section 508 and IT Security attachments are boilerplate templates that appear to have been attached as standard agency documents. The Section 508 attachment does impose some vendor reporting (Accessibility Conformance Report submission), which is a mild compliance mechanism, but it is standard for federal ICT procurement and proportionate to the purchase. The IT Security checklist marks most items N/A for COTS hardware, which is appropriate. The solicitation does not exhibit the hallmarks of compliance-over-outcomes: there are no overlapping reporting cadences, no prescribed report formats, no plan-adherence tracking, and no QA surveillance apparatus. For a simple commercial product purchase, this is the correct approach. Severity is 1 — reporting requirements are light and the accountability structure, while thin, is appropriately calibrated to the transaction type.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offers shall be evaluated based on lowest price technically acceptable. In determining technical acceptability, the following non-pricing criteria will be considered: Acceptable - quote meets or exceeds all requirements in the technical specifications and solicitation. Unacceptable - quote does not meet or exceed all requirements in the technical specifications and solicitation.</blockquote>
+  <div class="ev-explanation">The evaluation criterion is binary pass/fail against technical specifications — it is outcome-oriented in the sense that it asks whether the product meets defined physical and functional requirements. There is no process compliance element here; the government is asking &#x27;does the product work?&#x27; not &#x27;did the vendor follow a prescribed process?&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Quality Control. All software or hardware purchased must be free of malicious code such as viruses, Trojan horse programs, worms, spyware, etc. Validation of this must be written into the contract.</blockquote>
+  <div class="ev-explanation">The IT Security Guidelines checklist item 13 references a quality control requirement that is product-focused (malware-free hardware/software) rather than process-focused. For a COTS hardware purchase of satellite tags, this is a reasonable acceptance check on the delivered item, not a compliance theater mechanism.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial item purchase — 20 wildlife satellite tags and one reader — procured via simplified acquisition procedures under FAR 12.201-1. The evaluation methodology is Lowest Price Technically Acceptable (LPTA), where technical acceptability is determined solely by whether the offered product meets the technical specifications listed in Attachment 1. The technical specifications are entirely product-focused: weight ≤6.6g, GPS-enabled, Argos-compatible, customizable duty cycle, backpack harness attachment, waterproof, solar powered, and capable of operating at high temperatures. There are no experience requirements for vendors, no past performance evaluation factors, no personnel qualification requirements, no dollar-threshold contract history demands, no federal-specific experience mandates, and no lookback windows. The solicitation explicitly names &#x27;PinPoint Argos Solar tags from Lotek Wireless Inc.&#x27; as a &#x27;better than or equal to&#x27; reference — a brand-name-or-equal specification — which is a standard commercial procurement approach, not an incumbency mechanism. Any small business that can supply a conforming product meeting the eight listed technical criteria can compete on equal footing. The question for award is simply: does the product meet spec at the lowest price? A vendor who has never sold to this agency, or to the federal government at all, faces no structural barrier. There is no evidence of insider rewards in this solicitation.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a commercial item purchase order for specialized scientific hardware — 20 wildlife satellite tags and a reader. The solicitation is appropriately scoped for what it is. The technical specifications define product attributes (weight, GPS capability, satellite compatibility, power source, weatherproofing) that reflect genuine scientific constraints tied to the research mission, not prescriptive process mandates. The vendor is not told how to manufacture the tags, how to manage internal processes, or how to staff a team. The evaluation approach (lowest price technically acceptable) is clean and appropriate. The Section 508 and IT Security attachments are boilerplate USGS templates that are largely marked N/A for COTS hardware, which is the correct application of those templates. There is no evidence of incumbent capture through process prescription, no staffing mandates, no step-by-step workflow requirements, and no copy-paste operational procedures. The one mild concern — naming a specific manufacturer&#x27;s product — is mitigated by the &#x27;or equal&#x27; standard and is standard practice for specialized scientific equipment procurement. This solicitation exhibits minimal requirement sprawl and is competently written for its acquisition type.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The equipment must meet or exceed the following specifications: 1) Size requirements are most important; this is based on a biological tagging threshold principle of 3% body mass as a tag burden. a. 6.6 g or less in mass 2) GPS enabled ... 3) Compatible with Argos satellite platform ... 4) Customizable collection schedule (duty cycle) to account for seasonal changes to conserve battery 5) Backpack harness attachment style ... 6) Waterproof 7) Solar powered 8) Can operate at high environmental temperatures</blockquote>
+  <div class="ev-explanation">These specifications define physical and functional characteristics of the product being purchased, not how the vendor must perform work. Each requirement reflects a legitimate scientific or operational constraint rooted in wildlife research needs (tag weight limit derives from 3% body mass principle; Argos compatibility enables remote data delivery; harness style is required for attachment to live birds). This is appropriate outcome-based specification for a commercial product acquisition — it defines what the product must do and be, not how the vendor must manufacture or deliver it.</div>
+</div><div class="evidence-item">
+  <blockquote>The USGS, Cooperative Research Units in Reston, VA, supporting the Ecosystems Mission Area requests the purchase of 20 (better than or equal to) PinPoint Argos Solar tags from Lotek Wireless Inc.</blockquote>
+  <div class="ev-explanation">The technical specifications name a specific product and manufacturer (Lotek Wireless PinPoint Argos Solar tags), which approaches brand-name specification. However, the solicitation language &#x27;better than or equal to&#x27; signals an &#x27;or equal&#x27; standard, and the RFQ form uses &#x27;ETOB than PinPoint Argos Solar Tags,&#x27; indicating equivalents are acceptable. This is the closest thing to prescriptive vendor lock-in in the document, but it is a common and FAR-sanctioned approach for specialized scientific equipment with narrow commercial markets. It does not constitute process sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, straightforward commercial purchase — 20 wildlife satellite tracking tags and one reader, total value likely in the low tens of thousands of dollars, from a known commercial supplier (Lotek Wireless), for delivery within 30 days. The Technical Specifications attachment is well-written and appropriately scoped: eight clear, mission-driven specifications with biological rationale provided for size requirements. That core document is not a rule pool problem.
+
+The compliance burden, however, is moderately disproportionate to the acquisition. The most significant issue is the Section 508 attachment, which imposes user interface accessibility testing requirements — VPAT preparation, functional performance criteria for users with vision or hearing limitations, universal design narrative — on a device that has no human user interface. It is worn by a bird. The government reserved the right to test the device for Section 508 conformance. This is a clear case of a template-driven requirement that was never reviewed for relevance to the specific purchase.
+
+The FISMA IT Security Guidelines attachment is less problematic because it does include N/A markings for the COTS hardware column, but its inclusion as a full 6-page attachment with no accompanying narrative stating &#x27;items marked N/A for COTS hardware do not apply to this acquisition&#x27; still creates unnecessary interpretive work for vendors.
+
+The FAR clause list (23 clauses in Section C) is within normal range for a commercial supply purchase and largely represents standard boilerplate. The supply chain security representations (52.240-90) are lengthier than typical for this scope but not unreasonable given the satellite/telecommunications nature of the hardware.
+
+The overall picture is a moderate rule pool: the solicitation did not curate its compliance attachments to this specific acquisition. Templates were attached without meaningful review of applicability. However, the sins are bounded — the core technical requirements are clear, the FAR clause count is not excessive, and most of the N/A markings in the FISMA checklist partially mitigate the IT security burden. No regulations directly contradict the solicitation&#x27;s purpose (unlike the VA text-messaging example), and a sophisticated small-business vendor in the wildlife telemetry space would likely recognize the boilerplate nature of the 508 and FISMA attachments. Severity 2 is appropriate: elevated compliance burden driven by template reuse, but not a severe or impenetrable wall of regulation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>C.1 52.203-17 Contractor Employee Whistleblower Rights. (NOV 2023)
+C.2 52.204-13 System for Award Management Maintenance. (OCT 2018)
+C.3 52.209-10 Prohibition on Contracting With Inverted Domestic Corporations. (NOV 2015)
+C.4 52.212-4 Contract Terms and Conditions - Commercial Products and Commercial Services. (NOV 2023)
+C.5 52.219-28 Postaward Small Business Program Rerepresentation. (JAN 2025)
+C.6 52.222-3 Convict Labor. (JUN 2003)
+C.7 52.222-19 Child Labor - Cooperation with Authorities and Remedies. (JAN 2025)
+C.8 52.222-36 Equal Opportunity for Workers with Disabilities. (JUN 2020)
+C.9 52.222-50 Combating Trafficking in Persons. (OCT 2025)
+C.10 52.225-1 Buy American - Supplies. (OCT 2022)
+C.11 52.226-8 Encouraging Contractor Policies To Ban Text Messaging While Driving. (MAY 2024)</blockquote>
+  <div class="ev-explanation">The contract clauses section lists 23 FAR/agency clauses, many of which are standard boilerplate for commercial supply purchases, but several warrant scrutiny for a simple wildlife tag purchase: 52.222-3 Convict Labor (JUN 2003) and 52.222-50 Combating Trafficking in Persons are legitimate though routine. More notably, 52.226-8 (Text Messaging While Driving) and 52.222-36 (Equal Opportunity for Workers with Disabilities) appear to be standard copy-forward inclusions with no particular relevance to a 20-unit hardware purchase from a commercial vendor. None of these clauses include any explanation of how they specifically apply to this acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>Attachment 2: Section 508 Compliance — &#x27;Provide an Accessibility Conformance Report (ACR) for each commercially available Information and Communication Technology (ICT) item offered through this contract. Create the ACR using the Voluntary Product Accessibility Template Version 2.1 or later...&#x27;</blockquote>
+  <div class="ev-explanation">The Section 508 compliance attachment imposes a full-scale accessibility conformance reporting requirement — including VPAT preparation, descriptions of universal design principles, plans for non-conforming features, and user scenario descriptions — on a wildlife satellite transmitter tag. The 508 standards cited (E201, E206, E208, Chapter 4, Chapter 6, functional performance criteria 302.1 through 302.9) are written for software applications, user interfaces, and information systems. A solar-powered Argos GPS wildlife backpack harness tag worn by a Ridgway&#x27;s rail is not a user interface device and has no visual mode of operation, auditory mode, or manual operation interface for human users. The government even reserves the right to &#x27;perform testing on some or all of the Offeror&#x27;s proposed ICT items to validate Section 508 conformance claims.&#x27; This is a template-driven requirement that was clearly not reviewed for applicability to this specific hardware.</div>
+</div><div class="evidence-item">
+  <blockquote>FISMA 18-Point Checklist – IT Security Guidelines — Items 1 through 18 cited across six pages, with most items marked &#x27;N/A&#x27; for COTS Hardware or Software, but the entire framework is included as Attachment 3.</blockquote>
+  <div class="ev-explanation">The IT Security Guidelines attachment is an 18-point FISMA compliance checklist covering background investigations, nondisclosure agreements, annual security self-assessments, contingency plans (NIST SP 800-34), certification and accreditation (NIST SP 800-37, 800-18, 800-30, 800-53A), internet logon banners, and incident reporting. The majority of checklist items are explicitly marked &#x27;N/A&#x27; for the COTS Hardware/Software column — the category applicable to wildlife satellite tags. Despite these N/A markings, the full 6-page checklist is included as a contract attachment without any narrative explanation that the requirements do not apply, leaving vendors to interpret the matrix themselves. The inclusion of this framework for a commercial off-the-shelf hardware purchase creates an unnecessary interpretive burden.</div>
+</div><div class="evidence-item">
+  <blockquote>E.9 52.240-90 Security Prohibitions and Exclusions Representations and Certifications. (Deviation Effective Date) — [followed by four pages of definitions and certification requirements covering Sudan, Iran, FASCSA orders, covered telecommunications equipment, and sensitive technology]</blockquote>
+  <div class="ev-explanation">The solicitation includes four pages of supply chain security representations covering Sudan restricted business operations, Iran petroleum sanctions, sensitive technology export controls, FASCSA orders, and covered telecommunications equipment. These provisions are reproduced in full text. While supply chain security concerns are not unreasonable for satellite communications hardware (which could theoretically implicate covered telecommunications), the solicitation provides no explanation of why this full provision is included or which specific elements are most relevant to Argos GPS wildlife tags sourced from Lotek Wireless Inc. — a Canadian commercial wildlife tracking company. The combination of full-text reproduction and lack of context amplifies the compliance burden relative to the scope of work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simple commercial product purchase: 20 satellite animal tags and one reader, with well-defined technical specifications, a fixed quantity, a named reference product, and a 30-day delivery window. Firm-fixed pricing is the correct and expected contract type for this acquisition. The government knows exactly what it wants, the market price for these items is determinable through competition, and there is no labor, no ongoing services, and no scope uncertainty that would argue for T&amp;M or cost-reimbursement. The FAR explicitly favors FFP for commercial product purchases, and this solicitation is precisely that use case. There is no square peg here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Please provide open market firm-fixed discounted pricing for the following in accordance with the attached Technical Specifications, and applicable clauses. Wildlife Satellite Tags ETOB than PinPoint Argos Solar Tags</blockquote>
+  <div class="ev-explanation">The solicitation explicitly requests firm-fixed pricing for the supply of commercial hardware items — satellite animal tags and a reader. This is appropriate for a commercial product purchase where the deliverable, quantity, and specifications are well-defined.</div>
+</div><div class="evidence-item">
+  <blockquote>The equipment must meet or exceed the following specifications: 1) Size requirements are most important... 6.6 g or less in mass 2) GPS enabled... 3) Compatible with Argos satellite platform... 4) Customizable collection schedule... 5) Backpack harness attachment style... 6) Waterproof 7) Solar powered 8) Can operate at high environmental temperatures</blockquote>
+  <div class="ev-explanation">The technical requirements are specific, objective, and stable. The government knows exactly what it wants: 20 commercial satellite tags with defined physical and functional characteristics. This is precisely the scenario where FFP is appropriate — there is no scope uncertainty, no labor component, and no reason costs cannot be estimated.</div>
+</div><div class="evidence-item">
+  <blockquote>20 (better than or equal to) PinPoint Argos Solar tags from Lotek Wireless Inc... Delivery Timeframe: 30 days</blockquote>
+  <div class="ev-explanation">The quantity (20 units), the reference product (PinPoint Argos Solar tags from a named manufacturer), and the delivery timeframe (30 days) are all fixed and well-defined. This is a straightforward commercial product purchase — FFP is the textbook-appropriate contract type for this scenario.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="IT_Security_Guidelines.pdf">IT_Security_Guidelines.pdf</div></div>
+  <a class="dl-btn" href="../attachments/13f7ab9bda2c4dd8bf231554b32cf579_IT_Security_Guidelines.pdf" download="IT_Security_Guidelines.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Section_508_Compliance.pdf">Section_508_Compliance.pdf</div></div>
+  <a class="dl-btn" href="../attachments/13f7ab9bda2c4dd8bf231554b32cf579_Section_508_Compliance.pdf" download="Section_508_Compliance.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140G0126Q0132.pdf">Sol_140G0126Q0132.pdf</div></div>
+  <a class="dl-btn" href="../attachments/13f7ab9bda2c4dd8bf231554b32cf579_Sol_140G0126Q0132.pdf" download="Sol_140G0126Q0132.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Technical_Specifications.pdf">Technical_Specifications.pdf</div></div>
+  <a class="dl-btn" href="../attachments/13f7ab9bda2c4dd8bf231554b32cf579_Technical_Specifications.pdf" download="Technical_Specifications.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

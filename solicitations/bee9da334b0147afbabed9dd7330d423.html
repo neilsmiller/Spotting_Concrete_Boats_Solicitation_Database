@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landover Warehouse Slab On Grade (SOG) Evaluation — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Landover Warehouse Slab On Grade (SOG) Evaluation</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 bee9da334b0147afbabed9dd7330d423</span>
+      <a class="sam-link" href="https://sam.gov/opp/bee9da334b0147afbabed9dd7330d423/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-27</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">TREASURY, DEPARTMENT OF THE › BUREAU OF ENGRAVING AND PRINTING › OFFICE OF THE CHIEF PROCUREMENT OFFICER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-27</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Approach</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a narrowly scoped engineering evaluation contract — a structural analysis of a concrete slab on grade — not a multi-year IT services or operations contract. The PWS is correspondingly lean. The accountability structure consists essentially of: (1) one preliminary schedule submission, (2) a signed and sealed technical report subject to BEP review and approval, and (3) substantial and final completion walkthrough procedures. There are no recurring status reports, no prescribed report formats with mandated sections, no weekly or monthly reporting cadences, and no overlapping reporting obligations. The substantial/final completion language is boilerplate carried over from construction contracts and is somewhat mismatched to a pure engineering study, but it does not create compliance theater — it simply defines acceptance milestones. The primary outcome measure is implicit but present: the technical report must achieve the stated purpose of the SOW (determine maximum load capacity, loading patterns, and enhancement recommendations), and BEP retains approval authority over the deliverable. This is exactly the kind of outcome-focused acceptance mechanism the sin&#x27;s definition treats as appropriate. The solicitation does not define success as &#x27;completed documentation&#x27; in a hollow sense — the signed and sealed report from a licensed Maryland PE is both the deliverable and the evidence of substantive technical work. Severity 1 is appropriate: reporting requirements are minimal, and the accountability structure, while sparse, is oriented toward deliverable quality rather than process adherence.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall provide a preliminary schedule one week after contract is awarded and at the kickoff meeting.</blockquote>
+  <div class="ev-explanation">This is the closest thing to a process-compliance requirement in the solicitation — a schedule submission requirement. However, it is a single, minimal administrative deliverable for a short-duration engineering study, not a recurring reporting burden.</div>
+</div><div class="evidence-item">
+  <blockquote>Technical report shall be submitted to BEP for review and approval.</blockquote>
+  <div class="ev-explanation">The primary deliverable is the signed and sealed technical report itself, and acceptance is conditioned on BEP review and approval. This is deliverable acceptance testing — an outcome-focused mechanism asking &#x27;is the work good?&#x27; rather than &#x27;did you follow the process?&#x27;</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards patterns. The past performance requirements are deliberately broad: two references, any contracting sector (commercial included), three-year lookback, no dollar threshold. The technical evaluation is outcome-focused — understanding of the PWS scope, feasibility of approach — rather than awarding points for having held a prior BEP or Treasury contract. There is no indication of an incumbent on this requirement; the Q&amp;A explicitly confirms &#x27;This is a new requirement.&#x27; The Maryland P.E. requirement is a legitimate jurisdictional licensing mandate. The task itself — structural evaluation of a concrete slab on grade — is a common commercial structural engineering service performed by hundreds of small engineering firms. Nothing in the solicitation suggests institutional knowledge of BEP-specific systems or processes is required or advantaged. A qualified structural engineering firm with no prior federal experience could realistically compete. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors shall identify at least two (2) Commercial, Federal, State, Local, or Foreign contracts that demonstrate recent and relevant experience. Recent is defined as within the last three (3) years. Relevant is defined as work similar in size, scope, and complexity to the work identified in the PWS.</blockquote>
+  <div class="ev-explanation">The past performance requirement asks for two references within three years that are similar in size, scope, and complexity. Importantly, it explicitly accepts Commercial, Federal, State, Local, or Foreign contracts — not just federal work. No dollar threshold is imposed. This is a standard, capability-focused past performance requirement that a non-incumbent structural engineering firm could readily satisfy with prior commercial or state/local slab evaluation or structural assessment work.</div>
+</div><div class="evidence-item">
+  <blockquote>Yes, a registered P.E. in Maryland is required to perform this study under his supervision and to sign and seal the report since the warehouse location is in this jurisdiction.</blockquote>
+  <div class="ev-explanation">The Maryland P.E. licensure requirement is a genuine legal constraint, not an incumbency proxy. Maryland law requires a licensed engineer to seal engineering reports produced in the state. This is a standard professional licensing requirement for structural engineering services. While it narrows the pool to firms with Maryland-licensed P.E.s (or firms that can hire or subcontract one), it does not reward prior incumbency — any qualified structural engineering firm can obtain or partner with a Maryland P.E.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal requirement sprawl. The PWS is notably concise — roughly three pages of substantive requirements for a discrete engineering evaluation task. The core technical requirement (Section 2.2.1) is framed in outcomes: evaluate the SOG, determine load capacity, provide engineering recommendations. The government explicitly acknowledges missing drawings and defers to the contractor to determine the appropriate investigative methodology. The deliverable requirements (Section 2.2.2) are standard for a professional engineering engagement: a signed and sealed technical report, analysis data, drawings, and a preliminary schedule. The acceptance language in Section V (substantial completion, final completion) appears to have been copied from a construction contract template and is somewhat mismatched to an evaluation-only task — references to &#x27;installed systems,&#x27; &#x27;training,&#x27; and &#x27;operating and maintenance manuals&#x27; are inapplicable — but this is a boilerplate inclusion issue, not prescriptive sprawl about how the engineering work should be performed. The security and administrative requirements (Sections 4.3.1 through 4.3.5) are standard government facility access and personnel security provisions, not process mandates on how the engineering work is conducted. The Q&amp;A confirms the government&#x27;s outcome-oriented posture: when asked about drawings, the agency confirmed they are largely unavailable and expects the contractor to use &#x27;testing and other empirical approaches&#x27; of their choosing. Overall, this solicitation is competently scoped for a small professional services engagement. The prescriptive elements that do exist are either standard regulatory requirements or boilerplate clauses, not evidence of organizational dysfunction or the substitution of process mandates for outcome definition. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall conduct site survey, review available drawings and existing conditions of the SOG, and perform any necessary analysis and testing that shall be required to fulfill the requirements of this SOW. Original shell building drawings are not available; therefore the contractor is expected to perform technical aspects and approaches that can be, but not limited to, site visits for measurements, provide tools and equipment, perform technical testing as needed, and any other applicable approaches that can achieve the purpose of this SOW.</blockquote>
+  <div class="ev-explanation">This passage is explicitly non-prescriptive. Rather than mandating specific testing methods or survey protocols, it invites the contractor to determine the appropriate technical approach. The &#x27;but not limited to&#x27; language and the explicit acknowledgment that multiple approaches can achieve the purpose preserves vendor discretion. This is the opposite of sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall be responsible for all means and methods required to perform this evaluation, and shall adhere and comply with all the requirements of BEP-EMS document 75D-07.0-04 EHS Contractor Requirements.</blockquote>
+  <div class="ev-explanation">The safety compliance requirement references an external EHS standard, which is a legitimate safety and regulatory constraint rather than prescriptive process dictation. However, the &#x27;means and methods&#x27; language explicitly delegates the how to the contractor, which is performance-based framing. This is not sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool behavior. The regulatory citation landscape is notably sparse for a federal contract: the PWS cites one site-specific EHS document (75D-07.0-04) and defers generically to applicable industry standards rather than enumerating them. The RFQ incorporates standard FAR and DTAR clauses by reference — a normal, appropriate practice — but does not stack agency-specific policy lists on top of them. There is no &#x27;Applicable Documents&#x27; section, no bulk list of executive orders, no accumulation of tangentially related directives. The compliance requirements that do appear (physical security, OCI, non-personal services, contractor identification) are all standard for any federal facility access contract and are presented with explanatory text. For a structural engineering evaluation at a secure federal facility, the regulatory footprint here is lean and appropriately curated. A qualified structural engineer with Maryland PE licensure (explicitly called out in the Q&amp;A) would face no difficulty understanding the compliance landscape from this solicitation. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall comply with the current edition of all applicable practices, codes, methods, and industry standards as prepared by technical societies and associations. In the event of conflict between codes and standards of the organizations, the more stringent regulations shall govern.</blockquote>
+  <div class="ev-explanation">This is the solicitation&#x27;s entire &#x27;Codes, Standards and References&#x27; section. Rather than listing dozens of regulations, it defers generically to &#x27;applicable&#x27; industry standards — a practical approach for a structural engineering evaluation where the relevant standards (ACI, ASCE, IBC, etc.) are well understood by any licensed structural engineer. This is not a rule pool; it is a minimalist citation that trusts professional judgment.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall adhere and comply with all the requirements of BEP-EMS document 75D-07.0-04 EHS Contractor Requirements.</blockquote>
+  <div class="ev-explanation">The only site-specific compliance document cited by name. It is directly relevant — contractors performing physical testing at a federal facility need to follow the site&#x27;s environmental health and safety requirements. One focused citation with clear applicability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, discrete structural engineering evaluation with a clearly defined deliverable: a signed and sealed technical report assessing the load capacity of an existing concrete slab on grade and recommending enhancement approaches. While the solicitation acknowledges that original drawings are unavailable and that the contractor must use empirical testing and field investigation to compensate, this kind of uncertainty is routine in structural assessment work and is standard practice in A/E professional services. Experienced structural engineering firms regularly price such evaluations as fixed-price engagements because the scope — site visit, field testing, analysis, and report — is well understood as a category of work, even if the precise findings are unknown in advance. The deliverable is clear and finite. FFP is appropriate here because: (1) the output is well-defined (a signed and sealed report with analysis and drawings); (2) A/E firms can estimate the effort involved in a SOG evaluation with reasonable accuracy; (3) the small business set-aside and competitive process will discipline pricing; and (4) the government&#x27;s interest is in the report outcome, not in managing labor hours. There is no indication that scope is so unpredictable that the contractor cannot reasonably estimate cost. The missing original drawings add some uncertainty, but the Q&amp;A response acknowledges this and explicitly expects field testing and empirical approaches — meaning the scope of the investigation method is implicitly defined. FFP for a discrete professional engineering study with a single defined deliverable is a standard and appropriate contract type. No square peg is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This acquisition may result in a firm-fixed-price contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly anticipates a firm-fixed-price (FFP) contract for this engineering evaluation.</div>
+</div><div class="evidence-item">
+  <blockquote>Prices shall be quoted as an all-inclusive firm-fixed-price quote, to include any anticipated travel.</blockquote>
+  <div class="ev-explanation">Vendors are asked to submit a single all-inclusive FFP, confirming the pricing structure.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall conduct site survey, review available drawings and existing conditions of the SOG, and perform any necessary analysis and testing that shall be required to fulfill the requirements of this SOW.</blockquote>
+  <div class="ev-explanation">The deliverable is a discrete, bounded structural evaluation with a defined output: a signed and sealed technical report. This is the kind of well-scoped professional services task that experienced A/E firms routinely price as FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide signed and sealed technical report that shall include analysis data and drawings that serves and achieve the purpose of this SOW as indicated.</blockquote>
+  <div class="ev-explanation">There is a concrete, singular deliverable — the signed and sealed engineering report — which makes FFP appropriate. The output is specific and verifiable, not an open-ended labor stream.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="2031ZA26Q00069_Questions and Answers UPDATED 4.22.26.xlsx">2031ZA26Q00069_Questions and Answers UPDATED 4.22.26.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/bee9da334b0147afbabed9dd7330d423_2031ZA26Q00069_Questions+and+Answers+UPDATED+4.22.26.xlsx" download="2031ZA26Q00069_Questions and Answers UPDATED 4.22.26.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - PWS.docx">Attachment 1 - PWS.docx</div></div>
+  <a class="dl-btn" href="../attachments/bee9da334b0147afbabed9dd7330d423_Attachment+1+-+PWS.docx" download="Attachment 1 - PWS.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 - ALTA NSPS LAND TITLE SURVEY.pdf">Attachment 2 - ALTA NSPS LAND TITLE SURVEY.pdf</div></div>
+  <a class="dl-btn" href="../attachments/bee9da334b0147afbabed9dd7330d423_Attachment+2+-+ALTA+NSPS+LAND+TITLE+SURVEY.pdf" download="Attachment 2 - ALTA NSPS LAND TITLE SURVEY.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 -  ASSIGNMENT PLAN_LANDOVER WAREHOUSE.pdf">Attachment 3 -  ASSIGNMENT PLAN_LANDOVER WAREHOUSE.pdf</div></div>
+  <a class="dl-btn" href="../attachments/bee9da334b0147afbabed9dd7330d423_Attachment+3+-++ASSIGNMENT+PLAN_LANDOVER+WAREHOUSE.pdf" download="Attachment 3 -  ASSIGNMENT PLAN_LANDOVER WAREHOUSE.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ 2031ZA26Q00069 UPDATED 4.27.26.pdf">RFQ 2031ZA26Q00069 UPDATED 4.27.26.pdf</div></div>
+  <a class="dl-btn" href="../attachments/bee9da334b0147afbabed9dd7330d423_RFQ+2031ZA26Q00069+UPDATED+4.27.26.pdf" download="RFQ 2031ZA26Q00069 UPDATED 4.27.26.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

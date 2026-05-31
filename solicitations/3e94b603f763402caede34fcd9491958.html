@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Food Service Management System Software-as-a-Service — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Food Service Management System Software-as-a-Service</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 3e94b603f763402caede34fcd9491958</span>
+      <a class="sam-link" href="https://sam.gov/opp/3e94b603f763402caede34fcd9491958/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › 262-NETWORK CONTRACT OFFICE 22 (36C262)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Blanket Purchase Agreement (BPA)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year: 05/01/2026 – 04/30/2027, plus 4 option years through 04/30/2031 (1 base year + 4 option years)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical acceptability (acceptable/unacceptable) – verification that brand name or equal items meet all salient characteristics</li><li>Lowest Price (among technically acceptable offers)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward COTS software license renewal for a well-defined food service management system (Computrition or equal). The document is almost entirely a price schedule (140+ line items across five contract years), standard FAR/VAAR clauses, and a brief SOW. It does not contain a Performance Work Statement, a Quality Assurance Surveillance Plan, a reporting requirements matrix, or any deliverables structure beyond the license itself. There are no weekly status reports, monthly progress reports, meeting cadence requirements, or prescribed report formats. The SOW&#x27;s salient characteristics (sections 6.1–6.14) describe system capabilities and vendor obligations in functional terms — what the system shall do — without imposing a process-compliance accountability structure.
+
+The absence of reporting requirements is actually the dominant feature of this solicitation from a compliance-over-outcomes perspective. For a SaaS/COTS license acquisition, this is appropriate: the government is buying a commercial product, not managing a development effort. The evaluation methodology (technical acceptability + lowest price) focuses on whether the product meets salient characteristics, which is an outcome-oriented gate.
+
+The two minor findings noted in evidence are real: support availability is described as a process requirement without SLA metrics, and maintenance obligations lack measurable performance targets. However, these are typical of commercial software license agreements, where SLAs are normally embedded in vendor terms rather than government SOW language. They do not rise to the level of a compliance-over-outcomes sin because there is no competing compliance-reporting structure that crowds out outcome accountability — there is simply no elaborate QA apparatus at all.
+
+Severity 1 is appropriate. This is a lean commercial acquisition. The accountability structure is minimal and not compliance-theater-driven. The absence of outcome metrics is a minor concern but does not reflect the structural pattern this sin describes.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The vendor shall provide user support during standard business hours, at a minimum. The system shall allow submission of service requests and system enhancement requests, and the vendor shall provide technical assistance for system operation and optimization.</blockquote>
+  <div class="ev-explanation">This requirement specifies vendor availability (process/input) rather than defining response time SLAs or resolution rate targets. However, it is brief and not part of an elaborate compliance-tracking structure — it is a minimum threshold statement rather than a reporting mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>The vendor shall provide regular system updates and maintenance. The vendor shall ensure updates maintain system functionality and compatibility and shall provide ongoing support for system performance optimization.</blockquote>
+  <div class="ev-explanation">This language describes activities the vendor will perform rather than measurable outcomes (e.g., no patch shall take longer than X days, or system availability shall remain above Y%). This is a mild compliance-over-outcomes indicator, but it is a COTS software license renewal context where commercial SLAs would typically govern these terms outside the SOW.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe incumbent capture. The evidence forms a self-reinforcing pattern that goes beyond a mere brand-name preference and constitutes a structural exclusion of non-incumbent vendors.
+
+First, the Background section states explicitly that the government aims to &#x27;establish a new contract with Computrition&#x27; — not that it aims to procure a food service management system that Computrition or an equal vendor could fulfill. The intent is declared before competition begins.
+
+Second, the Objectives section calls for Computrition&#x27;s named products by their proprietary trade names and specifically requires &#x27;Computrition&#x27;s preconfigured standalone interface&#x27; for VA VISTA integration. An equal vendor would need to build and certify a VISTA interface from scratch — a significant technical and timeline barrier that the incumbent does not face.
+
+Third, the price schedule is built entirely around Computrition&#x27;s internal licensing taxonomy. CLINs reference &#x27;TouchPoint Dining Initialization,&#x27; &#x27;Tray inMotion (iTIM) Elite,&#x27; &#x27;Room Service Connect Plus,&#x27; and &#x27;HS Single Sign-On Module&#x27; — all Computrition product names. A competing vendor cannot meaningfully price a 28-CLIN schedule organized around a competitor&#x27;s product structure without either (a) knowing how Computrition bundles its licenses or (b) making assumptions that make price comparison unreliable.
+
+Fourth, the 6-day response window (posted April 23, response due April 29) is functionally incompatible with meaningful non-incumbent participation. Researching salient characteristics, mapping product capabilities, developing a price against 140 CLINs (28 per year × 5 years), and producing compliant documentation in six days is achievable only by a vendor already intimately familiar with the requirement — i.e., the incumbent.
+
+The FAR 52.211-6 &#x27;brand name or equal&#x27; mechanism is present but hollow. The salient characteristics in Section 6 are written at a level of generality (USDA nutrient database, HL7 interoperability, SSO capability) that any comparable commercial product could meet — but the price structure and objectives section require vendor-specific knowledge that only Computrition possesses. The solicitation uses the appearance of open competition while the operational mechanics guarantee incumbent re-selection.
+
+Mitigating factors are minimal. The evaluation criteria (Section E.5) use a lowest-price technically acceptable framework, which theoretically allows non-incumbents to win on price. However, the inability of non-incumbents to accurately price the Computrition-structured CLIN schedule, combined with the 6-day response window and the explicit statement of intent to re-award to Computrition, effectively nullifies this theoretical openness.
+
+This is a textbook case of vendor capture producing an insider rewards solicitation. Severity 3 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SUBJECT* FOOD SERVICE MANAGEMENT SYSTEM BY COMPUTRITION INC OR EQUAL TO</blockquote>
+  <div class="ev-explanation">The solicitation title itself announces the brand-name product, signaling that the procurement is organized around a specific incumbent vendor&#x27;s product suite. While &#x27;or equal&#x27; language is included per FAR 52.211-6, the entire price/cost schedule is built around Computrition&#x27;s specific product names and module architecture, creating a de facto requirement for familiarity with that vendor&#x27;s proprietary product taxonomy.</div>
+</div><div class="evidence-item">
+  <blockquote>BACKGROUND INFORMATION: Nutrition and Food Service&#x27;s 5-year contract with Computrition April 30, 2026. Our aim is to establish a new contract with Computrition by May 1, 2026, that will include the base year plus 4 option years.</blockquote>
+  <div class="ev-explanation">The Background section openly states the government&#x27;s intent to establish a new contract with Computrition specifically. This is not a neutral statement of need — it is a declaration of incumbent preference embedded in the SOW. Any competing vendor must overcome the agency&#x27;s explicitly stated intent to re-award to the incumbent.</div>
+</div><div class="evidence-item">
+  <blockquote>The scope of this contract is to provide licenses for Computrition&#x27;s Hospitality Suite Client/Service Software, Room Service Connect and Tray in Motion... Provide Computrition&#x27;s window&#x27;s based software solution... Seamless integration with the VA VISTA system using Computrition&#x27;s preconfigured standalone interface</blockquote>
+  <div class="ev-explanation">The Objectives section specifies Computrition&#x27;s proprietary product names (Hospitality Suite, Room Service Connect, Tray in Motion) and explicitly calls for &#x27;Computrition&#x27;s preconfigured standalone interface&#x27; for VA VISTA integration. A competing vendor would need to demonstrate their own VISTA integration capability, but the requirement language is written around the incumbent&#x27;s existing implementation — including a specific interface that only Computrition&#x27;s product currently has &#x27;preconfigured.&#x27; This is institutional knowledge masquerading as a technical requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>Please narrate your experience providing Service for Surgical Navigation and Imaging Systems.</blockquote>
+  <div class="ev-explanation">The Experience Narrative Sheet (Section D.1) instructs offerors to narrate experience with &#x27;Surgical Navigation and Imaging Systems&#x27; — a completely different product category from the food service management system being procured. This is almost certainly a copy-paste error from another solicitation template, but its effect is telling: it reveals that the experience documentation was not meaningfully tailored to this acquisition. It also suggests that the experience evaluation process is perfunctory and may not serve as a genuine screen — making the incumbent&#x27;s de facto advantage through the product-specific salient characteristics the operative selection mechanism.</div>
+</div><div class="evidence-item">
+  <blockquote>0001 Nutrition Care Management OR EQUAL TO... 0005 Multi-Site HL7 ADT/DO/Tube Feeding Interface OR EQUAL TO... 0007 TouchPoint Dining Initialization OR EQUAL TO... 0019 ROOM SERVICE CONNECT PLUS* (ROOM SERVICE, CALL CENTER, AND BEDSIDE CONNECT) SITE San Diego VA Healthcare System OR EQUAL TO... 0025 Tray inMotion (iTIM) Elite (includes Operations Connect - Tray Service) Annual License Subscription - Additional Site OR EQUAL TO</blockquote>
+  <div class="ev-explanation">The entire 28-CLIN price schedule (repeated across 5 performance years = 140 CLINs total) is structured around Computrition&#x27;s specific product module names: &#x27;Nutrition Care Management,&#x27; &#x27;Management Pro,&#x27; &#x27;TouchPoint Dining,&#x27; &#x27;Room Service Connect Plus,&#x27; &#x27;Tray inMotion (iTIM) Elite,&#x27; &#x27;HS Single Sign-On Module,&#x27; &#x27;EMR Conversion,&#x27; and &#x27;Learning Subscription Service.&#x27; An &#x27;or equal&#x27; vendor must map their product architecture to Computrition&#x27;s licensing model to price this correctly. This is not a functional requirements schedule — it is a Computrition invoice template with &#x27;OR EQUAL TO&#x27; appended. A non-incumbent vendor has no basis on which to price these CLINs without reverse-engineering Computrition&#x27;s internal product structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful requirement sprawl. The Statement of Work is brief — roughly two pages of substantive requirements — and the salient characteristics (Section 6) are written predominantly in outcome and capability terms: the system &#x27;shall support,&#x27; &#x27;shall provide functionality for,&#x27; &#x27;shall integrate with.&#x27; These describe what the system must do, not step-by-step how a vendor must deliver or operate it. The requirements align with functional capabilities (nutrient analysis, diet order tracking, HL7 interoperability, SSO, HACCP compliance) rather than dictating internal vendor processes, staffing structures, or operational workflows. Several salient characteristics reference specific technical standards that are legitimate constraints — HL7 interoperability, USDA nutrient database incorporation, HACCP food safety standards, Single Sign-On compatibility with VA infrastructure, and VA IT and cybersecurity compliance. These are either legally mandated frameworks, widely recognized industry standards, or necessary integration constraints given the VA&#x27;s existing clinical infrastructure (VISTA), not process prescriptions. The closest the solicitation comes to prescriptive sprawl is in the Objectives section, which names Computrition&#x27;s specific product suite. But the solicitation is explicitly structured as a &#x27;brand name or equal&#x27; procurement under FAR 52.211-6, which is the standard mechanism for this scenario: the government has an installed system in clinical operation across four medical centers, needs continuity, and is defining the incumbent product as the benchmark against which equal products will be evaluated. The salient characteristics in Section 6 provide the functional translation that allows competitors to respond. The solicitation&#x27;s core problem is not requirement sprawl — it is more accurately characterized as a near-sole-source procurement dressed in competitive clothing, with a 6-day response window and requirements written around an incumbent product so specifically (28 line items mapping to Computrition&#x27;s exact product catalog across five contract years) that meaningful competition is structurally difficult. But that is a different analytical problem. On the specific question of whether the SOW dictates HOW work is performed rather than WHAT outcomes are needed, the answer is no: the requirements describe system capabilities and integration needs at a functional level, leaving vendors free to propose how their product architecture delivers those capabilities.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The scope of this contract is to provide licenses for Computrition&#x27;s Hospitality Suite Client/Service Software, Room Service Connect and Tray in Motion. The objective is to continue automated food service operations and nutrition care management: Provide Computrition&#x27;s window&#x27;s based software solution; Ensure user-friendly interfaces featuring point-and-click functionality and rapid data processing; Seamless integration with the VA VISTA system using Computrition&#x27;s preconfigured standalone interface</blockquote>
+  <div class="ev-explanation">The Objectives section comes closest to prescribing a specific solution — it names Computrition&#x27;s exact product suite and references &#x27;Computrition&#x27;s preconfigured standalone interface.&#x27; However, this language is substantially mitigated by the solicitation&#x27;s explicit &#x27;brand name or equal&#x27; framework under FAR 52.211-6, which is the correct mechanism for this situation. The VA is renewing an expiring contract for a system already in production; naming the incumbent&#x27;s product as the benchmark is appropriate under brand-name-or-equal. The salient characteristics in Section 6 then abstract the requirements into functional terms (HL7, SSO, USDA nutrient database, HACCP compliance), allowing competing vendors to demonstrate equivalency.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful rule pool behavior. Section C contains the standard set of FAR and VAAR clauses for a commercial products acquisition — roughly nine clauses — all of which are either mandated for federal IT contracts or are the standard 52.212 commercial products framework. None of the cited clauses are obviously irrelevant to a software acquisition handling patient health data: the Kaspersky and ByteDance prohibitions apply to any federal IT contract, the security prohibitions and exclusions clause (52.240-91) is appropriate for a system touching VA clinical data, and the VAAR payment and small business clauses are standard. There is no dedicated &#x27;Applicable Documents&#x27; section, no bulk list of agency directives, no executive orders on energy efficiency or physical security badge policies appended to a software solicitation, and no contradictions between cited policies and the solicitation&#x27;s purpose. The SOW references &#x27;VA IT and cybersecurity requirements&#x27; and &#x27;HACCP or equivalent food safety compliance standards&#x27; without enumerating specific policy documents — this is vague but not the same as a rule pool; it actually reduces rather than expands the enumerated compliance burden. The 52.212-5 clause does contain a lengthy checklist of optional FAR clauses with checked and unchecked boxes, but this is a standard FAR form structure, not an agency-generated list, and most boxes are left unchecked. The two items worth noting are minor: first, 52.222-42 (Statement of Equivalent Rates for Federal Hires) is checked, which is somewhat anomalous for a pure software license subscription rather than a services contract with employed labor — but this is a paperwork anomaly rather than a compliance burden. Second, the SOW&#x27;s general reference to &#x27;VA IT and cybersecurity requirements&#x27; without citation of specific policies (such as VA Handbook 6500 or FedRAMP requirements) is actually less information than vendors might want, but that is an underspecification problem rather than a rule pool. Overall, the regulatory citation burden in this solicitation is minimal and appropriate for its scope.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>C.1 52.204-23 PROHIBITION ON CONTRACTING FOR HARDWARE, SOFTWARE, AND SERVICES DEVELOPED OR PROVIDED BY KASPERSKY LAB COVERED ENTITIES (DEC 2023)
+C.2 52.204-27 PROHIBITION ON A BYTEDANCE COVERED APPLICATION (JUN 2023)
+C.3 52.212-4 CONTRACT TERMS AND CONDITIONS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (NOV 2023)
+C.4 52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025)
+C.5 52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS (NOV 2025)</blockquote>
+  <div class="ev-explanation">The contract clauses section includes the standard suite of FAR/VAAR clauses appropriate for a commercial product acquisition of this type. These are the expected mandatory clauses for a VA IT procurement — Kaspersky and ByteDance prohibitions are legitimate cybersecurity mandates applicable to any software contract, and 52.212-4/5 are the standard commercial products terms. There is no excessive accumulation beyond what is expected.</div>
+</div><div class="evidence-item">
+  <blockquote>6.10 The vendor shall ensure compliance with VA IT and cybersecurity requirements. The system shall support Single Sign-On (SSO) capability and shall be compatible with existing VA infrastructure.
+6.8 The vendor shall provide a system capable of integrating with existing VA clinical and administrative systems, including legacy electronic health record platforms. The system shall support real-time exchange of patient data, including admission, discharge, transfer (ADT), and diet order information, and shall support HL7 or equivalent interoperability standards.</blockquote>
+  <div class="ev-explanation">The SOW&#x27;s cybersecurity and integration requirements reference VA IT requirements and HL7 standards without enumerating a bulk list of specific policy documents. &#x27;VA IT and cybersecurity requirements&#x27; is admittedly vague, but this is a commercial COTS product acquisition where specific VA policy citations would typically be handled during implementation — it is not the same as providing a 30-item list of directives without context.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is fundamentally a software license renewal acquisition for a commercial-off-the-shelf (COTS) nutrition and food service management system. The price schedule consists of discrete, named line items (e.g., &#x27;Nutrition Care Management,&#x27; &#x27;Room Service Connect Plus,&#x27; &#x27;Tray inMotion Elite Annual License Subscription&#x27;) priced per site and per client count over a base year plus four option years. This is precisely the scenario where fixed-price contracting is appropriate: the deliverables are well-defined commercial licenses with catalog pricing, the quantities are specified by site and client tier, and the performance period is fixed. There is no labor-hour uncertainty, no evolving scope, and no research or development component that would introduce cost unpredictability.
+
+The solicitation does contain BPA boilerplate language referencing time-and-materials and labor-hour order provisions (B.7 Segregation of Costs, B.9 Labor Hour Orders) and a general BPA framework. This is templated language that appears carried over from a standard BPA vehicle template — it references labor categories, hourly rates, and T&amp;M payment provisions that are plainly inapplicable to a software license acquisition. However, the operative requirement — as stated in the SOW objectives and the price schedule — is entirely fixed-price software licensing. The evaluation criterion is &#x27;Lowest Price meeting ALL the Salient Characteristics,&#x27; confirming a fixed-price award structure. The BPA boilerplate does not represent a genuine contract-type mismatch; it is administrative template residue that does not govern the substantive transaction. A competent analyst would note this as document hygiene sloppiness but not as a structural pricing misalignment.
+
+Overall, the contract type is well-matched to the requirement. Fixed pricing for commercial software licenses with defined quantities is the correct approach, and no significant misalignment between pricing scheme and requirement exists.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The scope of this contract is to provide licenses for Computrition&#x27;s Hospitality Suite Client/Service Software, Room Service Connect and Tray in Motion.</blockquote>
+  <div class="ev-explanation">The core deliverable is explicitly software licenses — a well-defined commercial product with catalog pricing. This is the paradigmatic use case for firm-fixed-price contracting under FAR Part 12/13 commercial item procedures.</div>
+</div><div class="evidence-item">
+  <blockquote>SUBJECT* FOOD SERVICE MANAGEMENT SYSTEM BY COMPUTRITION INC OR EQUAL TO ... VENDORS SHALL SHOW CLEAR, COMPELLING AND CONVINCING EVIDENCE THAT ALL &#x27;EQUAL TO ITEMS&#x27; MEET ALL REQUIRED SALIENT CHARACTERISTICS IAW FAR 52.211-6 – BRAND NAME OR EQUAL.</blockquote>
+  <div class="ev-explanation">The brand-name-or-equal structure confirms this is a commercial product acquisition with defined salient characteristics. The scope is sufficiently bounded to support fixed-price pricing.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.docx">S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.docx</div></div>
+  <a class="dl-btn" href="../attachments/3e94b603f763402caede34fcd9491958_S02+SF1449+Combined+Synopsis_Solicitation+36C26226Q0677+Food+Service+Management+System+SaaS.docx" download="S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.pdf">S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3e94b603f763402caede34fcd9491958_S02+SF1449+Combined+Synopsis_Solicitation+36C26226Q0677+Food+Service+Management+System+SaaS.pdf" download="S02 SF1449 Combined Synopsis_Solicitation 36C26226Q0677 Food Service Management System SaaS.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

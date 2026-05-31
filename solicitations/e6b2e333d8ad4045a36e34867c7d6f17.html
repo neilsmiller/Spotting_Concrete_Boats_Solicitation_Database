@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDIC&#x27;s Palo Alto Subscription &amp; Hardware Maintenance — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>FDIC&#x27;s Palo Alto Subscription &amp; Hardware Maintenance</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e6b2e333d8ad4045a36e34867c7d6f17</span>
+      <a class="sam-link" href="https://sam.gov/opp/e6b2e333d8ad4045a36e34867c7d6f17/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">FEDERAL DEPOSIT INSURANCE CORPORATION › FEDERAL DEPOSIT INSURANCE CORPORATION › _</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7J20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">423430</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">3-year period of performance (7/1/2026 - 6/30/2029), billed annually; base period 7/1/2026 - 6/30/2027 with option periods removed per Amendment 0001; certain line items (137-139, 141) have different periods of performance</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Acceptability (Lowest Price Technically Acceptable)</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product and subscription maintenance procurement — essentially a catalog-style buy for Palo Alto Networks firewall subscriptions and hardware support renewals. The nature of the requirement (renewing existing software subscriptions and hardware support contracts by part number and serial number) makes Sin #2 largely inapplicable in its classic form.
+
+The classic compliance-over-outcomes pattern involves elaborate reporting architectures — weekly status reports, monthly progress reports, prescribed meeting cadences, quality surveillance plans — that substitute process monitoring for outcome measurement. None of those elements are present here. Section C (Description/Specifications/Work Statement) contains no attachments and no embedded SOW. There are no reporting requirements beyond standard invoice submission. There is no quality assurance surveillance plan. There are no prescribed meeting cadences. There are no activity reports or schedule-adherence tracking requirements.
+
+The inspection and acceptance clause (7.6.4-01) is a standard boilerplate clause focused on delivery conformance — appropriate for a goods/subscription procurement. The delivery instructions require shipment tracking notification and software activation documentation, which are logistical requirements rather than process compliance theater.
+
+The accountability structure here is simply: deliver the correct subscriptions/support renewals for the correct serial numbers by the stated period of performance, and submit a proper invoice. This is outcome-appropriate for what is being purchased. There is no evidence of compliance-over-outcomes dysfunction. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.6.4-01 - Inspection and Acceptance: The FDIC shall have fifteen (15) business days from the date of Contractor&#x27;s delivery to determine if such goods and services are in compliance with the requirements of the contract.</blockquote>
+  <div class="ev-explanation">This is a standard acceptance clause for a products/maintenance contract. It measures whether delivered items conform to contract requirements — an outcome check, not a process compliance check.</div>
+</div><div class="evidence-item">
+  <blockquote>7.3.1-16 - Technical Requirements: Offeror must provide ALL items with matching Part Numbers in Attachment B1 - Price Schedule. Offeror must be an Authorized Reseller/Partner of Palo Alto or be the Original Equipment Manufacturer (OEM).</blockquote>
+  <div class="ev-explanation">The sole technical acceptability criteria are completeness of the price schedule and reseller authorization. These are appropriate threshold criteria for a product/subscription procurement, not indicators of compliance-over-outcomes reporting burdens.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product renewal — Palo Alto firewall subscriptions and hardware support maintenance for specific, serialized devices already deployed at FDIC. The evaluation method is Lowest Price Technically Acceptable (LPTA), and the only technical acceptability criteria are: (1) provide all required documents, (2) price all line items with matching part numbers, and (3) be an authorized Palo Alto reseller or OEM. There are no past performance evaluation factors, no dollar-threshold experience requirements, no federal-specific experience mandates, no key personnel qualifications, and no institutional knowledge requirements. The authorized-reseller requirement is a genuine technical necessity — only Palo Alto channel partners can activate, register, and renew subscriptions tied to specific serial numbers — not an incumbency filter. Any Palo Alto-authorized distributor or reseller, regardless of whether they have ever held an FDIC contract, can compete on equal footing by simply quoting the listed SKUs at a competitive price. The solicitation&#x27;s structure (LPTA, price-schedule-only evaluation, no past performance factor) is well-suited to a commodity product renewal and presents no meaningful insider-rewards characteristics. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror must be an Authorized Reseller/Partner of Palo Alto or be the Original Equipment Manufacturer (OEM). The CO may contact Palo Alto to confirm the Offeror&#x27;s reseller status.</blockquote>
+  <div class="ev-explanation">This requirement limits the pool to Palo Alto-authorized channel partners or Palo Alto itself. However, this is a legitimate technical requirement rather than an incumbency proxy: Palo Alto subscriptions and hardware maintenance can only be renewed by authorized resellers or the OEM — a non-authorized reseller literally cannot deliver the goods. The incumbent (FCN, Inc., disclosed in Q&amp;A response 6) holds no special advantage here that any other Palo Alto-authorized reseller would not also hold. Any VAR with a current Palo Alto authorization could compete.</div>
+</div><div class="evidence-item">
+  <blockquote>The incumbent vendor is FCN, Inc.</blockquote>
+  <div class="ev-explanation">The solicitation voluntarily discloses the incumbent in the Q&amp;A, which is actually pro-competitive transparency. There is no language in the solicitation that rewards FCN&#x27;s specific contract history or penalizes newcomers for lacking it. The disclosure does not translate into an evaluation advantage for FCN.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial product renewal RFQ — it is asking resellers or the OEM to quote prices for specific Palo Alto software subscriptions and hardware maintenance renewals against a defined list of 141 serial-numbered devices. The solicitation specifies WHAT needs to be renewed (specific part numbers, serial numbers, subscription types, periods of performance) but does not prescribe HOW the contractor should fulfill those renewals. There are no staffing structures mandated, no workflow procedures dictated, no step-by-step processes imposed on the vendor. The line items define the deliverable completely and objectively: activate subscription X on device with serial number Y for period Z. The requirement to be an Authorized Reseller or OEM is a genuine technical interoperability constraint — Palo Alto subscriptions can only be registered and activated through the vendor&#x27;s authorized channel — not an organizational or process prescription. The three-volume proposal structure (Pricing, Additional Information, SCRM) is standard FDIC acquisition procedure. The SCRM volume requirements and supply chain reporting clauses reflect legal and security mandates applicable to covered IT articles, not process sprawl. The absence of a Statement of Work section (Section C has no attachments and references only a single clause on duty to deliver) is entirely appropriate for a commercial product/subscription renewal where the deliverable is the subscription entitlement itself. This solicitation is competently scoped for what it is: a commercial item buy with well-defined deliverables and no meaningful prescription of vendor methods. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror must be an Authorized Reseller/Partner of Palo Alto or be the Original Equipment Manufacturer (OEM). The CO may contact Palo Alto to confirm the Offeror&#x27;s reseller status.</blockquote>
+  <div class="ev-explanation">This restricts the vendor pool to authorized channel partners or the OEM for a sole-source brand renewal, but it is a legitimate technical constraint rather than process sprawl. When renewing subscriptions and support tied to specific serial-numbered Palo Alto hardware already deployed, only the OEM or its authorized channel can activate and register those renewals. This is an interoperability constraint inherent to the vendor&#x27;s licensing model, not a prescription about how the contractor performs work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool behavior in any meaningful sense. The requirement is a straightforward commercial maintenance and subscription renewal for an existing Palo Alto firewall and security infrastructure. The regulatory structure consists of: (1) standard FDIC acquisition clauses incorporated by reference (Section I), most of which are routine for any FDIC commercial purchase; (2) a focused set of IT-security-specific clauses (Kaspersky ban, telecom surveillance prohibition, SCRM provisions) that are directly and obviously applicable to a purchase of network security equipment and subscriptions; and (3) supply chain risk management requirements (7.1.2-03, 7.1.2-04) that are entirely appropriate for hardware and software from a specific commercial vendor.
+
+The SCRM provision (7.1.2-03) is actually a good example of curated, contextually explained compliance — the solicitation explains exactly what information is needed, why (supply chain risk), and what the three categories of manufacturer/supplier status mean. This is the opposite of a rule pool.
+
+The Section H information security clauses (7.4.2-02 on off-site processing, 7.4.2-05 on basic safeguarding) are entirely appropriate for a contract involving cloud subscriptions (Prisma Access, Cortex Data Lake) and network security infrastructure that will process FDIC network traffic.
+
+There is no &#x27;Applicable Documents&#x27; appendix. There are no regulations that contradict the solicitation&#x27;s purpose. There are no clearly irrelevant policies (e.g., energy efficiency mandates, badge policies) included in the compliance burden. The clause list is long by ordinary standards but normal for FDIC commercial procurements, and the full-text clauses that appear are all directly tied to the nature of the acquisition. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.1.2-01 | Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab and Other Covered Entities | September 2020
+7.1.2-02 | Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment | April 2021
+7.1.3-03 | Contractor Employee Whistleblower Rights and Requirement to Inform Employees of Whistleblower Rights | December 2022</blockquote>
+  <div class="ev-explanation">The Section I clause list incorporates by reference approximately 30 FDIC-specific clauses plus standard administrative provisions. However, this is a typical volume for a commercial IT hardware/subscription maintenance award. The clauses cited — Kaspersky prohibition, telecom surveillance prohibition, whistleblower rights, anti-kickback, trade agreements, Section 508 — are all standard FDIC boilerplate and each is plausibly applicable to a commercial software and hardware procurement. There is no bulk &#x27;Applicable Documents&#x27; list of 50+ regulations that is the hallmark of a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a clean fit for firm-fixed-price contracting. The requirement is a renewal of commercial software subscriptions and hardware maintenance contracts for a specific fleet of Palo Alto network security appliances. Every line item is identified by vendor part number, serial number, quantity, and period of performance. There is no ambiguity about scope, no labor effort being procured, no research or development component, and no uncertainty about what will be delivered. The government knows exactly what it wants to buy — annual subscription renewals for named devices — and Palo Alto&#x27;s commercial catalog prices exist as a reference point. The solicitation&#x27;s evaluation method (Lowest Price Technically Acceptable) and the requirement for vendors to provide list price plus discount further confirms this is a catalog-price commercial transaction. FFP is the textbook correct contract type for commercial product and maintenance renewals of this kind. There is no evidence of a pricing structure mismatch.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.3.2-11 - Pricing Proposal (Firm-Fixed-Price) - February 2025 ... Offerors shall complete and submit the Pricing Schedule provided as Attachment B-1 to this solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly uses a Firm-Fixed-Price contract structure, as confirmed by the pricing proposal clause and the price schedule format requiring unit prices and extended prices per line item.</div>
+</div><div class="evidence-item">
+  <blockquote>The FDIC&#x27;s Palo Alto firewalls have been deployed at various network segments to enforce network security boundaries, inspect network traffic, and improve the FDIC&#x27;s network security posture. This requirement is to renew maintenance on the items listed in this schedule.</blockquote>
+  <div class="ev-explanation">The requirement is a straightforward commercial product renewal — subscriptions and hardware support contracts for specific Palo Alto devices identified by serial number. The scope is fully defined: known SKUs, known serial numbers, known quantities, known periods of performance. This is precisely the kind of requirement where FFP is the correct vehicle.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="AMENDED - Attachment B.1 - Price Schedule.xlsx">AMENDED - Attachment B.1 - Price Schedule.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/e6b2e333d8ad4045a36e34867c7d6f17_AMENDED+-+Attachment+B.1+-+Price+Schedule.xlsx" download="AMENDED - Attachment B.1 - Price Schedule.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment J.1 - Pre-Award SCRM Info - Example.xlsx">Attachment J.1 - Pre-Award SCRM Info - Example.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/e6b2e333d8ad4045a36e34867c7d6f17_Attachment+J.1+-+Pre-Award+SCRM+Info+-+Example.xlsx" download="Attachment J.1 - Pre-Award SCRM Info - Example.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CORHQ-26-Q-0067-Amendment 0001.pdf">CORHQ-26-Q-0067-Amendment 0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e6b2e333d8ad4045a36e34867c7d6f17_CORHQ-26-Q-0067-Amendment+0001.pdf" download="CORHQ-26-Q-0067-Amendment 0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CORHQ-26-Q-0067.pdf">CORHQ-26-Q-0067.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e6b2e333d8ad4045a36e34867c7d6f17_CORHQ-26-Q-0067.pdf" download="CORHQ-26-Q-0067.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

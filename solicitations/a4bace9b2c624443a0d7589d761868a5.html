@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HADES (Hybrid Architecture and Development for Experimental Systems) Draft Reque — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>HADES (Hybrid Architecture and Development for Experimental Systems) Draft Request for Proposal</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 a4bace9b2c624443a0d7589d761868a5</span>
+      <a class="sam-link" href="https://sam.gov/opp/a4bace9b2c624443a0d7589d761868a5/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › FA8809 SDA AND CMBT PWR SSC/SZK-IK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541715</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Cost-Reimbursable (CR) with Cost-Plus-Award-Fee (CPAF), Firm-Fixed-Price (FFP), and Cost CLINs; IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base ordering period: 10 Feb 2027 - 9 Feb 2030; Option 1: 10 Feb 2030 - 9 Feb 2031; Option 2: 10 Feb 2031 - 9 Feb 2032; Option 3: 10 Feb 2032 - 9 Feb 2033; Option 4: 10 Feb 2033 - 9 Feb 2034 (base period of three years with four 1-year option periods); 60-day transition period prior to performance start</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical (most important): Subfactor 1 - Program Management (most important within Technical); Subfactor 2 - Systems Engineering (less important than Program Management within Technical)</li><li>Past Performance (second most important)</li><li>Cost/Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The HADES solicitation presents a mixed picture on compliance versus outcomes. On the positive side, the solicitation includes genuine outcome metrics: 99% system availability requirements for Jaguar (PWS 5.1), 99.95% connectivity availability, specific 2-3 hour response/resolution time SLAs, and some outcome-oriented questions in the past performance questionnaire (e.g., PM2 asking about downtime). These are real performance standards that measure results, not just process adherence. The solicitation also lacks the classic compliance-theater signature of stacked, overlapping reporting cadences with prescribed section formats — there is no evidence of weekly status reports, monthly progress reports, AND quarterly reviews all mandated simultaneously.
+
+However, the award fee plan — which is explicitly confirmed as &#x27;the quality measure&#x27; for this contract — is primarily process-compliance oriented. Area B (Quality of Technical Services) counts process deviations and configuration control reruns rather than measuring mission outcomes. Area C (Cost Control) tracks monthly budget adherence rather than value delivered. The evaluation is holistic and adjectival rather than tied to measurable outcome thresholds. The government&#x27;s response to industry feedback requesting more objective criteria was to decline, stating that &#x27;award fee determinations involve professional judgment.&#x27; This means the primary accountability mechanism — the award fee evaluation — relies on subjective process assessment by the government rather than objective outcome measurement.
+
+The Q&amp;A record also reveals structural gaps: the government does not have a VCRM mapping requirements to verification artifacts, has no standardized test template, does not have a CMDB, and tracks system availability through &#x27;reported start and finish times&#x27; rather than automated monitoring. These gaps suggest the operational reality is more process-documentation-oriented than the solicitation&#x27;s sparse formal reporting requirements would suggest.
+
+The severity is 2 (moderate) rather than 3 because the solicitation does include meaningful outcome metrics in the PWS performance requirements, and the reporting burden is not the stacked-cadence compliance theater seen in the worst examples. However, the award fee plan as the primary accountability mechanism is insufficiently outcome-focused, and the operational gaps revealed in Q&amp;A suggest the compliance-over-outcomes dynamic will manifest in practice even if not fully visible in the solicitation text.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.2.1.1 The contractor shall perform all work with a high quality and technical degree. Provide routine maintenance, installation, testing, modification, troubleshooting, and repair of systems...</blockquote>
+  <div class="ev-explanation">The PWS describes activities to be performed but the primary Q&amp;A exchange confirms &#x27;The award fee plan is the quality measure&#x27; for technical quality of work — meaning the QA structure is the award fee evaluation, which as shown in Annex 2 relies heavily on process metrics rather than outcome-based performance targets.</div>
+</div><div class="evidence-item">
+  <blockquote>Contract used performance thresholds and objectives to measure and track contractor performance. [PM 3 in Performance Questionnaire] ... Nominal maintenance/sustainment actions were executed with minimal (&lt;1 hour) system downtime. [PM 2]</blockquote>
+  <div class="ev-explanation">The past performance questionnaire includes some outcome-oriented metrics (PM2 measures downtime) alongside process compliance items (PM3 asks whether thresholds existed at all). However, these are past performance assessment questions, not contract performance requirements — the questionnaire assesses whether a prior contract had outcome metrics, not whether HADES itself will have them.</div>
+</div><div class="evidence-item">
+  <blockquote>Award Fee Plan Annex 2 Area B Quality of Technical Services: evaluation criteria include &#x27;no more than three unapproved deviations&#x27; and &#x27;no more than three reruns to transition a modification into the test environment&#x27;</blockquote>
+  <div class="ev-explanation">The primary technical quality evaluation metric counts process deviations and reruns — measuring whether the contractor followed the change control process correctly — rather than measuring outcomes like system availability, mission success rates, or user satisfaction. The government acknowledged in Q&amp;A that &#x27;deviations imply a faulted configuration control/quality assurance process,&#x27; confirming the focus is on process compliance.</div>
+</div><div class="evidence-item">
+  <blockquote>Award Fee Plan Area C Cost Control evaluates monthly whether task orders are &#x27;above the task order cost&#x27; or &#x27;below 20% of task order&#x27;s cost on any monthly report.&#x27; The AFRB &#x27;considers legitimate reasons for monthly fluctuations (invoice timing, material deliveries, scheduled activities).&#x27;</blockquote>
+  <div class="ev-explanation">Cost control evaluation is entirely financial/process-oriented, tracking budget adherence on a monthly basis rather than measuring whether spending produced mission outcomes. The government defended monthly reporting as enabling &#x27;early identification of cost issues&#x27; — confirming the focus is on financial compliance monitoring rather than value delivered.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS 2.2.9.33: Contractor shall resolve the identified problems within 2 hours during business hours. Contractor shall resolve the identified problems within 3 hours during non-business hours. [and] PWS 5.1/5.2 Jaguar: 99% availability requirement</blockquote>
+  <div class="ev-explanation">These are genuine outcome metrics — response time SLAs and availability thresholds — that represent the opposite of compliance-over-outcomes. Their presence is a mitigating factor. However, they appear to be the exception rather than the rule in the broader accountability structure, which is dominated by the award fee plan&#x27;s process metrics.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate-to-borderline-severe case of insider rewards. The core problem is structural information asymmetry compounded by domain-narrow evaluation criteria, not explicit experience thresholds. The Government explicitly declined to provide technical baseline artifacts, classified or sanitized, while the incumbent (SAIC under the EDIS contract) retains full working knowledge of the RSC infrastructure, mission configurations, software stacks, staffing levels, and operational tempo. The solicitation then asks offerors to propose staffing matrices against notional government estimates, respond to scenario-based emerging requirements tied to existing infrastructure, and develop transition plans — all against a system they cannot characterize.
+
+The past performance subfactors (Ground System Maintenance and Sustainment, Ground System Development and Integration) are narrow enough that vendors without direct satellite ground system operations experience at comparable classification levels will score lower, not because they lack technical capability but because their prior work doesn&#x27;t match this precise taxonomy. The Q&amp;A responses confirm the Government will not provide geographic experience preferences (correctly), but the combination of domain specificity, five-year recency, and the TS/SCI cleared-workforce requirement already constrains the realistic competitor pool.
+
+Mitigating factors prevent a severity-3 rating: (1) The Government explicitly states notional staffing plans are estimates, not minimums, and invites alternative approaches. (2) No explicit dollar threshold requirements appear in the past performance criteria. (3) Commercial past performance is accepted. (4) The Government acknowledged and partially responded to industry concerns about information asymmetry, indicating some openness. (5) The solicitation is a draft RFP with active industry feedback incorporated.
+
+However, the cumulative effect — withheld technical baselines, scenario responses tied to unknown infrastructure, narrow past performance subfactors, and deferred operational details — tilts the competition meaningfully toward the incumbent. A qualified vendor without prior KAFB/RDSMO experience would face significant structural disadvantages in scoring, not from lack of capability, but from lack of insider knowledge the solicitation effectively requires but cannot acknowledge. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>For the purpose of this solicitation, relevant past or present performance may be a part of any Federal, State, and local Government or their agencies&#x27; contract, or a commercial contract or subcontract having a performance period completion within five (5) years of the RFP release date.</blockquote>
+  <div class="ev-explanation">A five-year lookback is reasonable on its face, but in the context of a niche satellite ground system operations contract at a specific installation (KAFB), the pool of vendors with directly relevant experience within five years is inherently small. Combined with the domain-specific subfactor structure, this recency window concentrates evaluable past performance among the incumbent and a handful of primes already working space ground systems.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will assess an Offeror&#x27;s relevant performance as it relates to Technical sub-factors... Factor 1: Ground System Maintenance &amp; Sustainment, Factor 2: Systems Engineering, Factor 3: Ground System Development &amp; Integration</blockquote>
+  <div class="ev-explanation">The past performance subfactors map almost exactly to the specific work scope of the incumbent EDIS contract: ground system maintenance, systems engineering, and ground system development and integration for space operations. A vendor with strong comparable experience in IT operations, infrastructure sustainment, or even adjacent space systems work would score lower simply because their prior contracts don&#x27;t match this precise taxonomy — not because they lack capability.</div>
+</div><div class="evidence-item">
+  <blockquote>Information vital to transition planning will be released, but no proprietary incumbent information will be provided... The existing incumbent does have this. It will be provided to the awardee during transition... These artifacts will be available to the successful bidder... Information will be provided to the successful bidder</blockquote>
+  <div class="ev-explanation">Across dozens of Q&amp;A responses, the Government repeatedly defers critical operational details — hardware/software inventory, architecture diagrams, configuration baselines, current ATO artifacts, software license lists, system documentation, RVDS inventory, mission baselines — exclusively to &#x27;the successful bidder&#x27; post-award. This means non-incumbents must propose against unknown system specifics, while the incumbent (SAIC/EDIS) already has this knowledge. The transition plan evaluation (Section M 4.3.2.4) and the Emerging Requirements scenario response (Section L 4.3.1.3) both require offerors to demonstrate detailed operational planning against a system they cannot fully characterize without access to information withheld until after award.</div>
+</div><div class="evidence-item">
+  <blockquote>The Offeror shall provide a description of changes due to each emerging requirements task using their Staffing Matrix and Labor Profile... Respond to each independently... baseline + task 1, baseline + task 2, baseline + task 3</blockquote>
+  <div class="ev-explanation">The emerging requirements scenario (Section L 4.3.1.3) requires offerors to describe staffing changes for three specific development tasks involving the existing RSC infrastructure. One respondent explicitly noted: &#x27;An incumbent or a contractor with intimate knowledge of the existing RSC infrastructure, configurations, and processes has a significant advantage in responding to these development tasks.&#x27; The Government&#x27;s response confirmed it would not provide architecture diagrams or system configurations. The incumbent can answer with real numbers; competitors must speculate. The scoring rubric for this criterion thus functions as an incumbency proxy.</div>
+</div><div class="evidence-item">
+  <blockquote>Due to OPSEC concerns no Technical Baseline Artifacts will be released to bidders. Bidders should describe their technical approach based on the required need... The Government will not establish a classified bidders&#x27; library or provide sanitized system documentation beyond what is included in the solicitation.</blockquote>
+  <div class="ev-explanation">The refusal to provide even sanitized technical baseline information — while the incumbent has full access to that information — creates a structural information asymmetry. Non-incumbent offerors must propose staffing, technical approaches, and cost estimates for a live, multi-mission TS/SCI ground system they have never seen. The incumbent can propose with precision; competitors must hedge. This asymmetry is most acute in the cost realism evaluation, where the Government will assess whether proposed costs reflect the actual work — but only the incumbent knows the actual workload with specificity.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The HADES solicitation is a complex, multi-year IDIQ for satellite ground system engineering, development, integration, and sustainment services. The document set is substantial, and the majority of the technical requirements are legitimately outcome-oriented: availability thresholds (99%, 99.95%, 99.99%), response time SLAs, configuration management outcomes, and security compliance requirements. The Government has also explicitly stated in multiple Q&amp;A responses that notional staffing plans are estimates and that alternative approaches are welcome — a positive signal against rigid process prescription. However, the solicitation exhibits moderate requirement sprawl in several identifiable areas. The Ground Support PWS contains step-by-step operational procedures for RVDS maintenance (monthly manual logins, specific vendor relationships, proprietary training attendance) that appear to be copied from incumbent operating procedures rather than derived from outcome needs. The pre-approval-before-baseline-change requirement combined with aggressive SLAs creates a process conflict that constrains contractor discretion in ways unrelated to outcomes. The mandatory WBS taxonomy was repeatedly flagged by industry as misaligned with how the work actually flows, and the Government resisted flexibility throughout the Q&amp;A period. The detailed proposal format requirements (five separate staffing tables in specific Excel formats) create implicit pressure to propose staffing in the government&#x27;s notional structure. These issues are real but not pervasive — much of the PWS is structured around outcomes, security standards, and legitimate interoperability constraints (working with KAFB infrastructure, compliance with DoD cyber policies, integration with existing government systems). The solicitation does not read primarily as an operating manual; it reads primarily as a performance specification with identifiable pockets of process prescription. This places it firmly at severity 2: present and consequential, but not dominating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.2.9.31 Perform maintenance on the Rendezvous and Proximity Video Distribution System (RVDS) as required. Effort includes, but is not limited to, the following actions: System administration of the RVDS SMP (Symmetric Multiprocessing) appliance (to include adding and removing sources from the SMP appliance, as requested) / Debugging and repairing RVDS network connections / Debugging and repairing touch panel connections or configurations / Repairing RVDS networking connections to displays (monitors, televisions and projectors) / Ensuring that RVDS equipment and interfaces are functioning as intended / The contractor shall be expected to work with the manufacturer of the RVDS system to establish a relationship in which the manufacturer will provide reach-back technical support to both the Contractor and the Government / Attend proprietary training for RVDS system as required / Login to every computer (not workstation) once per month on the NIPR, SIPR, JWICS, SGN, and Mission networks that are connected via the RVDS system as part of monthly PMI&#x27;s.</blockquote>
+  <div class="ev-explanation">This passage prescribes specific step-by-step actions for RVDS maintenance rather than defining an outcome such as &#x27;maintain RVDS system availability at X% with faults resolved within Y hours.&#x27; Requiring the contractor to log into every computer once per month, attend specific proprietary training, and establish a specific vendor relationship are process mandates that appear copied from incumbent operating procedures, not outcome definitions. A contractor who could automate availability checks or use a superior monitoring tool would be forced into manual monthly logins regardless.</div>
+</div><div class="evidence-item">
+  <blockquote>2.2.9.32 Provide on-site hardware support, troubleshooting and maintenance during normal business days and hours (M–F, 8–5) and on-call support during non-business hours with a 3-hour threshold. / 2.2.9.33 Contractor shall resolve the identified problems within 2 hours during business hours. Contractor shall resolve the identified problems within 3 hours during non-business hours. / 2.2.9.34 Ensure any changes to the baseline for the purpose of restoring mission service are presented to and approved by the Government prior to implementation.</blockquote>
+  <div class="ev-explanation">While response time SLAs (resolve within 2 or 3 hours) are legitimate outcome-based requirements, mandating &#x27;on-site&#x27; physical presence specifically and requiring Government pre-approval of every baseline change before implementation within a 3-hour resolution window creates an inherent process conflict that constrains vendor approach. The Q&amp;A confirms the Government revised this to require next-business-day approval for baseline changes, acknowledging the original language was operationally unworkable — a hallmark of process-copied-from-incumbent-operations rather than outcome design.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor defines the CWBS, to a minimum of the third level, using the level one PWS Breakdown Structure as follows: Systems Engineering / Engineering / Development / Integration / Sustainment / Cybersecurity / Program Management</blockquote>
+  <div class="ev-explanation">Prescribing the exact Level 1 WBS structure that contractors must use for cost organization, and mandating third-level decomposition to that specific taxonomy, constrains how vendors organize their work and estimate costs. Multiple Q&amp;A responses acknowledge this structure &#x27;does not cleanly align to all HADES PWS areas,&#x27; and industry repeatedly requested flexibility to use PWS-mapped or alternative structures. The Government&#x27;s insistence on a fixed WBS taxonomy regardless of how a vendor might naturally organize the work is a process mandate rather than an outcome requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3.1.1.1 Using the format in Table 4.1a, Staffing Matrix per TO shown below, the Offeror shall provide a completed Matrix that covers the first 12-months... The Offeror shall provide a breakout of labor hours associated with each TO per month for the 12-months after transition period. Use a format like Table 4.3 below produced in MS Excel. / The Offeror shall provide a breakout of labor hours associated with each position per month for the 12-months after transition period. Use a format like Table 4.4 below produced in MS Excel.</blockquote>
+  <div class="ev-explanation">While detailed cost proposals are legitimate and the notional staffing plans are explicitly described as estimates, requiring highly specific labor profile formats (Tables 4.1a, 4.1b, 4.2, 4.3, 4.4) in MS Excel with month-by-month breakouts by labor category, task order, and position for a 12-month window — when combined with the notional staffing plans that signal expected headcounts — creates strong pressure toward staffing to the government&#x27;s notional model rather than the contractor&#x27;s most efficient approach. The Q&amp;A responses repeatedly confirm the notional plans are estimates and alternative staffing is acceptable, suggesting the PWS language creates implied constraints beyond its stated intent.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS, GC 2.2.9.36-2.2.9.37: Ground Control PWS 2.2.9.36 and 2.2.9.37 require restoration within 2-3 hours yet require prior government approval for changes... System restoration within 2 hours is expected to be a return-to-service action. Fix actions are expected to involve an operational baseline change. An operational baseline change is not expected to be completed in the return-to-service window.</blockquote>
+  <div class="ev-explanation">Requiring Government pre-approval before implementing any baseline change while simultaneously requiring 2-3 hour resolution prescribes a specific two-step process (band-aid first, then fix) rather than simply stating &#x27;restore mission service within 2 hours and permanently resolve the root cause within X hours.&#x27; Industry noted this incentivizes sub-optimal quick fixes. The Government&#x27;s Q&amp;A clarification effectively acknowledged this by revising the language, but the original PWS prescription reflects a process mandate — likely copied from current operating procedures — rather than a performance outcome.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful rule pool behavior. Reviewing the full document — Section L, the Ground Support PWS, the Q&amp;A document, and the description — reveals a solicitation that cites regulatory references in a contextual and purposeful manner rather than dumping an undifferentiated bulk list. The standard contract clauses (FAR 52.216-18, 52.219-9, 52.215-22, DFARS 252.204-7021, 252.227-7013, 252.227-7014) are cited with clear explanations of their applicability. For example, DFARS 252.204-7021 is cited with explicit confirmation that CMMC Level 2 applies; DFARS data rights clauses are cited in direct connection to the government&#x27;s explanation of data rights expectations. The Q&amp;A documents are particularly revealing: when industry asked about EVMS (DFARS 252.234-7002), the government provided a detailed, well-reasoned explanation of why EVMS does not apply to this contract and confirmed it would be removed — exactly the kind of active regulatory curation that distinguishes good practice from rule pools. Similarly, when FAR 52.222-46 was flagged as having been removed by the Revolutionary FAR Overhaul, the government confirmed it would be deleted. The OCI section cites multiple DAFFARS alternates, which is the most regulation-dense passage, but the Q&amp;A shows the government actively explained which alternates apply and why. The PWS sections reference cybersecurity frameworks (DoD 8140, RMF, CMMC) that are entirely appropriate for a TS/SCI satellite ground system contract. There is no &#x27;Applicable Documents&#x27; bulk list of 20+ items, no irrelevant regulations, and no contradictory compliance requirements. The solicitation is complex but that complexity reflects the genuine regulatory environment for a classified DoD space systems contract, not passive accumulation of uncurated rules. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Adding updated copy of the draft RFP FA8809-26-R-B002, please note that many clauses will have deviations or will be updated due to the Revolutionary Far Overhaul. Expect to see many updated clauses and deviations in the final RFP.</blockquote>
+  <div class="ev-explanation">The solicitation acknowledges that clause lists are in flux due to the Revolutionary FAR Overhaul, which is a legitimate explanation for why some standard clauses appear in draft form. This is transparency about the regulatory environment rather than a rule pool.</div>
+</div><div class="evidence-item">
+  <blockquote>The Offeror shall submit an OCI Mitigation Plan in compliance with DAFFARS 5352.209-9000 ALT III,VI, &amp;VI (July 2023), DAFFARS 5352.209-9001 (July 2023) as well as the completed OCI Mitigation plan Checklist (Appendix I); the plan shall address OCI for the prime contractor and subcontractor EDIS providers.</blockquote>
+  <div class="ev-explanation">This is one of the more regulatory-dense passages, citing multiple DAFFARS alternates. However, the Q&amp;A responses show the government actively explained which alternates apply and why (task ordering contract with multiple systems, access to proprietary information, etc.), providing genuine context rather than a bulk dump.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate square peg concern, warranting severity 2. The HADES contract is primarily an O&amp;M sustainment effort at a fixed government facility (Kirtland AFB RSC) with an existing incumbent, known staffing profiles (~42.5 FTEs across three TOs), defined systems, and largely predictable workloads. For this type of work, T&amp;M with defined LCATs and ceiling prices — or even FFP for well-defined sustainment CLINs — would typically be considered. The Government&#x27;s own Q&amp;A confirms that staffing is predominantly M-F business hours with on-call support, and that the transition period (which is defined enough for FFP) involves the same labor categories as the ongoing work. Industry explicitly raised alternatives including FPI for sustainment tasks, and the Government declined without substantive justification beyond asserting CPAF is &#x27;appropriate.&#x27; However, the severity does not rise to 3 because: (1) HADES does include genuine developmental and prototype elements alongside sustainment, making some cost-uncertainty argument defensible; (2) the CPAF structure includes objective performance metrics and award fee criteria tied to measurable outcomes (availability, staffing, cost control), which partially mitigates the subjectivity concern; (3) the Government did acknowledge and remove EVMS (which would have been a significant burden for a primarily O&amp;M contract), showing appropriate calibration of oversight burden; and (4) there is a hybrid structure in place — FFP for the transition, CR for travel/ODCs — that shows some thoughtfulness in matching pricing to task type. The primary concern is that using CPAF for all labor CLINs, including routine sustainment tasks, creates administrative burden (award fee boards, performance monitoring, AFRB cycles) without providing proportionate performance incentives compared to what T&amp;M with defined LCATs or FFP for discrete sustainment deliverables would offer. This is a defensible but arguably suboptimal choice for a contract that is predominantly known-scope O&amp;M work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Space Systems Command (SSC), Innovation and Prototyping Delta (SD) is pleased to provide copies of the draft RFP for the HADES program... a competitive Cost-Reimbursable (CR) with Cost-Plus-Award-Fee (CPAF), Firm-Fixed-Price (FFP), and Cost CLINs contract to support satellite ground system and satellite operations center engineering, development, integration, and sustainment, and associated support services</blockquote>
+  <div class="ev-explanation">The solicitation uses a hybrid pricing structure: CPAF for the main labor CLINs (mission support), FFP for the transition period, and Cost-Reimbursable for travel and ODCs. The CPAF structure is the primary vehicle for what is largely a sustained operations and maintenance effort at a known facility with an existing incumbent, which raises questions about whether a simpler structure might have been more appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government has determined that Cost-Plus-Award-Fee (CPAF) is the appropriate contract type for this acquisition and will not adopt alternative contract types or hybrid approaches... A CPFF structure was initially contemplated, but was reconsidered and a CPAF structure has been put in place for this program.</blockquote>
+  <div class="ev-explanation">Industry specifically raised alternatives to CPAF, including Fixed-Price Incentive for well-defined sustainment tasks and CPIF with objective metrics. The Government&#x27;s response acknowledges it considered CPFF but switched to CPAF, suggesting internal deliberation about contract type. The Government does not provide substantive justification for why CPAF is superior to FFP or T&amp;M for the portions of the work that are routine O&amp;M sustainment.</div>
+</div><div class="evidence-item">
+  <blockquote>Alternatives to Cost-Plus-Award-Fee (CPAF): Consider a hybrid Fixed-Price Incentive (FPI) for well-defined sustainment tasks combined with CPAF only for developmental/prototype elements, or Cost-Plus-Incentive-Fee (CPIF) with objective performance metrics. These alternatives reduce administrative burden, lower the Government&#x27;s risk exposure to subjective fee determinations, and incentivize cost control more effectively. [Government Response:] The Government has determined that Cost-Plus-Award-Fee (CPAF) is the appropriate contract type for this acquisition and will not adopt alternative contract types or hybrid approaches.</blockquote>
+  <div class="ev-explanation">Industry identified that some portions of the work — specifically well-defined sustainment tasks — could support fixed-price or incentive-fee structures. The Government rejected this without substantive explanation. For an incumbent-supported, geographically fixed O&amp;M contract with defined staffing and known systems, at least some CLINs arguably could have used FFP or T&amp;M rather than CPAF.</div>
+</div><div class="evidence-item">
+  <blockquote>The transition period will not be part of an award fee period because it happens prior to the start of the contract, and will be Firm Fixed Price... [Transition] 90 days FFP</blockquote>
+  <div class="ev-explanation">The FFP transition CLIN is structurally sound for a defined 60-90 day phase-in with known deliverables and is appropriate. However, this creates an internal inconsistency: if the transition scope is defined enough to support FFP, that raises the question of why the ongoing sustainment work — which involves similar labor categories at a known facility — requires CPAF rather than a more performance-accountable structure like T&amp;M with ceiling prices or FFP for defined O&amp;M tasks.</div>
+</div><div class="evidence-item">
+  <blockquote>The government expects the availability requirements to be met. As a successful bidder - with an appropriate technology enabled strategy - the bidders are expected to be able to staff appropriately, although most staffing will be 8AM-5PM M-F, with on call and after hours assistance as required... Staffing plan provided are estimates. Alternative staffing levels are anticipated.</blockquote>
+  <div class="ev-explanation">The Government&#x27;s own responses indicate that staffing is largely predictable (primarily M-F business hours, ~10-42.5 FTEs across three TOs, at a fixed location), which is a hallmark of work that could be priced on T&amp;M with defined LCATs or even partially as FFP for routine sustainment. CPAF is typically reserved for complex, technically uncertain programs where outcomes are hard to measure objectively — which is partially but not entirely the case here given the well-defined O&amp;M nature of the work.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attach 4 Section L - 3.10.2026.pdf">Attach 4 Section L - 3.10.2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/a4bace9b2c624443a0d7589d761868a5_Attach+4+Section+L+-+3.10.2026.pdf" download="Attach 4 Section L - 3.10.2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="GC Notional Staffing Plan V.2.docx">GC Notional Staffing Plan V.2.docx</div></div>
+  <a class="dl-btn" href="../attachments/a4bace9b2c624443a0d7589d761868a5_GC+Notional+Staffing+Plan+V.2.docx" download="GC Notional Staffing Plan V.2.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Ground Control Notional Staffing Plan.pdf">Ground Control Notional Staffing Plan.pdf</div></div>
+  <a class="dl-btn" href="../attachments/a4bace9b2c624443a0d7589d761868a5_Ground+Control+Notional+Staffing+Plan.pdf" download="Ground Control Notional Staffing Plan.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Ground Support PWS V.2.docx">Ground Support PWS V.2.docx</div></div>
+  <a class="dl-btn" href="../attachments/a4bace9b2c624443a0d7589d761868a5_Ground+Support+PWS+V.2.docx" download="Ground Support PWS V.2.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="HADES DRFP Questions First and Second Round-GovermentResponse_05May2026.xlsx">HADES DRFP Questions First and Second Round-GovermentResponse_05May2026.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/a4bace9b2c624443a0d7589d761868a5_HADES+DRFP+Questions+First+and+Second+Round-GovermentResponse_05May2026.xlsx" download="HADES DRFP Questions First and Second Round-GovermentResponse_05May2026.xlsx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

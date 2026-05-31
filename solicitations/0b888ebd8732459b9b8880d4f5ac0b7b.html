@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NMMR SCANNER REPLACEMENTS — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>NMMR SCANNER REPLACEMENTS</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 0b888ebd8732459b9b8880d4f5ac0b7b</span>
+      <a class="sam-link" href="https://sam.gov/opp/0b888ebd8732459b9b8880d4f5ac0b7b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › OFFICE OF SURFACE MINING, RECLAMATION AND ENFORCEMENT › HEADQUARTERS OFFICE</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base year (07/01/2026 – 06/30/2027) + 4 option years (through 06/30/2031)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Technical</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is primarily a commercial product purchase (two large-format scanners) with associated installation, training, and multi-year maintenance. It does not exhibit the hallmarks of compliance-over-outcomes dysfunction.
+
+The technical requirements are highly outcome-oriented: they specify quantitative image quality metrics (MTF50, ΔE2000, noise limits, optical resolution) that must be validated using objective, standardized measurement tools (GoldenThread targets, OpenDICE, FADGI/DICE methods) against federal regulatory standards (36 CFR 1236). These are genuine performance targets — not process adherence requirements.
+
+The acceptance criteria tie government acceptance to demonstrated system performance, not to the vendor having followed prescribed procedures. This is the opposite of compliance theater.
+
+The deliverables list does include documentation artifacts (calibration certificates, training completion reports, maintenance logs), which are nominally process-compliance items. However, in the context of an equipment acquisition with warranty and maintenance obligations, these serve legitimate evidentiary purposes: verifying that OEM-authorized personnel performed work (preserving warranty validity), that calibration was actually conducted to standard, and that trained personnel can independently operate the system. They are proportionate to a one-time purchase, not a recurring reporting burden.
+
+Critically, there is no multi-layered reporting cadence — no weekly status reports, no monthly progress reports, no quarterly reviews stacked on top of each other. The solicitation imposes no waterfall-style plan-adherence tracking. The maintenance SLAs (4-hour phone response, 24–48 hour on-site response) provide ongoing outcome accountability for the service period.
+
+The minor compliance-documentation elements present (the deliverables list) do not crowd out outcome accountability; outcome metrics are the dominant feature of the QA structure. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>12.0 Acceptance Criteria
+The Government will accept the system upon successful verification that:
+• Conforms to salient characteristics &amp; all specifications in this SOW are met
+• Systems perform according to archival imaging standards in accordance with 36 CFR 1236 E as evaluated with Golden Thread target and OpenDICE software.
+• Training is completed
+• Documentation and warranty materials are delivered</blockquote>
+  <div class="ev-explanation">The acceptance criteria are outcome-oriented: the scanner must actually perform to archival imaging standards, validated by objective measurement tools (GoldenThread targets and OpenDICE software). This is a results-based acceptance gate, not a process-compliance checkbox.</div>
+</div><div class="evidence-item">
+  <blockquote>4.7 Deliverables
+1. Equipment Delivery Report
+2. Installation &amp; Calibration Certificate
+3. Training Completion Report
+4. Warranty Documentation
+5. Maintenance Logs (as applicable)
+6. Software License Documentation &amp; Update Schedule</blockquote>
+  <div class="ev-explanation">The deliverables list does include process-documentation items (installation certificate, training completion report). These are compliance-oriented records rather than performance outcome measures. However, given the nature of this acquisition — a one-time equipment purchase with multi-year maintenance — these deliverables are standard and proportionate. There is no overlapping reporting cadence or excessive status-reporting burden.</div>
+</div><div class="evidence-item">
+  <blockquote>Service Level Agreements (SLAs)
+• Telephone support within 4 hours
+• On-site technician response within 24–48 hours</blockquote>
+  <div class="ev-explanation">The SLAs establish measurable response-time commitments, which are outcome-oriented performance standards rather than process compliance. These provide a concrete accountability mechanism for the maintenance period.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate-to-borderline-severe insider rewards pattern, but its dynamics are somewhat different from the classical incumbency-bias scenario. Rather than rewarding a prior contract holder, the solicitation&#x27;s brand-name mandatory designation collapses competition to the authorized dealer network of a single manufacturer — Metis Imaging GmbH, a German company that makes the DRS 2020 DCS system. The practical effect is the same as incumbent capture: the pool of eligible competitors is drastically reduced not by experience requirements in the traditional sense, but by product-specific and OEM-authorization requirements that function as exclusionary gatekeeping.
+
+The Salient Characteristics document partially mitigates this by framing requirements as &#x27;equal to or exceed the capabilities and performance of the METIS DRS 2020 DCS,&#x27; which technically opens the door to equivalent products. However, the main solicitation body and SOW repeatedly name Metis-proprietary components (DC SynchroLight, METIS Scan Director, Light Inspector) as explicit requirements — not performance benchmarks — which forecloses the equivalence pathway in practice.
+
+The government&#x27;s need is genuine and well-articulated: permanent federal records digitization of fragile, oversized mine maps under 36 CFR 1236 is a specialized requirement. The non-contact table scanner market is narrow, and the specifications (78×47 inch table, 16K CMOS sensor, vacuum holddown, archival-grade image quality metrics) are legitimately demanding. It is possible that only one or two systems in the world can meet these functional requirements, which would make the brand-name designation legally defensible under FAR 11.105 (brand name justification). However, the solicitation does not include a visible brand-name justification document in the provided text, and the stacking of proprietary component names, OEM-authorization mandates, and named software creates a solicitation structure that would be very difficult for any non-Metis-authorized vendor to navigate — even if they possessed a technically superior product.
+
+I assess severity 2 (moderate) rather than 3 (severe) because: (1) the equivalence language in the Salient Characteristics does nominally preserve a path for non-Metis vendors; (2) the experience requirements themselves are not the primary exclusionary mechanism — there are no dollar thresholds, federal-specific experience mandates, or lookback windows of the type that classically define insider rewards; and (3) the market for this specific type of archival scanner is genuinely narrow, which provides some legitimate basis for the narrow specification. The sin here is real but partially attributable to market structure rather than pure incumbency protection. A qualified vendor who is not already in the Metis dealer network would face significant structural barriers to competition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This solicitation will be competed as Brand Name Mandatory, 100% Small Business Set-Aside... Two (2) fully operational Metis DRS 2020 DCS large-format table scanners</blockquote>
+  <div class="ev-explanation">The brand name mandatory designation for the Metis DRS 2020 DCS is the most significant insider-favoring element. Only vendors who are authorized dealers or resellers of this specific Metis product can compete. This is not a capability requirement — it is a product-specific requirement that collapses the competitive field to whoever holds an authorized dealer relationship with a single European manufacturer (Metis Imaging GmbH). A vendor with equivalent technical capability but a different product line cannot compete at all.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor shall be an Original Equipment Manufacturer/Software Developer (OEM) authorized dealer, authorized distributor or authorized reseller for the proposed equipment such that OEM warranty and service are provided and maintained by the OEM.</blockquote>
+  <div class="ev-explanation">Requiring OEM-authorized dealer/reseller status as an evaluation acceptability threshold — not just a preference — functionally limits competition to the handful of firms with an existing commercial relationship with Metis. This is not a capability test; it is a gatekeeping requirement that an otherwise qualified IT reseller or systems integrator cannot satisfy without first obtaining dealer authorization from the OEM, a process entirely outside their control.</div>
+</div><div class="evidence-item">
+  <blockquote>Critical System Components: The scanner and its maintenance coverage shall explicitly include the following components: 16K CMOS imaging sensor, DC SynchroLight lighting system, Motorized holding/scanning table</blockquote>
+  <div class="ev-explanation">The DC SynchroLight lighting system is a proprietary Metis component and trademark. Specifying it by proprietary name as a mandatory component — rather than specifying functional requirements like &#x27;controlled LED lighting with dynamic adjustment capability&#x27; — ensures that only Metis resellers can meet this requirement. A vendor offering an equivalent non-contact table scanner with comparable lighting technology would be disqualified regardless of performance.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor must provide, for the entire performance period: All software updates (e.g., METIS Scan Director, Light Inspector)</blockquote>
+  <div class="ev-explanation">Naming Metis-proprietary software (METIS Scan Director, Light Inspector) as required deliverables confirms the brand-specific orientation of the solicitation. A vendor offering a functionally equivalent scanner with different software cannot comply, even if the software meets all the underlying performance and archival standards required by 36 CFR 1236.</div>
+</div><div class="evidence-item">
+  <blockquote>Installation must be performed exclusively by OEM-authorized personnel... All maintenance must be performed by factory-authorized or OEM-certified technicians.</blockquote>
+  <div class="ev-explanation">Requiring OEM-authorized personnel for installation and all maintenance means that only technicians certified by Metis specifically can perform this work. This restricts the service delivery model to whoever Metis has credentialed, which in practice means the same small set of authorized channel partners. A qualified systems integrator who employs skilled imaging technicians cannot self-perform these functions without Metis certification, effectively locking the service chain to a single manufacturer&#x27;s ecosystem.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents less requirement sprawl than its length might suggest. The dominant structural feature — brand-name mandatory procurement of the Metis DRS 2020 DCS — is the primary driver of apparent prescriptiveness. Once a brand-name-or-equal approach is chosen, many details that would otherwise look like prescriptive HOW requirements become necessary equivalency benchmarks. The government&#x27;s decision to pursue brand-name procurement is a separate analytical question (potentially a sole-source concern), but within that frame, specifying sensor types, lighting systems, and component lists is logically coherent.
+
+The core technical requirements (Sections 2.2 and the Salient Characteristics document) are predominantly outcome-oriented: they specify measurable image quality metrics (MTF50, color accuracy ΔE2000, noise limits, optical resolution) that are drawn from 36 CFR 1236 and FADGI standards — which are legally mandated archival standards for permanent federal records. These are legitimate regulatory constraints, not process prescriptions. A vendor meeting those metrics through any compliant technology would satisfy the requirement.
+
+The SOW&#x27;s requirements for installation, calibration, training, warranty, and maintenance are similarly defensible. The SLA specifications (4-hour telephone response, 24-48 hour on-site response) define outcomes, not processes. The warranty requirement (3-year minimum, OEM parts only) protects a critical government asset. Training scoped to three personnel within 14 days of installation describes a deliverable, not a step-by-step workflow. The maintenance visit frequency (1-2 per year) is a service level, not a procedural mandate.
+
+The most prescriptive elements — OEM-only installation personnel and named component specifications — are minor in context and flow directly from the brand-name procurement decision. There is no evidence of copy-paste from an incumbent&#x27;s operating procedures, no staff composition mandates, and no step-by-step workflow prescriptions that would preclude vendor optimization. The solicitation is a competently scoped commercial item acquisition for specialized archival digitization equipment, and its specificity is largely driven by legitimate regulatory and mission constraints rather than organizational dysfunction. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Installation must be performed exclusively by OEM-authorized personnel.</blockquote>
+  <div class="ev-explanation">This prescribes who must perform installation rather than what installation outcome must be achieved. However, in context it is defensible: the system has a 3-year warranty that requires OEM certification to remain valid, and the underlying mission (digitizing permanent federal records) depends on precise calibration. Restricting installation to OEM-authorized personnel is a reasonable warranty-protection mechanism, not pure process sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>Critical System Components: The scanner and its maintenance coverage shall explicitly include the following components: 16K CMOS imaging sensor, DC SynchroLight lighting system, Motorized holding/scanning table.</blockquote>
+  <div class="ev-explanation">This names specific proprietary components rather than functional specifications. However, this must be read alongside the brand-name mandatory justification: the solicitation explicitly calls for the Metis DRS 2020 DCS by name, so enumerating its known components is a natural consequence of the brand-name designation, not independent process sprawl. The salient characteristics document frames these as equivalency benchmarks.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit a severe rule pool problem. The technical compliance section — the heart of the procurement — is admirably focused: it cites three CFR citations, all from 36 CFR 1236 Subpart E, all directly and demonstrably relevant to digitizing permanent federal records. The salient characteristics document and SOW show evidence of careful, mission-aligned requirement drafting.
+
+However, the terms and conditions layer introduces moderate rule-pool characteristics. The IPv6 DOI clause (DOI-AAAP-0055), written for networked IT systems, is applied to a standalone scanner without explanation of how its retrofit and dual-stack requirements interact with the OEM-only maintenance and firmware provisions elsewhere in the same solicitation — creating a potential internal tension. The Privacy Act notification clause appears misapplied to mine map scanning. The 52.212-5 checklist includes clauses (text-messaging-while-driving, sustainable products) that appear to be agency defaults applied without review for relevance to this purchase. And the full-text inclusion of 52.219-9 with all four alternates, when the clause by its own terms does not apply to small businesses, adds unnecessary bulk.
+
+These issues are consistent with a moderate rule pool: the technical requirements are curated and purposeful, but the standard commercial item terms layer includes boilerplate regulatory mass that was not reviewed for applicability to this specific acquisition. The compliance burden is elevated but not impenetrable — a sophisticated small business reseller familiar with federal IT contracting will recognize which clauses are standard boilerplate and which carry operational weight. The severity is 2, not 3, because the core technical and operational requirements are clean, there are no glaring contradictions between cited regulations and the solicitation&#x27;s purpose, and the volume of truly irrelevant citations — while present — does not overwhelm the document.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The scanner must comply with:
+• 36 CFR 1236 Subpart E
+• 36 CFR 1236.46(b)(1) – Acceptable performance-evaluation methods
+• 36 CFR 1236.50(e)(4) – Image-quality performance metrics</blockquote>
+  <div class="ev-explanation">This is the solicitation&#x27;s primary regulatory compliance section for the scanner itself (Section 2.9 of T&amp;C and Section 9 of Salient Characteristics). Notably, it cites only three CFR citations — all from the same subpart — and they are directly relevant to digitizing permanent federal records. This is curated, not pooled.</div>
+</div><div class="evidence-item">
+  <blockquote>DOI-AAAP-0055 INTERNET PROTOCOL VERSION 6 (JUN 2012)
+1. Any system hardware, software, firmware and/or networked component (voice, video or data) developed, procured, or acquired in support and/or performance of this contract shall be capable of transmitting, receiving, processing, forwarding and storing digital information across system boundaries utilizing system packets that are formatted in accordance with commercial standards of Internet Protocol (IP) version 6 (IPv6)...</blockquote>
+  <div class="ev-explanation">The IPv6 clause is included in full text and imposes non-trivial compliance obligations — including retrofit requirements at no cost — on what is essentially a standalone large-format scanner with a proprietary software suite installed on a government-furnished workstation. The degree to which a dedicated archival table scanner&#x27;s firmware and internal communications must achieve IPv6 compliance is unclear, and no context is provided explaining how this DOI-wide IT clause applies to scanning hardware of this nature. This is a boilerplate carryover applied without apparent review of its relevance.</div>
+</div><div class="evidence-item">
+  <blockquote>52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS... [X](55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024) (E.O. 13513)... [X](46) 52.223-23, Sustainable Products and Services (May 2024) (DEVIATION Feb 2025)... [X](32) 52.222-19, Child Labor-Cooperation with Authorities and Remedies (MAR 2026)</blockquote>
+  <div class="ev-explanation">The 52.212-5 checklist incorporates a substantial volume of clauses by reference, with checked boxes indicating applicability. While many (SAM maintenance, small business, payment terms) are routine for commercial item acquisitions, others — such as the text-messaging-while-driving encouragement clause (52.226-8) and the sustainable products clause (52.223-23) — are applied without any explanation of how they connect to the acquisition of two large-format scanners and multi-year maintenance. These appear to be standard agency checkbox defaults rather than curated selections reviewed for this specific procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>DIAR 1452.224-1 PRIVACY ACT NOTIFICATION (JUL 1996) (DEVIATION)
+The Contractor will be required to design, develop, or operate a system of records on individuals, to accomplish an agency function subject to the Privacy Act of 1974...</blockquote>
+  <div class="ev-explanation">The Privacy Act notification clause states the contractor &#x27;will be required to design, develop, or operate a system of records on individuals.&#x27; The scope of this contract is delivering, installing, calibrating, and maintaining two large-format scanners used to digitize mine maps — historical geological records, not personal data systems. The applicability of this clause to this specific acquisition is not explained and appears to be a boilerplate carryover, potentially inapplicable to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>52.219-9 Small Business Subcontracting Plan... [extensive full-text inclusion across pages 22-35, including four complete alternates (I, II, III, IV)]</blockquote>
+  <div class="ev-explanation">The solicitation reproduces the full text of FAR 52.219-9 including all four deviation alternates across approximately 14 pages, despite opening with the statement &#x27;(a) This clause does not apply to small business concerns&#x27; — and this is a 100% small business set-aside. The inclusion of the full clause with all alternates when the primary subclause exempts the likely awardee creates an unnecessary regulatory mass that a small business vendor must parse to determine their obligations. This is a structural indicator of copy-forward regulatory accumulation without targeted review.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial product acquisition with FFP pricing, which is the correct contract type. The requirement is precisely specified: two named scanner units (Metis DRS 2020 DCS) with enumerated technical characteristics, a defined delivery timeline (60 days), a concrete installation and training scope, and maintenance services with explicit SLAs. None of the hallmarks of a T&amp;M or cost-reimbursement scenario are present — the scope is not evolving, the labor quantity is not unpredictable, and the deliverable is a physical product with commercially available support services. The option years cover annual maintenance on equipment the vendor will have installed themselves, with defined response times and visit frequencies, making cost estimation straightforward. FAR guidance endorses FFP for commercial items and for requirements where risk can be predicted with acceptable certainty — both conditions are satisfied here. The brand-name specification further reduces scope uncertainty. There is no meaningful argument that a different contract type would be superior for this acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contract will be firm-Fixed Price (FFP). ... Two (2) fully operational Metis DRS 2020 DCS large-format table scanners including software, installation, calibration, training, warranty, and maintenance services.</blockquote>
+  <div class="ev-explanation">The solicitation uses FFP for a well-defined commercial product acquisition: two specific, named scanner units with enumerated accessories and services. The deliverable is concrete and the scope is fixed, making FFP appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 00010: Contractor shall provide all equipment, software, installation, calibration, training, warranty, and maintenance necessary for fully operational Metis DRS 2020 DCS large-format table scanners... CLINs 00020–00050: OY 1–4 – Contractor to provide maintenance &amp; service level requirements IAW SOW</blockquote>
+  <div class="ev-explanation">The base CLIN covers a discrete product delivery with defined specifications. The option CLINs cover recurring annual maintenance on known equipment with defined SLAs (4-hour telephone response, 24–48 hour on-site response, 1–2 preventative maintenance visits per year). These are predictable, commercially available services well-suited to FFP pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>The offer shall include all applicable costs (shipping, travel, etc.) in the total firm-fixed price quotation, as no additional funding will be provided after contract award.</blockquote>
+  <div class="ev-explanation">The government explicitly requires vendors to price all foreseeable costs up front, which is consistent with FFP practice and appropriate given that the equipment, installation, and maintenance services are commercially available with established market prices.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="A02_-_SOW_Metis_DRS_2020_DCS.pdf">A02_-_SOW_Metis_DRS_2020_DCS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b888ebd8732459b9b8880d4f5ac0b7b_A02_-_SOW_Metis_DRS_2020_DCS.pdf" download="A02_-_SOW_Metis_DRS_2020_DCS.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="A06_-_Scanner_Salient_Characteristics.docx">A06_-_Scanner_Salient_Characteristics.docx</div></div>
+  <a class="dl-btn" href="../attachments/0b888ebd8732459b9b8880d4f5ac0b7b_A06_-_Scanner_Salient_Characteristics.docx" download="A06_-_Scanner_Salient_Characteristics.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="B06_-_140S0126Q0002_NMMR_T_C.pdf">B06_-_140S0126Q0002_NMMR_T_C.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b888ebd8732459b9b8880d4f5ac0b7b_B06_-_140S0126Q0002_NMMR_T_C.pdf" download="B06_-_140S0126Q0002_NMMR_T_C.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140S0126Q0002.pdf">Sol_140S0126Q0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b888ebd8732459b9b8880d4f5ac0b7b_Sol_140S0126Q0002.pdf" download="Sol_140S0126Q0002.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

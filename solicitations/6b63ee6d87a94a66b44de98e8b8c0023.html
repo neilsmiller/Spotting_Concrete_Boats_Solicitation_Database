@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVOT HARD DRIVE KITS — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>AVOT HARD DRIVE KITS</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 6b63ee6d87a94a66b44de98e8b8c0023</span>
+      <a class="sam-link" href="https://sam.gov/opp/6b63ee6d87a94a66b44de98e8b8c0023/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-03-30</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334112</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-30</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 days after date of award</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simplified acquisition for commercial hardware items — specifically assembled hard drive kits (Samsung PM1653 SAS drives in carrier trays) for an existing RAID configuration. The entire acquisition is a product purchase, not a services contract. There is no Statement of Work, Performance Work Statement, or service delivery framework that would generate reporting requirements, QA surveillance plans, or performance monitoring structures. The solicitation specifies a delivery quantity, a delivery address, and a 30-day delivery deadline. That is the entirety of the performance requirement. There are no weekly status reports, monthly progress reports, meeting cadences, or QA surveillance language present — nor would any be expected for a firm-fixed-price supply contract of this nature. The Provisions &amp; Clauses attachment (pages largely blank in the provided text) would contain standard FAR/DFARS commercial item clauses, none of which introduce compliance-over-outcomes accountability structures for a simple product delivery. The sole accountability mechanism is delivery of conforming goods within 30 days of award — which is an outcome (delivery of the correct items on time), not a process compliance measure. There is simply no material here to assess for this sin. The solicitation is appropriately lean for what it is buying.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents a severity 3 insider rewards situation — the most severe category — because competition has been entirely foreclosed through a sole source determination. The solicitation does not tilt the playing field; it eliminates it. The sole source justification reveals a classic vendor capture pattern: a prior contract with Dedicated Computing created a proprietary RAID configuration, and that configuration is now being used as the technical rationale to exclude all other vendors from competition. The circular logic is evident — the government is locked into one vendor partly because it chose to standardize on that vendor&#x27;s products in earlier procurements. The justification cites compatibility with existing Dedicated Computing hardware and SAS drives as the basis for exclusivity, but this compatibility constraint is not an inherent market characteristic — it is the downstream consequence of prior sole-source or limited-competition awards that created the dependency in the first place. The claim that this is an &#x27;industry standard&#x27; is unsupported and appears to conflate a proprietary vendor ecosystem with a genuinely open standard. A qualified vendor who has never worked this specific contract cannot compete, not because they lack capability to supply enterprise SAS hard drives and drive carriers, but because the agency&#x27;s infrastructure was built around a specific vendor&#x27;s specifications. This is the defining characteristic of the insider rewards sin: incumbency, not capability, determines who can win. Mitigating factors are minimal. The dollar value is modest (simplified acquisition threshold), and the technical rationale (RAID configuration integrity, RMF ATO compliance across multiple sites) is not entirely implausible — there are genuine risks in mixing drive brands in RAID arrays. However, the solicitation makes no effort to explore whether functionally equivalent products exist, whether a market survey was conducted, or whether the ATO constraints truly require a specific commercial brand rather than specific technical specifications. The sole source justification is conclusory rather than analytically rigorous.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The proposed simplified acquisition is being solicited on a sole source basis.</blockquote>
+  <div class="ev-explanation">The solicitation is explicitly structured as a sole source action, meaning competition has been eliminated entirely. This is the most extreme form of insider rewards — rather than tilting the playing field, it removes the playing field altogether.</div>
+</div><div class="evidence-item">
+  <blockquote>All hard drives must be the same drive type and the same drive brand because they will be installed in a redundant array of independent disks (RAID) configuration to connect to already existing SAS Hard Drives of the same brand, hardware and adapters from Dedicated Computing.</blockquote>
+  <div class="ev-explanation">The justification mandates brand-specific compatibility with the existing vendor (Dedicated Computing), effectively encoding the incumbent&#x27;s product specifications as a technical requirement. Any vendor not offering Dedicated Computing-specified products is categorically excluded — not because they lack capability, but because the prior contract created a locked-in configuration.</div>
+</div><div class="evidence-item">
+  <blockquote>Procurement of any other brand but Dedicated Computing specifications would cause unduly burden to the Government with the need to re-structure the current infrastructure which would incur an erroneous monetary investment.</blockquote>
+  <div class="ev-explanation">This argument explicitly frames switching costs — the natural consequence of prior vendor lock-in — as justification for continued sole-source award. This is a textbook insider rewards dynamic: the incumbent&#x27;s historical position is used to justify exclusion of all competitors, regardless of their technical capability.</div>
+</div><div class="evidence-item">
+  <blockquote>These are the only types that are compatible with the configuration to the exclusion of all other brands. This is to maintain consistency, standardize maintenance, and maximize efficiency in the RAID configuration and this is an industry standard.</blockquote>
+  <div class="ev-explanation">The claim that only Dedicated Computing-specified products are compatible is presented without independent technical verification. The solicitation itself authored this exclusivity criterion based on a prior contract structure. Characterizing a proprietary vendor configuration as an &#x27;industry standard&#x27; conflates incumbency lock-in with genuine technical necessity.</div>
+</div><div class="evidence-item">
+  <blockquote>In accordance with FAR 6.302-1(c), the instant requirement can only be satisfied by unique suppliers from limited sources which are certified resellers.</blockquote>
+  <div class="ev-explanation">The sole source justification invokes FAR 6.302-1(c) (only one responsible source) but the underlying basis is that the agency previously adopted a vendor-specific configuration. The &#x27;uniqueness&#x27; is self-created through prior procurement decisions, not an inherent characteristic of the market. Certified reseller status is a distribution arrangement, not a capability differentiator — other resellers or distributors could potentially fulfill the same requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a highly simplified acquisition for commodity hardware items — two types of assembled hard drive kits consisting of a tray and a Samsung SAS drive. The solicitation does not dictate any workflow, staffing structure, process steps, or operational methods. The only prescriptive elements are the specific part numbers and brand names, which are justified by legitimate technical interoperability constraints: the drives must be compatible with an existing RAID configuration that has an approved RMF Authorization to Operate across multiple installations. The sole source justification, while brief, articulates a coherent technical rationale for the brand specificity. There is no incumbent SOW being copy-pasted, no detailed task procedures, and no staffing mandates. The solicitation simply defines WHAT items are needed (specific hardware components) and HOW MANY, along with a delivery date and location. This is textbook commercial item acquisition under FAR Part 12 for hardware with defined compatibility requirements. Severity is 1 — minimal. The brand-name specificity represents the entirety of the &#x27;prescriptive&#x27; content, and it is defensibly justified as a technical constraint rather than process sprawl.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FGI-LHM000037 Spare Drive Kit 1U Management: Required Quantity – 16 Each. Assembled Kit contains: - QTY1 CCZ-25EK3-R18302-U0R- HDD TRAY spare drive carrier 1U management SVR - QTY1 SAMSUNG PM1653 2TB SAS Internal Enterprise SAS</blockquote>
+  <div class="ev-explanation">The solicitation specifies exact part numbers and brand names for the hardware components. However, this is not requirement sprawl in the traditional sense — it is a brand-name or equal specification for commodity hardware items that must be compatible with an existing RAID infrastructure. The sole source justification explains the technical rationale: the drives must match existing SAS hardware in a RAID configuration with an approved RMF ATO. This is a technical interoperability constraint, not a process mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>All hard drives must be the same drive type and the same drive brand because they will be installed in a redundant array of independent disks (RAID) configuration to connect to already existing SAS Hard Drives of the same brand, hardware and adapters from Dedicated Computing.</blockquote>
+  <div class="ev-explanation">This language explains WHY the specific brand is required — RAID compatibility with existing infrastructure — rather than dictating how the vendor should perform work. It is a technical constraint rooted in interoperability, analogous to requiring integration with a specific government system. This is a legitimate constraint, not sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, straightforward simplified acquisition (SAP) for commercial hardware items — AVOT hard drive kits with a total of 48 units at a presumably modest price point. The solicitation is lean and purposeful. It incorporates FAR and DFARS clauses by reference in a single standard sentence, which is appropriate and normal. The Provisions &amp; Clauses attachment (pages 1–35) was not rendered with extractable text in the provided content, so I cannot audit it line by line; however, for a FAR Part 12 commercial item simplified acquisition of this nature, the standard clause set is well-defined and unlikely to contain anomalous bulk regulatory citations. The Sole Source Justification references FAR 6.302-1(c) appropriately and in context. There is no &#x27;Applicable Documents&#x27; section, no list of directives or executive orders, and no compliance framework citations beyond what the hardware&#x27;s RMF/ATO context would naturally require. The solicitation does not exhibit the hallmarks of rule pools: no bulk undifferentiated lists, no clearly irrelevant policies, no contradictions between cited regulations and the solicitation&#x27;s purpose. The regulatory footprint is minimal and appropriate to the scope.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This solicitation documents and incorporates provisions and clauses in effect through FAC 2026-01, effective 03/13/2026 and DFARS Publication Notice 11/10/2025. It is the responsibility of the contractor to be familiar with the applicable clauses and provisions. The clauses may be accessed in full text at these addresses: https://www.acquisition.gov/browse/index/far / http://www.https://www.acquisition.gov/dfars</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR and DFARS clauses by reference in standard fashion, pointing to the official acquisition gateway rather than listing dozens of individual citations. This is normal federal contracting practice and does not constitute a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial item purchase — two specific hardware kit types in fixed quantities, with a defined delivery deadline of 30 days after award. FFP is the canonical contract type for buying commercial goods: the quantities are known, the specifications are precise (specific Samsung PM1653 drives and specific Dedicated Computing carriers), and there is no labor component or scope uncertainty that would argue for T&amp;M or cost-reimbursement. The sole-source nature of the procurement does not change the appropriateness of the contract type — FFP still gives the government price certainty and places delivery risk on the vendor. There is no square peg here. The contract type is well-matched to the requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The proposed contract action is for supplies for which NAVSUP Fleet Logistics Center (FLC) Norfolk intends to solicit and negotiate a Firm Fixed Price contract and will utilize procedures under Federal Acquisition Regulations (FAR) Part 12.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm Fixed Price (FFP) contract type will be used.</div>
+</div><div class="evidence-item">
+  <blockquote>FGI-LHM000037 Spare Drive Kit 1U Management: Required Quantity – 16 Each... FGI-LHM000038 Kit Spare Drive Carrier 2U Compute SVR: Required Quantity – 32 Each... Required Delivery Date: 30 Days After Date of Award</blockquote>
+  <div class="ev-explanation">The requirement is for discrete, off-the-shelf hardware kits in defined quantities with a fixed delivery date. This is a well-defined commercial product purchase with no labor ambiguity, making FFP entirely appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - Combined Synopsis Solicitation.pdf">Attachment 1 - Combined Synopsis Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6b63ee6d87a94a66b44de98e8b8c0023_Attachment+1+-+Combined+Synopsis+Solicitation.pdf" download="Attachment 1 - Combined Synopsis Solicitation.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2 - Sole Source Justification.pdf">Attachment 2 - Sole Source Justification.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6b63ee6d87a94a66b44de98e8b8c0023_Attachment+2+-+Sole+Source+Justification.pdf" download="Attachment 2 - Sole Source Justification.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 - Provisions And Clauses.pdf">Attachment 3 - Provisions And Clauses.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6b63ee6d87a94a66b44de98e8b8c0023_Attachment+3+-+Provisions+And+Clauses.pdf" download="Attachment 3 - Provisions And Clauses.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

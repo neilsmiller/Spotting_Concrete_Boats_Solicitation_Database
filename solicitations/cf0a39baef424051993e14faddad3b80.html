@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DISA-PAC VIDEO WALL — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DISA-PAC VIDEO WALL</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 cf0a39baef424051993e14faddad3b80</span>
+      <a class="sam-link" href="https://sam.gov/opp/cf0a39baef424051993e14faddad3b80/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE INFORMATION SYSTEMS AGENCY (DISA) › DITCO-PAC</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334220</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12 months from date of contract award (plus 1-year installation warranty after Government acceptance)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price Factor</li><li>Technical/Management Approach (Subfactor 1: Tech Refresh; Subfactor 2: Warranty)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a bounded, hardware-focused task: procure, install, and warranty two video walls. The accountability structure is generally proportionate to the scope. The primary QA mechanism — 100% functional testing upon installation completion — is outcome-oriented and appropriate. The warranty SLA (95% of on-site responses within 8 business hours) is a concrete, measurable performance standard. These are the opposite of compliance theater.
+
+The reporting burden is light: a project plan, weekly status updates during installation, and event-triggered SCRM updates. There are no overlapping cadences, no prescribed report formats, no mandatory meeting schedules, and no plan-deviation tracking that would crowd out outcome focus. The weekly updates are tied to a finite installation period and use contractor-determined formats.
+
+The weakest element is the 80% &#x27;no re-work&#x27; AQL for Task 1 during execution — this measures process quality rather than system outcomes — but it exists alongside the more rigorous 100% functional completion standard. The SCRM plan is a process deliverable, but it reflects a legitimate regulatory requirement for DISA IT acquisitions.
+
+Overall, this is a well-scoped commercial IT procurement where the government has correctly focused its QA energy on the delivery endpoint (does the system work?) and the warranty period (are problems resolved on time?). The reporting requirements are proportionate and do not dominate the accountability structure. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance occurs with no required re-performance or re-work at least 80% of the time. Problems that occur are minor and are resolved in a satisfactory manner. | Routine/periodic inspection.
+
+All video wall components function 100% in the system. | 100% inspection of all delivered products/equipment and testing upon completion of Task 1.
+
+8x5 telephone support provided between 7:00 a.m. to 3:30 p.m. HST and on-site support with proper replacement parts within 8 business hours is provided at least 95% of the time. | Routine/periodic inspection.</blockquote>
+  <div class="ev-explanation">The QASP and PWS surveillance matrix does include outcome-oriented standards: 100% functional components at completion, and a specific 95% response-time SLA for warranty support. These are genuine performance targets rather than pure process compliance. However, the 80% &#x27;no re-work&#x27; standard for Task 1 during execution is a process-adjacent metric — it measures whether work had to be redone rather than whether the installed system meets user needs. It is a weak outcome proxy but not pure compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide an equipment installation project plan with proposed schedule. A final updated plan is due no later than two (2) weeks after contract award. Provide weekly updates to the MP POC and additional updates, as necessary, upon request of the Contracting Officer until installation completion.</blockquote>
+  <div class="ev-explanation">The weekly status updates during installation are a modest reporting requirement tied to a discrete, finite installation task. For a hardware installation project lasting up to 12 months, weekly updates are reasonable project management — not an excessive compliance burden. The solicitation does not prescribe the format or sections of these updates beyond &#x27;written contractor-determined format with contracting officer approval,&#x27; which limits the compliance theater risk.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall submit a SCRM plan as part of its technical proposal that describes how the contract will reduce and mitigate Supply Chain Risk... The contractor shall provide an updated SCRM Plan to the Contracting Officer and MP POC within five (5) business days whenever there is a change that affects one or more security controls.</blockquote>
+  <div class="ev-explanation">The SCRM plan is a process-compliance deliverable — it documents how the vendor manages supply chain risk rather than measuring whether supply chain risk was actually reduced. However, for a DISA IT hardware procurement in a classified facility, this is a legitimate regulatory requirement rather than management theater. The update trigger (actual changes to ownership, suppliers, etc.) is event-driven rather than calendar-driven, limiting gratuitous paperwork.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a discrete, well-scoped hardware procurement: two video walls, two video processors, and associated AV cabling, plus incidental installation and a 12-month warranty. The evaluation structure is Lowest Price Technically Acceptable (LPTA), which means price drives the award decision once a vendor clears technical acceptability thresholds. There are no past performance evaluation criteria — the solicitation explicitly states &#x27;Past performance is not an evaluation factor; it will be used in determining contractor responsibility in accordance with FAR 9.104.&#x27; There are no dollar-threshold experience requirements, no mandatory prior federal contract history, no lookback windows, and no evaluation bonus points for prior similar work. The technical acceptability threshold (Subfactor 1: Tech Refresh) requires only that the offeror demonstrate ability to complete the tasks and that personnel have interim or final SECRET clearances. The SECRET clearance requirement is a genuine access constraint driven by the workspace — not an incumbency filter — and is applicable to all offerors equally. The brand-name justification for two Extron components (output boards and fiber optic transmitters) is grounded in legitimate interoperability constraints with existing government-owned equipment (the Extron IPCP Pro 555Q xi controller and XTP II Crosspoint 6400 matrix switch), is properly documented in the J&amp;A under FAR 6.302-1, and does not function as an experience requirement that favors the incumbent. The remaining five product line items are specified as &#x27;or equal,&#x27; with salient characteristics published in the solicitation to enable non-incumbent vendors to propose alternatives. The SCRM plan requirement is a standard DoD supply chain risk documentation requirement, not an insider knowledge test. The solicitation is set aside for small businesses, further broadening the competitive pool. In sum, this solicitation lacks the hallmarks of insider rewards: there are no narrow dollar-threshold experience mandates, no federal-specific experience requirements, no evaluation scoring that rewards incumbency proxies, and no institutional knowledge requirements. A qualified AV integration small business without prior work on this specific contract could realistically compete.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal requirement sprawl for a hardware procurement and installation effort. The PWS is appropriately scoped for what it is: a tech refresh of two existing video walls at a fixed facility, requiring removal, installation, programming, and warranty support. The requirements are predominantly outcome-oriented: the video walls must function at 100% upon completion, the warranty must meet 8x5 support with 8-hour on-site response, and installation must be complete within 12 months. The technical specifications — pixel resolution, brightness (1,000 nits), dimensions, input count — define WHAT the government needs, not HOW the contractor must build it. The brand-name restrictions on two Extron components are properly justified (compatibility with existing government-owned matrix switch) and disclosed through a formal Brand Name Justification. The security requirements (SECRET clearance, visit authorization procedures, VAR/VTN packages) are legitimate regulatory and facility access constraints, not process prescription. The SCRM plan requirement and Section 508 standards are similarly mandated by regulation rather than representing organizational dysfunction. The reporting deliverables — project plan and weekly status updates — are modest and reasonable for a defined installation project. The surveillance matrix uses outcome-based AQLs (100% functional upon completion; 95% warranty response rate) rather than prescribing how the contractor manages quality. The overall solicitation reads as a well-bounded supply-and-install acquisition where the government has appropriately described what it needs, where it needs it, and what constraints exist, while leaving the contractor latitude to determine installation methods, sequencing, staffing, and technical approach for the equal-product items. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.1.3 Subtask 3 - Programming/Testing. Assist with programming of the control system and test and checkout of the video walls and A/V system in the DNC. Existing control system in place is Extron Electronics. The controller is an Extron IPCP Pro 555Q xi. The video matrix switch is an Extron XTP II Crosspoint 6400. The contractor shall connect to both Government-owned devices, not replace them.</blockquote>
+  <div class="ev-explanation">This language specifies that the contractor must connect to specific named Government-owned devices rather than replace them. However, this is a legitimate interoperability constraint — the Government owns existing infrastructure and has explicitly justified why replacement is cost-prohibitive (see Brand Name Justification). This is a technical boundary condition, not process prescription. The contractor retains discretion over how to accomplish the connection and programming.</div>
+</div><div class="evidence-item">
+  <blockquote>6.1.2 Subtask 2 - Installation. Install two new video walls, two video processors, and all associated A/V equipment and cabling meeting all salient characteristics and brand name specifications in the attached Product List. Video walls shall be mounted on the same walls as the existing video walls.</blockquote>
+  <div class="ev-explanation">Requiring installation on the same walls as existing video walls is a physical constraint that could be seen as prescriptive. However, it reflects a legitimate facility constraint — the concaved walls, existing infrastructure, and the comm room behind each wall are physical realities of the installation site, not arbitrary process choices. The contractor still determines the method of mounting and installation approach.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics — a severity 2 finding. The compliance burden is elevated but not at the extreme end of the spectrum. Several mitigating factors prevent a severity 3 rating: the solicitation is relatively focused in scope (commercial hardware installation), the bulk of the regulatory citation is concentrated in predictable locations (Security Requirements and SCRM sections) rather than scattered incoherently, and the FAR/DFARS clauses incorporated by reference are standard for a DoD contract of this type. The solicitation is not obviously the product of years of uncurated accumulation.
+
+However, several genuine rule pool patterns are present. The 15-item security reference list includes documents with no apparent relevance to commercial display hardware installation (FOIA program, distribution statement policies, RMF for DoD systems). The 29-control NIST SP 800-53 SCRM table dumps the entire supply chain controls section onto small business offerors without distinguishing which controls are actually applicable to a resell-and-install hardware contract — the hedge phrase &#x27;as applicable to your contract&#x27; shifts all interpretive burden to the vendor. Most strikingly, seven pages of Section 508 full-text requirements are reproduced verbatim including standards for braille instructions, WCAG web conformance, hearing aid coupling, and two-way voice communication — provisions that have little or no relevance to passive LED display panels in a government facility. The agency&#x27;s note that 508 compliance will be evaluated before technical factors and could disqualify proposals elevates this from minor boilerplate to a genuine competitive barrier. Small businesses unfamiliar with which 508 provisions actually apply to video walls face real uncertainty in proposing. In sum, this solicitation shows the signature of standard DISA/DoD contract templates applied to a narrow commercial hardware purchase without meaningful curation of the compliance sections to fit the actual work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>a. DISA End User Access Agreement, 11 February 2021
+b. DISA Policy Letter, Unauthorized Connections to Network Devices, 11 September 2013
+c. DISA Instruction 240-110-8, Information Security
+d. DISA Instruction 240-110-36, Personnel Security
+e. DISA Instruction 240-110-38, Industrial Security
+f. DISA Instruction 240-110-43, Insider Threat Program
+g. DISA Instruction 630-230-19, Cybersecurity
+h. DoD Manual 5200.01, Vol 1-2 Information Security Program, 24 February 2012
+i. DoD Manual 5200.02, Procedures for the DoD Personnel Security Program, 3 April 2017
+j. DoD Instruction 5200.48, Controlled Unclassified Information (CUI), 6 March 2020
+k. 32 CFR Part 117, &quot;National Industrial Security Program Operating Manual (NISPOM)&quot;, 24 February 2021
+l. Security Executive Agent Directive 4, National Security Adjudicative Guidelines, 8 June 2017
+m. DoDM 5400.07, Freedom of Information Act Program
+n. DoDI 5230.24, &quot;Distribution Statements for DoD Technical Information,&quot; January 10, 2023
+o. DoD Instruction 8510.01, &quot;Risk Management Framework for DoD Systems,&quot; July 19, 2022</blockquote>
+  <div class="ev-explanation">The security references section lists 15 documents without explaining how each applies to this specific work — installing video wall hardware in a conference room. Several citations are questionable in context: DoDM 5400.07 (Freedom of Information Act Program) and DoDI 5230.24 (Distribution Statements for DoD Technical Information) have no obvious relevance to a commercial hardware installation and warranty contract. DoD Instruction 8510.01 (Risk Management Framework for DoD Systems) governs authorization of IT systems, but this contract explicitly states the work is UNCLASSIFIED and involves commercial display hardware, not system authorization. No explanation is provided for why each document was included.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall submit a SCRM plan as part of its technical proposal that describes how the contract will reduce and mitigate Supply Chain Risk using the security controls outlined below (further described in CNSSI 1253, Appendix D and NIST SP 800-53), as applicable to your contract.
+[Table listing 29 NIST SP 800-53 supply chain risk management controls including SR-2(1), SR-3(1), SR-3(2), SR-3(3), SR-4(1) through SR-4(4), SR-5, SR-5(1), SR-5(2), SR-6, SR-6(1), SR-7, SR-8, SR-9(1), and others]</blockquote>
+  <div class="ev-explanation">A table of 29 NIST SP 800-53 security controls is cited for SCRM purposes with no differentiation between which controls are mandatory versus advisory, and no guidance on which are actually applicable to a commercial display hardware purchase. Controls like SA-11 (Developer Testing and Evaluation) and PL-8(2) (Security and Privacy Architectures/Supplier Diversity) have questionable relevance to a vendor reselling and installing commercial LED video wall panels. The phrase &#x27;as applicable to your contract&#x27; places the entire burden of interpretation on the offeror. This is a textbook undifferentiated compliance dump.</div>
+</div><div class="evidence-item">
+  <blockquote>This contract is subject to the Federal SCRM policies and regulations including the Defense Federal Acquisition Regulation Supplement (DFARS) 252.239-7017 Notice of Supply Chain Risk, DFARS 252.239-7018 Supply Chain Risk, DoD Instruction 5200.44 Protection of Mission Critical Functions to Achieve Trusted Systems and Networks, Section 806 of the FY2011 NDAA Requirements for Information Relating to Supply Chain Risk, and internal DISA SCRM Processes and Procedures.</blockquote>
+  <div class="ev-explanation">Five separate SCRM frameworks are cited in bulk for what is essentially a commercial IT products purchase of display hardware from small business vendors. No explanation is provided for how each of these frameworks applies differently or which takes precedence. &#x27;Internal DISA SCRM Processes and Procedures&#x27; is cited without any reference to where those procedures can be found, making compliance impossible to plan or price.</div>
+</div><div class="evidence-item">
+  <blockquote>E201 Application... E202 General Exceptions... E206 Hardware... E207 Software... E207.2 WCAG Conformance... E208 Support Documentation and Services... E301 General... E302 Functional Performance Criteria... 302.1 Without Vision... 302.2 With Limited Vision... [continuing through] 603 Support Services
+603.1 General. ICT support services including, but not limited to, help desks, call centers, training services, and automated self-service technical support, shall conform to 603.</blockquote>
+  <div class="ev-explanation">Seven pages of Section 508 accessibility standards are reproduced in full text in the PWS, including requirements for braille instructions (402.2.5), WCAG 2.0 web content conformance (E207.2), two-way voice communication specifications (412), closed caption processing (413), and audio description processing (414). The vast majority of these provisions are irrelevant to LED video wall display panels used by watch officers in a network operations center. The solicitation states &#x27;Compliance with Section 508 standards will be considered prior to evaluating any of the selection criteria&#x27; and &#x27;Any proposal failing to meet the Section 508 Accessibility Standards...may be eliminated from consideration for award.&#x27; Dumping the full 508 standard text without filtering it to what actually applies to passive display hardware creates unnecessary compliance burden and ambiguity.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation appropriately uses firm-fixed-price for all four CLINs. The requirement is a well-scoped commercial IT product procurement with incidental installation: a defined product list (seven line items with specific part numbers or salient characteristics), a fixed installation site, a clear removal task, and a 12-month warranty with defined response-time metrics. FFP is the standard and appropriate vehicle for this type of acquisition. The government knows what it wants to buy, the quantities are fixed, the products are commercially available, and the performance criteria are objective and measurable. CLIN 0003 (Travel, Shipping, Other) is also FFP, which could theoretically raise questions if travel costs were highly unpredictable, but given the single fixed installation site in Pearl Harbor and the finite scope, this is not a meaningful concern. The QASP&#x27;s AQL structure (100% functionality on completion, 95% warranty response rate) further supports FFP by giving the government clear acceptance levers. There is no indication that scope uncertainty, evolving requirements, or unpredictable labor quantities are present at a level that would argue for T&amp;M or cost-reimbursement. This is a straightforward commercial equipment-and-installation contract and FFP is the correct pricing mechanism.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ITEM NO SUPPLIES/SERVICES QUANTITY UNIT UNIT PRICE AMOUNT
+0001 Each
+MATERIAL AND EQUIPMENT
+FFP
+0002 Each
+INCIDENTAL INSTALLATION
+FFP
+0003 Each
+TRAVEL, SHIPPING, OTHER
+FFP
+0004 Each
+INSTALLATION WARRANTY
+FFP</blockquote>
+  <div class="ev-explanation">All four CLINs are firm-fixed-price. The requirements are: procure specific commercial IT products (video walls, processors, cables), remove and dispose of existing equipment, install the new equipment, and provide a 12-month warranty. These are well-defined, bounded tasks with commercially available products and predictable scope.</div>
+</div><div class="evidence-item">
+  <blockquote>Procure equipment for two video walls, two video processors, and miscellaneous A/V equipment/materials. Remove and dispose of existing video walls in the DNC. Install two new video walls, two video processors, and all associated cabling.</blockquote>
+  <div class="ev-explanation">The scope is concrete and finite: a defined product list, defined installation location, defined existing equipment to remove, and a defined 12-month warranty period. This is exactly the type of procurement for which FFP is appropriate — deliverables are known, quantities are fixed, and outcomes are measurable.</div>
+</div><div class="evidence-item">
+  <blockquote>The required installation completion date is 12 months from Date of Contract Award. The installation warranty shall be valid for one (1) year after Government acceptance of the newly installed video walls, video processors, and all associated A/V equipment and cabling.</blockquote>
+  <div class="ev-explanation">The performance period is fixed and the acceptance criteria are objective (100% component functionality upon completion). A firm-fixed-price structure aligns well with this bounded timeline and measurable outcome.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="HC101925R0007 Brand Name Justification.pdf">HC101925R0007 Brand Name Justification.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cf0a39baef424051993e14faddad3b80_HC101925R0007+Brand+Name+Justification.pdf" download="HC101925R0007 Brand Name Justification.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="HC101925R0007 FINAL.pdf">HC101925R0007 FINAL.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cf0a39baef424051993e14faddad3b80_HC101925R0007+FINAL.pdf" download="HC101925R0007 FINAL.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="HC101925R0007 Price Quote Worksheet_5.8.26.xlsx">HC101925R0007 Price Quote Worksheet_5.8.26.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/cf0a39baef424051993e14faddad3b80_HC101925R0007+Price+Quote+Worksheet_5.8.26.xlsx" download="HC101925R0007 Price Quote Worksheet_5.8.26.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="HC101925R0007 QASP.pdf">HC101925R0007 QASP.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cf0a39baef424051993e14faddad3b80_HC101925R0007+QASP.pdf" download="HC101925R0007 QASP.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="HC101925R0007-0001.pdf">HC101925R0007-0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/cf0a39baef424051993e14faddad3b80_HC101925R0007-0001.pdf" download="HC101925R0007-0001.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

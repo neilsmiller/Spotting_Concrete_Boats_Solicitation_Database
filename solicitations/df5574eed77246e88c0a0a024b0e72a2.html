@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R425--Traffic Analysis Brockton B8 Service — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>R425--Traffic Analysis Brockton B8 Service</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 df5574eed77246e88c0a0a024b0e72a2</span>
+      <a class="sam-link" href="https://sam.gov/opp/df5574eed77246e88c0a0a024b0e72a2/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-04-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › 241-NETWORK CONTRACT OFFICE 01 (36C241)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Past Performance</li><li>Technical</li><li>Veterans Preference Factor</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a small, one-time task order for traffic engineering analysis at a VA campus. The scope is narrow: conduct a site survey, analyze traffic and access conditions, review infrastructure conflicts, and deliver a final report with recommendations. The accountability structure is correspondingly lean.
+
+The deliverables (Task 5) consist of a single written final report covering the substantive findings of the analysis — traffic and access analysis, pedestrian and vehicular impacts, infrastructure conflict identification, and recommendations. This is outcome-focused: the government is asking &#x27;did you analyze the conditions and tell us what you found?&#x27; not &#x27;did you follow the prescribed process?&#x27;
+
+There are no recurring status reports, no weekly or monthly progress reports, no prescribed report formats or section mandates, no meeting cadences, and no process compliance documentation. The records management and security sections are standard boilerplate clauses that appear in nearly all VA contracts and do not constitute compliance-over-outcomes reporting requirements.
+
+The solicitation lacks explicit performance metrics or SLAs, which is appropriate for a one-time analytical study — the &#x27;outcome&#x27; is the quality and completeness of the final report and recommendations, which is evaluated through deliverable acceptance under FAR 52.212-4(a). This is normal practice for professional services task orders of this scope and does not indicate a compliance-over-outcomes problem.
+
+Overall, this is a severity 1 situation. The reporting requirements are minimal and substantive, not process-compliance oriented.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Task 5 – Reporting
+The contractor shall provide a written report including:
+Traffic and access analysis
+Documentation of roadway and pedestrian impacts
+Evaluation of large vehicle delivery access
+Identification of infrastructure conflicts
+Recommendations to minimize operational and safety impacts.</blockquote>
+  <div class="ev-explanation">This is the only reporting requirement in the solicitation. It describes a single deliverable report — a final analysis document — rather than a recurring status reporting cadence. The report is substantive and outcome-oriented: it asks for analysis, findings, and recommendations, not process documentation or schedule adherence tracking.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a discrete, one-time traffic engineering analysis at a single VA campus building — a task with a well-defined commercial analog. The past performance requirements ask for three similar references but impose no dollar thresholds, no federal-specific experience mandate, and no lookback window restrictions. The technical evaluation criteria ask vendors to demonstrate corporate experience and technician qualifications, but these are framed in capability terms rather than incumbency proxies. The two-day response window and small task scope suggest the agency is not relying on deep institutional knowledge transfer. There is no evidence of stacked requirements, evaluation bonus points tied to prior similar federal contracts, or institutional knowledge requirements that only an incumbent could satisfy. Traffic engineering analysis is a standard commercial service with a broad market of qualified vendors. The solicitation&#x27;s experience requirements are lean and capability-focused rather than incumbency-filtering. Severity is rated 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide (3) references of work, similar in scope and size with the requirement detailed in the Performance Work Statement. References must include contact information; brief description of the work completed, and contract # (if relevant).</blockquote>
+  <div class="ev-explanation">The past performance requirement asks for three references of similar scope and size, but does not impose specific dollar thresholds, lookback windows, or federal-only requirements. A vendor with relevant commercial or municipal traffic engineering experience could plausibly submit qualifying references.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall demonstrate their corporate experience and approach to meet all requirements stated in the Performance Work Statement. Contractor shall demonstrate that their technicians meet the qualification standards stated in the Performance Work Statement.</blockquote>
+  <div class="ev-explanation">The technical evaluation language is capability-focused and does not specify prior federal contract requirements, dollar thresholds, or domain-narrow criteria that would exclude non-incumbents. The PWS itself describes a bounded, one-time traffic analysis task for which any qualified traffic engineering firm could propose.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a narrow, well-scoped traffic engineering analysis for a single facility improvement project — relocation of a Bulk Oxygen pad at one VA building. The Statement of Work is brief (approximately one page of substantive requirements) and organized around five tasks: site data review, topographic survey, traffic and access analysis, infrastructure conflict review, and reporting. The tasks describe what work must be done and what deliverables must be produced, without specifying the analytical methodology, software tools, staffing structure, or step-by-step workflow the contractor must follow. A traffic engineering firm retains full discretion over how to conduct the survey, what software to use for circulation analysis, how to staff the engagement, and how to structure the analytical approach. The requirements that do appear prescriptive — such as coordinating with VA Engineering or reviewing existing drawings — are practical scope definitions for a site-specific study, not process mandates imported from an incumbent&#x27;s playbook. The deliverable list in Task 5 is a standard content specification for an engineering report, not a workflow prescription. The bulk of the document is standard FAR and VAAR clauses (records management, security, payment terms, set-aside requirements), none of which constitute requirement sprawl under the definition. This solicitation reads as a lean, outcome-oriented scope appropriate to its scale. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Task 1 – Site Data Review and Coordination
+Coordinate with VA Engineering Service to confirm project limits and investigation area.
+Review available site drawings and facility plans related to Building 8.</blockquote>
+  <div class="ev-explanation">These bullets describe what information needs to be gathered and from whom, but they do not prescribe how the contractor must organize this work, what meetings must occur, or what internal process must be followed. The tasks define the scope of investigation rather than a step-by-step workflow the vendor must replicate.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 5 – Reporting
+The contractor shall provide a written report including:
+Traffic and access analysis
+Documentation of roadway and pedestrian impacts
+Evaluation of large vehicle delivery access
+Identification of infrastructure conflicts
+Recommendations to minimize operational and safety impacts.</blockquote>
+  <div class="ev-explanation">This is a deliverable specification listing required content areas for the report. It tells the vendor what the report must cover (outcomes and findings), not how to conduct the analysis or produce the document. This is closer to a legitimate deliverable requirement than prescriptive process sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward, small-scope traffic engineering analysis solicitation for a single VA campus facility (Building 8, Brockton). The solicitation is concise — approximately 11 pages across all documents — and does not include an &#x27;Applicable Documents&#x27; section, a bulk regulatory citation list, or an &#x27;Referenced Standards&#x27; appendix. The compliance requirements that do appear are: (1) standard FAR/VAAR commercial services clauses incorporated by reference, which is normal federal contracting practice and not a rule pool; (2) a records management clause citing NARA and Privacy Act authorities directly germane to any federal contractor handling records; and (3) a security clause (52.240-91) addressing telecommunications and supply chain security, which is a governmentwide deviation applied broadly. The SOW itself cites only &#x27;NFPA requirements&#x27; in passing as the compliance driver for the oxygen pad relocation — a highly relevant and specific citation for this type of facility work. There is no evidence of accumulated, undifferentiated regulatory lists, irrelevant citations, or contradictory compliance mandates. The wage determination attachment is a standard Service Contract Act requirement. This solicitation does not exhibit rule pools. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>C.1 52.212-4 CONTRACT TERMS AND CONDITIONS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (NOV 2023)... C.3 52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS (NOV 2025) (DEVIATION)... C.9 52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025)</blockquote>
+  <div class="ev-explanation">The contract clauses section incorporates standard FAR and VAAR clauses by reference — 52.212-4, 52.212-5, 52.217-8, 52.219-74, 52.219-75, 52.232-72, 52.240-91, and others. These are standard commercial services acquisition clauses required by the FAR for this type of procurement. They are not a &#x27;rule pool&#x27; — they are the normal boilerplate for a simplified acquisition commercial services contract.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall comply with all applicable records management laws and regulations, as well as National Archives and Records Administration (NARA) records policies, including but not limited to the Federal Records Act (44 U.S.C. chs. 21, 29, 31, 33), NARA regulations at 36 CFR Chapter XII Subchapter B, and those policies associated with the safeguarding of records covered by the Privacy Act of 1974 (5 U.S.C. 552a).</blockquote>
+  <div class="ev-explanation">The Records Management section cites several statutory and regulatory authorities, but all are plausibly applicable: the Federal Records Act, NARA regulations, and the Privacy Act are standard requirements for any contractor whose employees create or handle federal records. The citations are focused and directly relevant to the records management obligation being imposed.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm-Fixed-Price for a traffic engineering analysis and site survey at a specific VA campus location (Building 8, Brockton). The scope is narrow and well-defined: a site survey, traffic and access analysis, infrastructure conflict review, and a final report with recommendations — all tied to a single, bounded facility question (Bulk Oxygen pad relocation). These are routine professional services with clear deliverables. The government knows what it wants: a report with specified components. The geographic scope is fixed (one building on one campus), the regulatory driver is identified (NFPA compliance), and the deliverables are enumerated. FFP is well-suited to this type of discrete analytical engagement where a professional firm can reasonably estimate the labor required for a site visit, topographic survey, analysis, and report writing. This is not a case where scope will evolve unpredictably or where labor quantity is unknowable — it is closer to a standard engineering study than an open-ended IT or R&amp;D task. The 2-day response window and apparent urgency do not change the fundamental suitability of FFP for a bounded deliverable. No mismatch between the contract type and the requirements is apparent.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government contemplates award of a Firm-Fixed-Price contract resulting from this solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states FFP as the intended contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide a written report including: Traffic and access analysis; Documentation of roadway and pedestrian impacts; Evaluation of large vehicle delivery access; Identification of infrastructure conflicts; Recommendations to minimize operational and safety impacts.</blockquote>
+  <div class="ev-explanation">The deliverables are discrete, well-defined outputs: a written report with specified components. This is a defined-scope analytical study, not an open-ended or evolving task.</div>
+</div><div class="evidence-item">
+  <blockquote>Conduct site survey of the project area surrounding the proposed Bulk Oxygen pad relocation site. Document roadway alignments, parking areas, pedestrian paths, and other relevant site features.</blockquote>
+  <div class="ev-explanation">The topographic survey and data collection tasks are bounded and predictable in scope — a defined geographic area for a specific facility relocation study.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C24126Q0385_1.docx">36C24126Q0385_1.docx</div></div>
+  <a class="dl-btn" href="../attachments/df5574eed77246e88c0a0a024b0e72a2_36C24126Q0385_1.docx" download="36C24126Q0385_1.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="LOS certification.pdf">LOS certification.pdf</div></div>
+  <a class="dl-btn" href="../attachments/df5574eed77246e88c0a0a024b0e72a2_LOS+certification.pdf" download="LOS certification.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Past Performance Worksheet.xlsx">Past Performance Worksheet.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/df5574eed77246e88c0a0a024b0e72a2_Past+Performance+Worksheet.xlsx" download="Past Performance Worksheet.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Wage Determination.pdf">Wage Determination.pdf</div></div>
+  <a class="dl-btn" href="../attachments/df5574eed77246e88c0a0a024b0e72a2_Wage+Determination.pdf" download="Wage Determination.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

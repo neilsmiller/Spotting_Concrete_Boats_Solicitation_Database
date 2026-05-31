@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maximize E1 Capability RTS Communication System — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Maximize E1 Capability RTS Communication System</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4787d993f817453abd86d66b9faf08d6</span>
+      <a class="sam-link" href="https://sam.gov/opp/4787d993f817453abd86d66b9faf08d6/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NASA SHARED SERVICES CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP (Firm Fixed Price) — implied by FAR Part 12 commercial item acquisition, though not explicitly stated</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1-3 weeks (lead time for ADAM section: 2-3 weeks; all other products: 7-10 days)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not contain sufficient content to assess Compliance Over Outcomes. The posting is a 4-page combined synopsis/solicitation for a commercial hardware procurement (an RTS communication intercom system with associated equipment and one training session). The attached documents consist of: (1) a Statement of Work that is essentially a product list with part numbers and quantities, a place of performance, and a delivery lead-time — no QA surveillance plan, no reporting requirements, no meeting cadences, no performance metrics; (2) a capability statement/synopsis notice describing the sole-source determination; and (3) a Recommendation and Determination to Solicit from One Source form with justification narrative. There are no reporting requirements, no QA surveillance mechanisms, no deliverable acceptance criteria language, and no contract performance accountability structure of any kind in these documents. This is a straightforward commercial product acquisition, and the solicitation documents provided do not include contract terms, a PWS/SOW with performance requirements, or any QASP. Without those elements, it is impossible to evaluate whether the accountability structure measures compliance vs. outcomes. The sin cannot be detected — or ruled out — from what is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a sole-source procurement for specific commercial hardware — the Bosch/RTS Maximize E1 Capability RTS Communication System — explicitly justified on the grounds that the named vendor (Bosch Security Systems / Keenfinity Group) is the sole provider of the required system. The solicitation does not contain experience requirements, evaluation criteria, past performance thresholds, or institutional knowledge requirements of the type that would constitute an Insider Rewards problem. There are no dollar thresholds for prior contracts, no federal-specific experience mandates, no lookback windows, and no evaluation scoring rubric at all — because this is a direct commercial item purchase, not a competed acquisition.
+
+The Insider Rewards sin is specifically about experience and evaluation criteria that exclude non-incumbents from competing. Here, there is no competition to exclude anyone from: the justification is a straightforward sole-source determination based on system compatibility with existing infrastructure at Stennis Space Center. The RDSS document explains the rationale — existing RTS intercom systems are deployed sitewide and the proposed system must integrate with that infrastructure. This is a compatibility and continuity argument, not an experience-requirements argument.
+
+It is worth noting a discrepancy in the sole-source documentation: the capability statement names &#x27;BOSCH SECURITY SYSTEMS, LLC&#x27; as the sole provider, while the RDSS names &#x27;Keenfinity Group&#x27; as the recommended sole source. This inconsistency may reflect a legitimate reseller/distributor relationship, but it is a documentation quality issue rather than an Insider Rewards issue per se.
+
+Because the solicitation contains no experience requirements, evaluation criteria, or past performance thresholds — the structural elements that define this sin — severity is 1 (minimal). The sole-source determination may raise competition concerns under a different analytical framework, but it does not exhibit the insider rewards pattern.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simple commercial product purchase — a bill of materials for a specific intercom/communications hardware system with part numbers, quantities, and a training deliverable. The concept of requirement sprawl (dictating HOW work should be done rather than WHAT outcome is needed) applies primarily to services or complex development contracts where a vendor could otherwise propose alternative implementation approaches. Here, the government is buying specific hardware components from a sole source vendor. Specifying exact catalog part numbers and quantities is entirely appropriate for a product acquisition — there is no &#x27;process&#x27; being prescribed, no staffing structure being mandated, and no workflow being dictated. The SOW does not constrain a vendor&#x27;s method of delivering services; it simply identifies the physical items to be purchased. The sole source justification cites interoperability with existing SSC infrastructure as the rationale for specifying the exact system, which is a legitimate technical constraint rather than organizational dysfunction. The solicitation lacks the service-delivery context in which requirement sprawl would manifest. Severity is 1 — minimal — because the document is competently scoped for what it is: a commercial item procurement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement is for the acquisition of the Maximize E1 Capability RTS Communication System for NASA Stennis Space Center. The information listed below is required to complete this purchase.</blockquote>
+  <div class="ev-explanation">The SOW is essentially a bill of materials — it lists specific part numbers and quantities for a defined product system. This is a commercial product acquisition, not a services contract, so specifying exact part numbers is the appropriate way to define what is being purchased, not prescriptive process sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>31809LT / TRAINING, VOIP, LOCAL | 1 PCE</blockquote>
+  <div class="ev-explanation">Onsite training is listed as a line item deliverable, which is an outcome (training provided) rather than a prescriptive method. This is a reasonable deliverable specification.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward sole-source commercial item purchase for a specific communications hardware system (RTS/Bosch intercom equipment) at NASA Stennis Space Center. The documents provided consist of a product configuration list with part numbers, a brief Statement of Work, a capability statement synopsis, and a Recommendation and Determination to Solicit from One Source.
+
+There is no &#x27;Applicable Documents,&#x27; &#x27;Referenced Standards,&#x27; or bulk regulatory compliance section anywhere in this solicitation. The only regulatory references present are: (1) FAR 12.102(a) cited as the sole-source authority, (2) FAR Part 12 as the acquisition framework for commercial items, (3) NAICS Code 334290, and (4) NASA FAR Supplement Clause 1852.215-84 (Ombudsman). Each of these is a standard, contextually appropriate citation — FAR Part 12 governs commercial item acquisitions, the sole-source authority is correctly cited, and the Ombudsman clause is a standard NASA supplement requirement.
+
+This is a minimal, focused procurement document for off-the-shelf hardware with part numbers already specified. There is no opportunity for rule pools to manifest in the conventional sense — the SOW contains only product specifications, place of performance, and lead times. No compliance frameworks, security standards, data handling policies, or regulatory lists are appended. A vendor receiving this solicitation faces a completely transparent compliance landscape: standard FAR commercial item clauses and nothing more.
+
+The absence of rule pools here is appropriate given the nature of the acquisition. This is a severity 1 finding — the solicitation cites a focused, reasonable, and minimal set of regulatory references that are clearly applicable to the work.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a well-defined set of commercial off-the-shelf (COTS) communications hardware — specific Bosch/RTS catalog items identified by part numbers (e.g., DBP 5F, KP4016, TR-1000 US 5F), defined quantities, and one training service. The scope is clear and stable: buy specific items and deliver them to NASA Stennis Space Center within a defined lead time (7 days to 3 weeks). There is no ambiguity about what is being purchased, no variable labor, and no evolving requirements. A fixed-price contract is the textbook correct vehicle for this type of procurement. FAR Part 12 commercial item procedures, explicitly cited in the solicitation, mandate or strongly favor fixed-price approaches. The contract type (implicitly firm-fixed-price, as is standard for commercial item purchases of defined hardware) aligns well with the requirement&#x27;s characteristics: known items, known quantities, predictable delivery timelines, and catalog pricing. There is no indication of T&amp;M or cost-reimbursement structure, nor would either be appropriate here. No square peg issue exists.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement is for the acquisition of the Maximize E1 Capability RTS Communication System for NASA Stennis Space Center. The information listed below is required to complete this purchase.</blockquote>
+  <div class="ev-explanation">The requirement is entirely for the purchase of specific, named commercial hardware items and one training service. This is a well-defined, discrete commercial item purchase — exactly the scenario where firm-fixed price is appropriate under FAR Part 12.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government intends to acquire Commercial items or services using the provisions, clauses and procedures prescribed in FAR Part 12 for Commercial</blockquote>
+  <div class="ev-explanation">The solicitation explicitly invokes FAR Part 12 commercial item procedures. FAR Part 12 acquisition defaults to fixed-price contracting for commercial items, which is entirely appropriate here given that all items are catalog products with part numbers and defined quantities.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041051 Tab 04 4 SOW..pdf">SATPC0041051 Tab 04 4 SOW..pdf</div></div>
+  <a class="dl-btn" href="../attachments/4787d993f817453abd86d66b9faf08d6_SATPC0041051+Tab+04+4+SOW..pdf" download="SATPC0041051 Tab 04 4 SOW..pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041051 Tab 06 RDSS..pdf">SATPC0041051 Tab 06 RDSS..pdf</div></div>
+  <a class="dl-btn" href="../attachments/4787d993f817453abd86d66b9faf08d6_SATPC0041051+Tab+06+RDSS..pdf" download="SATPC0041051 Tab 06 RDSS..pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0041051 Tab 07 Capability Statement.pdf">SATPC0041051 Tab 07 Capability Statement.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4787d993f817453abd86d66b9faf08d6_SATPC0041051+Tab+07+Capability+Statement.pdf" download="SATPC0041051 Tab 07 Capability Statement.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

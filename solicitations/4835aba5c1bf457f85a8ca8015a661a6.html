@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vehicle-to-Everything (V2X) Performance Measurement Support Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Vehicle-to-Everything (V2X) Performance Measurement Support Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4835aba5c1bf457f85a8ca8015a661a6</span>
+      <a class="sam-link" href="https://sam.gov/opp/4835aba5c1bf457f85a8ca8015a661a6/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">COMMERCE, DEPARTMENT OF › NATIONAL INSTITUTE OF STANDARDS AND TECHNOLOGY › DEPT OF COMMERCE NIST</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">06/01/2026 to 05/30/2027 (approximately 12 months)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Technical Key Personnel</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the hallmarks of severe compliance-over-outcomes dysfunction. The accountability structure is lean: one monthly progress report and a deliverable acceptance process. There are no overlapping reporting cadences, no prescribed report formats with mandated sections, no weekly status calls, and no waterfall-style plan-adherence tracking. The deliverables themselves are substantive outputs — software tools, technical reports, an architectural diagram — and the acceptance mechanism is tied to those deliverables, not to process compliance. The monthly progress report does focus on activities and schedule (classic compliance language), but it is the only status reporting requirement and is a reasonable baseline for a one-year engagement. The solicitation does lack explicit performance targets or outcome metrics — for example, there is no specification that the software tool must achieve a particular detection accuracy, that the technical reports must meet defined completeness criteria, or that the SCMS framework must receive endorsement from a specified number of stakeholders. The acceptance standard (&#x27;acceptance or request for revision email within 14 days&#x27;) is minimally defined. These are mild gaps but do not rise to the level of compliance theater, because the deliverables themselves are concrete, testable artifacts. A reviewer can evaluate whether software captures packets and measures latency, or whether a technical report accurately documents a methodology, without a formal rubric. Overall, the QA structure is thin but not dysfunctional. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Monthly Progress Report documenting: activities accomplished, deliverables completed, outstanding deliverables, reasons for delays. | MS Word | Monthly, before the 15th day of the next month | 12</blockquote>
+  <div class="ev-explanation">The monthly progress report focuses on activities and schedule adherence rather than outcome metrics. It asks whether tasks were completed and why things are delayed — not whether the work product quality met user needs or research objectives. However, this is a single, low-cadence reporting requirement, which limits the severity.</div>
+</div><div class="evidence-item">
+  <blockquote>The NIST Point of Contact (POC) shall review all the above deliverables and respond with an acceptance or request for revision email to the Contractor POC within 14 days of receipt of deliverable.</blockquote>
+  <div class="ev-explanation">This is the primary acceptance mechanism, and it is structured around deliverable review rather than a defined quality standard or outcome criterion. The solicitation does not specify what &#x27;acceptance&#x27; means beyond the POC&#x27;s judgment — no rubric, performance target, or user satisfaction measure is defined. That said, this is deliverable-based acceptance testing, which is outcome-adjacent rather than pure process compliance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards concern, driven primarily by the personnel qualification requirements and the narrow V2X domain rather than explicit contract dollar thresholds or count-based past performance filters. The solicitation does not commit the most egregious insider rewards patterns — it imposes no minimum contract dollar values, no requirement for a specific number of completed federal contracts, and no explicit mandate for prior work with NIST specifically. The past performance lookback window (3-5 years) is reasonable and the requirement to submit up to 3 examples is not unusually restrictive.
+
+However, the stacking of requirements creates a moderately tilted playing field: (1) a master&#x27;s degree in a relevant field, (2) 5 years specifically in wireless network performance assessment, (3) hands-on V2X experience, and (4) proficiency in OOP. The V2X domain is nascent enough that the intersection of wireless performance assessment expertise and V2X-specific experience substantially limits the eligible personnel pool. Paired with an evaluation factor that awards extra credit for personnel exceeding minimums and meeting undefined &#x27;preference&#x27; criteria, the framework creates meaningful advantage for vendors already embedded in the V2X research ecosystem — likely including whoever has been supporting NIST&#x27;s CTL previously.
+
+A genuinely qualified vendor new to this specific contract could still plausibly compete — for example, a firm with strong wireless network performance assessment credentials and personnel who have worked on adjacent V2X industry projects (OmniAir plugfests, DSRC deployments, C-V2X standards work) would meet the stated requirements. The solicitation does not require prior NIST contracts or institutional knowledge of NIST-specific systems by name. The 4-day response window (a separate concern) is a more severe barrier to new entrants than the experience requirements themselves. Overall, this warrants a severity 2: the playing field is tilted toward vendors already in the V2X government research space, but it is not formally closed to capable non-incumbents.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>(a) A master&#x27;s degree from an accredited college or university in a field related to the work required
+(b) At least 5 years of experience in distributed systems and the performance assessment of wireless networks
+(c) Proficient in an object-oriented programming language such as Java
+(d) Experienced with vehicle-to-everything communication technologies</blockquote>
+  <div class="ev-explanation">The combination of these four requirements — a master&#x27;s degree, 5 years of wireless network performance assessment experience, OOP proficiency (specifically calling out Java), AND V2X-specific experience — stacks toward a narrow candidate profile. The V2X domain is still emerging and the pool of people with 5+ years specifically in wireless network performance assessment who also have V2X experience is genuinely small. However, the requirements are stated as qualifications for personnel, not as contract-level past performance thresholds with dollar minimums, which moderates the severity.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will evaluate the key personnel proposed by the offeror for the extent to which they are qualified to efficiently and effectively address the requirements in the Statement of Work. The Government will consider the extent to which the proposed key personnel meets or exceeds the minimum qualifications identified in the Statement of Work, as well as the qualifications &#x27;preference&#x27; identified in the Statement of Work. Greater consideration will be given to key personnel that exceed the specific minimum qualification requirements and/or meet the key personnel preference identified in the Statement of Work.</blockquote>
+  <div class="ev-explanation">The evaluation awards &#x27;greater consideration&#x27; to personnel exceeding minimum qualifications and meeting unspecified &#x27;preference&#x27; criteria. Because the SOW references a preference category without fully defining it in the available text, this creates ambiguity that could operationally favor whoever is familiar with the NIST V2X testbed environment — i.e., the incumbent. However, absent explicit dollar thresholds or contract count requirements, this is a tilt rather than a lock-out.</div>
+</div><div class="evidence-item">
+  <blockquote>The offeror shall submit up to 3 examples of relevant past performance performed within the last 3 to 5 years. Examples should be of work similar in scope, size and complexity to this requirement.</blockquote>
+  <div class="ev-explanation">A 3-to-5 year lookback window for past performance in a domain (V2X) that has only become commercially significant within the last few years narrows the eligible pool. However, the solicitation does not impose minimum dollar thresholds or require a specific number of federal contracts, which keeps this requirement from being severely exclusionary. The domain specificity combined with the recency window is the moderating concern here.</div>
+</div><div class="evidence-item">
+  <blockquote>Experienced with vehicle-to-everything communication technologies</blockquote>
+  <div class="ev-explanation">V2X as a domain — particularly the combination of C-V2X, DSRC, SCMS, and IEEE 1609.2.1 — is sufficiently specialized that this requirement meaningfully limits the pool of eligible personnel. There are relatively few commercial firms with personnel who have hands-on experience across all these V2X sub-domains. This functions as a soft incumbency filter, though it is arguably a legitimate capability requirement given the technical depth of the tasks.</div>
+</div><div class="evidence-item">
+  <blockquote>The quoter is encouraged to focus on prior projects encompassing the same RFQ requirements and describe how these requirements were specifically supported by the quoter.</blockquote>
+  <div class="ev-explanation">Explicitly encouraging vendors to demonstrate prior projects matching &#x27;the same RFQ requirements&#x27; signals evaluators to look for prior V2X testbed experience. While framed as guidance rather than a threshold requirement, this language implicitly rewards vendors who have previously worked on similar government V2X testbed programs — narrowing competitive advantage toward incumbents or adjacent program holders.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The SOW is outcome-oriented in its overall framing — it defines deliverables, acceptance criteria, and measurable end products — but several tasks cross into prescribing implementation methods rather than outcomes. The most significant instance is Task 3, where the government specifies not only what to build but how to physically integrate hardware (mount and wire) and which architectural pattern to use (RSU processes LiDAR data, then transmits). Task 1.2&#x27;s packet-capture mandate and Task 2&#x27;s prescribed three-step process are additional examples where the government has pre-selected the solution approach. The personnel qualification mismatch (Java specified, Python delivered) is a minor but telling signal of requirements drafted around a specific incumbent profile rather than actual needs. Importantly, the sprawl is not pervasive — much of the SOW defines clear deliverables with formats and due dates, and the overall task structure is coherent and technically grounded. The safety, security (HSPD-12), and PPE requirements are legitimate non-sprawl constraints. The government&#x27;s role as a research institution with a specific existing testbed also legitimately constrains the solution space in ways that would not constitute sprawl in a commercial IT services context. On balance, severity 2 is appropriate: vendors can propose meaningful technical approaches in several areas, but they are genuinely constrained in others by process and method mandates that could have been written as outcomes.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1 Integrate additional sensors such as LiDAR into the NIST V2X Testbed. The contractor shall integrate the sensor hardware into the testbed by mounting and wiring the sensors to the existing OBU/RSU devices, develop software for the OBU/RSU from multiple vendors to exchange data with the sensors, and develop test cases to demonstrate successful transmission of data.</blockquote>
+  <div class="ev-explanation">This task prescribes a specific implementation sequence — mount, wire, develop software, develop test cases — rather than stating the outcome (e.g., &#x27;LiDAR sensors shall be operational and exchanging data with OBU/RSU devices as demonstrated by successful test cases&#x27;). The &#x27;mounting and wiring&#x27; specification in particular dictates a physical integration method, constraining how the contractor may approach hardware integration.</div>
+</div><div class="evidence-item">
+  <blockquote>3.2 Design and implement a use case where an RSU processes LiDAR data to transmit an appropriate message to approaching vehicles upon detection of an obstacle (such as a pedestrian) detected by the sensor.</blockquote>
+  <div class="ev-explanation">This prescribes a specific use case scenario and processing architecture (RSU processes data, then transmits), rather than defining the desired outcome (e.g., &#x27;demonstrate a functional hazard-detection alerting capability using LiDAR-integrated V2X devices&#x27;). The government has pre-selected not only the use case but the processing topology, removing the contractor&#x27;s ability to propose an alternative architectural approach that might better achieve the safety goal.</div>
+</div><div class="evidence-item">
+  <blockquote>1.2 Design and implement a software tool to assess the performance of V2X hardware in the NIST testbed based on the survey results. The software must be able to capture packets transmitted between different devices in the NIST testbed and analyze system performance using key performance indicators such as latency, packet loss, and bandwidth utilization.</blockquote>
+  <div class="ev-explanation">While specifying KPIs like latency and packet loss is reasonable, requiring that the tool work by capturing packets is a process prescription. A contractor might achieve equivalent performance assessment through passive monitoring, log aggregation, or vendor-provided telemetry APIs. The packet-capture mandate forecloses those alternatives without technical justification.</div>
+</div><div class="evidence-item">
+  <blockquote>(c) Proficient in an object-oriented programming language such as Java</blockquote>
+  <div class="ev-explanation">Specifying Java (or an object-oriented language) as a personnel qualification is a mild form of tool/process prescription embedded in staffing requirements. The actual deliverables call for Python source code (Deliverables 1 and 4), making the Java qualification internally inconsistent and suggesting the staffing requirement was drafted to match a particular incumbent&#x27;s profile rather than the stated work.</div>
+</div><div class="evidence-item">
+  <blockquote>2.1 Coordinate with NIST research staff and industry stakeholders to catalogue the Security Credential Management System (SCMS) test methods in use by different SCMS providers and V2X device vendors. 2.2 Develop a framework for conducting SCMS interoperability testing... 2.3 Present the framework to industry stakeholders and make revisions based on their feedback...</blockquote>
+  <div class="ev-explanation">Task 2 specifies a rigid three-step process (catalogue → develop → present and revise) for producing what is ultimately a framework document. While the sequence is logical, mandating each intermediate step as a &#x27;shall&#x27; requirement removes contractor flexibility to conduct outreach and framework development in a more integrated or iterative way. The outcome — a validated, industry-aligned SCMS interoperability framework — could have been stated without locking in the execution sequence.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not rise to a severe rule pool finding. The regulatory citation list in the Provisions and Clauses attachment is a standard FAR/CAR clause set for a simplified commercial acquisition, and the clauses cited are at least plausibly applicable to a small-business federal services contract of this type. The HSPD-12 section, while citing multiple directives, is genuinely applicable to on-site NIST work. There are no egregiously irrelevant citations of the type seen in classic rule pool cases (e.g., a standby power executive order in a software contract).
+
+However, the solicitation does exhibit a moderate rule pool pattern, primarily in the SOW&#x27;s boilerplate safety and health tasks (Tasks 5, 6, and 7). These tasks import industrial and construction-grade compliance requirements — PAPR respirators, hard hats, high-visibility clothing, crane operator training, forklift training, health hazard exposure assessments and medical screenings — into a contract for one software developer performing V2X research in a university-style laboratory environment. The actual work described in Tasks 1-4 involves Python programming, literature surveys, technical report writing, and mounting a LiDAR sensor. No task description identifies the specific hazards that would justify these requirements. A small business responding to this solicitation must price and plan for an unknown safety compliance burden that appears to have been inherited from a template rather than derived from the actual work.
+
+The duplicate citation of FAR 52.203-17 reinforces the inference that the clause list was assembled and not carefully reviewed. Taken together, the evidence points to moderate boilerplate accumulation — elevated compliance burden without clear irrelevance or internal contradiction — warranting a severity 2 rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Task 5 - Safety-Related Equipment
+The Contractor shall:
+Provide all safety-related equipment required to perform the work under this award, including personal protective equipment (PPE) and other equipment that is required or appropriate to protect contractor personnel and other personnel on the NIST campus. Contractor-provided personal protective equipment shall include, at a minimum, hard hats, safety shoes, safety glasses (prescription or standard), respiratory protection (powered air purifying respirator or full-face mask respirator), high visibility clothing and gloves that meet applicable OSHA standards for PPE.</blockquote>
+  <div class="ev-explanation">This is a software development and systems integration contract for one FTE performing research in a laboratory environment. The PPE requirements — hard hats, powered air purifying respirators, high visibility clothing — appear to be drawn from a boilerplate template for construction or industrial contracts rather than tailored to the actual work. A researcher mounting a LiDAR sensor and writing Python software is unlikely to require a PAPR or high-visibility vest. These OSHA PPE requirements appear to be standard-template carryovers with no explained connection to the actual hazards present in this specific work environment.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 6 - Training
+The Contractor shall:
+Provide safety-related training required by applicable OSHA, state and local regulations or standards to affected contractor personnel (including subcontractor personnel) that perform work under this award. Such training may include, for example, training for proper use of PPE, respirator use, fall protection, crane operation, forklift operation; electrical safety, or other safety-related topics.</blockquote>
+  <div class="ev-explanation">Crane operation and forklift operation training requirements appear in a solicitation for one FTE performing V2X software development and sensor integration. No cranes or forklifts are mentioned anywhere in the SOW&#x27;s actual task descriptions. This is classic copy-forward accumulation from a generic or heavier-works template, included without review of whether it applies to this specific scope.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 7 - Health Hazard Assessments and Medical Evaluations
+The Contractor shall:
+Provide required health hazard exposure assessments, medical evaluations and screenings, and exposure monitoring required by applicable OSHA requirements.</blockquote>
+  <div class="ev-explanation">Health hazard exposure assessments and medical evaluations and screenings are requirements typically associated with chemical, biological, radiation, or industrial hazards. The SOW describes software development, literature surveys, technical report writing, and integration of a LiDAR sensor. No occupational health hazards specific to this work are identified or explained. This requirement appears to be a boilerplate carryover with no contextual justification for why it applies here.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor (and/or any subcontractor) and its employees who require physical access to NIST facilities or logical access to NIST IT networks or systems must comply with Homeland Security Presidential Directive (HSPD)-12, Policy for a Common Identification Standard for Federal Employees and Contractors; OMB M-05-24; OMB M-19-17; FIPS 201, Personal Identity Verification (PIV) of Federal Employees and Contractors; NIST HSPD-12 policy; and Executive Order 13467, Part 1 §1.2.</blockquote>
+  <div class="ev-explanation">The HSPD-12 section cites five distinct directives/standards (HSPD-12 itself, OMB M-05-24, OMB M-19-17, FIPS 201, and EO 13467) without explaining what each one adds beyond the others or how each applies differently to this specific work. For a Low Risk designation with one FTE, this multi-document citation list is not wrong, but it is undifferentiated — a vendor must research each document independently to understand the compliance implications rather than receiving curated guidance.</div>
+</div><div class="evidence-item">
+  <blockquote>52.203-17 Contractor Employee Whistleblower Rights (Nov 2023)
+52.203-12 Limitation on Payments to Influence Certain Federal Transactions (Jun 2020)
+52.203-17 Contractor Employee Whistleblower Rights (Nov 2023)
+52.203-19, Prohibition on Requiring Certain Internal Confidentiality Agreements or Statements (Jan 2017)</blockquote>
+  <div class="ev-explanation">FAR 52.203-17 (Contractor Employee Whistleblower Rights) is cited twice in the Clauses Incorporated by Reference list, indicating a copy-editing error that was not caught. This is minor in isolation, but it is symptomatic of a document assembled without careful review — the same clause appears under two consecutive entries. This kind of duplication is a signature indicator of uncurated, copy-forward list management.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses firm-fixed-price for what is substantially a research and development engagement with significant scope uncertainty. The core work — literature surveys that drive software design, iterative stakeholder-reviewed framework development, and open-ended testbed integration investigation — involves meaningful unknowns at time of award. FFP is appropriate when requirements are well-defined and costs can be estimated with reasonable accuracy; here, several tasks are explicitly discovery-driven, with outputs that depend on what is found along the way.
+
+That said, this is not a severe square peg. Several mitigating factors bring the severity down to moderate. First, the contract is for a single FTE over 12 months — a relatively small, bounded engagement where the labor quantity is known even if the precise technical path is not. A skilled contractor can price in contingency without excessive distortion. Second, the deliverables are reasonably concrete: specific software tools, technical reports, and an architectural diagram with defined due dates. This is not pure exploratory research with no expected outputs. Third, NIST is a technically sophisticated agency that likely has reasonable cost estimates for this type of work from prior engagements. Fourth, the LiDAR hardware is government-furnished (per Amendment 0001, Question 1), removing one significant cost uncertainty.
+
+A T&amp;M or labor-hour contract would have been a more natural fit given the investigative and iterative nature of several tasks, and would give NIST better visibility into how the contractor&#x27;s time is being spent. However, the FFP structure is not indefensible given the bounded labor scope, concrete deliverables, and defined period of performance. The primary risk is that the contractor prices defensively — submitting a high FFP to cover scope uncertainty — or cuts corners on the iterative/stakeholder engagement tasks to protect margin. This is a moderate rather than severe mismatch.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All offerors shall provide a firm-fixed-price quotation for the following line item(s)</blockquote>
+  <div class="ev-explanation">The solicitation explicitly requires firm-fixed-price pricing. This is the foundational contract type decision being evaluated.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001 – Vehicle-to-Everything (V2X) Performance Measurement Support Services | 1 | LO ... CLIN 0002 - Travel | 1 | LO</blockquote>
+  <div class="ev-explanation">Both CLINs are priced as a single lump sum (Lot), meaning the contractor must estimate and bear risk for the entire scope of research, software development, and testbed integration work at a fixed price. There is no labor category or hour breakdown, making cost oversight difficult.</div>
+</div><div class="evidence-item">
+  <blockquote>1.1 Conduct a survey of recent technical publications to identify relevant metrics and methodologies for assessing the performance of C-V2X devices that are agnostic to the device manufacturer. 1.2 Design and implement a software tool to assess the performance of V2X hardware in the NIST testbed based on the survey results.</blockquote>
+  <div class="ev-explanation">Task 1 asks the contractor to first survey the literature and then design software based on what that survey reveals. The software design cannot be fully scoped in advance because it depends on findings that do not yet exist at time of contract award. This introduces genuine scope uncertainty that is difficult to price accurately under FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>2.2 Develop a framework for conducting SCMS interoperability testing including description of appropriate use cases and test scenarios to assess and verify IEEE 1609.2.1 interoperability. 2.3 Present the framework to industry stakeholders and make revisions based on their feedback</blockquote>
+  <div class="ev-explanation">Task 2 explicitly contemplates iterative revision based on stakeholder feedback. The extent of revisions is unknowable at award, creating open-ended scope. Under FFP, the contractor bears the risk of unlimited revision cycles, which may drive them to under-deliver or price defensively.</div>
+</div><div class="evidence-item">
+  <blockquote>3.3 Investigate how the NIST V2X testbed could be integrated with the O-RAN testbed at NIST. The contractor shall coordinate with NIST research staff to understand and document the IT infrastructure between the testbeds, and shall produce an architectural diagram that describes a potential solution</blockquote>
+  <div class="ev-explanation">This is an investigative/research task with an inherently undefined scope — the contractor must first understand the IT infrastructure before they can design a solution. The depth and complexity of this investigation cannot be estimated with confidence before the work begins, which is a classic mismatch with FFP pricing.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Amendment 0001.pdf">Amendment 0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4835aba5c1bf457f85a8ca8015a661a6_Amendment+0001.pdf" download="Amendment 0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CSS 1333ND26QNB670135.pdf">CSS 1333ND26QNB670135.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4835aba5c1bf457f85a8ca8015a661a6_CSS+1333ND26QNB670135.pdf" download="CSS 1333ND26QNB670135.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CSS Provisions and Clauses_1333ND26QNB670135.pdf">CSS Provisions and Clauses_1333ND26QNB670135.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4835aba5c1bf457f85a8ca8015a661a6_CSS+Provisions+and+Clauses_1333ND26QNB670135.pdf" download="CSS Provisions and Clauses_1333ND26QNB670135.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SOW_CSS.pdf">SOW_CSS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4835aba5c1bf457f85a8ca8015a661a6_SOW_CSS.pdf" download="SOW_CSS.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

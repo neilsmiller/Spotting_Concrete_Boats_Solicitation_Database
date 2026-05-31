@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Collective Joint Training — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Collective Joint Training</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 be16464808e54349abe9da89bcb0f4e2</span>
+      <a class="sam-link" href="https://sam.gov/opp/be16464808e54349abe9da89bcb0f4e2/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-17</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-17</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Cost-type (as indicated by the Contract Administration Plan title &#x27;CAP FOR COST TYPE CONTRACTS&#x27;)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">6 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe compliance-over-outcomes characteristics. The deliverables table enumerates 143 line items, the vast majority of which are process documentation, status reports, plans, logs, and administrative records — not measures of training effectiveness, exercise quality, or mission readiness. The accountability cadence includes: daily reports (NOSC pass-down, exercise portals), weekly reports (WAR, event weekly status, JLVC weekly status, out-of-cycle summary, long-range calendar, trouble ticket system, SCIF audit log review), monthly reports (financial report, MSR, NKE status, JTEN operations schedule, usage/availability statistics, SCIF access roster, M&amp;S scheduling documents), and quarterly reports (training assessment, AI integration, missile defense training plan, OPFOR reference book updates). This is not a single reasonable status report — it is a comprehensive surveillance apparatus. Critically, the entire structure asks &#x27;did you produce the required document on the required schedule?&#x27; There are no performance thresholds anywhere in the accessible text: no exercise fidelity targets, no training audience readiness improvement metrics, no system availability SLAs, no user satisfaction benchmarks. The one outcome-adjacent item — the Joint Training Assessment customer feedback report — lacks any defined standard or consequence structure. The Contract Administration Plan reinforces this orientation, directing the COR to monitor whether &#x27;the percentage of work performed reasonably corresponds to the percentage of funds expended&#x27; — a financial compliance check, not an outcomes check. The CAP also focuses COR surveillance on invoice verification and process observations rather than on whether training events actually improved joint force readiness. The sheer volume and variety of overlapping reporting cadences, combined with the complete absence of measurable performance standards, places this solicitation firmly at severity 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Monthly Status Report (MSR). Identifies the progress and status of accomplishments — Within 15 calendar days of each month</blockquote>
+  <div class="ev-explanation">A monthly status report focused on &#x27;progress and status of accomplishments&#x27; measures activity completion, not whether those accomplishments produced training outcomes. There is no corresponding metric for training audience performance, exercise fidelity, or mission readiness improvement.</div>
+</div><div class="evidence-item">
+  <blockquote>Weekly Activity Report (WAR) Submission — Coordinate with all Divisions to gather and consolidate input and ensure adherence to required WAR format and guidelines. Weekly</blockquote>
+  <div class="ev-explanation">A weekly activity report requiring coordination across all divisions to ensure &#x27;adherence to required WAR format&#x27; is pure compliance documentation. The accountability mechanism is whether the format was followed, not whether the week&#x27;s work improved any measurable outcome. This also creates substantial reporting overhead with no outcome-oriented counterpart.</div>
+</div><div class="evidence-item">
+  <blockquote>Monthly Financial Report — Identifies hours, funding, product deliverables, expenditures by tasks, personnel changes, issue identification and contractor personnel roster. Within 15 calendar days of each month</blockquote>
+  <div class="ev-explanation">This report tracks labor hours, expenditures, and personnel rosters — all input and process metrics. Combined with the monthly status report and weekly activity report, the government now has three overlapping monthly/weekly reporting streams, none of which measure training effectiveness, exercise quality, or any result-oriented standard.</div>
+</div><div class="evidence-item">
+  <blockquote>Event Weekly Status Report — Identifies weekly status report of upcoming events requiring cybersecurity and/or planner input. Weekly; JTEN NOSC Pass-down Report — NOSC activities and status of upcoming events. Daily IAW NOSC meeting schedule; Weekly Status Report [JLVC] — Reports shall contain the development and modernization efforts that align to the Joint Training Synthetic Environment (JTSE). First Tuesday of every week</blockquote>
+  <div class="ev-explanation">These three reports — one daily, two weekly — cover overlapping operational status ground (cybersecurity, network, and JLVC modernization). None contain performance thresholds, uptime targets, or quality benchmarks. The accountability question being asked is &#x27;did you report on time and cover the prescribed topics?&#x27; not &#x27;is the network performing adequately?&#x27; or &#x27;are the JLVC modernization efforts producing measurable capability improvements?&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Quality Control Plan — Procedures to identify, prevent, and ensure non-recurrence of defective services — Within 30 calendar days at the beginning of the PoP</blockquote>
+  <div class="ev-explanation">The QCP deliverable itself is process-compliance oriented: it is a plan describing procedures, not a set of outcome standards or performance metrics. Acceptance of the QCP is measured by whether the document was submitted on time and describes the right procedures — not by whether contractor quality actually improved training effectiveness. This is emblematic of the sin: the QA mechanism is a plan about how to do QA, not measurement of results.</div>
+</div><div class="evidence-item">
+  <blockquote>Joint Training Assessment — Summary Report of customer feedback. Quarterly and annually</blockquote>
+  <div class="ev-explanation">This is the closest the solicitation comes to outcome measurement, but it reduces to &#x27;customer feedback&#x27; with no defined metrics, baseline, targets, or consequences for poor scores. It is a single lightweight item buried among dozens of activity-and-process reports, insufficient to rebalance an accountability structure overwhelmingly oriented toward compliance documentation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards concern rooted primarily in institutional knowledge dependency rather than explicit dollar thresholds or federal-specific experience mandates. The available solicitation text — largely the PWS deliverables table, the contract administration plan, and one amendment — does not include the evaluation criteria section, personnel qualifications, or past performance requirements, which are the most common locations for explicit insider rewards language. That limits the analysis but does not eliminate the concern.
+
+What is visible supports a severity 2 finding. The government&#x27;s own amendment acknowledges an incumbent and characterizes the new requirement as an expansion of the prior one — a clear signal of continuity-oriented procurement. The deliverables table is saturated with references to existing artifacts (SOPs, portals, established battle rhythms, named tools like JTT and JLLIS) that only the incumbent currently possesses. Delivery timelines are calibrated to &#x27;IAW SOPs&#x27; that do not yet exist for a new vendor. The operational complexity — 143 numbered deliverables spanning exercise planning, intelligence support, M&amp;S systems, SCIF management, and network operations — means the transition burden falls almost entirely on a non-incumbent.
+
+Critically, this is a highly specialized Joint Staff training support contract with deep operational integration across DDJT divisions. The knowledge required to credibly respond to this PWS — specific named systems (JLLIS, JTT, JTEN, JLVC), organizational roles (DDJT Desk Officers, OE Branch Chief, IE/Cyber Branch Chief), and process rhythms (JELC timelines, battle rhythms) — is largely tacit and embedded in years of incumbent performance. A new vendor could theoretically compete, but would face a steep information asymmetry that the solicitation does not appear to mitigate (e.g., through a thorough incumbent data package or extended transition period).
+
+The absence of evaluation criteria prevents confirming whether explicit scoring bonuses or narrow dollar thresholds exist, which is why this does not rise to severity 3. The concern is real but is driven by structural complexity and institutional dependency rather than demonstrably exclusionary written criteria.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The increase in the estimated level of effort, in comparison to the incumbent requirement, is commensurate to the newly added PWS tasks and increase in scope.</blockquote>
+  <div class="ev-explanation">The government&#x27;s own amendment explicitly acknowledges an incumbent and frames the new requirement as an expansion of the prior contract. This framing signals that the solicitation is structured around continuity with the incumbent rather than open competition — the baseline expectation is that offerors understand the prior requirement and how it has grown.</div>
+</div><div class="evidence-item">
+  <blockquote>JExD JTT SOP, business rules adapted to each exercise, Monthly Newsletter, JTT training syllabus, identifies trends, battle rhythms, reoccurring themes, noted points of the exercise and lessons learned</blockquote>
+  <div class="ev-explanation">The deliverables reference &#x27;JExD JTT SOP&#x27; and &#x27;business rules adapted to each exercise&#x27; — these are artifacts that exist within the current operating environment. A new vendor would need to acquire or recreate these SOPs from scratch, while the incumbent already possesses them. The deliverable table assumes familiarity with existing institutional documents rather than requiring the vendor to build from first principles.</div>
+</div><div class="evidence-item">
+  <blockquote>IAW SOPs, guidance, the JELC and written correspondence and POA&amp;M timelines.</blockquote>
+  <div class="ev-explanation">Numerous deliverables across the PWS are due &#x27;IAW SOPs&#x27; — referencing existing standard operating procedures that the incumbent developed or currently maintains. A non-incumbent would not have access to these SOPs prior to award, making it difficult to credibly plan delivery timelines or demonstrate understanding of the operational rhythm in a proposal.</div>
+</div><div class="evidence-item">
+  <blockquote>Newly developed SOPs will be completed within 3 calendar months after award of the PoP start date. Existing SOPs will be updated within 3 calendar months after award of the PoP start date.</blockquote>
+  <div class="ev-explanation">The distinction between &#x27;newly developed&#x27; and &#x27;existing&#x27; SOPs presupposes that there is an existing SOP library that carries over from the prior contract. This benefits the incumbent, who possesses the existing SOPs, while a new vendor must either recreate them or negotiate access — a significant disadvantage during transition evaluation.</div>
+</div><div class="evidence-item">
+  <blockquote>Portal and Shared Drives — IM/KM portal pages to permit information sharing — Daily throughout all DDJT divisions</blockquote>
+  <div class="ev-explanation">The deliverables include ongoing management of established portal infrastructure and shared drives. The incumbent already operates this infrastructure. A non-incumbent would need to design, build, populate, and migrate this infrastructure — a substantial hidden cost and risk that the solicitation does not appear to account for, disadvantaging new entrants in any cost/price evaluation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of requirement sprawl. The primary evidence is the 143-item deliverables table, which is extraordinarily granular — it constitutes essentially an operational manual for the Joint Staff J7 training enterprise. However, the deliverables table alone does not automatically constitute sprawl under the definition: many of the deliverables define WHAT artifacts must be produced (e.g., After Action Reports, Post Exercise Reports, Room Build and Floor Plans) with due dates tied to the exercise planning lifecycle. These are closer to outcome-oriented deliverables than process mandates.
+
+The more significant sprawl signals appear in specific requirements that name tools (JTT, JMSEL, NATO-JEMM), prescribe information management infrastructure (portal pages and shared drives), mandate labor management documentation (staffing plans with ramp-up/ramp-down), and require the contractor to maintain SOPs for the government organization&#x27;s internal processes. These requirements cross from &#x27;what must be delivered&#x27; into &#x27;how the contractor must organize and execute work.&#x27;
+
+The SOP requirement is particularly diagnostic: requiring the contractor to document and maintain the client organization&#x27;s internal processes on a monthly cadence is a strong indicator that the contract was drafted from the incumbent&#x27;s current operations. It converts the incumbent&#x27;s methodology into a compliance requirement for successor contractors, which is a textbook sprawl-generating pattern.
+
+Mitigating factors: the available text is limited to the deliverables table and contract administration plan — the full PWS task sections (5.3 through 5.15) were referenced but not fully provided. The deliverables table is dense but its specificity is partly attributable to the genuine complexity of the Joint Exercise Lifecycle (JELC) and the need to coordinate dozens of artifacts across a multi-year exercise program. Many of the named deliverables are standard military exercise planning products with well-understood formats.
+
+On balance, this is a severity 2. Sprawl is present in identifiable sections — particularly around tooling mandates, information management infrastructure, labor planning structure, and SOP maintenance — but the solicitation is not so dominated by process prescription that it precludes all meaningful vendor differentiation. A capable contractor could still propose alternative approaches to staffing, tooling, and process design in areas not explicitly locked down, though they would face real constraints in the areas identified.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Develop, plan, manage, operate and provide training in the selected MSEL Tool (e.g., Joint Training Tool (JTT), Joint Master Scenario Event List (JMSEL), North Atlantic Treaty Organization Joint Exercise Management (NATO-JEMM), or the Joint Training Tool (JTT).</blockquote>
+  <div class="ev-explanation">This requirement names specific tools the contractor must use for Master Scenario Event List management. While a parenthetical &#x27;e.g.&#x27; softens it slightly, the framing still ties the contractor to a specific set of named government systems rather than specifying the outcome (a managed, executable MSEL) and allowing the contractor to propose the most effective toolset. This forecloses the possibility of a more efficient or automated approach.</div>
+</div><div class="evidence-item">
+  <blockquote>Portal and Shared Drives — IM/KM portal pages to permit information sharing — Daily throughout all DDJT divisions</blockquote>
+  <div class="ev-explanation">This prescribes the specific delivery mechanism (portal pages and shared drives) for information management rather than defining the outcome (e.g., &#x27;all DDJT divisions have reliable, timely access to current information&#x27;). A vendor who could achieve the same result via a more modern collaboration architecture is constrained to replicate what appears to be the incumbent&#x27;s current implementation.</div>
+</div><div class="evidence-item">
+  <blockquote>Staffing Plan and Operating Strategy — Ramp up and ramp down, surge labor plan and labor plan — Due within 15 working days of notice</blockquote>
+  <div class="ev-explanation">Requiring the contractor to submit a staffing plan that includes explicit ramp-up/ramp-down and surge labor plans prescribes the labor management structure rather than defining performance outcomes. This signals that the government is managing HOW the contractor staffs the effort rather than holding the contractor accountable for results. Combined with the 143-deliverable table, this suggests the contract is organized around labor tracking rather than mission outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Standard Operating Procedures (SOP) — Identifies routine, repetitive processes within DDJT resulting in clearly identifiable, efficient work processes — Newly developed SOPs will be completed within 3 calendar months after award of the PoP start date. Existing SOPs will be updated within 3 calendar months after award of the PoP start date. All SOPs will be revised monthly when processes change.</blockquote>
+  <div class="ev-explanation">Requiring the contractor to produce and maintain SOPs for DDJT&#x27;s internal processes — and to update them monthly — is a process-management requirement, not an outcome requirement. It locks the contractor into documenting and perpetuating existing workflows rather than being accountable for training outcomes. This is a classic incumbent-capture pattern: the current contractor&#x27;s way of doing business becomes a deliverable the next contractor must replicate.</div>
+</div><div class="evidence-item">
+  <blockquote>Level I and II Help Desk Support — Provide continuous help desk support across the various Joint Staff systems and applications including but not limited to JKO, JTP, JTT, JLLIS and troubleshoot user account issues, application errors and access problems — Daily</blockquote>
+  <div class="ev-explanation">This requirement names specific government systems and specifies the tier structure of help desk support, prescribing the organizational approach to IT support rather than defining service levels (e.g., resolution times, availability rates). A vendor who could consolidate or automate Tier 1 support is constrained to match the existing tiered structure serving the named applications.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation materials available for review consist primarily of: (1) a Contract Administration Plan (CAP) that is a standard administrative document laying out PCO/CAO/COR roles under FAR 42.302 — this is entirely standard and not a rule pool; (2) a brief amendment providing Q&amp;A responses; (3) a DD-254 that failed to render; and (4) an extensive deliverables table (Attachment I) listing 140+ deliverables tied to specific PWS task references. Notably absent from the reviewed materials is the core Performance Work Statement itself, any &#x27;Applicable Documents&#x27; or &#x27;Referenced Standards&#x27; section, and any Section L/M evaluation criteria document. The deliverables table — the most substantive content available — references compliance primarily through internal program constructs (JELC, SOPs, POA&amp;Ms, battle rhythms) and specific government POCs rather than through citation of external regulatory frameworks. Where regulations are referenced, they appear contextually appropriate: SCIF management tasks cite SCIF/DIA policy directives (correct), COMSEC tasks cite COMSEC directives (correct), and CPARS obligations cite the CPARS AIS system (standard). There is no &#x27;Applicable Documents&#x27; list of 20+ regulations visible in the provided materials, no contradictory regulatory citations, and no evidence of copy-forward accumulation of irrelevant policies. The CAP itself is a template document that is standard across Navy cost-type contracts — its presence does not constitute a rule pool. The critical limitation here is that the full PWS body (tasks 5.3 through 5.15 referenced throughout the deliverables table) was not provided, and that is precisely where an &#x27;Applicable Documents&#x27; section would typically appear. Given what is actually visible, the compliance architecture appears appropriately contextual rather than pooled. Severity is assessed at 1 — minimal — based on available evidence, with the caveat that the full PWS text could alter this assessment if it contains a bulk regulatory citation section not visible in the provided attachments.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>IAW SOPs, guidance, the JELC and written correspondence and POA&amp;M timelines.</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s deliverables table references compliance primarily through internal program-specific mechanisms (JELC, SOPs, POA&amp;Ms) rather than external regulatory lists. This is contextual guidance tied to specific deliverables rather than a bulk regulatory dump.</div>
+</div><div class="evidence-item">
+  <blockquote>IAW applicable directives, manuals and regulations</blockquote>
+  <div class="ev-explanation">This is the closest the available text comes to an undifferentiated regulatory citation (in the SCIF Inspection Book entry, row 107). However, it appears in a narrow security context where the reference to classified facility regulations is entirely appropriate and expected for SCIF management tasks. It does not represent a bulk applicable documents list.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation&#x27;s Contract Administration Plan is explicitly titled &#x27;FOR COST TYPE CONTRACTS,&#x27; and the DCAA audit and invoice verification mechanisms confirm this is a cost-reimbursement contract. The question is whether cost-reimbursement is well-matched to these requirements.
+
+The requirement — Collective Joint Training support for Joint Staff J7 — is a complex, sustained advisory and exercise support service. The work involves supporting unpredictable joint training events across multiple combatant commands, integrating classified intelligence, managing live exercise networks, and adapting to evolving operational priorities. The scope is genuinely large and somewhat fluid: exercise schedules shift, new tasks were added relative to the prior contract (per the amendment), and the work requires surge capacity. These characteristics can justify cost-reimbursement over fixed-price.
+
+However, the deliverables table tells a more nuanced story. The PWS specifies 143 discrete deliverables with defined descriptions, responsible parties, and concrete due dates. Many deliverables are recurring and predictable (monthly financial reports, weekly activity reports, quarterly assessments, annual handbooks). The recurring, well-defined nature of much of this work — combined with the fact that this is a follow-on to an incumbent contract, meaning historical cost data should exist — suggests that at minimum, portions of this work could have been structured under T&amp;M with labor categories and fixed hourly rates, giving the government better cost control than open-ended cost-reimbursement.
+
+The use of cost-reimbursement is not indefensible here. The J7 training support mission inherently involves classified, operationally sensitive work that fluctuates with national security priorities. The government cannot always predict how many exercises will occur, at what classification level, or with what surge requirements. Cost-reimbursement is commonly and reasonably used for this class of defense advisory and training support work.
+
+Nonetheless, the combination of a mature incumbent contract (historical cost data available), 143 specified deliverables with due dates, and recurring administrative deliverables suggests that a T&amp;M structure — or a hybrid with some FFP CLINs for recurring deliverables and T&amp;M for surge/variable support — would have given the government stronger cost control incentives without imposing unreasonable risk on contractors. Cost-reimbursement places essentially all cost risk on the government with DCAA as the primary backstop, and the COR surveillance burden described in the CAP is substantial.
+
+This is a moderate finding (severity 2), not severe. The cost-reimbursement choice is defensible given the classified, operationally complex, and somewhat unpredictable nature of joint training support. The sin is that the government did not appear to consider whether T&amp;M or a hybrid structure might have been more appropriate given the maturity of this requirement and the specificity of its deliverables.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CONTRACT ADMINISTRATION PLAN (CAP) FOR COST TYPE CONTRACTS</blockquote>
+  <div class="ev-explanation">The Contract Administration Plan is explicitly titled for cost-type contracts, indicating the pricing structure is cost-reimbursement. This is the clearest signal of contract type available in the solicitation documents.</div>
+</div><div class="evidence-item">
+  <blockquote>The Defense Contract Audit Agency (DCAA) is responsible for audit verification/provisional approval of invoices and final audit of this contract prior to final payment to the contractor.</blockquote>
+  <div class="ev-explanation">DCAA provisional approval of invoices and final audit is characteristic of cost-reimbursement contracts, where costs must be verified as allowable, allocable, and reasonable before payment. This further confirms the cost-type structure.</div>
+</div><div class="evidence-item">
+  <blockquote>The COR shall maintain surveillance of the contractor&#x27;s performance to determine if the percentage of work performed reasonably corresponds to the percentage of funds expended.</blockquote>
+  <div class="ev-explanation">This surveillance obligation — tracking whether funds expended correspond to work performed — is a hallmark cost-reimbursement oversight mechanism. Under cost-type contracts, the government bears the risk of cost overruns, making this monitoring essential but burdensome.</div>
+</div><div class="evidence-item">
+  <blockquote>The increase in the estimated level of effort, in comparison to the incumbent requirement, is commensurate to the newly added PWS tasks and increase in scope.</blockquote>
+  <div class="ev-explanation">The amendment references an &#x27;estimated level of effort,&#x27; which is consistent with cost-reimbursement or labor-hour contracting. However, combined with the deliverables table showing 143 discrete, well-defined deliverables with specific due dates, this suggests the work is sufficiently scoped that a different pricing structure could have been considered.</div>
+</div><div class="evidence-item">
+  <blockquote>Newly developed SOPs will be completed within 3 calendar months after award of the PoP start date... All SOPs will be revised monthly when processes change. [plus 143 numbered deliverables with specific due dates across the PWS]</blockquote>
+  <div class="ev-explanation">The PWS Deliverables Table contains 143 individually specified deliverables — plans, reports, annexes, rosters, watch bills, briefings — many with precise due dates (e.g., &#x27;NLT 14 working days prior to the exercise,&#x27; &#x27;Within 15 calendar days of each month&#x27;). This level of specificity in deliverables and timelines suggests the government has enough visibility into the work to define outputs, which is more consistent with a fixed-price or T&amp;M structure than open-ended cost-reimbursement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Amendment N0018926QD026 0001.pdf">Amendment N0018926QD026 0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/be16464808e54349abe9da89bcb0f4e2_Amendment+N0018926QD026+0001.pdf" download="Amendment N0018926QD026 0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CJT PWS - Deliverables.pdf">CJT PWS - Deliverables.pdf</div></div>
+  <a class="dl-btn" href="../attachments/be16464808e54349abe9da89bcb0f4e2_CJT+PWS+-+Deliverables.pdf" download="CJT PWS - Deliverables.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Contract Administrative Plan.pdf">Contract Administrative Plan.pdf</div></div>
+  <a class="dl-btn" href="../attachments/be16464808e54349abe9da89bcb0f4e2_Contract+Administrative+Plan.pdf" download="Contract Administrative Plan.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="DD 254  - CJT.pdf">DD 254  - CJT.pdf</div></div>
+  <a class="dl-btn" href="../attachments/be16464808e54349abe9da89bcb0f4e2_DD+254++-+CJT.pdf" download="DD 254  - CJT.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926QD026.pdf">Solicitation - N0018926QD026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/be16464808e54349abe9da89bcb0f4e2_Solicitation+-+N0018926QD026.pdf" download="Solicitation - N0018926QD026.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

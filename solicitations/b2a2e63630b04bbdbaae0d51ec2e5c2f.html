@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19CG5026Q0001-P00001_Sol_Amend — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>19CG5026Q0001-P00001_Sol_Amend</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b2a2e63630b04bbdbaae0d51ec2e5c2f</span>
+      <a class="sam-link" href="https://sam.gov/opp/b2a2e63630b04bbdbaae0d51ec2e5c2f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-02-18</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › USEMBASSY KINSHASA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517112</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-02-18</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months) + 4 option years (12 months each) + 1 six-month option</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate compliance-over-outcomes problem. On one hand, it is meaningfully better than the worst examples of this sin: it does include several specific, measurable response-time requirements (1-hour customer service response, 24-hour SIM provisioning, 90% network coverage), and the complaint-count threshold in the QASP — while weak — is at least nominally outcome-adjacent. The contract is also for a commodity telecom service, where outcomes are inherently simpler to define than in complex IT development, and detailed waterfall-style reporting is not present at all. There are no weekly status reports, no prescribed report formats with mandatory sections, no overlapping reporting cadences.
+
+However, the QASP is severely underdeveloped for the scope it is supposed to govern. A single surveillance row covering all 29 PWS sections with one composite threshold (&#x27;all services performed, fewer than 2 complaints/week&#x27;) is not meaningful quality assurance — it is a compliance checkbox. The most important service attributes — network uptime, billing accuracy, actual response-time adherence — are defined in the PWS but not carried forward into the QASP as measurable objectives. The 1-hour response-time requirements in section 1.14 are particularly notable: they are the strongest performance commitments in the document, yet they are nowhere in the surveillance plan. If the vendor routinely responds in 3 hours, the QASP provides no mechanism to detect or remedy this unless users formally complain. The result is that quality assurance reduces to: &#x27;did the vendor show up and avoid complaints?&#x27; rather than &#x27;did the vendor deliver the specific service levels promised?&#x27; This is the defining characteristic of compliance-over-outcomes thinking — the process of delivering service is assumed adequate as long as no one complains loudly enough. Severity 2 is appropriate: the solicitation is not drowning in paperwork theater, but its accountability structure is meaningfully incomplete and tilted toward process confirmation over outcome verification.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Objective: Performs all Smartphone/Mobile services set forth in the performance work statement /scope of work. | Scope of Work Para: 1. thru 1.29. | Performance Threshold: All required services are performed and no more than two (2) customer complaints are received per week.</blockquote>
+  <div class="ev-explanation">The entire QASP collapses the full scope of the contract — 29 PWS sections covering network quality, billing, SIM management, customer service, roaming, equipment, and more — into a single performance threshold. That threshold has two components: (1) &#x27;all required services are performed,&#x27; which is a process/compliance check (did you do the thing?), and (2) no more than two customer complaints per week, which is a proxy metric rather than a true outcome measure. There are no SLAs for network uptime, no data speed minimums, no billing accuracy rates, no resolution time targets — just a complaint count that can easily undercount problems if users don&#x27;t formally complain.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall ensure that the connection through its network is of the highest quality possible and shall be uninterrupted, clear, and with no static. Network problems shall be remedied immediately, and the COR must be immediately informed of any problems and their resolution.</blockquote>
+  <div class="ev-explanation">This is aspirational language (&#x27;highest quality possible,&#x27; &#x27;uninterrupted&#x27;) without measurable performance standards. There is no defined uptime percentage (e.g., 99.5%), no maximum permissible outage duration, no mean-time-to-repair target, and no definition of what constitutes a &#x27;network problem.&#x27; The requirement to inform the COR is a process step (notification), not an outcome measure. The QASP does not translate this language into any verifiable metric.</div>
+</div><div class="evidence-item">
+  <blockquote>Customer Service shall provide support within 1 hour of email notification... The U.S. Embassy will require the vendor to activate/deactivate SIMs or reduce service plans to a minimum of &#x27;Keep Alive&#x27; within 1 hours of receipt of email or phone call from the Embassy. The Vendor will establish a new service as needed within 1 hour of email or phone call notification.</blockquote>
+  <div class="ev-explanation">These are the closest thing to SLAs in the document, and they are meaningful response-time requirements. However, they are defined in the PWS narrative and are not reflected anywhere in the QASP performance threshold. The QASP&#x27;s single surveillance row covering &#x27;Para 1. thru 1.29.&#x27; subsumes these without specifically measuring compliance with them. There is no tracking mechanism specified — no requirement for the contractor to report on response times, no government audit of response logs, and no consequence tied to missing the 1-hour target beyond the generic complaint-count threshold.</div>
+</div><div class="evidence-item">
+  <blockquote>The monthly lists of calls made shall be forwarded to the Contracting Officer&#x27;s Representative (COR) within three days of the end of the billing cycle... The monthly breakdown of calls made by individual numbers shall be provided on an online dashboard... The monthly utilization and detailed billing reports shall be available on a vendor online dashboard application, If applicable.</blockquote>
+  <div class="ev-explanation">The billing and reporting requirements are process-delivery obligations (submit this document, maintain this dashboard) rather than outcome measures. There is no accuracy standard for the billing data (e.g., 99% billing accuracy), no definition of what constitutes a billing error, and no consequence structure for late or inaccurate invoices beyond the government&#x27;s right to reject a defective invoice. The QASP does not list billing accuracy as a separate performance objective with its own threshold.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for commercial mobile telephone services at the U.S. Embassy Kinshasa — a commoditized telecommunications service procured in the local DRC market. After carefully reviewing the full amendment document, including the revised pricing tables, Performance Work Statement (PWS), and all supporting sections, I find no evidence of insider rewards.
+
+The PWS specifies service requirements in capability terms — coverage thresholds (90% local network coverage), response times (1-hour customer service SLA), billing formats (CSV), and technical specifications (plan tiers, data limits, excluded device brands). None of these requirements presuppose knowledge of the incumbent&#x27;s systems or demand prior contract history with the U.S. Embassy or U.S. federal government.
+
+The solicitation contains no past performance evaluation criteria section, no minimum contract dollar thresholds, no federal experience mandates, and no requirements for a specified number of prior similar contracts within a lookback window. The Key Personnel requirement (Section 1.17) asks only that the Project Manager be fluent in French and English — a reasonable operational requirement for a DRC-based contract, not an incumbency proxy.
+
+The excluded equipment brands (Huawei, ZTE, Hytera, Hikvision, Dahua) reflect NDAA Section 889 compliance requirements — a legal mandate, not an incumbency filter.
+
+The 1-hour SLA for activation/deactivation and customer service response is operationally demanding but applies equally to any qualified local telecommunications provider. In the DRC market, the pool of mobile network operators is limited by infrastructure realities, not by artificially narrow experience requirements.
+
+A qualified telecommunications vendor operating in Kinshasa that has never held this specific contract could realistically read the PWS, understand what is required, and submit a competitive quotation. The solicitation tests capability (network coverage, service plan offerings, billing systems, customer service infrastructure) rather than prior contract history. This is severity 1 — no meaningful insider rewards pattern is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for Embassy Kinshasa mobile phone services shows moderate requirement sprawl. The PWS is detailed and largely appropriate for a commercial telecommunications service contract — defining service tiers, data caps, coverage requirements, and billing formats is standard for this type of procurement. Many requirements are legitimately outcome-oriented: coverage thresholds (90% local network coverage), data allowances per plan, equipment exclusions (Huawei/ZTE/etc. based on security law), and invoicing content requirements are all defensible constraints rather than process prescriptions.
+
+However, several sections cross from outcomes into prescribed methods. The notification mechanism (SMS specifically), the customer support channel architecture (dedicated email plus one other channel), the SIM management trigger mechanism (email or phone call), and the dashboard requirement all specify HOW the vendor must deliver rather than WHAT the Embassy needs to receive. These prescriptions could foreclose vendors whose service delivery models — while achieving equivalent or superior outcomes — rely on different channel architectures, automation tools, or self-service portals.
+
+The &#x27;Detailed Billing&#x27; section (1.15) also contains a fairly granular itemization of billing fields (10 specific data elements) that borders on prescribing an exact invoice format, though this is partially justified by the Embassy&#x27;s need for consistent, auditable records.
+
+The sprawl present is real but not pervasive. The solicitation does not read like an operating manual — it has a clear service catalog structure, and most service-level requirements define quantifiable outcomes (minutes, GB, response times). The prescriptive elements cluster primarily in the customer service and reporting sections rather than dominating the entire document. Severity 2 (moderate) is appropriate: a vendor would feel constrained in how it structures its account management and notification systems, but could still propose meaningful differentiation on network quality, pricing, and equipment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall ensure that the connection through its network is of the highest quality possible and shall be uninterrupted, clear, and with no static. Network problems shall be remedied immediately, and the COR must be immediately informed of any problems and their resolution.</blockquote>
+  <div class="ev-explanation">&#x27;Highest quality possible,&#x27; &#x27;uninterrupted, clear, and with no static,&#x27; and &#x27;remedied immediately&#x27; are prescriptive aspirations without measurable thresholds. More importantly, requiring the COR be &#x27;immediately&#x27; informed of every network problem prescribes a specific notification workflow rather than defining an outcome (e.g., &#x27;network availability shall meet X% uptime&#x27;). This constrains how the vendor manages incident communication.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor must send automatic notices (most commonly via SMS text messages) to a specific mobile number when the designated plan has reached the 75% data and call usage mark and the 100% data and call usage mark.</blockquote>
+  <div class="ev-explanation">This prescribes the specific mechanism (&#x27;most commonly via SMS text messages&#x27;) for usage alerts rather than stating the outcome: that users must be notified at 75% and 100% thresholds. A vendor with a superior app-based or dashboard notification system is constrained by this language.</div>
+</div><div class="evidence-item">
+  <blockquote>Customer Service shall provide support within 1 hour of email notification. The contractor shall provide an exclusive customer support email for the US Embassy with responses within one hour, 24/7. Besides the exclusive customer support email, the contractor shall also provide support at least through one other means of communication., i.e. Direct customer support telephone number.</blockquote>
+  <div class="ev-explanation">While 1-hour response SLAs are legitimate outcome requirements, mandating a specific channel structure — an exclusive Embassy email plus at least one additional channel — prescribes the vendor&#x27;s support architecture rather than the outcome (responsive, accessible support). A vendor offering a dedicated portal, chat, or account manager model is constrained to conform to this specific channel configuration.</div>
+</div><div class="evidence-item">
+  <blockquote>The U.S. Embassy will require the vendor to activate/deactivate SIMs or reduce service plans to a minimum of &#x27;Keep Alive&#x27; within 1 hours of receipt of email or phone call from the Embassy. The Vendor will establish a new service as needed within 1 hour of email or phone call notification.</blockquote>
+  <div class="ev-explanation">Requiring SIM management actions within 1 hour of &#x27;email or phone call&#x27; prescribes the triggering mechanism and workflow, not just the SLA. A vendor with an automated self-service portal allowing the Embassy to activate/deactivate SIMs instantly is constrained to also maintain staffed email/phone response capability even if the automated system provides a superior outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>The monthly breakdown of calls made by individual numbers shall be provided on an online dashboard that can be readily available electronically... The monthly utilization and detailed billing reports shall be available on a vendor online dashboard application, If applicable.</blockquote>
+  <div class="ev-explanation">Requiring an online dashboard is a specific technology/delivery mechanism prescription. The underlying outcome — timely, accessible, detailed billing data — could be met through various means (API data feeds, standardized CSV reports, etc.). The solicitation locks vendors into a dashboard-based delivery model for billing, though the &#x27;if applicable&#x27; qualifier partially mitigates this.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pool pattern. The document is an amendment to an RFQ for commercial cellphone services at a U.S. Embassy, and its regulatory footprint is remarkably lean. There is no &#x27;Applicable Documents&#x27; section, no bulk list of directives or executive orders, and no multi-page compliance framework inventory. The only compliance references present are: (1) a CSCRM questionnaire requirement, which is an appropriate State Department supply chain security control for a telecommunications contract, and (2) a single FAR 52.212-4 citation used contextually to explain the technological refreshment provision. Standard FAR commercial item acquisition clauses are incorporated by reference via the SF-1449 form, which is normal and expected practice — not a rule pool. The PWS itself (sections 1.1 through 1.29) is written operationally, specifying service performance requirements without cascading regulatory citations. The tax requirements (16% VAT, 10% excise tax) are host-country legal mandates explained with appropriate context. The prohibition on Huawei/ZTE/Hytera/Hikvision/Dahua equipment reflects a legitimate statutory prohibition (National Defense Authorization Act provisions) applied correctly without being buried in an undifferentiated list. In sum, this is a competently scoped commercial services solicitation with a focused, appropriate compliance posture. Severity 1 is the correct assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CYBERSECURITY SUPPLY CHAIN RISK MANAGEMENT (CSCRM) Questionnaire and/or State Department Secure Software Development Attestation Form</blockquote>
+  <div class="ev-explanation">This is the only regulatory/compliance framework cited beyond standard FAR references. It is contextually appropriate for a telecommunications services contract involving government communications infrastructure, and it is presented as a submission requirement rather than a free-floating list.</div>
+</div><div class="evidence-item">
+  <blockquote>1.23. TECHNOLOGICAL REFRESHMENT... pursuant to FAR clause 52.212-4 - Contract Terms and Conditions –Commercial Items, paragraph (c), Changes</blockquote>
+  <div class="ev-explanation">The single FAR clause cited in the PWS is relevant and contextualized — it is used to explain the mechanism for technology refresh. This is the opposite of a rule pool: a specific clause cited for a specific, explained purpose.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for commercial mobile telecommunications services for approximately 550 embassy lines in Kinshasa, DRC. The pricing structure is a hybrid: prepaid plans use a firm monthly fixed rate per user (appropriate because the plan parameters are capped and well-defined), while postpaid plans are billed on actual usage (appropriate because consumption varies by user and cannot be precisely predicted in advance). Both components reflect standard commercial telecommunications industry pricing models. The requirement is well-defined — specific plan tiers, user counts, and service parameters (minutes, SMS, data) are all enumerated. This is a commercial services acquisition under FAR Part 12, and the pricing structure mirrors how carriers actually sell these services in the market. There is no mismatch between the contract pricing approach and the nature of the requirement. The use of estimated quantities for evaluation purposes is standard practice. No significant square peg concern exists here: the government is not using a T&amp;M structure where FFP would serve better, nor is it imposing rigid fixed pricing on genuinely unpredictable scope. The pricing scheme is well-matched to the requirements. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Prepaid services based on a price limit that must not be exceeded. Postpaid services based on actual usage for services rendered each month.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly distinguishes between prepaid CLINs (fixed monthly rate per user) and postpaid CLINs (actual usage-based billing). This is a commercially rational structure: prepaid plans have a defined monthly cap price, functioning like a firm-fixed-price per unit, while postpaid plans are billed on actual consumption, which is inherently variable and appropriate for usage-based services.</div>
+</div><div class="evidence-item">
+  <blockquote>Unit Price (Monthly fixed rate per user) ... Total Price (Estimated Qty x Unit Price x 12 Months) USD</blockquote>
+  <div class="ev-explanation">Prepaid plans are priced at a fixed monthly rate per user. This is a standard commercial telecommunications pricing model. Fixed pricing for defined monthly service bundles is entirely appropriate — the service parameters (minutes, SMS, data caps) are well-specified, and competition among carriers will keep prices honest. This is a textbook appropriate use of fixed-price-per-unit for a commercial service.</div>
+</div><div class="evidence-item">
+  <blockquote>POSTPAID PLAN A ... minimum of 800 minutes ... minimum of 30 Gigabytes ... minimum of 100 messages ... Postpaid services based on actual usage for services rendered each month.</blockquote>
+  <div class="ev-explanation">Postpaid services are priced on actual usage, which is the correct pricing mechanism for variable consumption. The government cannot predict exactly how many minutes or gigabytes each user will consume monthly, so usage-based (variable) billing is appropriate. Using a rigid FFP for postpaid would have been a mismatch; the solicitation correctly avoids this.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="19CG5026Q0001-P00001_Sol_Amend.pdf">19CG5026Q0001-P00001_Sol_Amend.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b2a2e63630b04bbdbaae0d51ec2e5c2f_19CG5026Q0001-P00001_Sol_Amend.pdf" download="19CG5026Q0001-P00001_Sol_Amend.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request for Proposal: ALCF Artemis Compute Cluster — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Request for Proposal: ALCF Artemis Compute Cluster</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 f8650a29a017403f81512fddb647061f</span>
+      <a class="sam-link" href="https://sam.gov/opp/f8650a29a017403f81512fddb647061f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">ENERGY, DEPARTMENT OF › ENERGY, DEPARTMENT OF › ARGONNE NATL LAB - DOE CONTRACTOR</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Overall Technical Requirements</li><li>Maintenance and Support</li><li>Installation Services</li><li>Price Criteria</li><li>Business/Management Criteria (Pass/Fail)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a compute cluster hardware acquisition (NAICS 334111 — Electronic Computer Manufacturing), including hardware, software/licensing, installation, and maintenance and support services, structured as a firm-fixed-price contract. The documents provided are primarily administrative in nature: representations and certifications (ANL-70B), standard commercial terms and conditions (ANL-71COM), evaluation criteria (Enclosure 4), a tax exemption certificate, and site safety/insurance supplements (ANL-366M). The Statement of Work itself (referenced as &#x27;Artemis Compute Cluster,&#x27; dated May 6, 2026) does not appear to have been extracted into the provided text — it is referenced in the evaluation criteria document but its content is not available for review.
+
+With that important caveat, the documents that ARE available show no evidence of compliance-over-outcomes pathology. The evaluation criteria establish an adjectival rating system (Outstanding through Unacceptable) focused on technical merit — hardware, software/licensing, maintenance and support, and installation services — evaluated against SOW conformance. There is no evidence of layered reporting cadences, mandated report formats, weekly/monthly/quarterly overlapping status reports, or plan-adherence tracking mechanisms. The acceptance clause (Section 9 of ANL-71COM) is deliverable-quality focused: the Laboratory tests whether supplies conform to requirements and can require repair, replacement, or reperformance. The site safety supplement (ANL-366M) contains process requirements (JSA submission, incident reporting, safety orientations) but these are legitimate safety compliance mechanisms for on-site physical work, not QA theater substituting for outcome measurement.
+
+The solicitation is fundamentally a hardware procurement with a pass/fail responsibility determination and a best-value technical evaluation. The absence of the SOW prevents full analysis of any maintenance/support reporting requirements that might exist, but the visible accountability structure is appropriately outcome-oriented for this type of acquisition. The severity is assessed as 1 — minimal — with the caveat that the missing SOW could contain reporting requirements that would change this assessment if reviewed.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Argonne intends to award a contract on a best-value basis. Best value is expected to result from selection of the proposal that offers the greatest overall value to the Laboratory, considering technical merit, contractor responsibility, and price.</blockquote>
+  <div class="ev-explanation">The evaluation framework is outcome-oriented at its core — it asks whether the proposal delivers value, not whether the vendor will follow a prescribed process. This is a positive indicator against compliance-over-outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>The Laboratory reserves the right to inspect or test any supplies or services that have been tendered for acceptance. The Laboratory may require repair or replacement of nonconforming supplies or reperformance of nonconforming services at no increase in contract price.</blockquote>
+  <div class="ev-explanation">The acceptance mechanism is deliverable-quality focused — it tests whether hardware and services meet specifications, not whether the vendor completed paperwork. This is outcome-oriented accountability appropriate for a hardware procurement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a compute cluster hardware acquisition (NAICS 334111 — Electronic Computer Manufacturing), which is fundamentally a commercial goods and services procurement. The available documents — representations and certifications, standard Argonne terms and conditions, insurance and safety supplements, evaluation criteria, and tax exemption documentation — do not contain the structural patterns that constitute insider rewards. The evaluation criteria document (Enclosure No. 4) establishes a best-value framework with adjectival technical ratings and a pass/fail business/management determination. Crucially, neither the evaluation criteria nor any other document imposes specific prior-contract dollar thresholds, requires a minimum number of completed federal contracts in a narrow domain, mandates federal-specific experience as opposed to commercial experience, or awards bonus points for incumbency proxies. The business/management responsibility check references &#x27;past performance record&#x27; generically alongside financial capability and delivery ability — standard FAR-aligned language that does not structurally favor an incumbent. The technical criteria focus on conformance to the SOW&#x27;s hardware, software, and installation requirements, which any qualified compute hardware vendor could address based on capability rather than contract history. It is worth noting that Appendix 1 — the detailed technical criteria — was referenced but its full content was not included in the provided text. If that appendix contains specific prior-contract experience requirements with dollar thresholds or federal-specific mandates, the severity rating could increase. Based on the available content, however, this solicitation does not exhibit meaningful insider rewards characteristics. A qualified compute hardware vendor without prior Argonne contract history could realistically compete on the merits of their proposed system.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>In making this determination, the Laboratory may consider factors including, but not limited to, the Offeror&#x27;s general business integrity, financial and organizational capability, past performance record, ability to comply with required delivery or performance schedules, and any other information relevant to the Offeror&#x27;s responsibility.</blockquote>
+  <div class="ev-explanation">The business/management evaluation is pass/fail only and considers broad, capability-focused factors. Past performance is listed as one of several factors without specifying dollar thresholds, federal-specific experience mandates, or lookback windows. This is standard contractor responsibility language, not an insider reward.</div>
+</div><div class="evidence-item">
+  <blockquote>Technical Proposals will be evaluated in the following areas, listed in descending order of importance: Overall Technical Requirements (Including, but not limited to, hardware, software, and licensing); Maintenance and Support; Installation Services</blockquote>
+  <div class="ev-explanation">The technical evaluation criteria focus on the substance of the proposed solution — hardware, software, licensing, maintenance, and installation — rather than on the vendor&#x27;s history of winning comparable contracts. No dollar thresholds, federal contract quantity requirements, or narrow domain experience mandates are visible in the evaluation structure.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is overwhelmingly administrative and contractual in nature. The documents provided are: a Representations and Certifications form (ANL-70B), Argonne&#x27;s standard commercial Terms and Conditions (ANL-71COM), an Evaluation Criteria document, a Tax Exemption Certificate, and Moderate Risk On-Site Supplemental Conditions (ANL-366M). Notably absent from the provided text is the actual Statement of Work (SOW) for the Artemis Compute Cluster — the Evaluation Criteria document references &#x27;Appendix 1 – Technical Criteria&#x27; but its content is not included in the extracted text, and the SOW itself (&#x27;Artemis Compute Cluster&#x27;, dated May 6, 2026) is referenced but not provided in readable form. The documents that are present are standard boilerplate: FAR/DEAR clause incorporations, site safety requirements rooted in 10 CFR 851, insurance minimums, and administrative certifications. The on-site safety requirements in ANL-366M are prescriptive in some respects (JSA form, foreperson presence, specific PPE standards) but these are all safety-baseline requirements mandated by federal regulation or necessary for DOE site access — they are not substitutes for outcome definition in the technical scope. The Evaluation Criteria document is notably outcome-oriented: it uses adjectival ratings based on &#x27;approach and understanding of requirements,&#x27; lists three technical areas (Overall Technical Requirements, Maintenance and Support, Installation Services) without dictating how each must be performed, and emphasizes best-value selection. Without the SOW, I cannot assess whether the actual technical requirements exhibit sprawl. Based solely on available content, the solicitation shows no meaningful requirement sprawl — the prescriptive language that exists is either safety-mandated or administrative. Severity is 1 (minimal), with the caveat that the SOW — the document most likely to contain sprawl if it exists — was not provided in readable form.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall submit to the Project Specialist/Technical Representative and have reviewed by Laboratory, prior to the pre-job meeting, a JSA (activity hazard analysis, per 10 CFR 851; ANL-209M) which details the specific hazards associated with each phase of the job as well as the mitigating actions the contractor shall take to reduce the risk of injury.</blockquote>
+  <div class="ev-explanation">The JSA submission requirement is prescriptive about process steps (submit before pre-job meeting, use form ANL-209M, include specific content categories). However, this is a safety compliance requirement rooted in 10 CFR 851 and DOE site access rules — not a business process choice. It belongs in the safety-baseline category, not sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor&#x27;s Foreperson shall be present at all times work is being performed on site. If the contractor&#x27;s Foreperson must be off site, the contractor shall notify the Laboratory Project Specialist/Technical Representative of an alternate.</blockquote>
+  <div class="ev-explanation">This prescribes a specific staffing structure (named foreperson on-site at all times) rather than an outcome. However, this is a site safety and oversight requirement tied to DOE&#x27;s on-site contractor management obligations under 10 CFR 851, and it is common and appropriate for physical installation work at a federal laboratory. It does not meaningfully constrain how the vendor designs or delivers the compute cluster itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics driven primarily by two sources: the 43-clause incorporation-by-reference block in Appendix A (ANL-71COM) and the ES&amp;H supplement (ANL-366M). The former provides threshold-based applicability notes for many clauses — a genuine mitigating factor that distinguishes this from a severe rule pool — but includes several clauses (nuclear criticality, Privacy Act, cargo preference) with no agency determination of whether the applicability conditions are actually met for this procurement. The latter cascades through nuclear and hazardous materials regulations that are implausible for a compute cluster installation context, without culling inapplicable standards.
+
+Critically, this is a hardware procurement (NAICS 334111) for a compute cluster — a relatively bounded scope of work involving equipment delivery, rack installation, cabling, and maintenance. The regulatory footprint implied by the full clause set is disproportionate to that scope. A vendor unfamiliar with ANL&#x27;s standard terms would need to assess nuclear criticality compliance, Privacy Act system-of-records obligations, cargo preference logistics requirements, and beryllium exposure programs before pricing a server installation.
+
+The mitigating factors are real: the Appendix A clauses are organized with threshold applicability notes rather than presented as a bare list; the FAR/DEAR citations are largely standard government contract boilerplate rather than agency-specific accumulations; and the solicitation is relatively short (39 pages total across all attachments) for a hardware acquisition of this type. The Representations and Certifications document (ANL-70B) also structures its requirements by dollar threshold, which provides some useful context.
+
+On balance, this reads as a competent but not curated compliance section — standard agency terms applied wholesale to a specific procurement without meaningful review of which clauses are operationally relevant to compute hardware installation. The absence of glaring contradictions (no policy prohibiting compute clusters cited in a compute cluster RFP) and the presence of some threshold-based differentiation keep this at severity 2 rather than 3. The nuclear and beryllium regulatory cascade for a data center installation is the most notable specific concern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>23-65 - Clauses Incorporated by Reference
+23. DEAR 952.203-70 – WHISTLEBLOWER PROTECTION FOR CONTRACTOR EMPLOYEES (DEC 2000) Applies to work on DOE-owned or leased sites.
+24. DEAR 970.5204-2 – LAWS, REGULATIONS, AND DOE DIRECTIVES (MAY 2018)
+25. FAR 52.203-6 – RESTRICTIONS ON SUBCONTRACTOR SALES TO THE GOVERNMENT (JUN 2020) (ALT 1) Applies to contracts &gt;SAT.
+26. FAR 52.203-12 – LIMITATION ON PAYMENTS TO INFLUENCE CERTAIN FEDERAL TRANSACTIONS (JUN 2020) Applies to contracts &gt;$200,000.
+[...through clause 65]</blockquote>
+  <div class="ev-explanation">Appendix A lists 43 clauses (items 23–65) incorporated by reference in a single block. While many include threshold-based applicability notes (e.g., &#x27;&gt;SAT&#x27;, &#x27;&gt;$200,000&#x27;), the list is undifferentiated in terms of operational relevance to the actual scope — procuring compute hardware, software, installation, and maintenance. Clauses addressing cargo preference for U.S.-flag vessels (FAR 52.247-64), Privacy Act systems of records (FAR 52.224-1, 52.224-2, 52.224-3), combating trafficking in persons for services performed outside the U.S. (FAR 52.222-50), and radiation protection (DEAR 952.223-72) are all presented at the same level as directly applicable requirements without explanation of how or whether they apply to this compute cluster procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>DEAR 952.223-72 RADIATION PROTECTION AND NUCLEAR CRITICALITY (APR 1984)
+The Contractor shall take all reasonable precautions in the performance of work under this contract to protect the safety and health of employees and of members of the public against the hazards of ionizing radiation and radioactive materials and shall comply with all applicable radiation protection and nuclear criticality safety standards and requirements (including reporting requirements) of DOE.</blockquote>
+  <div class="ev-explanation">This clause — requiring compliance with nuclear criticality safety standards and a management program submission within 30 days — is included in full text in the Moderate Risk on-site supplement (ANL-366M) for a compute cluster hardware procurement. A compute cluster installation poses no nuclear criticality hazard. No explanation is provided for why this clause appears, and a vendor reading the solicitation cannot determine whether this is a boilerplate carryover or a genuine requirement. Its inclusion without context or qualification is a meaningful compliance interpretation burden.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.224-1 PRIVACY ACT NOTIFICATION (APR 1984) Applies if contractor is required to design, develop, or operate a system of records on individuals subject to the Privacy Act of 1974...
+FAR 52.224-2 PRIVACY ACT (APR 1984) Applies to contracts when contractor employees will have access to a system of records; create collect, use, process, store, maintain, disseminate, disclose, dispose, or otherwise handle personally identifiable information; or design/develop, maintain, or operate a system of records.
+FAR 52.224-3 – PRIVACY ACT TRAINING (JAN 2017) Applies to contracts when contractor employees will have access to a system of records...</blockquote>
+  <div class="ev-explanation">Three Privacy Act clauses are cited for a compute hardware procurement. While ALCF systems may eventually process research data, the solicitation covers hardware supply, installation, and maintenance — not the design or operation of Privacy Act systems of records. The applicability conditions noted in the clauses themselves suggest these are conditional requirements, yet no determination is made in the solicitation as to whether those conditions are met. A vendor cannot tell if Privacy Act compliance training is actually required of installation technicians.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.247-64 – PREFERENCE FOR PRIVATELY OWNED U.S. – FLAG COMMERCIAL VESSELS (NOV 2021) Applies when involve transportation of supplies subject to the Cargo Preference Act of 1954.</blockquote>
+  <div class="ev-explanation">The Cargo Preference Act clause is included in the standard terms for a domestic compute cluster acquisition. While the clause notes its own conditional applicability, no determination is provided as to whether imported compute hardware components trigger this requirement. For a NAICS 334111 procurement potentially involving components manufactured abroad (the solicitation itself includes a foreign end-products table), this creates genuine uncertainty about whether ocean shipping compliance is required — without any guidance from the agency.</div>
+</div><div class="evidence-item">
+  <blockquote>Title 10 of the Code of Federal Regulations (CFR), Energy, Part 851, Worker Safety and Health Program (WSHP), which invokes:
+o Title 29 CFR, Labor, including but not limited to parts 1910 and 1926 as applicable;
+o Title 40 CFR, Protection of Environment;
+o Title 49 CFR, Transportation;
+o Title 10 CFR 820, Procedural Rules for DOE Nuclear Activities;
+o Title 10 CFR 850, Chronic Beryllium Disease Prevention Program;
+o Title 10 CFR 830, Nuclear Safety Management;
+o Other applicable state, federal, and local regulations</blockquote>
+  <div class="ev-explanation">The ES&amp;H section of ANL-366M invokes 10 CFR 851, which in turn cascades to six additional CFR parts — including 10 CFR 820 (DOE Nuclear Activities), 10 CFR 850 (Beryllium Disease Prevention), and 10 CFR 830 (Nuclear Safety Management). A compute cluster installation involves no nuclear activities or beryllium exposure hazards. The clause acknowledges this list &#x27;is not intended to be all inclusive,&#x27; compounding rather than resolving the ambiguity. Vendors must evaluate an open-ended cascade of nuclear safety regulations to determine which, if any, apply to racking servers.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation requests a Firm Fixed Price contract for the ALCF Artemis Compute Cluster — a compute hardware acquisition bundled with software/licensing, installation, and maintenance and support services. FFP is the appropriate contract type here for several reasons. First, the core deliverable is commercial compute hardware, a product category with established market prices, standard specifications, and competitive commercial suppliers. Hardware acquisitions are canonical use cases for FFP: the scope is defined (a specific cluster configuration), the deliverable is tangible, and vendors can price it with confidence. Second, the installation and maintenance/support components, while service-based, are routine and well-understood in the HPC procurement market — vendors regularly price these as fixed-price line items based on known labor and parts costs. Third, the evaluation criteria document explicitly contemplates price reasonableness evaluation, which is consistent with FFP where competitive pricing is expected to reflect market rates. There is no indication in the available documents of open-ended research, uncertain scope, or labor-intensive work with unpredictable quantities — the hallmarks of requirements that would favor T&amp;M or cost-reimbursement. The SOW is not fully visible in the provided text, but the description is consistent with a standard HPC cluster procurement. The Argonne Terms and Conditions also include standard commercial goods clauses (warranty, inspection and acceptance, packaging) reinforcing that this is predominantly a goods acquisition. FFP is well-aligned with this type of requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>You are invited to furnish a firm fixed price proposal to meet this requirement.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states that a Firm Fixed Price (FFP) contract type is being used for this acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>The RFP covers compute hardware, software/licensing, installation, and maintenance and support services which are the subject of this Request for Proposal (RFP).</blockquote>
+  <div class="ev-explanation">The requirement is for defined, tangible deliverables: specific compute hardware, associated software licenses, installation services, and maintenance/support. These are well-bounded commercial goods and services in NAICS 334111 (Electronic Computer Manufacturing), a category where commercial pricing is well-established.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Enclosure No. 2A - Appendix A ANL-71COM.pdf">Enclosure No. 2A - Appendix A ANL-71COM.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f8650a29a017403f81512fddb647061f_Enclosure+No.+2A+-+Appendix+A+ANL-71COM.pdf" download="Enclosure No. 2A - Appendix A ANL-71COM.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Enclosure No. 2C - Appendix E ANL-366M.pdf">Enclosure No. 2C - Appendix E ANL-366M.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f8650a29a017403f81512fddb647061f_Enclosure+No.+2C+-+Appendix+E+ANL-366M.pdf" download="Enclosure No. 2C - Appendix E ANL-366M.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Enclosure No. 4 - Evaluation Criteria.docx">Enclosure No. 4 - Evaluation Criteria.docx</div></div>
+  <a class="dl-btn" href="../attachments/f8650a29a017403f81512fddb647061f_Enclosure+No.+4+-+Evaluation+Criteria.docx" download="Enclosure No. 4 - Evaluation Criteria.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Enclosure No. 5 - ANL-70B.pdf">Enclosure No. 5 - ANL-70B.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f8650a29a017403f81512fddb647061f_Enclosure+No.+5+-+ANL-70B.pdf" download="Enclosure No. 5 - ANL-70B.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Enclosure No. 6 - Tax Exemption Certificate.pdf">Enclosure No. 6 - Tax Exemption Certificate.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f8650a29a017403f81512fddb647061f_Enclosure+No.+6+-+Tax+Exemption+Certificate.pdf" download="Enclosure No. 6 - Tax Exemption Certificate.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

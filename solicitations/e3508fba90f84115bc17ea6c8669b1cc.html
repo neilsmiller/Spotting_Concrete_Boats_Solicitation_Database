@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Support to Master Breacher Course — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Training Support to Master Breacher Course</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e3508fba90f84115bc17ea6c8669b1cc</span>
+      <a class="sam-link" href="https://sam.gov/opp/e3508fba90f84115bc17ea6c8669b1cc/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › MISSION INSTALLATION CONTRACTING COMMAND</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541990</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">07 Jul 2026 to 31 Dec 2026 (base), with options up to 5 years total</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Technical Capability</li><li>Mission Capability</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes problems. The available documentation — primarily a Q&amp;A sheet, a solicitation amendment, and evaluation criteria — provides limited visibility into the full PWS reporting structure, but what is visible does not suggest an excessive compliance apparatus. The evaluation framework is explicitly LPTA (pass/fail on technical, mission capability, and past performance), which is simple and does not layer in elaborate process-monitoring criteria. There is no evidence of overlapping reporting cadences, prescribed report formats, excessive meeting requirements, or QA surveillance language focused on plan adherence rather than results. The solicitation does require a Quality Control Plan prior to start of work, which is standard for services contracts and not inherently problematic on its own. The government&#x27;s answers are often outcomes-oriented in tone — e.g., key personnel are expected to &#x27;meet their expectations&#x27; however the contractor determines is best. The core limitation here is that the full PWS text is not reproduced in the provided excerpts, so a definitive assessment of all QA and reporting requirements is not possible. However, based on the nature of this contract (discrete training support courses for a military breacher course, valued around $210K per course iteration, structured as fixed-price CLINs), the administrative burden of elaborate compliance reporting would be disproportionate and there is no indication the agency designed the solicitation that way. Severity is rated 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Please confirm that the Quality Control Plan (QCP) is not required at proposal submission and is only required after award. [Gov Response:] Required prior to start of work. Not required at time of proposal submission.</blockquote>
+  <div class="ev-explanation">The solicitation requires a Quality Control Plan before work begins, which is a standard process compliance mechanism. However, the Q&amp;A reveals no detail about what the QCP must contain or how QA surveillance will operate — suggesting a lightweight requirement rather than an elaborate compliance apparatus.</div>
+</div><div class="evidence-item">
+  <blockquote>They are expected to meet their expectations, its up to the contractor if that requires full time, part time or collateral. [In response to key personnel question]</blockquote>
+  <div class="ev-explanation">The government&#x27;s response on key personnel reflects outcome-orientation — &#x27;meet their expectations&#x27; — rather than prescribing specific process requirements or hours. This is a positive signal away from compliance-over-outcomes thinking.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards problem, primarily driven by informational asymmetry rather than explicit experience thresholds or dollar-size requirements. The evaluation structure is LPTA (lowest price, technically acceptable), which theoretically opens competition to any vendor that can meet the pass/fail criteria. Past performance is explicitly stated to be acceptable for vendors with no prior performance. These are mitigating factors that prevent a severity-3 rating.
+
+However, several structural features tilt the playing field toward the incumbent. First, Mission Capability requires vendors to demonstrate SOF-specific understanding and identify SOF-specific personnel — a meaningful requirement given the sensitivity of the 75th Ranger Regiment&#x27;s breacher course. Second, and more significantly, the government has withheld the training curriculum and schedule on classification grounds, meaning new vendors cannot ground their technical or mission capability narratives in the actual course requirements. The incumbent (Rampdown Works LLC) possesses this knowledge from prior performance and can write a more credible, specific narrative as a result. Third, the government declined to share current staffing data, requiring newcomers to estimate labor from first principles while the incumbent already knows what staffing works.
+
+These factors combine to create a meaningful — though not insurmountable — advantage for the incumbent. A well-organized small business with genuine SOF training support experience could plausibly compete; the solicitation does not impose dollar thresholds, federal-specific experience mandates, or explicit lookback windows. But the practical information gap is real and consequential, particularly for a 9-day response window. The severity is assessed at 2 — the playing field is tilted but not closed.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Factor 3 Mission Capability - The offeror shall provide narrative descriptions outlining an understanding of Special Operations Forces (SOF) and identify SOF specific personnel as outlined in the PWS.</blockquote>
+  <div class="ev-explanation">This evaluation factor requires vendors to demonstrate SOF-specific knowledge and identify SOF-specific personnel. While not explicitly requiring prior work on this exact contract, the practical effect is that vendors without prior SOF training support experience — ideally on this or a closely analogous contract — would struggle to produce a credible narrative. The incumbent (Rampdown Works LLC) has direct familiarity with the 75th Ranger Regiment&#x27;s breacher course environment and can speak to SOF-specific requirements with concrete detail that a newcomer cannot easily replicate.</div>
+</div><div class="evidence-item">
+  <blockquote>Please provide incumbent contractor name, contract number, and current contract value. | Rampdown Works LLC, one course, $210,000</blockquote>
+  <div class="ev-explanation">The government confirmed an incumbent exists and disclosed the contract value. Combined with the SOF-specific knowledge requirement and the classified training schedules and course curriculum (which cannot be shared due to sensitivity), the incumbent holds significant informational advantages. A new vendor cannot review the course curriculum or training schedule to calibrate their technical or mission capability narrative, because &#x27;Course material and curriculum are not shareable due to TTPs and techniques associated with the sensitivity of the training.&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Training calendars are not shareable due to their classification levels... Course material and curriculum are not shareable due to TTPs and techniques associated with the sensitivity of the training.</blockquote>
+  <div class="ev-explanation">By withholding the training schedule and curriculum from prospective offerors, the government structurally advantages the incumbent. A vendor competing for the first time must write a technical and mission capability narrative about a course they cannot study. The incumbent already knows the course structure, pacing, target requirements, and operational rhythms. This is a form of institutional knowledge asymmetry that functions like an insider reward even if it is not intentionally designed as one.</div>
+</div><div class="evidence-item">
+  <blockquote>Current contractor proprietary information. [in response to: Please provide the current number of personnel (manning) supporting this requirement, including labor categories and approximate hours.]</blockquote>
+  <div class="ev-explanation">The government declined to share current staffing levels, labor categories, or approximate hours, citing contractor proprietary information. This means new vendors must estimate their staffing model from scratch using only the PWS and estimated workload data, while the incumbent already knows exactly what staffing is required to perform the work. This asymmetry inflates pricing risk for newcomers and makes it harder for non-incumbents to submit competitive, well-calibrated quotes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the available solicitation text, Q&amp;A document, and amendment, this solicitation exhibits moderate requirement sprawl (severity 2). The core indicators are: (1) the PWS mandates specific key personnel roles by title, which is a staffing structure prescription rather than a capability outcome requirement; (2) the Mission Capability evaluation factor requires vendors to identify specific SOF personnel &#x27;as outlined in the PWS,&#x27; suggesting the PWS pre-determines the personnel solution rather than defining the training support standard that must be met; (3) the contractor is required to provide all equipment, tools, and materials with no GFE, and the Q&amp;A exchanges suggest the PWS contains detailed specifications for target types and construction (Middle Eastern door attachments, jail doors, heavy/light/heavy metal doors with specific material requirements), which reads more like an operating manual for how to build training aids than a performance outcome. Mitigating factors prevent a severity 3 rating: the government&#x27;s evaluation approach is sensibly structured as LPTA (pass/fail on technical, mission capability, and past performance, with award to lowest price), which is appropriate for a well-understood repetitive task; the government does leave staffing time commitments to contractor discretion; and the Q&amp;A responses show some flexibility (e.g., clearance not required at award, QCP not required at proposal). The full PWS is not available in the extracted text, so the actual depth of step-by-step process prescription cannot be confirmed — the evidence available suggests moderate prescriptiveness rather than severe. A vendor responding to this solicitation would feel meaningfully constrained by personnel role requirements and material specifications, but would retain latitude on staffing levels, internal management approach, and scheduling logistics.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor will be responsible for providing all necessary management, supervision, travel, tools, supplies, equipment, and labor to perform comprehensive maintenance.</blockquote>
+  <div class="ev-explanation">This language bundles a broad set of input requirements (management, supervision, travel, tools, supplies, equipment, labor) rather than defining what the output of the work should be. It frames the requirement around providing inputs rather than achieving a training support outcome, which is a characteristic sprawl pattern — though at this summary level it may simply reflect imprecise drafting rather than deep prescriptiveness.</div>
+</div><div class="evidence-item">
+  <blockquote>Para 1.10 (Key Personnel) — Please confirm whether key personnel roles (Contract Manager, Quality Control Manager, Systems Administrator) are expected to be full-time, part-time, or collateral duties. Gov Response: They are expected to meet their expectations, its up to the contactor if that requires full time, part time or collateral.</blockquote>
+  <div class="ev-explanation">The PWS prescribes specific named roles (Contract Manager, Quality Control Manager, Systems Administrator) as key personnel. For a training support contract of this apparent scale (~$210K per course iteration), mandating three distinct named key personnel roles by title imposes a staffing structure rather than a capability requirement. However, the government&#x27;s answer does leave the time commitment to the contractor, which partially mitigates the prescriptiveness.</div>
+</div><div class="evidence-item">
+  <blockquote>Factor 3 Mission Capability - The offeror shall provide narrative descriptions outlining an understanding of Special Operations Forces (SOF) and identify SOF specific personnel as outlined in the PWS.</blockquote>
+  <div class="ev-explanation">This evaluation factor requires vendors to identify specific SOF-qualified personnel as prescribed in the PWS rather than demonstrating the capability to deliver the training outcome. This shifts the focus from &#x27;can you produce the required training support result&#x27; to &#x27;do you have the exact personnel type we have pre-determined is needed,&#x27; constraining the vendor&#x27;s ability to propose alternative staffing configurations that could achieve the same outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS General — Please clarify what materials and equipment are Government-furnished versus contractor-provided (e.g., target materials, tools, vehicles, disposal). Gov Response: No Government Furnished equipment.</blockquote>
+  <div class="ev-explanation">The absence of GFE combined with contractor responsibility for all tools, supplies, and equipment (including target materials, tools, vehicles, and disposal) suggests the PWS specifies a comprehensive and detailed list of what the contractor must provide and how maintenance/support activities are to be conducted, rather than simply defining the training support outcome. This pattern — specifying every input the contractor must furnish — is a marker of sprawl, though the full PWS text is not available for deeper analysis.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for Master Breacher Course training support does not exhibit rule pool behavior to any meaningful degree. The solicitation documents provided — including the Q&amp;A, SF30 amendment, and evaluation criteria — contain standard FAR/DFARS clauses incorporated by reference in the normal manner (52.212-2, 52.212-3, 52.217-8, 52.217-9, 252.232-7006 WAWF payment instructions). There is no &#x27;Applicable Documents&#x27; section, no bulk regulatory citation list, and no evidence of accumulated policy lists from prior contract iterations. The compliance requirements visible in the solicitation are appropriately scoped: WAWF invoicing instructions for payment processing, standard FAR commercial acquisition provisions, and SAM.gov registration — all of which are universally applicable to federal commercial contracts and require no contextual explanation. The security requirements are minimal and clearly contextualized (the Q&amp;A explicitly clarifies that a Secret clearance is not required at award and will only be required if the 75th Ranger Regiment identifies a future need). The evaluation factors (Price, Technical Capability, Mission Capability, Past Performance) are clearly explained with pass/fail criteria and no ambiguous regulatory compliance burdens attached to them. The full solicitation package was not completely reproduced in the provided text, so there is some residual uncertainty about whether the PWS contains a longer applicable documents list — the Q&amp;A references a PWS and attachments. However, the Q&amp;A responses themselves show no signs of regulatory complexity being managed through the Q&amp;A process; vendor questions focused on scope, personnel, pricing structure, and security clearances rather than confusion about applicable regulations. Given what is available, this solicitation appears to be a focused, straightforward small business set-aside with a narrow compliance footprint appropriate to its scope. Severity 1 is warranted.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation appropriately uses a firm-fixed-price contract structure for what is fundamentally a well-defined, recurring training support service. The core requirement — providing target support and training aids for the Regimental Master Breacher Course — is a repeatable, course-based deliverable with known historical pricing (approximately $210,000 per course iteration and 3 courses annually). The government has historical data sufficient to underpin an IGCE, and the incumbent contractor has already performed the work, establishing a cost baseline. The CLINs are structured per course iteration, which aligns naturally with FFP: you pay a fixed amount per course supported. While there is some variability (training schedules may shift within the fiscal year, a potential 4th course has a different scope), these are managed through the option CLIN structure and the government&#x27;s explicit acknowledgment that an amended PWS would be issued for the 4th course. The variability in scheduling does not undermine FFP suitability because the unit of work (one course iteration) remains consistent and predictable in scope. There is no indication of open-ended labor requirements, undefined deliverables, or scope uncertainty that would make T&amp;M or cost-reimbursement more appropriate. FFP is the correct contract type here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award a Firm-Fixed price contract using price and other non-price factors, in accordance with procedures in the Federal Acquisition Regulation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract will be firm-fixed-price (FFP). This is the key contract type designation against which the requirements must be evaluated.</div>
+</div><div class="evidence-item">
+  <blockquote>3 annual courses with the possibility to conduct a 4th course. The 4th course POI would differ slightly and an amended PWS would be submitted for the 4th course specifically.</blockquote>
+  <div class="ev-explanation">The core recurring requirement — supporting 3 annual courses of the Master Breacher training — is a known, repeatable deliverable. Each course iteration involves a defined set of target support and training aids as specified in the PWS. The predictable, recurring nature of 3 courses per year supports FFP pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>Rampdown Works LLC, one course, $210,000</blockquote>
+  <div class="ev-explanation">The incumbent contract history provides a concrete per-course price point of $210,000. Historical pricing data makes it feasible to estimate costs accurately, which supports the use of FFP rather than T&amp;M or cost-reimbursement.</div>
+</div><div class="evidence-item">
+  <blockquote>The estimated workload was part of independent government estimate and was used for estimated pricing based on historical data only.</blockquote>
+  <div class="ev-explanation">The government conducted an IGCE based on historical data, further confirming that the scope and level of effort are sufficiently predictable to support fixed-price contracting.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Question and Answer RMBC Base Plus Four.pdf">Question and Answer RMBC Base Plus Four.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e3508fba90f84115bc17ea6c8669b1cc_Question+and+Answer+RMBC+Base+Plus+Four.pdf" download="Question and Answer RMBC Base Plus Four.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RMBC_PWS.pdf">RMBC_PWS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e3508fba90f84115bc17ea6c8669b1cc_RMBC_PWS.pdf" download="RMBC_PWS.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - W9124M26QA0060001 SF 1449.pdf">Solicitation - W9124M26QA0060001 SF 1449.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e3508fba90f84115bc17ea6c8669b1cc_Solicitation+-+W9124M26QA0060001+SF+1449.pdf" download="Solicitation - W9124M26QA0060001 SF 1449.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment W9124M26QA0060001 SF 30.pdf">Solicitation Amendment W9124M26QA0060001 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e3508fba90f84115bc17ea6c8669b1cc_Solicitation+Amendment+W9124M26QA0060001+SF+30.pdf" download="Solicitation Amendment W9124M26QA0060001 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

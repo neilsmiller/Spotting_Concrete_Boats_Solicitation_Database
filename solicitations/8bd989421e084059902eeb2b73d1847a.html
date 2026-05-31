@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jakarta Tail Site Internet Connectivity — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Jakarta Tail Site Internet Connectivity</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 8bd989421e084059902eeb2b73d1847a</span>
+      <a class="sam-link" href="https://sam.gov/opp/8bd989421e084059902eeb2b73d1847a/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-22</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › US EMBASSY JAKARTA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-22</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months from date of contract award) + 4 option years (12 months each), not to exceed 5 years total</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>C-SCRM Go/No-Go Evaluation Factor</li><li>Technical</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a mixed picture that warrants a moderate severity rating rather than severe. On the positive side, the document includes genuine outcome-oriented accountability mechanisms: a defined 99.9% availability SLA, a ≤0.5% packet loss threshold, a detailed downtime credit calculation methodology with financial consequences, a 24-hour acceptance testing period, and a requirement for contractor-provided performance monitoring tools. These are real outcome metrics, not compliance theater.
+
+However, the QASP — the dedicated quality assurance surveillance mechanism — is structurally compliance-focused. Its primary surveillance method is complaint collection, and its sole performance threshold is &#x27;no more than one customer complaint per month.&#x27; The COR&#x27;s role is to receive, document, and route complaints — not to proactively interrogate the monitoring data the contractor is required to provide. The technical SLA thresholds that exist elsewhere in the document are not operationalized within the QASP. This creates a situation where the government has specified good outcome metrics but built its quality assurance process around a reactive, process-oriented mechanism that could miss real performance degradation that never rises to the level of a formal complaint.
+
+This is a classic moderate case: the solicitation is not devoid of outcome thinking, but the formal QA structure does not fully reflect the outcome standards that exist in the technical requirements. The sin is present but contained — the downtime credit regime and SLA provisions provide meaningful backstop accountability, preventing a severity 3 rating. The primary deficiency is the QASP&#x27;s failure to incorporate the existing technical metrics into its surveillance methodology.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>STANDARD. The performance standard is that the Government receives no more than one (1) customer complaint per month. The COR shall notify the Contracting Officer of the complaints so that the Contracting Officer may take appropriate action to enforce the inspection clause (FAR 52.212.4, Contract Terms and Conditions - Commercial Products and Commercial Services (NOV 2023), if any of the services exceed the standard.</blockquote>
+  <div class="ev-explanation">The primary quality standard in the QASP is a complaint-counting mechanism: success is defined as receiving no more than one customer complaint per month. This is a process/perception proxy rather than a true outcome metric. It does not measure whether the internet service actually performed well — only whether anyone bothered to complain. A circuit could degrade significantly without triggering a formal complaint, and this standard would register no failure.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Objective: Services. Performs all internet services set forth in the scope of work. Scope of Work Para: 1. thru 6. Performance Threshold: All required services are performed and no more than one (1) customer complaint is received per month.</blockquote>
+  <div class="ev-explanation">The QASP performance matrix in the solicitation collapses all service delivery into a single vague threshold — &#x27;all required services are performed&#x27; — coupled again with the complaint-count measure. There are no measurable outcome thresholds tied to the technical SLA metrics (packet loss, latency, jitter, throughput) already specified elsewhere in the document. The performance surveillance plan does not reference the 99.9% availability standard or ≤0.5% packet loss requirement as surveillance criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>SURVEILLANCE. The COR will receive and document all complaints from Government personnel regarding the services provided. If appropriate, the COR will send the complaints to the Contractor for corrective action.</blockquote>
+  <div class="ev-explanation">The surveillance methodology is entirely reactive and complaint-driven. The COR is not directed to proactively monitor bandwidth utilization, circuit availability logs, packet loss data, or SLA compliance — even though the solicitation requires the contractor to provide &#x27;24/7/365 visibility into the meshed network to monitor performance.&#x27; The government is not required to use that monitoring capability for QA purposes; instead it waits for staff to lodge complaints.</div>
+</div><div class="evidence-item">
+  <blockquote>High quality performance, the following parameters in a vendor&#x27;s Service Level Agreement (SLA) should be used: a. Packet Loss &lt;=.5% b. Availability of 99.9%. Bandwidth monitoring connection with software access allowing U.S. Embassy Jakarta 24/7/365 visibility into the meshed network to monitor performance and identify hard outages or network saturation.</blockquote>
+  <div class="ev-explanation">This is a mitigating factor: the solicitation does specify concrete technical SLA thresholds (availability 99.9%, packet loss ≤0.5%) and requires contractor-provided monitoring tools. These are outcome-oriented requirements. However, the QASP — the actual QA enforcement mechanism — does not reference or operationalize these metrics. The SLA thresholds live in the technical specifications but are not wired into the surveillance plan, creating a gap between stated standards and actual accountability.</div>
+</div><div class="evidence-item">
+  <blockquote>Credits shall be assessed against the Contractor in those instances where the circuit during any given month or year that fail to achieve and sustain the minimum acceptance standards stated above... Downtime Credits shall be assessed based on cumulative downtime time with the minimum assessment being one hour.</blockquote>
+  <div class="ev-explanation">The downtime credit mechanism is a meaningful outcome-linked accountability tool — financial consequences attach to measured unavailability. This partially offsets the compliance-over-outcomes problem in the QASP. However, the credit regime is triggered only by reported outages documented through the Remedy Ticket process, which still depends on the government initiating contact with the carrier. There is no provision for automated or contractor-initiated reporting of availability shortfalls against the 99.9% threshold.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards patterns. The past performance requirements are capability-focused and broadly framed: offerors must show they are established ISPs with relevant experience, but there are no minimum dollar thresholds per contract, no minimum number of prior federal contracts, no requirement for U.S. government-specific experience, and no evaluation bonus points for having previously held this specific contract. The 7-year lookback window, while longer than average, actually benefits new entrants by allowing a broader range of historical experience rather than restricting to a narrow recent window. The evaluation criteria are structured as a comparative evaluation under FAR 13, with technical quality and price as the primary discriminators — not a points-based system that awards extra credit for prior incumbency. The requirement for local Indonesian presence and licenses is operationally justified, not an incumbency screen. The C-SCRM go/no-go factor is a security compliance requirement, not an experience threshold. In sum, a qualified Indonesian ISP without prior U.S. Embassy contracts could realistically compete: the solicitation tests whether vendors can provide the required internet services at the specified locations to the specified technical standards, not whether they have previously done so for the U.S. government at a specific dollar scale. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>List of clients over the past 7 years, demonstrating prior experience as telecommunication&#x27;s internet service provider (ISP) with relevant past performance information and references (provide dates of contracts, places of performance, value of contracts, contact names, telephone numbers and email addresses).</blockquote>
+  <div class="ev-explanation">The solicitation requests a 7-year client list, which is a longer lookback window than many solicitations. However, it does not impose a minimum dollar threshold, a minimum number of contracts, or a requirement that prior experience be with the U.S. federal government specifically. Any established ISP operating in Indonesia for several years could respond to this. The window is broad, not narrow.</div>
+</div><div class="evidence-item">
+  <blockquote>Evidence that the offeror/quoter operates an established business with a permanent address and telephone listing in Indonesia.</blockquote>
+  <div class="ev-explanation">This requires local presence in Indonesia, which is a practical operational necessity for providing terrestrial internet services to specific physical locations in Jakarta. It is not an incumbency proxy — any Indonesian ISP with physical infrastructure could meet this requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation contains meaningful prescriptive sprawl, primarily concentrated in the technical specifications section of the SOW, but it does not rise to severe levels because the core performance outcomes are well-defined (bandwidth minimums, 99.9% availability SLA, packet loss thresholds, dedicated/unshared service) and the evaluation criteria remain outcome-oriented.
+
+The most significant sprawl pattern is legacy boilerplate carry-over: multiple passages reference T-1 circuit architecture, DSU/DCE interfaces, CCITT specifications, and 1.544 Mbps transparency requirements — all anachronistic for a modern fiber internet service. This strongly suggests the SOW was adapted from an older telecom contract template without substantive revision, and these passages prescribe implementation assumptions rather than outcomes.
+
+A second pattern is physical hardware specification beyond what security or interoperability needs justify: specific fiber connector types (50-micron SC MM), rack-mounting mandates, dual-voltage requirements (partially defensible in Jakarta), and per-service physical connector topology. These constrain how vendors provision equipment rather than defining what the government needs operationally.
+
+Mitigating factors keep this at severity 2 rather than 3: the NDAA Section 889 Huawei/ZTE prohibition is a legitimate legal mandate, not sprawl. The SLA metrics (99.9% availability, ≤0.5% packet loss, 99.9% BER standard) are genuine outcome definitions. The QASP, while using a weak &#x27;one customer complaint per month&#x27; threshold, is at least outcome-structured. The bandwidth scalability provisions give the government flexibility. The solicitation reads as a competent procurement with pockets of prescriptive legacy language rather than a comprehensively process-dictating document.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ISP interface connectors: 50-micron SC fiber connector (MM-multimode) – Gigabit interface. Internet Service Provider (ISP) must provide all data media converters or transmission devices in all cases.</blockquote>
+  <div class="ev-explanation">This prescribes a specific physical connector type (50-micron SC fiber, multimode) rather than specifying a connectivity performance outcome. A vendor might achieve the required bandwidth and reliability using alternative fiber standards (e.g., single-mode, different connector formats), but this requirement locks them into a specific implementation choice that has no clear security or legal mandate behind it.</div>
+</div><div class="evidence-item">
+  <blockquote>ISP must permit ping and trace route traffic from 169.252.0.0/16 and 169.253.0.0/16 to the ISP connection (LC fiber Gigabit MM router interface which terminates Customer VPN encryption device).</blockquote>
+  <div class="ev-explanation">This specifies not only a network management function (ping/traceroute permissibility — a legitimate outcome need) but also the physical interface type (&#x27;LC fiber Gigabit MM router interface&#x27;). Specifying the termination interface type at this level of detail prescribes vendor hardware choices rather than the monitoring outcome the government needs.</div>
+</div><div class="evidence-item">
+  <blockquote>Power standard sources must be dual voltage (110v/60hz and 220v/50hz). Devices must be rack-mountable in a standard Commercial off-the-shelf (COTS) rack. One separate or individual physical interface connector is required per service.</blockquote>
+  <div class="ev-explanation">These are equipment form-factor mandates that go beyond the government&#x27;s actual operational need (reliable power and accessible equipment). While dual-voltage may be partially justified in an overseas context, mandating rack-mountability and connector-per-service topology prescribes how ISP equipment must be physically installed rather than what reliability or serviceability outcome must be achieved.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide sufficient technical support to ensure uninterrupted end-to-end service between such terminal points as are covered in this contract. The Contractor shall provide, properly adjust, and maintain the circuit for continuous Department of State use... If required, signal element timing shall be provided by the Contractor&#x27;s facility.</blockquote>
+  <div class="ev-explanation">While service continuity is a legitimate outcome, this section layers in specific technical implementation language — &#x27;signal element timing,&#x27; &#x27;Data Service Unit (DSUs) configured with a Data Communications Equipment (DCE) interface&#x27; — that appears carried over from legacy telecom contract boilerplate (T-1 era specifications). These prescribe internal technical implementation details rather than end-state performance, and the T-1/DSU framing is anachronistic for a modern fiber internet services contract.</div>
+</div><div class="evidence-item">
+  <blockquote>The circuit shall be completely transparent to the 1.544 Mbps data, with no bits added to or deleted from the bit stream provided to the interface of the Department of State equipment. The circuit shall be supplied for the transmission of a multiplexed aggregate bit stream for telegraphic and data signals. All other characteristics will be in accordance with International Telegraph and Telephone Consultative Committee (CCITT) specifications.</blockquote>
+  <div class="ev-explanation">This language references 1.544 Mbps (T-1 rate), &#x27;multiplexed aggregate bit stream for telegraphic signals,&#x27; and the CCITT — an ITU predecessor body superseded in 1992. This is copy-pasted legacy boilerplate from older telecom contracts and is technically inapplicable to a modern 100-300 Mbps fiber internet service. It prescribes obsolete implementation assumptions rather than current outcome requirements, which is a hallmark of incumbent-capture sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of rule pools. It is not a severe example — the core technical requirements are well-articulated with genuine specificity (fiber optic connectors, IP subnet specifications, SLA parameters, NDAA Section 889 compliance), and many of the regulatory citations are legitimately applicable to an overseas Embassy procurement. The solicitation is also working with a standard State Department template, which explains much of the clause volume.
+
+However, several patterns consistent with rule pooling are evident. First, a number of checked clauses in 52.212-5 — particularly the child labor, text-messaging-while-driving, and sustainable products clauses — appear to be checked from a master list without evaluation of whether they govern an Indonesian ISP connectivity contract. Second, the inclusion of three simultaneous variants of 52.219-1 (small business representations) for a procurement explicitly targeting local Indonesian vendors is a clear template carryover that was never reviewed for applicability. Third, 652.229-70 (excise tax exemption for contractors &#x27;within the United States&#x27;) is facially inapplicable to a local Indonesian service provider and signals copy-forward accumulation. Fourth, elevating the C-SCRM Software Producer Attestation to a Go/No-Go gate without explaining its applicability to a service-only ISP contract creates unexplained compliance burden.
+
+The mitigating factors that prevent a severity 3 rating are significant: the solicitation does not have a dedicated &#x27;Applicable Documents&#x27; bulk list of 20-50 items; the technical requirements section is focused and well-specified; the most clearly applicable compliance frameworks (NDAA Section 889, C-SCRM, SAM registration, telecommunications-specific SLA requirements) are cited with reasonable context; and the overall regulatory volume, while elevated, is characteristic of the State Department&#x27;s standard commercial acquisition template rather than an egregious accumulation. The problems here are boilerplate inheritance and insufficient template customization for a foreign ISP acquisition — a moderate compliance interpretation burden but not an impenetrable wall of regulations.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.212-5 CONTRACT TERMS AND CONDITIONS REQUIRED TO IMPLEMENT STATUTES OR EXECUTIVE ORDERS—COMMERCIAL PRODUCTS AND COMMERCIAL SERVICES (OCT 2025) ... (b) The Contractor shall comply with the FAR clauses in this paragraph (b) that the Contracting Officer has indicated as being incorporated in this contract by reference ... _X_ (32) 52.222-19, Child Labor—Cooperation with Authorities and Remedies (Jan 2025)( E.O. 13126). ... _X_ (46) 52.223-23, Sustainable Products and Services (May 2024) ... _X_ (55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024) ( E.O. 13513).</blockquote>
+  <div class="ev-explanation">Several checked clauses have questionable relevance to an overseas ISP connectivity contract for the U.S. Embassy Jakarta. 52.222-19 (Child Labor) and 52.226-8 (Ban Text Messaging While Driving) are domestic labor/safety-oriented requirements that have minimal logical application to a foreign telecommunications service provider in Indonesia supplying internet circuits. 52.223-23 (Sustainable Products and Services) similarly has tenuous application to a service contract for internet bandwidth provisioning. These appear to be checked because they are on the standard 52.212-5 checklist rather than because someone evaluated their applicability to this specific overseas ISP procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>52.228-3 WORKERS&#x27; COMPENSATION INSURANCE (DEFENSE BASE ACT) (JUL 2014) ... 52.228-5 INSURANCE - WORK ON A GOVERNMENT INSTALLATION (JAN 1997)</blockquote>
+  <div class="ev-explanation">The Defense Base Act (DBA) workers&#x27; compensation clause is incorporated by reference, and the cover letter also instructs: &#x27;The Offeror shall include Defense Base Act (DBA) insurance premium costs covering employees.&#x27; DBA applies to contractors performing work on overseas U.S. government bases. While arguably applicable if technicians perform installation work on Embassy premises, its blanket inclusion without explanation of which employees or activities are covered creates ambiguity. A local Indonesian ISP providing a managed telecommunications service may not have employees who clearly fall under DBA coverage, yet the clause is applied without qualification or context.</div>
+</div><div class="evidence-item">
+  <blockquote>52.225-14 INCONSISTENCY BETWEEN ENGLISH VERSION AND TRANSLATION OF CONTRACT (FEB 2000) ... 652.225-71 SECTION 8(A) OF THE EXPORT ADMINISTRATION ACT OF 1979, AS AMENDED (AUG 1999) [full text provided covering Arab League boycott of Israel] ... 652.229-70 EXCISE TAX EXEMPTION STATEMENT FOR CONTRACTORS WITHIN THE UNITED STATES (JUL 1988)</blockquote>
+  <div class="ev-explanation">652.229-70 is titled &#x27;Excise Tax Exemption Statement for Contractors WITHIN THE UNITED STATES&#x27; and states &#x27;This is to certify that the item(s) covered by this contract is/are for export solely for the use of the U.S. Foreign Service Post.&#x27; This clause appears to be a boilerplate carryover that was written for domestic suppliers exporting goods; it is awkward and potentially inapplicable to a local Indonesian ISP providing in-country telecommunications services that are never &#x27;exported.&#x27; Its inclusion without any contextual note about applicability suggests copy-forward accumulation rather than deliberate curation.</div>
+</div><div class="evidence-item">
+  <blockquote>THE FOLLOWING FEDERAL ACQUISITION REGULATIONS (FAR) CLAUSES ARE INCORPORATED BY REFERENCE: CLAUSE TITLE AND DATE / 52.204-9 PERSONAL IDENTITY VERIFICATION OF CONTRACTOR PERSONNEL (JAN 2011) / 52.204-13 SYSTEM FOR AWARD MANAGEMENT MAINTENANCE (OCT 2018) / 52.204-18 COMMERCIAL AND GOVERNMENT ENTITY CODE MAINTENANCE (AUG 2020) / 52.209-5 Certification Regarding Responsibility Matters (Aug 2020) / 52.219-1 Small Business Program Representations (Feb 2024) / 52.219-1 Alt I Small Business Program Representations (Feb 2024) / 52.219-1 Alt II Small Business Program Representations (Mar 2023) / 52.225-14 INCONSISTENCY BETWEEN ENGLISH VERSION AND TRANSLATION OF CONTRACT (FEB 2000) / 52.228-3 WORKERS&#x27; COMPENSATION INSURANCE (DEFENSE BASE ACT) (JUL 2014) / 52.228-5 INSURANCE - WORK ON A GOVERNMENT INSTALLATION (JAN 1997) / 52.229-6 TAXES-FOREIGN FIXED-PRICE CONTRACTS (FEB 2013) / 52.232-39 UNENFORCEABILITY OF UNAUTHORIZED OBLIGATIONS (JUNE 2013)</blockquote>
+  <div class="ev-explanation">52.219-1 (Small Business Program Representations) and its two alternates are incorporated by reference despite this being an unrestricted overseas procurement of a local Indonesian ISP — a context in which U.S. small business program representations have no practical relevance. The vendor base is foreign firms operating in Indonesia; none would be registered as U.S. small businesses. Three variants of 52.219-1 are listed simultaneously (base, Alt I, Alt II), which is procedurally unusual and suggests the clause was included from a standard template without review of applicability to this foreign-vendor acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>Section I, Pricing ... Section 5 Representations and Certifications ... 5.The Offeror should submit a completed IRS Form W-14 ... 6. Proof of SAM Registration 7. CYBERSECURITY SUPPLY CHAIN RISK MANAGEMENT (C-SCRM) C-SCRM Questionnaire and C-SCRM Software Producer Attestation Form</blockquote>
+  <div class="ev-explanation">The C-SCRM Software Producer Attestation Form is required as a submission item and is a Go/No-Go evaluation factor. However, the primary deliverable under this contract is a telecommunications connectivity service (internet circuits/bandwidth), not software. The SCRM attestation form is oriented toward software development practices. Its elevation to a mandatory Go/No-Go gate for an ISP providing fiber internet connectivity — where no custom software is being developed or delivered — lacks contextual justification in the solicitation. While some network equipment has embedded software, no explanation is provided for why a Software Producer Attestation Form is required for a service contract of this nature.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm Fixed Price for the procurement of commercially available telecommunications services — dedicated internet circuits and broadband connections at specified Embassy locations in Jakarta. FFP is the correct and standard contract type for this requirement. The scope is clearly defined: specific bandwidths (100 Mbps minimum for OpenNet, up to 300 Mbps for NEN residential), specific locations, specific SLA parameters (99.9% availability, ≤0.5% packet loss), and fixed 12-month performance periods with option years. ISPs in the commercial market routinely price these services at fixed monthly rates, which is exactly what the CLIN structure reflects. There is no labor uncertainty, no evolving requirements, and no research or development element that would argue for T&amp;M or cost-reimbursement. The separate installation CLINs (non-recurring) are also FFP, which is appropriate for one-time installation tasks with predictable costs. The solicitation includes a downtime credit mechanism that further protects the government against non-performance under the fixed price structure. The minor tension — that the government reserves the right to increase or decrease bandwidth within 30 days notice — is addressed through a bandwidth adjustment provision with &#x27;fractional T-1 fixed cost pricing&#x27; for changes, which is a standard commercial arrangement. This is a textbook appropriate use of FFP for commercial services procurement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>In consideration of satisfactory performance of all scheduled services required under this contract, the Contractor shall be paid a firm fixed price for all services.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly adopts a Firm Fixed Price structure across all CLINs — monthly recurring charges for dedicated internet and broadband circuits at defined locations. This is appropriate because the deliverable (continuous connectivity at specified bandwidth thresholds) is well-defined, commercially available, and priced on a per-month basis by ISPs operating in this market.</div>
+</div><div class="evidence-item">
+  <blockquote>Contract Line Item # | Description of Services | Quantity | Monthly Price | Total Firm-Fixed Price ... 1 | OpenNet – Extension at the Hang Jebat warehouse ... One (1) dedicated Internet channel. Digital bandwidth must be at minimum of 100 Mbps | 12 Months</blockquote>
+  <div class="ev-explanation">Each CLIN is structured as a fixed monthly price for a defined service level (bandwidth floor, fiber connectivity, 99.9% SLA). The scope is stable and commercially benchmarkable: ISPs in Jakarta routinely quote fixed monthly rates for dedicated circuits. There is no ambiguity about what is being purchased or how much it will cost over time.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="US Embassy Jakarta Solicitation Internet Tail Site Connectivity.pdf">US Embassy Jakarta Solicitation Internet Tail Site Connectivity.pdf</div></div>
+  <a class="dl-btn" href="../attachments/8bd989421e084059902eeb2b73d1847a_US+Embassy+Jakarta+Solicitation+Internet+Tail+Site+Connectivity.pdf" download="US Embassy Jakarta Solicitation Internet Tail Site Connectivity.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

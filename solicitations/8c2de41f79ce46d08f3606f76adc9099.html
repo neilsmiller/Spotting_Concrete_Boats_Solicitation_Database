@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KnowItAll IR Spectral Library Subscription — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>KnowItAll IR Spectral Library Subscription</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 8c2de41f79ce46d08f3606f76adc9099</span>
+      <a class="sam-link" href="https://sam.gov/opp/8c2de41f79ce46d08f3606f76adc9099/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2025-11-13</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DCSO › DCSO PHILADELPHIA › DCSO PHILADELPHIA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-11-13</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 option years (Base Year: November 15, 2025 – November 14, 2026; Option Year 1: November 15, 2026 – November 14, 2027; Option Year 2: November 15, 2027 – November 14, 2028; Option Year 3: November 15, 2028 – November 14, 2029; Option Year 4: November 15, 2029 – November 14, 2030)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest priced</li><li>Technically acceptable</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a brand-name commercial software subscription — the KnowItAll IR Spectral Library from Wiley — procured through NASA SEWP V as a firm-fixed-price delivery order. The nature of the acquisition is a simple product subscription: the vendor either delivers access to the spectral library or it does not. There are no services, no development activities, no project management, and no performance work statement. Accordingly, the solicitation contains no reporting requirements, no QA surveillance plan, no prescribed meeting cadences, and no process compliance mechanisms of any kind. The evaluation and award criteria are purely commercial: lowest priced technically acceptable, with technical acceptability meaning acceptance of solicitation terms. While the absence of any performance metrics (e.g., uptime SLAs, database currency requirements, or access reliability standards) is notable, this is consistent with the acquisition of a COTS software subscription rather than a managed service. The solicitation does not exhibit compliance-over-outcomes behavior because it does not impose any QA process at all — there is simply nothing to measure compliance against. The Section 508 VPAT requirement is the closest thing to a process deliverable, but it is a legitimate accessibility conformance check, not compliance theater. Overall severity is 1: there are no meaningful compliance-over-outcomes problems in this solicitation because the acquisition structure does not generate them.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Award shall be made to a responsible business offeror whose proposal is lowest priced and technically acceptable based on the total price of all line items identified in the Bill of Materials (BoM) attached to this solicitation. For this acquisition, offers that take no exception to the terms and conditions of the solicitation, including the requiring items, will be considered technically acceptable.</blockquote>
+  <div class="ev-explanation">The award decision is purely price-based (lowest priced technically acceptable), with technical acceptability defined solely as not taking exception to solicitation terms. There are no performance metrics, SLAs, or outcome criteria specified — however, for a straightforward commercial software subscription, this simplicity is appropriate rather than problematic.</div>
+</div><div class="evidence-item">
+  <blockquote>KnowItAll IR Spectral Library\nE-Procurement #: TBD\n(Use Reverse and/or Attach Additional Sheets as Necessary)</blockquote>
+  <div class="ev-explanation">The schedule of supplies/services lists the product as a single deliverable line item — a commercial software library subscription — with no reporting requirements, no QA surveillance plan, and no performance metrics. The absence of any reporting structure means there is no compliance-over-outcomes problem to speak of, though equally there are no outcome measures defined.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a brand-name specific commercial software subscription — the KnowItAll IR Spectral Library (Wiley SKU 978EALDB03150) — procured via NASA SEWP V as a firm-fixed price delivery order. The nature of the acquisition makes insider rewards analysis largely inapplicable. There are no experience requirements, no past performance evaluation criteria, no personnel qualifications, and no institutional knowledge demands imposed on offerors. Award is on a lowest-price, technically acceptable (LPTA) basis, where technical acceptability is defined solely as: &#x27;offers that take no exception to the terms and conditions of the solicitation, including the requiring items.&#x27; Any NASA SEWP V contract holder who can supply this specific Wiley product at an acceptable price can win. The restriction to NASA SEWP V holders does limit the vendor pool, but that is a function of the GWAC vehicle&#x27;s existing competition — not an insider rewards structure within this solicitation itself. The brand-name justification invokes FAR 16.505(b)(2) exception to fair opportunity, which is a separate competitive concern, but it does not operate as an experience requirement that rewards incumbency. There is no evaluation scoring system, no dollar-threshold past performance requirement, no federal-specific experience mandate, and no institutional knowledge prerequisite anywhere in the document. A qualified reseller new to this specific contract who holds a NASA SEWP V vehicle and can supply the Wiley product is on equal footing with any incumbent. This solicitation does not exhibit insider rewards characteristics.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward brand-name commercial subscription product — the Wiley KnowItAll IR Spectral Library — procured through NASA SEWP V. The acquisition is essentially a catalog purchase of a single SKU item with a five-year base-plus-options period of performance. The requirement statement is two sentences long. There is no Statement of Work, Performance Work Statement, or task description that could generate requirement sprawl. The bulk of the 61-page document (approximately 55 pages) consists of boilerplate FAR and DFARS contract clauses, representations and certifications, and standard solicitation provisions — none of which prescribe how a vendor must perform work, because the &#x27;work&#x27; is delivering access to a commercial product. The Section 508 requirements are legitimate legal compliance obligations, not sprawl. The WAWF invoicing instructions are administrative payment procedures, not process mandates. There is no staffing requirement, no workflow prescription, no task methodology, and no operational procedure specified anywhere in the document. The brand-name justification (invoking the exception to fair opportunity under FAR 16.505) means the government has already determined this specific product meets its need — which is a separate procurement policy question from whether requirements are outcome- or process-focused. For requirement sprawl analysis, this solicitation scores at the minimum severity level: the requirements section is so minimal that sprawl simply cannot manifest. The government said what it wants (a specific library subscription), not how it wants it done.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DLA Information Operations has a current requirement to procure brand-name specific KnowItAll IR Spectral Library access to support materiel ID analysis using FTIR instrumentation.</blockquote>
+  <div class="ev-explanation">This is the entire substantive requirement statement. It defines what is being procured (access to a named commercial spectral library) and what it supports (materiel ID analysis using FTIR instrumentation). It says nothing about how the vendor must deliver, install, configure, or maintain the product — because the product is a commercial subscription that delivers itself.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001-4001: KnowItAll® IR Spectral Library | Wiley | 978EALDB03150 | Qty: 1 | PoP: annual periods through 11/14/2030</blockquote>
+  <div class="ev-explanation">The schedule of supplies specifies a commercial off-the-shelf product by manufacturer, SKU number, and quantity. This is a brand-name COTS item procurement, not a service delivery requirement. Specifying the exact product by OEM part number is appropriate and necessary for this type of purchase — it is not sprawl, because there is no &#x27;how&#x27; to prescribe for delivering a spectral library subscription.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward brand-name software subscription: one SKU from Wiley (KnowItAll IR Spectral Library), procured through NASA SEWP V as a firm-fixed-price delivery order. The actual performance requirement is minimal — essentially a license renewal for a digital spectral database. Yet the solicitation incorporates dozens of FAR and DFARS clauses, several in full text, many of which have no logical connection to a software subscription.
+
+The most egregious examples are clauses that are facially inapplicable: DFARS 252.225-7052 (magnets, tantalum, and tungsten restrictions) occupies approximately four pages of full text in a solicitation for a digital product. DFARS 252.247-7023 (transportation by sea) and FAR 52.247-34 (F.O.B. destination) are incorporated for an electronically delivered subscription. DFARS 252.223-7008 (hexavalent chromium prohibition) appears in a contract for database access. FAR 52.222-19 (child labor in manufacturing) applies to a Wiley database license.
+
+This is not a severity 3 finding for two reasons. First, many of the citations — Kaspersky prohibition, telecommunications prohibitions (Section 889), cloud computing requirements, cybersecurity (DFARS 252.204-7012), Section 508 — are genuinely applicable or at least plausibly applicable to a software product procured for DoD use. The government&#x27;s inclusion of these reflects legitimate regulatory obligations, not pure padding. Second, the clause structure here largely follows a standard DoD commercial items template (SF 1449 / FAR Part 12) with FAR 52.212-5&#x27;s checklist, which is a known boilerplate mechanism; sophisticated SEWP V vendors are generally familiar with this template and can quickly triage which checked boxes are operationally relevant.
+
+However, the inclusion of multiple full-text clauses that have zero logical connection to a digital subscription — particularly the magnets/tungsten clause spanning several pages — does impose unnecessary compliance interpretation burden and reflects passive, copy-forward solicitation drafting rather than active curation. This is a moderate rule pool: elevated above normal commercial item boilerplate, but not the severe, context-free document dump seen in the worst examples of this sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR 52.222-19 Child Labor-Cooperation with Authorities and Remedies (JAN 2025) ... (b) Cooperation with Authorities. To enforce the laws prohibiting the manufacture or importation of products mined, produced, or manufactured by forced or indentured child labor...</blockquote>
+  <div class="ev-explanation">This clause governs physical manufacturing and mining of end products. The solicitation is for a software spectral library subscription (KnowItAll IR Spectral Library from Wiley). No physical manufacturing, mining, or importation of goods is involved. Citing child labor compliance for a database subscription is a textbook boilerplate carryover with no logical connection to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>DFARS 252.225-7052 Restriction on the Acquisition of Certain Magnets, Tantalum, and Tungsten (May 2024) ... &#x27;Covered material&#x27; means— (1) Samarium-cobalt magnets; (2) Neodymium-iron-boron magnets; (3) Tantalum metals and alloys; (4) Tungsten metal powder; and (5) Tungsten heavy alloy...&#x27;</blockquote>
+  <div class="ev-explanation">This clause, included in full text across multiple pages, governs the acquisition of specific rare-earth magnets and metals. The solicitation is for a digital spectral library subscription — a software/data product. No magnets, tantalum, or tungsten are being procured. This clause has zero applicability to the scope of work and represents several pages of compliance text that vendors must read and assess despite being entirely irrelevant.</div>
+</div><div class="evidence-item">
+  <blockquote>DFARS 252.247-7023 Transportation of Supplies by Sea (Oct 2024) [incorporated by reference] ... FAR 52.247-34 F.o.b. Destination (NOV 1991) [incorporated by reference]</blockquote>
+  <div class="ev-explanation">Transportation of supplies by sea and F.O.B. destination shipping clauses are incorporated for a digital software library subscription delivered electronically. No physical goods are being shipped by sea or any other carrier. These clauses are inapplicable to an electronic subscription delivered over a GWAC (NASA SEWP V) and represent copy-forward accumulation from a supply-chain template.</div>
+</div><div class="evidence-item">
+  <blockquote>DFARS 252.223-7008 Prohibition of Hexavalent Chromium (JAN 2023) [incorporated by reference]</blockquote>
+  <div class="ev-explanation">Hexavalent chromium is a hazardous substance used in certain metal finishing and coating processes for defense hardware. This prohibition clause is incorporated by reference into a solicitation for an online spectral library subscription. There is no conceivable pathway by which a digital database subscription would involve hexavalent chromium. This is a clear boilerplate carryover from a hardware/supply-chain clause template.</div>
+</div><div class="evidence-item">
+  <blockquote>_X_ (39) (i) 52.222-50, Combating Trafficking in Persons (Oct 2025)... _X_ (35) (i) 52.222-35, Equal Opportunity for Veterans (Jun 2020)... _X_ (37) 52.222-37, Employment Reports on Veterans (Jun 2020)... _X_ (38) 52.222-40, Notification of Employee Rights Under the National Labor Relations Act (Dec 2010)... _X_ (31) 52.222-3, Convict Labor (Jun 2003)</blockquote>
+  <div class="ev-explanation">While individually defensible as standard clauses, the combination of labor and employment clauses checked as applicable — convict labor, trafficking in persons, veteran employment reporting, NLRA rights notification — applied to a single-vendor, single-SKU software subscription renewal (one line item from Wiley) creates a compliance burden disproportionate to the transaction. These clauses imply a workforce of employees performing labor under the contract; the vendor is providing a database license key renewal.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation purchases a brand-name commercial software subscription (KnowItAll IR Spectral Library) from a single OEM (Wiley), at a fixed quantity of one unit per year, for five years, through an established GWAC (NASA SEWP V) with pre-negotiated catalog pricing. Every element of the FAR rationale for firm-fixed-price contracting is satisfied: the requirement is perfectly well-defined (a specific OEM SKU), the scope cannot change (it is a fixed library subscription), costs are externally capped by published SEWP rates, and there is nothing about the performance of the contract that would vary unpredictably. There is no labor component, no service-delivery uncertainty, and no research or design involved. FFP is the textbook-correct contract type for a commercial product subscription of this kind. Cost-reimbursement or T&amp;M would be wholly inappropriate here, as there are no incurred costs or labor hours to reimburse. The solicitation shows no signs of a square-peg mismatch; this is a clean, well-matched pairing of contract type to requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contract Type: The Government intends to award a single firm-fixed price delivery order.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type is firm-fixed-price (FFP). This is directly appropriate for the requirement being purchased.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001: KnowItAll® IR Spectral Library (978EALDB03150), Qty: 1, PoP: 11/15/2025–11/14/2026 [and four option years at the same OEM SKU]</blockquote>
+  <div class="ev-explanation">The requirement is a commercial software subscription — a named, single-SKU product from a known manufacturer (Wiley) at a fixed quantity of 1 per year. The scope is entirely stable: the same product, the same quantity, each year. There is nothing uncertain about what is being delivered.</div>
+</div><div class="evidence-item">
+  <blockquote>The prices submitted should not exceed the vendor&#x27;s NASA SEWP rates, and vendors are encouraged to submit pricing with discounts. The Government is prohibited from paying a price which is in excess of the rate published under the firm&#x27;s NASA SEWP contract.</blockquote>
+  <div class="ev-explanation">Pricing is anchored to published NASA SEWP catalog rates, which means costs are already publicly established and predictable. This is precisely the scenario FAR envisions for FFP: risk is minimal and can be predicted with acceptable certainty.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ_SP4701-26-Q-0014_KnowItAll.pdf">RFQ_SP4701-26-Q-0014_KnowItAll.pdf</div></div>
+  <a class="dl-btn" href="../attachments/8c2de41f79ce46d08f3606f76adc9099_RFQ_SP4701-26-Q-0014_KnowItAll.pdf" download="RFQ_SP4701-26-Q-0014_KnowItAll.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

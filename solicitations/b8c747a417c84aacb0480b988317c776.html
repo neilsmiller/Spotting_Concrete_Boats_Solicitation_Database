@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRANSMITTER,INFRARE — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>TRANSMITTER,INFRARE</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b8c747a417c84aacb0480b988317c776</span>
+      <a class="sam-link" href="https://sam.gov/opp/b8c747a417c84aacb0480b988317c776/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">30 days</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li><li>Technical acceptability (compliance with minimum technical requirements in the performance work statement)</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a firm-fixed-price supply contract for a single NSN item (TRANSMITTER,INFRARE, NSN 5850-01-168-8212) destined for USS Shoup DDG-86. The accountability structure is appropriate to this type of procurement and does not exhibit the compliance-over-outcomes pattern in any meaningful way.
+
+The QA regime centers on 100% production lot testing against approved technical drawings and specifications, with DCMC-QAR acceptance at origin. This is exactly the right approach for a manufactured military component: the government is asking &#x27;does the unit meet spec?&#x27; not &#x27;did you fill out the right forms?&#x27; The two CDRL deliverables (DD Form 1423 Exhibit A) are a Production Lot Inspection Procedure (A001) and a Production Lot Inspection Report (A002) — both directly tied to substantive testing activities, not to schedule tracking, personnel reporting, or plan adherence.
+
+There is no evidence of the layered reporting cadences (weekly + monthly + quarterly), no prescribed report sections covering activities, personnel, and plans, no meeting frequency requirements, and no waterfall-style project plan tracking that characterize the compliance-over-outcomes sin. The solicitation is appropriately lean: it specifies what to make, how to package it, and how to verify it works — with acceptance delegated to DCMA quality representatives who will physically evaluate conformance.
+
+The configuration management provisions (WSSTERMCZ05) are substantive engineering controls, not compliance theater — they protect the Navy&#x27;s configuration baseline for a gun mount component, which is a legitimate technical requirement. ISO 9001 is required as the QMS, but this is a standard baseline requirement that does not crowd out outcome-focused accountability.
+
+Overall, this solicitation appropriately focuses its QA mechanisms on whether the delivered transmitter actually meets engineering specifications. Severity 1 is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.6 Production Lot Test (Contractor) - The Contractor shall perform 100% production testing in accordance with &lt;the contractors approved test/inspection procedure for drawing 5181698 and all associated drawings and specifications. Acceptance delegated to the DCMC-QAR.&gt;</blockquote>
+  <div class="ev-explanation">This requirement mandates 100% production testing against technical specifications and drawing requirements — this is outcome-focused acceptance testing, not compliance theater. The DCMC-QAR acceptance delegation means the government is verifying the physical product meets engineering requirements, not just checking whether the vendor followed procedures.</div>
+</div><div class="evidence-item">
+  <blockquote>4.5 Production Lot Test Procedures - (Government Approval) - The Contractor shall prepare and submit test procedures in accordance with the Contract Data Requirements List (DD Form 1423). There is hereby created an option for the Government to waive the requirement for submission of a test procedure. If the Offeror has had its test procedure previously approved by the Government, furnish the name of the approval activity, date of approval, and contract number under which the test procedure was approved.</blockquote>
+  <div class="ev-explanation">The test procedure submission and the government&#x27;s ability to waive it for previously approved procedures reflects a process documentation requirement layered on top of the substantive testing. However, the underlying obligation — 100% production testing — remains outcome-oriented (does the unit work?), so this procedure requirement is supportive overhead rather than a displacement of outcome accountability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simplified acquisition solicitation for a single NSN hardware item — an infrared transmitter (NSN 5850-01-168-8212) destined for USS Shoup (DDG-86), part of the 5&quot;/54-Caliber Gun Mount MK45. The solicitation uses LPTA (Lowest Price Technically Acceptable) source selection with minimal evaluation criteria: technical acceptability is defined solely as compliance with solicitation terms and no exceptions taken. There are no experience thresholds, no dollar-value requirements for prior contracts, no federal-specific experience mandates, no lookback windows, no past performance scoring that advantages incumbents, and no institutional knowledge requirements.
+
+The one restriction that narrows competition — the authorized distributor/authorized source requirement — is a legitimate supply chain integrity measure common in DoD hardware procurements for weapons system components. It prevents counterfeit parts from entering the supply chain. Any distributor who obtains OEM authorization can participate; this is not equivalent to requiring prior performance on this specific contract.
+
+The solicitation does include a provision allowing waiver of the test procedure submission requirement if the offeror has a previously approved procedure, which marginally benefits a prior contractor. However, this is an administrative efficiency provision with an explicit waiver mechanism, not an evaluation scoring advantage — new vendors simply submit a procedure for approval within 60 days of contract award.
+
+Overall, this solicitation does not exhibit insider rewards as defined. The evaluation criteria are price-focused (LPTA), the technical requirements reference publicly available military specifications and government-furnished drawings, and no experience floors or incumbency proxies appear in the evaluation factors. A qualified manufacturer or authorized distributor of this NSN who has never held this specific contract could realistically compete. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement restricts award to authorized distributors of the original manufacturer, which functionally limits competition to vendors with an established distribution relationship with the OEM. However, this is a standard traceability and supply chain integrity requirement for military hardware procurement — it is not an experience threshold tied to prior federal contracts or incumbency. Any vendor who obtains OEM authorization could compete. This is closer to a legitimate sourcing constraint than an insider reward.</div>
+</div><div class="evidence-item">
+  <blockquote>The ultimate awardee of the proposed contract action must be an authorized source. Award of the proposed contract action will not be delayed while an unauthorized source seeks to obtain authorization.</blockquote>
+  <div class="ev-explanation">This reinforces the authorized-source requirement, making clear that vendors cannot cure a lack of authorization after receiving award. While this narrows the pool, it reflects supply chain security concerns appropriate for a military weapons system component (part of the 5&quot;/54-Caliber Gun Mount MK45), not an incumbency preference derived from prior contract history.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simplified acquisition (estimated small purchase) for a single unit of a military hardware spare part — an infrared transmitter (NSN 5850-01-168-8212) for the 5&quot;/54-Caliber Gun Mount MK45 aboard USS Shoup (DDG 86). The solicitation is fundamentally a make-to-print hardware procurement.
+
+Requirement sprawl, as defined, primarily concerns service and IT contracts where agencies describe incumbent workflows, staff roles, and step-by-step processes rather than outcomes. That pattern is structurally absent here. The solicitation defines WHAT must be delivered: a physical item conforming to specific government drawings (drawing 5181698 and associated specs), packaged to MIL-STD-2073, marked per MIL-STD-130, and quality-tested per an approved procedure. These are outcome and standard constraints — they define the envelope the item must meet, not a prescribed manufacturing process.
+
+The extensive reference list of military specifications (MIL-STD-202, MIL-PRF-39003, MIL-PRF-19500, etc.) is characteristic of make-to-print defense hardware and constitutes legitimate technical standards, not sprawl. The QPL requirements (section 3.4) similarly reflect legitimate supply chain integrity mandates for safety-critical naval weapon system components.
+
+The configuration management requirements (MIL-STD-973, WSSTERMCZ05) are detailed but are standard maritime CM provisions appropriate for a weapon system component going to a fleet asset — they protect the Navy&#x27;s configuration baseline for a gun mount on an active destroyer.
+
+The packaging section (WSSTERMDZ03) is lengthy but is largely standard NAVSUP WSS boilerplate that applies across all maritime procurements; it is not tailored to constrain this specific vendor&#x27;s approach beyond applicable standards.
+
+The DD Form 1423 CDRL requiring a test procedure and test report adds documentation burden, but for a one-unit weapon system component with production lot approval requirements, this is proportionate to the safety and reliability stakes.
+
+Overall, the solicitation is well-scoped for its type. There are no sections dictating step-by-step manufacturing processes, no prescribed staffing structures, and no evidence of copy-paste from an incumbent&#x27;s operating procedures. The prescriptive elements that do exist (drawings, specs, MIL-STDs, testing) are precisely the kind of outcome-and-standard constraints that are legitimate in defense hardware procurement. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1 Manufacturing and Design - The TRANSMITTER,INFRARE furnished under this contract/purchase order shall meet the material and physical requirements as specified &lt;on drawing 5181698 and all associated drawings and specifications&gt;.</blockquote>
+  <div class="ev-explanation">This is a design-to-specification requirement for a hardware part — it defines WHAT the item must conform to (government drawings and specifications), not HOW the contractor must manufacture it internally. For a spare parts procurement of a military hardware item, reference to controlling drawings is a legitimate technical constraint, not process sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>4.6 Production Lot Test (Contractor) - The Contractor shall perform 100% production testing in accordance with &lt;the contractors approved test/inspection procedure for drawing 5181698 and all associated drawings and specifications. Acceptance delegated to the DCMC-QAR.&gt;</blockquote>
+  <div class="ev-explanation">Requiring 100% production testing is somewhat prescriptive about the quality methodology. However, for a single-unit (quantity 1) NSN buy of a naval weapons system component — an infrared transmitter for the 5&quot;/54-Caliber Gun Mount MK45 on USS Shoup — this is a standard and reasonable quality assurance requirement tied to safety-critical hardware for a warship. It defines a quality floor, not an arbitrary process mandate.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools. The Document References section lists approximately 60 specifications and standards in an undifferentiated table with no explanatory text linking individual standards to specific aspects of the transmitter&#x27;s manufacture, materials, or testing. The list spans MIL-STD configuration management documents, multiple QPL-governed component specifications (resistors, capacitors, semiconductors, printed wiring boards), material standards (aluminum alloys, solder, rubber), commercial standards (ASME, ASTM, IPC, SAE-AMS), and quality system standards — all presented identically with no prioritization or applicability context.
+
+The &#x27;Document Changes&#x27; section, which maps ~30 superseded standards to current equivalents, is a clear marker of copy-forward accumulation: this list has been carried through multiple contract iterations. The &#x27;OS9987 NOT REQUIRED&#x27; entry is a telling artifact — it suggests at least one document was at some point reviewed and deemed inapplicable, but the review clearly has not been extended to the rest of the list.
+
+That said, this is a hardware manufacturing solicitation for a specific military electronics component (an infrared transmitter for the 5&quot;/54-caliber gun mount). For such items, complex technical data packages with extensive drawing trees and QPL-governed component specifications are expected and legitimate. Many of the cited standards — QPLs for resistors, capacitors, semiconductors, printed wiring boards, and solder — are plausibly applicable to a precision electronics assembly. This is not a case of a software contract citing irrelevant energy efficiency standards.
+
+The most significant mitigating factor is that the MIL-STD-973 configuration management requirement is actually well-tailored, with specific paragraphs enumerated as applicable or inapplicable. This demonstrates the agency can and does provide curation when motivated to do so — but has not applied that discipline to the broader specification list.
+
+The severity is 2 (Moderate): the compliance burden is elevated and the list shows signs of copy-forward accumulation, but most citations are at least plausibly relevant to precision military electronics manufacturing, and the absence of clearly irrelevant or contradictory regulations prevents a severity 3 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DRAWING NO. CAGE REV DOC TYPE DISTR CD SHEET NR REV TYPE SIZE
+2691778 10001 D D3 0001 D 49998 0141535
+3176207 10001 F DW D3 0001 F 49998 0270958
+5151698 53711 E 1N D3 0001 E 49998 0323014
+5181687 53711 A D3 0001 A 49998 4695602
+[...continues for ~35 drawing entries...]</blockquote>
+  <div class="ev-explanation">The solicitation lists approximately 35 separate drawing entries across multiple sheets and revisions. While drawings for a complex military electronics component are expected, the sheer volume and the absence of any guidance on which drawings govern which aspects of manufacture could create interpretation burden for a new entrant unfamiliar with this specific weapon system.</div>
+</div><div class="evidence-item">
+  <blockquote>SPEC NO. SLASH NO. PART NO REV DATE DISTR CD AMEND CHG NTC SUPP
+FF-S-86 F 07 JAN 20 A 4
+J-STD-001 A
+MIL-STD-108 E 19 SEP 85 A 01
+MIL-STD-130 N 16 NOV 12 A
+MMM-A-134 11 APR 19 A 1
+[...continues for ~60 specification entries...]</blockquote>
+  <div class="ev-explanation">The Document References section lists approximately 60 separate specifications, standards, and data item descriptions — covering materials (SAE-AMS, ASTM), electronic components (MIL-PRF-19500, MIL-PRF-39003, MIL-PRF-39007, MIL-PRF-39014), packaging (MIL-STD-2073), quality (ISO9001), configuration management (MIL-STD-973), and many others — all presented in an undifferentiated table with no explanatory context linking each standard to the specific aspect of the transmitter it governs.</div>
+</div><div class="evidence-item">
+  <blockquote>DOCUMENT CHANGES
+FROM TO
+AMS3222 SAE-AMS3222
+AMS4182 SAE-AMS4182
+ANSI-B1.1 ASME-B1.1
+[...continues for ~30 document change mappings...]
+OS9987 NOT REQUIRED</blockquote>
+  <div class="ev-explanation">The Document Changes section maps approximately 30 superseded standards to their current equivalents, revealing that this list has been carried forward across multiple contract iterations. The entry &#x27;OS9987 NOT REQUIRED&#x27; is particularly revealing — it indicates that at least one previously-cited document was determined to be inapplicable, suggesting the overall list has accumulated over time without systematic review of continued relevance for all entries.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1 Manufacturing and Design - The TRANSMITTER,INFRARE furnished under this contract/purchase order shall meet the material and physical requirements as specified &lt;on drawing 5181698 and all associated drawings and specifications&gt;.</blockquote>
+  <div class="ev-explanation">The requirements section provides almost no specificity about which of the ~60 referenced specifications govern which design or manufacturing requirements. The catch-all phrase &#x27;all associated drawings and specifications&#x27; effectively makes every document in the list equally operative, denying vendors any prioritization guidance and placing the full burden of compliance interpretation on the contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>3.3 Configuration Control in accordance with MIL-STD-973 Short Form procedures [...] Only paragraphs 5.3.3.2, 5.3.6.4, 5.3.6.7, 5.3.6.7.3 are required [...] Paragraph 5.3.6 with the exception of paragraph 5.3.6.5 and 5.3.6.7.1 are required [...] Paragraph 5.3.6.6 and 5.3.6.6.2 are required [...]</blockquote>
+  <div class="ev-explanation">Notably, MIL-STD-973 is the one standard where the solicitation actually provides tailoring — spelling out which specific paragraphs apply and which do not across items A through AF. This is the correct approach and represents genuine curation. Its contrast with the completely unannotated treatment of the other ~59 referenced specifications highlights that the agency is capable of providing this context but has only done so for one standard.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward procurement of a single physical hardware component — an infrared transmitter (NSN 5850-01-168-8212) — for the 5&quot;/54-Caliber Gun Mount MK45 aboard USS SHOUP DDG 86. The implied contract type is firm-fixed-price, consistent with the LPTA award methodology, the request for unit price and total price quotations, and the 30-day delivery requirement. A fixed-price structure is entirely appropriate here: the item is well-specified through a comprehensive technical data package (drawing 5181698 and associated drawings and MIL-STD specifications), the quantity is fixed at one unit, performance criteria are objective (manufacture and deliver to specification), and multiple vendors can in principle bid. The requirement is for delivery of a tangible product, not for services of unpredictable duration or scope. There is no mismatch between the chosen contract pricing structure and the nature of the requirement. This is a textbook fixed-price hardware buy and scores severity 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement will utilize the Lowest Price Technically Acceptable (LPTA) source selection process... Award of the proposed contract action will not be delayed while an unauthorized source seeks to obtain authorization.</blockquote>
+  <div class="ev-explanation">The solicitation uses a fixed-price structure (FFP implied by LPTA award methodology and unit price quotation), which is appropriate for the procurement of a discrete, well-specified physical component with a defined NSN, drawing package, and military specifications.</div>
+</div><div class="evidence-item">
+  <blockquote>NSN 1HM 5850-01-168-8212 GL TRANSMITTER,INFRARE... QUANTITY: 1... UNIT PRICE (e)... TOTAL PRICE</blockquote>
+  <div class="ev-explanation">The solicitation requests a firm unit price and total price for a specific quantity (1 unit) of a defined hardware item. This is the classic fixed-price structure appropriate for buying a physical good with known specifications.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.01_RFQ_N0010426PUB38_25345-0045.pdf">3.01_RFQ_N0010426PUB38_25345-0045.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b8c747a417c84aacb0480b988317c776_3.01_RFQ_N0010426PUB38_25345-0045.pdf" download="3.01_RFQ_N0010426PUB38_25345-0045.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.02_Amend1_25345-0045.pdf">3.02_Amend1_25345-0045.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b8c747a417c84aacb0480b988317c776_3.02_Amend1_25345-0045.pdf" download="3.02_Amend1_25345-0045.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

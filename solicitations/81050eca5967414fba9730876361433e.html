@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trane Maintenance Renewal — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Trane Maintenance Renewal</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 81050eca5967414fba9730876361433e</span>
+      <a class="sam-link" href="https://sam.gov/opp/81050eca5967414fba9730876361433e/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-24</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NASA SHARED SERVICES CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-24</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">One year from date of award</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a short-form commercial item acquisition (sole source to Trane U.S. Inc.) for annual software license renewals and software maintenance plans covering Trane HVAC control systems at NASA Langley Research Center. The SOW is two pages and focuses almost entirely on identifying what must be purchased — specific named software licenses (Trace 3D Plus, Tracer TU Professional Edition for named users, Tracer Ensemble), software maintenance plans for 59 existing controllers, and related requirements (local office proximity, factory-certified personnel, 24/7 response capability). There are no reporting requirements, no prescribed report formats, no meeting cadences, no QA surveillance plan, and no process-compliance documentation mandated anywhere in the document. The place of performance is listed as &#x27;E-delivery to NASA LaRC&#x27; and the period of performance is &#x27;one year from date of award.&#x27; The nature of this acquisition — software license renewals — is inherently outcome-defined by delivery and functionality: either the licenses are active and the software works, or they are not. There is simply no compliance-over-outcomes structure present to evaluate. This solicitation does not exhibit Sin #2 in any meaningful way. The absence of reporting requirements is appropriate for a straightforward commercial software renewal, not a gap to criticize.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most severe form of the Insider Rewards pattern — a severity 3 finding — but it is also a case where the &#x27;sin&#x27; has been made explicit rather than embedded: the government has openly declared a sole-source award to Trane U.S. Inc. The SOW then confirms why competition is structurally impossible through a stack of requirements that collectively function as an incumbent filter: (1) the vendor must be a corporate-owned entity of Trane itself, (2) personnel must hold Trane-proprietary &#x27;factory trained&#x27; and &#x27;Tracer Elite&#x27; certifications, (3) software renewals are for Trane-proprietary platforms (Trace 3D Plus, Tracer TU, Tracer Ensemble) that only Trane can license, and (4) the SOW references specific named individual license holders, demonstrating the kind of operational insider knowledge that only the current contractor possesses. No third party could satisfy requirement #1 alone — being a &#x27;corporate owned entity of Trane&#x27; is not a capability standard but an identity requirement. The remaining requirements are circular: they are only satisfiable by Trane because Trane controls the certification programs and software licenses being renewed. This is a legitimate case of vendor capture driven by proprietary technology lock-in: NASA LaRC has deployed Trane-proprietary building control systems (Tracer SC+ controllers, Tracer Ensemble, Tracer TU) across 59 buildings, and the maintenance and licensing ecosystem for those systems is entirely controlled by the OEM. The sole-source justification under FAR 12.102(a) may well be legally defensible given this technical dependency, but the pattern represents classic self-reinforcing vendor capture: proprietary system installation → sole-source maintenance renewals → deepening dependency → no viable path to competition. The severity 3 rating reflects not that the agency has acted improperly in this specific procurement, but that the structural conditions documented here — OEM-controlled certification, proprietary software licensing, named-individual operational details — make meaningful competition impossible and will continue to do so for as long as these systems are in service.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>NASA/NSSC intends to issue a sole source contract to TRANE U.S. INC. under the authority of FAR 12.102(a). It has been determined that TRANE U.S. INC. is the sole provider of Trane Maintenance Renewal.</blockquote>
+  <div class="ev-explanation">The government has already determined a single vendor is the only eligible provider, explicitly naming the incumbent. This is the most extreme form of insider rewards — not merely tilting the playing field but eliminating competition entirely by design.</div>
+</div><div class="evidence-item">
+  <blockquote>Must be corporate owned entity of Trane.</blockquote>
+  <div class="ev-explanation">This requirement explicitly restricts eligibility to entities that are corporate subsidiaries of Trane (the OEM). No third-party maintainer, authorized reseller, or independent service organization can qualify regardless of their technical competence. This is a direct vendor lock-in requirement embedded in the SOW.</div>
+</div><div class="evidence-item">
+  <blockquote>Employ Tracer Elite certified technicians.</blockquote>
+  <div class="ev-explanation">Tracer Elite is a Trane-proprietary certification program. Only Trane-authorized entities can employ technicians with this credential, reinforcing the exclusion of any non-Trane-affiliated vendor. A competitor with highly qualified HVAC technicians who are not Trane-certified is structurally disqualified.</div>
+</div><div class="evidence-item">
+  <blockquote>Have factory trained and certified personnel providing all engineering, service, startup, and commissioning field labor for the project from their local office location.</blockquote>
+  <div class="ev-explanation">&#x27;Factory trained&#x27; personnel means personnel trained by Trane itself. Combined with the &#x27;corporate owned entity of Trane&#x27; requirement, this stacks additional Trane-proprietary credentialing on top of ownership requirements, further ensuring only Trane&#x27;s own corporate infrastructure can satisfy the SOW.</div>
+</div><div class="evidence-item">
+  <blockquote>Tracer TU Professional Edition Annual License Renewal: Mark Lovell license... B1215 license... David Zimmerman license</blockquote>
+  <div class="ev-explanation">The SOW references specific named individual licenses tied to identified personnel. This level of specificity — naming individual users and their existing license installations — reflects requirements that could only be authored with intimate knowledge of the current contract&#x27;s operational details. Only the incumbent could know these specific license holders and their associated software configurations.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a sole-source solicitation for proprietary Trane maintenance and software license renewals, which fundamentally shapes the analysis. Much of what appears as &#x27;requirement sprawl&#x27; in a competitive context is actually the natural consequence of buying a branded product from its manufacturer — there is no alternative solution space to foreclose. The SOW requirements (factory-certified Trane technicians, Tracer Elite certification, corporate-owned Trane entity, named software licenses) are essentially product specifications inseparable from the item being purchased. This mitigates the severity significantly compared to a competitive services solicitation with the same language. That said, genuine sprawl elements exist: the 50-mile office radius requirement substitutes a structural/locational mandate for a response-time SLA; named-user license itemization embeds operational detail that belongs in an order form, not a statement of work; and the personnel sourcing requirement (&#x27;from their local office location&#x27;) prescribes organizational structure rather than capability. These patterns suggest the SOW was drafted by copying the incumbent Trane contract&#x27;s operational terms rather than articulating the government&#x27;s actual needs (uptime, support responsiveness, software functionality). The document is very short (2 pages of substantive requirements) and the majority of its content is a parts list (building SMPs) and license inventory rather than process mandates — so sprawl is present but not pervasive. Severity 2 is appropriate: the prescriptive elements are meaningful but the short, narrow scope of the document limits their overall impact.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Have an established business office within 50.00 miles of the project site and must provide 24 hours/day, 7 days/week response in the event of a customer warranty or service call.</blockquote>
+  <div class="ev-explanation">This prescribes a specific organizational characteristic (physical office location within a defined radius) rather than an outcome. The legitimate requirement would be a response time SLA (e.g., &#x27;respond to emergency calls within X hours&#x27;). Mandating a nearby office is a process/structural requirement that forecloses providers who could meet equivalent response times through other means — though in context of a sole-source to Trane, this reads as a descriptor of the intended vendor rather than a genuine competition constraint.</div>
+</div><div class="evidence-item">
+  <blockquote>Have factory trained and certified personnel providing all engineering, service, startup, and commissioning field labor for the project from their local office location.</blockquote>
+  <div class="ev-explanation">This dictates WHERE and HOW labor must be sourced (local office, factory-certified) rather than defining the required competency outcome. A requirement that technicians demonstrate specific competencies or hold relevant certifications would be outcome-oriented; requiring they come from a &#x27;local office location&#x27; is a structural/process mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>Must be corporate owned entity of Trane. Employ Tracer Elite certified technicians.</blockquote>
+  <div class="ev-explanation">These requirements explicitly mandate vendor identity and specific proprietary certification — which in a competitive context would constitute outright brand specification rather than outcome definition. The combination of these bullets effectively describes Trane itself and no other entity, collapsing the distinction between &#x27;how&#x27; and &#x27;who.&#x27; While the sole-source justification makes this somewhat understandable, it represents the solicitation prescribing the solution (Trane&#x27;s own workforce structure) rather than the needed capability.</div>
+</div><div class="evidence-item">
+  <blockquote>Tracer TU Professional Edition Annual License Renewal: Mark Lovell license ... Tracer TU Professional Edition Annual License Renewal: B1215 license ... Tracer TU Professional Edition Annual License Renewal: David Zimmerman license</blockquote>
+  <div class="ev-explanation">The SOW itemizes license renewals by individual named user, which is an operational detail (HOW the government currently consumes the software) rather than an outcome requirement. The outcome needed is &#x27;maintain software access for authorized users.&#x27; Specifying individual names in an acquisition document locks the contract to a snapshot of current operations and adds no meaningful competitive or performance content.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a short, focused solicitation for a specific commercial maintenance renewal — Trane HVAC software licenses and service maintenance plans at NASA Langley Research Center. The SOW is terse and functional: it describes the specific software licenses required (Trace 3D Plus, Tracer TU Professional Edition, Tracer Ensemble), lists the 59 buildings requiring Software Maintenance Plans, and specifies vendor qualification criteria (factory-trained personnel, Tracer Elite certified technicians, corporate-owned Trane entity, local office within 50 miles). There is no &#x27;Applicable Documents&#x27; section, no bulk list of regulations, no compliance frameworks, and no cited directives beyond a single FAR reference (FAR 12.102(a) for commercial items acquisition and the NASA Ombudsman clause 1852.215-84) in the synopsis. The regulatory footprint is minimal and appropriate for the scope: a straightforward commercial software license renewal. The only FAR/NASA FAR Supplement citations are standard procurement procedure references, not substantive compliance burdens imposed on vendors. There is no evidence of rule pool behavior — no bulk lists, no irrelevant regulations, no undifferentiated compliance burden. This solicitation scores 1 (minimal) on the rule pools dimension.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for annual renewal of proprietary software licenses and software maintenance plans for Trane building automation systems at NASA Langley. The scope is well-defined: a fixed number of software licenses (three named Tracer TU licenses, one Trace 3D Plus license, one Tracer Ensemble license) and SMPs for exactly 59 enumerated controllers across named buildings, with a one-year period of performance. The government intends to use FAR Part 12 commercial item procedures, which typically implies a firm-fixed-price structure. This is an entirely appropriate contract type for this requirement. License renewals and maintenance plans are standard commercial offerings with catalog pricing — the quantity is known, the deliverables are defined, and there is no ambiguity about scope that would warrant cost-reimbursement or T&amp;M treatment. A FFP/commercial item approach is the correct and conventional vehicle for this type of purchase. No square peg issue is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement is for the acquisition of the FY26 Trane Maintenance Renewal for NASA Langley Research Center (LaRC).</blockquote>
+  <div class="ev-explanation">The requirement is for annual software license renewals and software maintenance plans (SMPs) for existing Trane building automation controllers — these are standard commercial products and services with well-defined, predictable scope and pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>Trace 3D Plus Annual License Renewal... Tracer TU Professional Edition Annual License Renewal... Tracer Ensemble Software Annual License Renewal... Software maintenance plans (SMP) for all Fifty-Nine (59) existing Application SC+ Controllers</blockquote>
+  <div class="ev-explanation">The deliverables are discrete, enumerable commercial license renewals and maintenance plans with fixed quantities (59 controllers, named individual licenses). This is the archetypal use case for a firm-fixed-price commercial item purchase under FAR Part 12.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Tab 04 SOW Revised 2.pdf">Tab 04 SOW Revised 2.pdf</div></div>
+  <a class="dl-btn" href="../attachments/81050eca5967414fba9730876361433e_Tab+04+SOW+Revised+2.pdf" download="Tab 04 SOW Revised 2.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Tab 07 Capability Statement.pdf">Tab 07 Capability Statement.pdf</div></div>
+  <a class="dl-btn" href="../attachments/81050eca5967414fba9730876361433e_Tab+07+Capability+Statement.pdf" download="Tab 07 Capability Statement.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

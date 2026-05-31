@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Michigan Fingerprint Channeling — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Michigan Fingerprint Channeling</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 7db0679187a94332b4e843a8c421d67a</span>
+      <a class="sam-link" href="https://sam.gov/opp/7db0679187a94332b4e843a8c421d67a/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE COUNTERINTELLIGENCE AND SECURITY AGENCY (DCSA) › DEFENSE CI AND SECURITY AGENCY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">518210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (17 June 2026 – 16 June 2027) + 4 option years (OY1–OY4, each 12 months) + 1 six-month extension option (17 June 2031 – 17 December 2031)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, but with important mitigating factors that prevent a severity-3 rating. On the compliance side, the Performance Requirements Summary — the heart of the QA structure — relies on circular, self-referential standards (&#x27;results are to be provided IAW the PWS&#x27;) rather than defining independent outcome metrics. For a fingerprint channeling service, one would expect to see standards like &#x27;CHRI response delivered within X business days of submission&#x27; or &#x27;bad print rate below Y%&#x27; or &#x27;follow-up resolution within Z days.&#x27; None of these appear. The QCP deliverable and the training certificate deliverable further reflect a compliance orientation: the government is auditing paperwork, not results. On the other hand, the solicitation is genuinely simple in scope — it covers a narrow, well-defined transaction service processing roughly 400 submissions per year. The reporting burden is light: there is no weekly status report, no monthly narrative progress report, and no prescribed meeting cadence beyond what is described in the periodic progress meetings clause. The deliverables list is short. The solicitation does not exhibit the overlapping-cadences and format-prescription pathology that characterizes severity-3 cases. The problem here is less about reporting volume and more about the PRS table&#x27;s failure to define what &#x27;good&#x27; looks like in outcome terms. The government has described the process (digitize, transmit, ensure response) but not the performance targets that would let it hold a contractor accountable for doing it well. That is the compliance-over-outcomes sin in moderate form.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall develop and maintain an effective quality control program, including a Quality Control Plan (QCP), to ensure services are performed IAW this PWS. The Contractor shall develop and implement procedures to identify, prevent, and ensure non-recurrence of defective services. The Contractor&#x27;s quality control program is the means by which they assure themselves that their work complies with the requirement(s) of the contract.</blockquote>
+  <div class="ev-explanation">The QCP requirement frames quality entirely as procedural compliance — &#x27;their work complies with the requirement(s) of the contract&#x27; — rather than defining what good outcomes look like. There is no reference to accuracy rates, turnaround times, or customer satisfaction as success criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>PRS No. 1: Digitization of hardcopy fingerprint cards and electronic transmission of print and associated PII to the State repository. Standard: Results are to be provided IAW PWS Section 5.2.2.1. Performance Threshold: Results are to be provided as described in the PWS 100% of the time. Method of Surveillance: 100% inspection.</blockquote>
+  <div class="ev-explanation">The performance standard for the core deliverable is circular: success is defined as compliance with a PWS section rather than a meaningful outcome. &#x27;100% of the time&#x27; measures throughput but not accuracy, turnaround time, or data quality. The government will inspect whether the contractor transmitted prints, not whether the transmissions were timely, accurate, or resulted in usable CHRI responses.</div>
+</div><div class="evidence-item">
+  <blockquote>PRS No. 2: File of all documentation authorizing handling of CUI for this contract. Standard: Results are to be provided IAW PWS Section 5.3. Performance Threshold: Maintained file of all current, required documentation including any and all updates. Method of Surveillance: Random Inspection.</blockquote>
+  <div class="ev-explanation">This performance standard measures pure process compliance — whether a file of documentation exists — with no connection to any service outcome. The government evaluates whether paperwork is current, not whether the contractor is protecting data effectively.</div>
+</div><div class="evidence-item">
+  <blockquote>PRS No. 3: Complete response for each submitted applicant to include &#x27;No Record&#x27; results as well as any and all pertinent criminal history data. Standard: Results are to be provided IAW PWS Section 5.2.3.1. Performance Threshold: Results are to be provided as described in the PWS 100% of the time. Method of Surveillance: Periodic inspection, as needed.</blockquote>
+  <div class="ev-explanation">Again the standard is self-referential: success means doing what the PWS says &#x27;100% of the time.&#x27; No turnaround time standard is defined (e.g., CHRI response within X business days), no accuracy metric is included, and surveillance is only &#x27;periodic, as needed&#x27; — the least rigorous surveillance method in the table, applied to the most mission-critical deliverable.</div>
+</div><div class="evidence-item">
+  <blockquote>Deliverable 4: Initial and annual refresher training certificates/documentation for all applicable personnel. Frequency: Within 30 calendar days after contract award and of completed annual refresher training. Medium: Email. Submit To: COR.</blockquote>
+  <div class="ev-explanation">Training certificate submission is listed as a formal deliverable in the deliverables schedule, placing it on equal footing with the actual fingerprint channeling work. This is a classic compliance artifact — evidence that a box was checked — not a measure of whether contractor personnel are actually protecting PII or handling CHRI correctly.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents no meaningful insider rewards problem. The PWS describes a straightforward commercial service — digitizing hardcopy fingerprint cards and transmitting them electronically to the Michigan state repository for CHRI. The experience requirements are minimal: personnel must be U.S. persons with citizenship verification, complete standard DoD training (OPSEC, PII, CUI), and a Contract Manager must be designated. There are no dollar-threshold past performance requirements, no mandates for prior federal contracts of a specific size or number, no federal-specific experience mandates beyond what is inherent to handling PII for a government client, and no evaluation criteria that award bonus points for incumbency proxies.
+
+The service itself — fingerprint card digitization and electronic submission to a state repository — is a well-defined commercial activity. This is not a high-complexity, proprietary-knowledge domain where only an incumbent could understand the requirements. The Q&amp;A section confirms the work is straightforward: the vendor receives mailed hardcopy fingerprint cards, digitizes them, and transmits to Michigan&#x27;s state portal. The volumes are small (382–430 submissions per year at peak). Any vendor in the fingerprint channeling or identity services space could plausibly compete without prior DCSA contract history.
+
+The solicitation lacks evaluation criteria sections in the available text (the SF30 amendment pages did not render), but nothing in the PWS or Q&amp;A introduces experience requirements that would screen out non-incumbents. The security requirement — U.S. citizenship verification only, no clearance required — is appropriately modest for this work. A qualified newcomer in the biometric services or background check channeling market could realistically compete on price and technical approach. Severity is 1.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation describes a narrow, well-scoped commercial service: digitizing hardcopy fingerprint cards and transmitting them to a state repository. The PWS is outcome-oriented at its core — it defines what must be delivered (CHRI responses for submitted applicants), the required data elements in those responses (arrest records, disposition data, etc.), response completeness standards (100% response rate including &#x27;No Record&#x27; results), and turnaround expectations for bad print notifications (1 business day). The Performance Requirements Summary in Technical Exhibit 1 maps directly to outcomes and thresholds rather than prescribing how to achieve them.
+
+The security and training requirements (OPSEC, CUI, PII training) are regulatory compliance mandates derived from DoD policy — these are legitimate constraints, not sprawl. The holiday schedule and availability window requirements are reasonable operational coordination parameters for a service that interfaces with government workflows.
+
+The one area with mild prescriptiveness is the invoice documentation format (Excel spreadsheet), but this is a trivial administrative specification. Notably, the solicitation explicitly leaves place of performance to the contractor&#x27;s facility and does not dictate staffing levels, headcount, technology platforms, or workflow sequences. The Q&amp;A clarifies that the contractor has flexibility in how they operate.
+
+Overall, the solicitation is appropriately scoped for a simple, low-volume transactional service (~400 submissions per year). The requirements define what outcomes must be achieved without over-specifying how to achieve them. Severity 1 is appropriate — this is a competently written solicitation with no meaningful requirement sprawl.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5.2.2.1 Digitize the hardcopy fingerprint cards and electronically transmit the print and associated Personally Identifiable Information (PII) to the State repository, while properly safeguarding the confidentiality of data exchanged as per DCSA terms and conditions found within the PWS and provisions and clauses section of the contract.</blockquote>
+  <div class="ev-explanation">This is the core technical task description. While it specifies the input medium (hardcopy fingerprint cards) and destination (State repository), it does not dictate the specific digitization technology, software platform, hardware, or workflow the vendor must use. The vendor retains latitude to choose their equipment and process. The input format constraint (hardcopy SF-87/FD-258 cards provided by the government) is a genuine interoperability constraint, not sprawl — it reflects how DCSA currently collects prints.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2.3.2.2 Must be submitted electronically in an Excel spreadsheet at the time the invoice is submitted.</blockquote>
+  <div class="ev-explanation">Specifying Excel as the invoice supporting documentation format is mildly prescriptive. A more outcome-focused requirement would specify &#x27;machine-readable tabular format.&#x27; However, this is a narrow administrative deliverable requirement, not a core operational process mandate, and the impact on vendor approach is minimal.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate rule pool pattern. The work is narrow and well-defined: a contractor receives hardcopy fingerprint cards by mail, digitizes them, and electronically transmits the data to the Michigan state repository. The total annual volume is under 500 submissions. Despite this simplicity, the PWS cites dozens of legal authorities, executive orders, and DoD directives across multiple sections — the background section alone lists 20+ statutory and regulatory authorities, and Part 6 adds 13 more DoD publications, several of which are restated again within the OPSEC subsections of Part 5.
+
+The most significant problem is inclusion of clearly irrelevant requirements: DoDI 5200.39 (Critical Program Information in RDT&amp;E) has no plausible connection to commercial fingerprint channeling. DoDI 5400.04 (Provision of Information to Congress) and DoDI 5230.09 (Clearance of DoD Information for Public Release) are governance documents for DoD components releasing information publicly, not for commercial vendors transmitting biometric data to a state system. These appear to be copy-forward boilerplate from a standard DoD security clause template that was never reviewed for relevance to this particular acquisition.
+
+Severity is held to 2 rather than 3 for several reasons. First, the genuinely applicable compliance requirements — CUI handling, PII protection, OPSEC awareness, Privacy Act training — are legitimate given that the contractor will handle sensitive biometric and personal data. The core security framework is defensible. Second, the solicitation is relatively short (20-page PWS) and not an overwhelming 80+ document compliance wall. Third, the Q&amp;A document shows the contracting office was responsive to vendor questions, suggesting some degree of active management. The rule pool here is real but appears to reflect standard DoD boilerplate copy-forward rather than deliberate regulatory accumulation — the list is padded but not egregiously so, and the core compliance obligations are discernible beneath the noise.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The following authorities provide DCSA and its Agents the authorization to request and maintain information, depending on the purpose of the investigation: Executive Orders (E.O.s) 9397, 10450, 10577, 10865, 12333, and 12968, as amended; E.O.s 13467, 13488, and 13549; 5 U.S.C. sections 1103, 1302, 1303, 1304, 3301, 7301, 9101, and 11001; 22 U.S.C. sections 272b, 290a, and 2519; 31 U.S.C. section 1537; 42 U.S.C. sections 1874(b)(3), 2165, 2201, and 20132; 50 U.S.C. section 3341; Public Law 108-136; 5 C.F.R. parts 2, 5, 731, 732, 736, and 1400; and Homeland Security Presidential Directive 12 (HSPD 12). Public Law 101-647, Crime Control Act of 1990.</blockquote>
+  <div class="ev-explanation">This passage lists 20+ legal authorities — executive orders, U.S. Code sections, CFR parts, and public laws — with zero explanation of how each applies to a vendor digitizing fingerprint cards and transmitting them to Michigan. Most of these statutes and EOs govern DCSA&#x27;s internal authority to conduct investigations, not what a private channeling vendor must do. A vendor bidding on this work cannot determine from this list which of these authorities creates actionable compliance obligations for them.</div>
+</div><div class="evidence-item">
+  <blockquote>DoD Regulation 5400.7, DoD Freedom of Information Act Program; DoD 5200.01-M, DoD Information Security Program; DoDI 5200.48, Controlled Unclassified Information (CUI), dated March 6, 2020; Section 2002:30 of Title 32 CFR, Education and Training; DoDM 5205.02, Privacy Act of 1974; DoDI 5200.39, Critical Program Information (CPI) Identification and Protection within RDT&amp;E; DoDD 5205.02E, DoD OPSEC Program; DoDM 5205.02-M, DoD OPSEC Program Manual; DoDI 5230.09, Clearance of DoD Information for Public Release; DoDI 5230.29, Security and Policy Review of DoD Information for Public Release; DoDI 5400.04, Provision of Information to Congress; DoDM 5400.07, DoD FOIA Program; and DoDI 8170.01, Online Information Management and Electronic Messaging.</blockquote>
+  <div class="ev-explanation">Part 6 lists 13 DoD directives and regulations as &#x27;Applicable Publications&#x27; with no explanation of how each applies to fingerprint channeling work performed at a contractor facility. Several are of questionable relevance: DoDI 5200.39 governs Critical Program Information within Research, Development, Test and Evaluation programs — this is a simple fingerprint channeling service with no RDT&amp;E component. DoDI 5400.04 (Provision of Information to Congress) and DoDI 5230.09 (Clearance of DoD Information for Public Release) have no obvious connection to a vendor digitizing fingerprint cards and transmitting them to a state repository. The list appears to be a standard DoD boilerplate block, not curated for this specific scope.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2.5.3.4 Programs protected by a Program Protection Plan (PPP) and that have identified Critical Program Information (CPI) and/or Critical Technologies Information (CTI) must be identified and protected IAW DoDI 5200.39, CPI Identification and Protection within RDT&amp;E.</blockquote>
+  <div class="ev-explanation">DoDI 5200.39 governs Critical Program Information in Research, Development, Test and Evaluation contexts. This is a firm-fixed-price commercial services contract to digitize hardcopy fingerprint cards and transmit them to the State of Michigan — an estimated 382–430 submissions per year. There is no RDT&amp;E program, no Critical Program Information, and no Critical Technologies involved. Including this requirement verbatim in the PWS is a textbook copy-forward artifact that adds compliance language with zero operational relevance to this work.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2.5.3.5 The contractor shall comply with OPSEC content review policies within the Agency... The contractor will ensure that these reviews are conducted according to agency guidance IAW mandates from: DoDD 5205.02E, DoD OPSEC Program; DoDM 5205.02-M, DoD OPSEC Program Manual; DoDI 5230.09, Clearance of DoD Information for Public Release; DoDI 5230.29, Security and Policy Review of DoD Information for Public Release; DoDI 5400.04, Provision of Information to Congress; DoDM 5400.07, DoD FOIA Program; and DoDI 8170.01, Online Information Management and Electronic Messaging.</blockquote>
+  <div class="ev-explanation">Seven additional directives are cited within the OPSEC section alone, many overlapping with Part 6&#x27;s list, with no explanation of how a fingerprint channeling vendor — working at their own facility, receiving mailed fingerprint cards, and transmitting data to a state repository — would conduct public release reviews (DoDI 5230.09), manage congressional information requests (DoDI 5400.04), or administer FOIA responses (DoDM 5400.07). These requirements appear to be a standard OPSEC clause block applied wholesale to a narrow, low-complexity commercial service.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a well-matched use of Firm-Fixed-Price contracting. The core requirement — digitizing hardcopy fingerprint cards and electronically transmitting them to the Michigan state repository — is a discrete, repeatable, commercially available service with a clear deliverable per transaction (a processed fingerprint submission with a CHRI result returned). The CLIN structure prices on a per-unit &#x27;Each&#x27; basis, which is the standard commercial model for fingerprint channeling services. The scope is stable and well-defined: the government sends a fingerprint card, the contractor digitizes and transmits it, and a result comes back. There is no ambiguity about what constitutes completion, no significant technical uncertainty, and no evolving requirements. The quantities (382–430 submissions per year) are modest and based on historical patterns, making estimation reasonably straightforward. FFP per-unit pricing is the industry norm for channeling services, incentivizes the contractor to process submissions efficiently, and gives the government cost predictability. There is no indication that requirements will change materially, that scope is uncertain, or that labor content is unpredictable in ways that would argue for T&amp;M or cost-reimbursement. The choice of FFP here is well-justified and appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>1.6.6. Type of Contract: The Government will award a Firm-Fixed-Price.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type is Firm-Fixed-Price (FFP).</div>
+</div><div class="evidence-item">
+  <blockquote>0002 | Michigan Fingerprint Channeling (Base) | 17 June 2026 - 16 June 2027 | 382 | Each | [unit price] | 0</blockquote>
+  <div class="ev-explanation">The CLIN structure prices fingerprint channeling on a per-unit (Each) basis with fixed quantities estimated for each period. This is a classic per-transaction FFP model, where the contractor is paid a fixed rate per fingerprint submission processed — a straightforward commercial service with a well-defined deliverable per unit.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="B04 a%29 Solicitation Amendment 0002 SF 30.pdf">B04 a%29 Solicitation Amendment 0002 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7db0679187a94332b4e843a8c421d67a_B04+a%29+Solicitation+Amendment+0002+SF+30.pdf" download="B04 a%29 Solicitation Amendment 0002 SF 30.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="B04 a%29 Solicitation HS002126QE023 Amendment 0002.pdf">B04 a%29 Solicitation HS002126QE023 Amendment 0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7db0679187a94332b4e843a8c421d67a_B04+a%29+Solicitation+HS002126QE023+Amendment+0002.pdf" download="B04 a%29 Solicitation HS002126QE023 Amendment 0002.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="B04 b%29 Attachment 0002 - HS002126QE023 Pricing Workbook.xlsx">B04 b%29 Attachment 0002 - HS002126QE023 Pricing Workbook.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/7db0679187a94332b4e843a8c421d67a_B04+b%29+Attachment+0002+-+HS002126QE023+Pricing+Workbook.xlsx" download="B04 b%29 Attachment 0002 - HS002126QE023 Pricing Workbook.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="B04 b%29 Attachment 0003 - Questions and Answers.pdf">B04 b%29 Attachment 0003 - Questions and Answers.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7db0679187a94332b4e843a8c421d67a_B04+b%29+Attachment+0003+-+Questions+and+Answers.pdf" download="B04 b%29 Attachment 0003 - Questions and Answers.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Performance Work Statement %28PWS%29.pdf">Performance Work Statement %28PWS%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7db0679187a94332b4e843a8c421d67a_Performance+Work+Statement+%28PWS%29.pdf" download="Performance Work Statement %28PWS%29.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

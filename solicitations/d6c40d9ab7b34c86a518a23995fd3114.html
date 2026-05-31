@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Federal Bureau of Prisons Inmate Tablet Implementation Initiative — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Federal Bureau of Prisons Inmate Tablet Implementation Initiative</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d6c40d9ab7b34c86a518a23995fd3114</span>
+      <a class="sam-link" href="https://sam.gov/opp/d6c40d9ab7b34c86a518a23995fd3114/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-27</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">JUSTICE, DEPARTMENT OF › FEDERAL PRISON SYSTEM / BUREAU OF PRISONS › PRIVATIZATION - CO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541512</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-27</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price Requirements</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">48-month base period (4 years) from Notice to Proceed, followed by three independently exercisable 12-month option periods and one 6-month extension period (up to 90 months total)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Approach</li><li>Security and Compliance</li><li>Management &amp; Staffing Plan</li><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-to-significant compliance-over-outcomes pattern. On one hand, it includes some genuine outcome orientation that prevents a severity 3 rating: there are defined SLAs (7-day hardware replacement, 24-hour critical patch deployment, 14-day standard patching), explicit performance targets like bed-level connectivity coverage, FedRAMP High certification requirements, and Section 508 compliance mandates. These are real accountability commitments. The security compliance framework (FISMA, FedRAMP, ATO requirements) also reflects legitimate, non-negotiable federal requirements rather than pure compliance theater.
+
+However, the accountability structure is meaningfully tilted toward process compliance over mission outcomes. The four-tiered meeting cadence (weekly through annual) combined with prescribed artifacts at each level — RAID logs, deployment roadmaps, compliance dashboards, CAP documentation — creates substantial overhead oriented around &#x27;are you following the plan?&#x27; The reporting deliverables section is dominated by compliance artifacts: ATOs, VPATs, PIAs, SORNs, penetration test results, patch management percentages. These are all process compliance measures.
+
+Most tellingly, the solicitation&#x27;s stated rehabilitative mission — enhancing &#x27;educational, healthcare, legal, religious, and communication resources&#x27; for 150,000 people — has no corresponding outcome metrics in the accountability structure. There are no defined targets for GED completion rates, telehealth utilization, legal access usage, educational module completion, or any indicator that the platform is achieving its rehabilitative purpose. The government will know if the vendor filed the right paperwork on time; it will not know if the platform is transforming outcomes for incarcerated people. This gap between stated mission and measured accountability is the hallmark of this sin, warranting a severity 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Weekly Meetings – Tactical Execution &amp; Issue Resolution... Output: Weekly status report, updated RAID log (Risks, Actions, Issues, Decisions)
+
+Monthly Meetings – Program Management &amp; Performance Oversight... Output: Monthly Program Dashboard, updated deployment roadmap, validated performance metrics
+
+Quarterly Meetings – Executive Governance &amp; Compliance Assurance... Output: Quarterly Executive Briefing Package, Corrective Action Plans (if required), governance directives
+
+Annual Meeting – Strategic Planning &amp; Full Lifecycle Review... Output: Annual Performance Review, updated Strategic Modernization Plan</blockquote>
+  <div class="ev-explanation">The solicitation mandates four overlapping reporting cadences — weekly, monthly, quarterly, and annual — each with prescribed attendees, agendas, and output artifacts. The weekly output is a status report and RAID log focused on &#x27;deployment progress,&#x27; &#x27;open defects,&#x27; and &#x27;SLA tracking&#x27; rather than any outcome measure. The monthly output is a &#x27;program dashboard&#x27; and &#x27;updated roadmap&#x27; — essentially plan-adherence documents. This layered cadence generates substantial paperwork and meeting time, much of it tracking whether activities are proceeding per plan rather than whether the system is delivering value to users.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide a PM who will work in alignment with a PM assigned by the FBOP enterprise PMO. The Vendor&#x27;s PM will follow FBOP PMO reporting processes, and artifact requirements per the BOP&#x27;s PM (weekly status reports, RAID logs, Milestones, Project Schedules etc...). Vendor PM will create a detailed Microsoft project schedule that includes the milestones.</blockquote>
+  <div class="ev-explanation">This requirement orients the vendor&#x27;s project management toward plan-adherence artifacts — RAID logs, milestone tracking, Microsoft Project schedules — rather than performance outcomes. The primary accountability mechanism is whether the vendor is following the BOP PMO&#x27;s process framework, not whether the system is working well for inmates or staff.</div>
+</div><div class="evidence-item">
+  <blockquote>Compliance Reporting – Ongoing reporting and assurance artifacts, including: Quarterly compliance reports covering vulnerability scans, patch management (14-day compliance), accessibility validation, and privacy/records management audits. Annual independent third-party security assessments validating ongoing compliance. Corrective Action Plans (CAPs) within thirty (30) days of any audit finding.</blockquote>
+  <div class="ev-explanation">The compliance reporting deliverables are almost exclusively process-compliance artifacts: patch management adherence percentages, audit findings, and CAPs. While patch compliance has a security rationale, this section contains no user-facing outcome metrics — no measure of whether educational content is being accessed, whether telehealth visits are succeeding, or whether the platform is improving rehabilitative outcomes. The accountability structure asks &#x27;did you follow the patching schedule?&#x27; not &#x27;is the system serving 150,000 users effectively?&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Quarterly compliance reports covering... accessibility validation... Monthly Program Dashboard... Review of AI analytic outputs and operational enhancements... Review of accessibility compliance and user adoption metrics</blockquote>
+  <div class="ev-explanation">The one near-outcome measure — &#x27;user adoption metrics&#x27; — appears once in a monthly meeting agenda item without any definition, target, or consequence tied to it. It is embedded in a list dominated by process items. There is no defined threshold for acceptable adoption rates, no consequence for low adoption, and no specification of what &#x27;user adoption&#x27; means in this context. This illustrates the pattern: outcome-adjacent language exists but is subordinated to and undefined relative to the compliance-heavy accountability framework.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Reports – Metrics validating uptime, SLA adherence, interoperability testing, and user adoption. Dashboards shall be provided to senior leadership for ongoing program oversight.</blockquote>
+  <div class="ev-explanation">The performance reporting deliverable is framed around SLA adherence and uptime — which are process compliance metrics (did you meet the 7-day replacement window?) rather than true outcome measures. &#x27;User adoption&#x27; again appears without definition or targets. Notably absent: measures of educational outcomes, rehabilitative engagement rates, telehealth utilization quality, reduction in disciplinary incidents, or any mission-level indicator of whether the $500M+ program is achieving its stated rehabilitative purpose.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider-reward characteristics that tilt competition toward incumbents without completely foreclosing it. The core problem is the repeated, explicit preference for correctional-institution-specific tablet experience, combined with a requirement for three comparable contracts within five years and past performance weighted equally with technical approach (together significantly more important than price). The inmate communications and tablet market is a highly specialized, tightly regulated niche with very few large-scale players. Requiring demonstrated experience managing tablet programs &#x27;across numerous correctional institutions&#x27; is not a generic capability test — it is a market-specific credential that only a handful of vendors can credibly claim.
+
+However, the solicitation does not reach severity 3 for several reasons. First, the past performance requirement does not impose a specific dollar threshold (e.g., &#x27;$25M+ contracts only&#x27;), which would be more exclusionary. Second, the Section M language explicitly notes that &#x27;The Government may consider efforts performed by the offeror for agencies of the federal, state, or local governments and commercial customers as potentially relevant&#x27; — this leaves a door open for non-federal and non-correctional experience to be credited. Third, the evaluation criteria allow non-incumbents to compete on technical approach and price, and price (though secondary) could still be a tiebreaker. Fourth, the solicitation was structured with multiple site visits, an in-person blueprint review, and multiple amendment cycles responsive to vendor questions — signs of at least some effort to enable broader competition.
+
+The net effect is a playing field that is meaningfully tilted toward vendors with prior correctional technology experience, particularly BOP-specific tablet or telecommunications contract history, but not completely closed to well-resourced new entrants who can credibly analogize comparable enterprise deployments. Severity 2 is appropriate: competition is disadvantaged but not eliminated.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Preference will be given to proposals that demonstrate a proven approach to managing projects of comparable size and scope, including the ability to effectively oversee multiple concurrent installations, as well as the operation and management of the physical tablet and its operating environment across numerous correctional institutions.</blockquote>
+  <div class="ev-explanation">This language, repeated in both Section L (past performance instructions) and Section M (evaluation criteria), creates an explicit preference for vendors who have previously managed tablet programs in correctional institutions. The correctional setting is a narrow operational domain, and &#x27;numerous correctional institutions&#x27; is a further specificity. A vendor with extensive enterprise tablet deployment experience in, say, healthcare or hospitality — comparable in scale, security complexity, and multi-site logistics — would be disadvantaged relative to someone with direct prison tablet experience, even if the underlying capability is equivalent or superior.</div>
+</div><div class="evidence-item">
+  <blockquote>An Offeror&#x27;s past performance information shall include a minimum of three (3) of the offeror&#x27;s most recent contracts occurring during the past five years that are similar and relevant in nature to the services required in the Statement of Objectives.</blockquote>
+  <div class="ev-explanation">Requiring three relevant contracts within five years is a stacking requirement. Combined with the preference for correctional-specific experience and enterprise-scale tablet deployment, the pool of vendors who can produce three recent, relevant, comparable contracts is very small. The inmate tablet market is dominated by a handful of specialized vendors (NCIC Inmate Communications, Securus/Aventiv, Global Tel Link/ViaPath, etc.), and this lookback window with a three-contract floor effectively filters toward those incumbents or their closest competitors.</div>
+</div><div class="evidence-item">
+  <blockquote>2.1 FACTOR - Vendor experience in delivering large-scale, multi-state enterprise IT solutions. 2.2 FACTOR - Documented history of meeting SLA targets and maintaining federal security compliance. 2.3 FACTOR - References from comparable federal/state/enterprise-level projects.</blockquote>
+  <div class="ev-explanation">Past performance accounts for a significant share of evaluation weight (equal to technical, and both together &#x27;significantly more important than price&#x27;). Factor 2.2 specifically requires &#x27;documented history of... maintaining federal security compliance&#x27; — a federal-specific experience mandate. A vendor with excellent commercial enterprise IT credentials and strong SLA performance would need to demonstrate federal security compliance history specifically, which disadvantages new entrants to the federal market even if their security posture is equivalent or superior.</div>
+</div><div class="evidence-item">
+  <blockquote>Preference will be given to proposals that demonstrate a proven approach to managing projects of comparable size and scope, including the ability to effectively oversee multiple concurrent installations, as well as the operation and management of the physical tablet and its operating environment across numerous correctional institutions.</blockquote>
+  <div class="ev-explanation">The phrase &#x27;the physical tablet and its operating environment across numerous correctional institutions&#x27; is the most pointed insider-reward signal in the document. It is not asking for large-scale multi-site IT deployment experience generically — it is asking for correctional tablet experience specifically. This is a domain so narrow that only a tiny number of vendors have done it at scale. The current federal inmate tablet market has essentially one major incumbent (Global Tel Link/ViaPath, which holds or has held BOP tablet contracts), and this language rewards that institutional familiarity directly.</div>
+</div><div class="evidence-item">
+  <blockquote>1.3.1 Subfactor - Qualifications of key personnel and subcontractors. 1.3.2 Subfactor - Approach to managing logistics, site access, and facility coordination nationwide.</blockquote>
+  <div class="ev-explanation">&#x27;Site access and facility coordination&#x27; in a federal correctional context requires understanding FBOP-specific security clearance processes, institution protocols, NCIC background check procedures, and coordination with facility wardens — knowledge that accumulates through prior BOP contract performance. While not explicitly requiring prior BOP experience, scoring this subfactor in practice advantages vendors whose key personnel have navigated these specific institutional processes before, because they can credibly describe and document an approach. New entrants must describe an approach they have not yet executed in this environment.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. It is a complex, high-stakes procurement for a correctional IT infrastructure serving 150,000+ users across 120 facilities, and a significant portion of the specificity is legitimately justified by the unique correctional security environment — devices cannot have USB ports, must resist tampering, must prevent contraband introduction, must operate within FedRAMP-High constraints. These are genuine constraints, not sprawl.
+
+However, the SOO crosses from outcome-defining into solution-prescribing in several meaningful areas. Hardware specifications specify exact materials, gauges, and dimensions rather than performance standards. Infrastructure requirements dictate installation architecture (specific cable grades, run length limits, patch panel placement) rather than network performance outcomes. The communications monitoring section prescribes a detailed intelligence platform feature set rather than defining security surveillance outcomes. The five-layer nested security group requirement is a specific design choice masquerading as a security requirement.
+
+The document is structured as a Statement of Objectives, which should be the most outcome-focused of all SOW formats — yet it frequently slides into specification-level detail that constrains vendor solution design. The overall pattern suggests that multiple organizational stakeholders (security, IT, facilities, intelligence) each added detailed requirements from their domain without a unifying effort to translate those needs into outcomes.
+
+The sprawl is present and consequential — a vendor with innovative approaches to tamper-resistant device design, network architecture, or access management would face significant compliance hurdles — but it is not pervasive enough to warrant a severity 3. The framework of the SOO does define outcomes and objectives in most sections, with the prescriptive elements appearing as specific sub-requirements rather than dominating the entire document. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The vendor shall deliver a secure tablet with a screen size of 8 to 12 inches. The device shall be durable, including a ruggedized design and possess weather resistant features with tamper monitoring to alert if the case is compromised. The device must be strengthened to resist wear and drop abuse and must prevent access to internal components (e.g., specialty screws which require custom, proprietary tools to remove them.) In addition, device should have a 3.5mm audio jack, an FM radio receiver and no external speaker. Device shall only have wireless, magnetic or cordless charging to prevent tampering and destruction of charging stations.</blockquote>
+  <div class="ev-explanation">While correctional security constraints justify some hardware specificity (tamper resistance, no external ports), the combination of exact screen size range, mandatory FM radio receiver, 3.5mm audio jack requirement, and the specific charging method prescription (wireless/magnetic/cordless only) goes beyond outcome-based security constraints. These lock vendors into specific hardware design choices rather than defining a functional outcome like &#x27;devices must not enable contraband introduction or unauthorized connectivity.&#x27; A vendor with an innovative device meeting the security objectives but using a different charging architecture or audio solution would be disqualified.</div>
+</div><div class="evidence-item">
+  <blockquote>Kiosk should contain a touch screen; however, a durable security centered keyboard will also be considered especially supporting disabled inmates who could not access the kiosks... Kiosks shall have a heavy-duty locking mechanism, hinges, door mechanisms capable of resisting inmate tampering and vandalism. Hardware must be contained in the kiosk enclosure... Kiosks should be built with heavy-gauge (e.g., 14-gauge) welded steel housing to withstand significant physical abuse... Touchscreens must be sealed against dirt, dust, and liquids and made of impact-resistant material, such as 3mm or 4mm tempered glass.</blockquote>
+  <div class="ev-explanation">The specification of 14-gauge steel, 3mm-4mm tempered glass thickness, and specific locking hardware types prescribes manufacturing specifications rather than performance outcomes. A legitimate outcome-based requirement would be: &#x27;Kiosk enclosures must withstand [defined force/impact standard] and prevent unauthorized internal access.&#x27; Instead, the SOO dictates the specific material grade and thickness, eliminating vendors who might propose equivalent or superior tamper-resistance through alternative materials or construction methods.</div>
+</div><div class="evidence-item">
+  <blockquote>The vendor shall utilize Cat6a or greater cabling, engineered to support 10Gbps links... Distance Limitations: To maintain signal integrity, no individual cable run shall exceed 300 feet in length... All backbone or long-distance cabling shall utilize single-mode fiber... All cabling must be terminated into dedicated patch panels located within designated secure building communications closets... patch panels must be clearly labeled and physically separated from existing FBOP network infrastructure.</blockquote>
+  <div class="ev-explanation">These infrastructure installation requirements cross from performance standards into installation specifications. Requiring Cat6a specifically (when Cat6a is one way to achieve 10Gbps), setting a 300-foot maximum run length, and specifying patch panel placement and labeling methodology are all &#x27;how to install&#x27; prescriptions. The legitimate outcome — reliable 10Gbps network connectivity throughout designated areas — could be achieved through multiple cabling approaches. The 300-foot limit and patch panel segregation requirements reflect a specific wiring architecture rather than a performance standard.</div>
+</div><div class="evidence-item">
+  <blockquote>The system should leverage artificial intelligence (AI), natural language processing (NLP), and advanced analytics to automatically transcribe, translate, and analyze inmate communications, and to correlate those communications with other available inmate communications and intelligence related data sources... Systems must automatically transcribe audio and flag specific security-relevant keywords (e.g., &#x27;contraband,&#x27; &#x27;hit,&#x27; &#x27;snitch,&#x27; or gang-specific slang) for immediate administrative review... Investigators require the ability to set &#x27;watch lists&#x27; that send automated SMS or email alerts to staff the moment a high-risk inmate initiates a video visit or sends a message... Every video session must be stored in a tamper-proof, cloud-based repository with a chain-of-custody log for legal evidence. Monitoring logs should include GPS location (for remote visitors), IP addresses, device IDs, and inmate account numbers linked to every interaction.</blockquote>
+  <div class="ev-explanation">The video visitation and communications monitoring section prescribes specific technical capabilities in granular detail — keyword flagging with example slang terms, watch-list functionality with specific alert delivery methods (SMS/email), GPS location logging, and chain-of-custody repositories. These prescribe a specific intelligence platform architecture rather than defining the outcome (e.g., &#x27;staff must be able to identify and respond to security threats in inmate communications&#x27;). The specificity of required data elements, alert mechanisms, and AI analytical methods significantly constrains how a vendor can design the monitoring system.</div>
+</div><div class="evidence-item">
+  <blockquote>The security system must provide administrators with the ability to manage access rights at multiple levels, including by individual device, group, location, and content. Security groups must support nested group structures up to five layers, allowing for granular access control and simplified enterprise administration. Security assignments shall at a minimum allow for usage time limits, Time-of-Day (TOD) usage, location usage and content filtering.</blockquote>
+  <div class="ev-explanation">Specifying exactly five layers of nested security group depth is a design prescription rather than an outcome requirement. The legitimate need — granular administrative control across a large correctional enterprise — could be met through flat role hierarchies, attribute-based access control, or other identity management architectures. Mandating a specific depth of nested group structures forces vendors to implement a particular administrative model, potentially excluding superior access control approaches that don&#x27;t use nested groups at all.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate but not severe case of rule pooling. The regulatory citations are heavily concentrated in three areas: the SOO Section 7.10 Government Policy Requirements list, the Security Objectives in Section 6.2, and the incorporated DOJ-05 clause in Section H. Together, these cite approximately 20-25 distinct regulatory frameworks, standards, and directives across FISMA, FedRAMP, NIST SPs, FIPS publications, Privacy Act, E-Government Act, Federal Records Act, NARA, OPCL, OMB M-21-31, DOJ Orders 0904, 0601, DOJ-03, DOJ-05, DOJ-07, Section 508, multiple FBOP TDG divisions, and catch-all references to &#x27;DOJ IT Security Standards as amended&#x27; and &#x27;OMB Memoranda.&#x27; The volume is elevated above what would be expected for a focused compliance section. However, this does not rise to severity 3 for several reasons. First, the majority of the cited regulations are at least plausibly relevant to an enterprise IT deployment handling PII for 150,000 incarcerated individuals in a federal law enforcement environment — this is genuinely a high-compliance environment. Second, unlike the canonical rule pool example (the VA SMS solicitation with its 88-document list including standby power device regulations), there are no clearly absurd or contradictory inclusions. There is no cited regulation that flatly contradicts the solicitation&#x27;s purpose. Third, Section 7.10 does include a mitigating statement: &#x27;When government-furnished information is required... FBOP will cite only the specific sections relevant to this effort, rather than entire publications,&#x27; suggesting some self-awareness about the problem. Fourth, the FBOP TDG attachments, while numerous, are at least identified by specific division number, giving vendors a starting point. The primary deficiencies are: no prioritization among the cited regulations, no explanation of which provisions within each framework create specific contractor obligations, overlapping and redundant citations of security requirements across multiple sections, and catch-all references (&#x27;OMB Memoranda relating to security&#x27;) that are effectively open-ended compliance commitments. A vendor new to FBOP contracting would face meaningful difficulty scoping the compliance burden, but an experienced federal IT contractor would recognize most of the cited frameworks as standard for high-sensitivity federal systems work. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall adhere to all applicable Department of Justice (DOJ) and FBOP policies, including but not limited to: DOJ Order 0904 (Cybersecurity Program) and DOJ-03 (Personnel Security Requirements For Contractor Employees)... DOJ 05 (Security of Department Information and Systems)... DOJ residency requirements... Prohibitions on unauthorized wireless bridging... Requirements that all hosting occur within approved GovCloud environments... Protection of FBOP intellectual property... Federal Information Security Modernization Act (FISMA). Federal Risk and Authorization Management Program (FedRAMP) High. Privacy Act of 1974. E-Government Act of 2002. Federal Records Act and applicable National Archives and Records Administration (NARA) records schedules. Section 508 of the Rehabilitation Act accessibility standards. Department of Justice (DOJ) Cybersecurity Directives. DOJ Office of Privacy and Civil Liberties (OPCL) privacy and records management requirements. FBOP Technical Design Guidelines (TDG&#x27;s)</blockquote>
+  <div class="ev-explanation">Section 7.10 of the SOO lists approximately 13 distinct regulatory frameworks in a single undifferentiated block under &#x27;Government Policy Requirements.&#x27; While most are plausibly relevant to an enterprise IT deployment in a federal prison environment, no explanation is provided for how each applies to the specific work. The E-Government Act of 2002 and the Federal Records Act, for example, are cited without any context explaining which provisions apply or what contractor obligations they create. The list reads as a compiled master list rather than a curated set of operationally relevant mandates.</div>
+</div><div class="evidence-item">
+  <blockquote>Comply with OMB Memorandum M-21-31... Contractors must meet FISMA, FedRAMP, Privacy Act 1974, DOJ Cyber Security Orders and DOJ-05.</blockquote>
+  <div class="ev-explanation">In the Security Objectives section (6.2), OMB M-21-31 (Improving the Federal Government&#x27;s Investigative and Remediation Capabilities Related to Cybersecurity Incidents) is cited alongside FISMA, FedRAMP, and Privacy Act without explanation of which provisions apply or why. OMB M-21-31 is specifically focused on federal agency logging requirements and incident response reporting timelines — its application to a commercial vendor deploying tablets in prisons is not self-evident and no context is provided.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractors must comply with DOJ-03... Contractors must meet the background investigation requirement... Contractor employees will occupy Public Trust Positions... Covered Contract is any contract... DOJ Information shall not process, store, or transmit using a Covered Information System without first obtaining an ATO for each Covered Information System.</blockquote>
+  <div class="ev-explanation">The security objectives section layers multiple overlapping requirements (DOJ-03, DOJ-05, FISMA, FedRAMP, ATO requirements) without clarifying the sequencing or priority relationships between them. The ATO requirement is stated twice in slightly different forms in the SOO (sections 6.2 and 3), creating redundancy without clarity. Vendors must piece together from multiple sections how these interdependent requirements interact — e.g., what the relationship is between the ATO and the FedRAMP authorization already required.</div>
+</div><div class="evidence-item">
+  <blockquote>All installation work shall strictly adhere to the current FBOP Technical Design Guidelines (TDGs). The contractor is responsible for ensuring all materials and workmanship meet or exceed the following specific TDG divisions: 26 05 33: Raceways and Boxes for Electrical Systems; 28 50 10: Security Electronics Raceways; 28 50 20: Security Electronics Conductors; 28 51 20: Security Electronics Fiber Optic Cable System; 28 61 60: Security Electronics DV Distribution System.</blockquote>
+  <div class="ev-explanation">Five separate FBOP Technical Design Guideline divisions are cited for physical installation work. These are provided as attachments (attachments 5-9, totaling 73 pages), but no context is provided distinguishing which TDG provisions are mandatory versus advisory, which apply to all facilities versus only specific facility types, or how vendors should handle conflicts between TDG requirements and the physical constraints of existing facility infrastructure. The TDGs are referenced as absolute compliance mandates without any applicability scoping.</div>
+</div><div class="evidence-item">
+  <blockquote>For all Covered Information Systems, in addition to any other applicable requirements... the Contractor shall comply with the security requirements of the Federal Information Security Modernization Act of 2014 (&#x27;FISMA&#x27;), Privacy Act of 1974, E-Government Act of 2002, National Institute of Standards and Technology (&#x27;NIST&#x27;) Special Publications (&#x27;SP&#x27;), including NIST SP 800-37, 800-53, and 800-60 Volumes I and II, Federal Information Processing Standards (&#x27;FIPS&#x27;) Publications 140-2, 199, and 200, Federal Risk and Authorization Management Program (&#x27;FedRAMP&#x27;), DOJ IT Security Standards as amended, and OMB Memoranda relating to the security of information and/or Federal Information Systems.</blockquote>
+  <div class="ev-explanation">The DOJ-05 clause incorporated into Section H lists FISMA, Privacy Act, E-Government Act, NIST SP 800-37, NIST SP 800-53, NIST SP 800-60 (Volumes I and II), FIPS 140-2, FIPS 199, FIPS 200, FedRAMP, DOJ IT Security Standards, and a catch-all reference to &#x27;OMB Memoranda relating to security&#x27; — all in a single sentence with no differentiation. The catch-all &#x27;OMB Memoranda&#x27; reference is particularly undifferentiated, as there are dozens of OMB security memoranda and no guidance is given on which apply. This is the most classic form of rule pooling: a single clause that gestures at an entire regulatory ecosystem.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a genuine pricing structure mismatch, though it is moderate rather than severe because the government&#x27;s approach — while unconventional — has an internal logic and some mitigation factors. The core issue is that the solicitation labels itself &#x27;Firm Fixed Price&#x27; but operates as a usage-based concessionaire model: the primary deployment CLIN is $0, the government disclaims all capital costs, and vendor revenue depends entirely on variable inmate consumption of services. Per-unit prices are fixed, but the total contract value and cost to the government (via Trust Fund markups) is entirely unpredictable. This is closer to a requirements contract with fixed unit rates than a true FFP arrangement. The severity is 2 rather than 3 for several reasons: (1) per-unit pricing for each service category (minutes of phone calls, messages sent, etc.) is internally consistent with FFP at the unit level, which is a defensible approach for commercial-service type contracts; (2) the concessionaire model — where the vendor recoups costs through service fees rather than direct government payments — is a recognized approach in correctional telecommunications, so the structure is not without precedent; (3) for the variable usage items, the government has provided historical consumption estimates that vendors can use for pricing, which partially addresses the uncertainty; and (4) the no-cost CLIN for implementation is unusual but reflects a deliberate policy choice to offload capital risk to the vendor rather than a drafting error. However, the fundamental tension remains: FFP works best when the government knows what it is buying and at what total cost. Here, the government knows the unit price but not the total, does not pay for the primary deliverable (infrastructure), and the vendor&#x27;s ability to recover its investment depends on inmate purchasing behavior over a 4-7 year period. This creates incentive misalignments — vendors may underprice optional services to win the award while planning to recover costs through mandatory services, or may price conservatively to cover deployment risk, making the contract less competitive. A more appropriate structure might have been a concession contract with separately structured capital recovery provisions, or a hybrid where infrastructure deployment was priced on a cost-reimbursable or milestone-based basis while recurring services used per-unit FFP pricing. The placeholder in the contract type clause (52.216-1 still reads &#x27;[Contracting Officer insert specific type of contract]&#x27;) also suggests the government has not fully resolved its own contract type determination.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government contemplates award of a Requirements [Contracting Officer insert specific type of contract] contract resulting from this solicitation. (52.216-1 Type of Contract)</blockquote>
+  <div class="ev-explanation">The solicitation invokes FAR 52.216-21 (Requirements contract) and labels itself a &#x27;requirements contract,&#x27; but Section B explicitly states &#x27;Firm Fixed Price&#x27; as the pricing structure. A requirements contract sets ordering obligations but does not itself fix pricing type — here the combination with FFP means the vendor receives fixed unit prices for highly variable, usage-driven consumption. The contract type field still contains an unfilled placeholder (&#x27;[Contracting Officer insert specific type of contract]&#x27;), indicating the government has not fully resolved its own contract type determination.</div>
+</div><div class="evidence-item">
+  <blockquote>The BOP does not intend to directly pay for the tablets or the infrastructure they will operate on. The offeror will recoup these costs through the sale of services to the inmate/Trust Fund. ... Consistent with Trust Fund policy, the vendor shall provide services directly to the Bureau of Prisons (BOP) and shall invoice the BOP monthly for services based on actual usage in accordance with the contract pricing schedule.</blockquote>
+  <div class="ev-explanation">The government explicitly disclaims responsibility for capital costs (tablets, infrastructure) and instead structures compensation as usage-based revenue from inmate purchases. This is a hybrid commercial/concessionaire model — not a standard government procurement. The FFP label does not accurately describe what is happening: there is no fixed price to the government for the core deliverable (the infrastructure deployment), and revenue depends entirely on inmate usage patterns that cannot be predicted. This creates a fundamental mismatch between the stated FFP contract type and the actual economic structure.</div>
+</div><div class="evidence-item">
+  <blockquote>ITEM NO. 0001: Inmate Use Tablet Implementation... **THIS IS A NO COST CLIN**... The Implementation will consist of providing all necessary hardware, software, network infrastructure, kiosks, and deployment support to implement a tablet program to be utilized by approximately 150,000 inmates at 120 FBOP institutions throughout the United States.</blockquote>
+  <div class="ev-explanation">The single largest and most complex element of the contract — deploying hardware, software, and network infrastructure across 120+ correctional facilities — is priced as a $0 CLIN. This means the FFP structure has no mechanism to price or control the government&#x27;s most significant obligation: the physical deployment. The vendor must instead model all of its deployment cost recovery through downstream usage-based service fees, which are inherently variable and unpredictable. A FFP structure normally gives cost certainty on defined deliverables; here, the primary deliverable is unpriced.</div>
+</div><div class="evidence-item">
+  <blockquote>Entertainment 39%, Phone – 37%, E-mail – 16%, Video call 7%. Any contract line item identified as ancillary/optional shall not be included in the price evaluation.</blockquote>
+  <div class="ev-explanation">The price evaluation methodology weights service categories by estimated usage percentages. Phone calls alone account for 400,000,000 minutes per year as an estimated quantity, with actual payment based on &#x27;actual consumption/usage.&#x27; These are not fixed-price deliverables — they are variable-rate, usage-driven services. A FFP contract is inappropriate for this structure because there is no fixed price for a defined deliverable; instead, total government cost (and vendor revenue) is entirely a function of inmate behavior over time.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors are advised that all quantities are estimates only. The estimates are not a representation by the Government to purchase these quantities. The quantities are estimates based on inmate purchases from the previous year and should be used to prepare the pricing proposal. Payment shall be made for actual consumption/usage.</blockquote>
+  <div class="ev-explanation">The government explicitly disclaims the estimated quantities and confirms payment is based on actual consumption. This is definitionally inconsistent with a firm-fixed-price contract, which requires a fixed price for a fixed deliverable. The contract is actually structured more like a requirements/indefinite-quantity contract with per-unit pricing — which can be FFP at the unit level but is not FFP in total value. The disconnect between the &#x27;Firm Fixed Price&#x27; label and the actual &#x27;pay for what you use&#x27; economic reality is a structural mismatch.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="1. Business Management Questionaire.pdf">1. Business Management Questionaire.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6c40d9ab7b34c86a518a23995fd3114_1.+Business+Management+Questionaire.pdf" download="1. Business Management Questionaire.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="10. DOJ Self-Attestation-Common-Form.pdf">10. DOJ Self-Attestation-Common-Form.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6c40d9ab7b34c86a518a23995fd3114_10.+DOJ+Self-Attestation-Common-Form.pdf" download="10. DOJ Self-Attestation-Common-Form.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="12. SOO FBOP Inmate Tablet Initiative.pdf">12. SOO FBOP Inmate Tablet Initiative.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6c40d9ab7b34c86a518a23995fd3114_12.+SOO+FBOP+Inmate+Tablet+Initiative.pdf" download="12. SOO FBOP Inmate Tablet Initiative.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Cover Letter.pdf">Cover Letter.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6c40d9ab7b34c86a518a23995fd3114_Cover+Letter.pdf" download="Cover Letter.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFP 15BPCC26R00000001 00004.pdf">RFP 15BPCC26R00000001 00004.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d6c40d9ab7b34c86a518a23995fd3114_RFP+15BPCC26R00000001+00004.pdf" download="RFP 15BPCC26R00000001 00004.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

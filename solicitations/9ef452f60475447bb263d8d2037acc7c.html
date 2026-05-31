@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Display Paint/Refresh — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Display Paint/Refresh</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 9ef452f60475447bb263d8d2037acc7c</span>
+      <a class="sam-link" href="https://sam.gov/opp/9ef452f60475447bb263d8d2037acc7c/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-01-29</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVAIR › NAVAIR NAWC WD › NAVAL AIR WARFARE CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">238320</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-01-29</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">From 09 Feb 2026 to 09 Mar 2026</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Delivery</li><li>MUST Provide separate quote of items/services</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits minimal compliance-over-outcomes characteristics. The accountability structure is lean and outcome-oriented for a job of this scope. The SOW contains one deliverable (the repainted aircraft), one acceptance criterion (painted per the scheme with no deviations), and relies on direct inspection of the finished product rather than process documentation. There are no recurring status reports, no prescribed report formats, no required meeting cadences, and no plan-adherence tracking requirements. The Safety Data Sheets requirement (section 4.3) is a legitimate regulatory obligation, not compliance theater. The QA section explicitly frames evaluation around &#x27;the finished product&#x27; and the paint scheme specifications — the quintessential outcome measure for a painting job. The solicitation is a simple FFP commercial services purchase under SAT using FAR Parts 12 and 13, and its accountability mechanisms are appropriately scaled to that type of acquisition. Severity 1 is the correct rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The government POCs will evaluate the finished product (i.e., the fully repainted aircraft) with the specifications in accordance with the paint scheme provided.</blockquote>
+  <div class="ev-explanation">This QA language is outcome-focused: acceptance is based on evaluating the finished product against the paint scheme specifications, not on verifying the contractor followed a prescribed process. The government is asking &#x27;did the aircraft get painted correctly?&#x27; not &#x27;did the contractor document their steps?&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Skyraider is painted in accordance with Skyraider paint scheme document with no deviations.</blockquote>
+  <div class="ev-explanation">The single deliverable acceptance criterion is product-oriented and concrete — zero deviations from the paint scheme. This is a clear outcome standard, not a process compliance checkbox.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a straightforward, one-time commercial painting service — repainting a static display aircraft (Douglas AD-4N Skyraider) at China Lake, CA. The evaluation criteria are limited to price, delivery, and submission of a separate quote with specifications. There are no experience requirements of any kind stated in the solicitation, no minimum dollar thresholds for prior contracts, no federal-specific experience mandates, no past performance scoring criteria, no key personnel qualifications with experience floors, and no institutional knowledge requirements. The SOW describes tasks any competent commercial painter could perform: surface preparation, painting to a provided paint scheme, applying finishing touches, and site cleanup. The paint scheme itself is attached as a reference document, making the requirements fully transparent to any bidder. Base access is required, but that is an administrative requirement, not an experience filter. The evaluation section (FAR 52.212-2) lists only &#x27;Price&#x27; and &#x27;Delivery&#x27; as factors, with a note to provide a separate quote. No past performance factor is listed. A qualified commercial painter who has never worked a federal contract could realistically compete on equal footing with any incumbent. There is no evidence of insider rewards in this solicitation.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, simple procurement — repainting a static display aircraft to a documented paint scheme. The core outcome is well-defined and appropriately stated: &#x27;Skyraider is painted in accordance with Skyraider Paint Scheme document with no deviations.&#x27; The paint scheme attachment provides a legitimate technical specification (colors, patterns, insignia placement) that any qualified painter needs to meet. That portion of the solicitation is well-scoped.
+
+However, the SOW then breaks the work into five numbered tasks that read as a step-by-step operating procedure: lay tarps, tape off areas, sand surfaces, paint, apply finishing touches, clean up. Each task description tells the contractor not just what to achieve but how to achieve it. A professional painting contractor bidding on this work would already know these steps — they are the standard craft practice for any exterior paint job. By codifying them as contract requirements, the government removes the contractor&#x27;s discretion to use, for example, different surface preparation methods, different masking techniques, or different sequencing that their experience suggests would produce a better result. The outcome standard (paint matches the scheme, no deviations) could stand alone without the procedural scaffolding.
+
+The sprawl here is real but limited in scope. There is no staffing prescription, no tool mandate, no reporting cadence overkill, and no complex workflow diagram. The specifications for paint type (&#x27;durable, UV-resistant polyurethane paints over an epoxy primer&#x27;) could be read as prescriptive, though they reflect legitimate durability requirements for an outdoor display aircraft subject to the Mojave Desert climate and may be appropriate constraints. The USACE EM 385-1-1 citation is an unusual addition for a commercial painting contract but not deeply harmful.
+
+Overall, this is a severity 2: the process-dictating elements in tasks 4.1–4.5 are clearly present and constitute genuine requirement sprawl, but they don&#x27;t dominate the solicitation — the outcome standard in the deliverables table is clear, the work scope is narrow, and a vendor could still price and propose the job meaningfully. The solicitation is not operationally crippled by the sprawl, but a more experienced drafter would have stated the tasks as outcomes rather than procedures.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Prepare and protect the area around the aircraft. This task includes laying and securing tarps around the aircraft to protect the concrete pad under the aircraft and the surrounding areas.
+4.2 Prepare the aircraft for painting. This task includes applying painter&#x27;s tape as appropriate to areas that will not be painted, removing old paint, and sanding surfaces as necessary.
+4.3 Paint the aircraft. This task includes painting the aircraft in accordance with the Skyraider Paint Scheme document, using durable, UV-resistant polyurethan paints over an epoxy primer designed to withstand extreme temperatures.
+4.4 Apply finishing touches. This task includes correcting any mistakes, applying a high quality gloss or semi-gloss finish, removing any overspray, and ensuring that all insignias are placed and painted in accordance with the Skyraider Paint Scheme document.
+4.5 Remove all materials, equipment, and dispose of all refuse associated with the tasks. This task includes cleaning up the work site, disposing of any accumulated trash and used materials, and disposing of any hazardous waste in accordance with OSHA regulations.</blockquote>
+  <div class="ev-explanation">The SOW enumerates a step-by-step operational procedure — tarp placement, painter&#x27;s tape application, sanding, overspray correction, site cleanup — that dictates exactly how a professional painter must sequence and execute the work. A competent painting contractor already knows how to prepare a surface and clean up afterward; these are standard trade practices. Specifying them as contract requirements constrains the contractor&#x27;s professional judgment without adding meaningful accountability for the actual outcome. The desired outcome — an aircraft painted correctly to spec — could have been stated without prescribing each intermediate task.</div>
+</div><div class="evidence-item">
+  <blockquote>Safety Data Sheets for all paint used must be provided to Government POCs listed in 12.0.</blockquote>
+  <div class="ev-explanation">This is a minor prescriptive process requirement (submitting SDS documents to named POCs) rather than an outcome. While SDS documentation is a reasonable safety expectation, mandating the delivery mechanism to specific government contacts rather than simply requiring OSHA-compliant material handling is a low-level process prescription. It is a minor example of the same pattern.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall observe all appropriate safety standards in accordance with all OSHA standards and the U.S. Army Corps of Engineers (USACE) Safety and Health Requirements Manual (EM 385-1-1). Fall protection is also required for all work that is 4 feet or more off the ground.</blockquote>
+  <div class="ev-explanation">Referencing OSHA standards is a legitimate legal/safety constraint and is not sprawl. However, additionally mandating compliance with the USACE Safety and Health Requirements Manual (EM 385-1-1) — a construction-focused manual not legally required for a simple aircraft repainting by a commercial contractor — layers on a prescriptive process reference beyond what the legal baseline requires. This is a marginal example, but it reflects the same instinct to specify &#x27;how&#x27; rather than simply stating the safety outcome required.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. The actual work scope is narrow and well-defined: repaint a single static display aircraft on a military base using commercially available paint, per a provided paint scheme document. The SOW is appropriately concise and its applicable documents section cites only what matters. However, the contract clauses section (Section I) is a standard DoD small-purchase template that has been applied wholesale to this simple task without filtering. The result is 35+ FAR/DFARS clauses incorporated by reference, plus several reproduced in full text (most notably the five-page IUID clause, which is self-evidently inapplicable and says so internally by populating its own applicability fields with &#x27;N/A&#x27;). Several clauses — UAS foreign entity prohibitions, export controls, cyber incident reporting — have no plausible connection to painting an aircraft. The 52.212-5 omnibus clause further multiplies the list by enumerating 65 sub-items with checkmarks, presenting vendors with a wall of regulatory text to parse. That said, this is recognizably standard DoD commercial-contract boilerplate rather than an agency-specific accumulation of custom directives, and the clause list does not contain outright contradictions with the solicitation&#x27;s purpose. The severity is elevated above minimal because the regulatory volume is disproportionate to the scope, several citations are plainly irrelevant, and no contextual guidance is provided — but it does not reach severe because the clauses are mostly standard templates rather than an idiosyncratic accumulated list, and the SOW itself is well-scoped. Severity 2 is the appropriate assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR Clauses Incorporated by Reference: 52.203-19, 52.204-10, 52.204-13, 52.204-19, 52.204-23, 52.204-25, 52.204-27, 52.209-6, 52.209-10, 52.212-4, 52.219-6, 52.222-3, 52.222-36, 52.222-50, 52.223-23, 52.225-3, 52.225-13, 52.226-8, 52.232-33, 52.232-40, 52.233-1, 52.233-3, 52.233-4, 52.240-1 [plus DFARS clauses 252.203-7000, 252.203-7002, 252.204-7003, 252.204-7012, 252.204-7018, 252.225-7048, 252.225-7056, 252.225-7060, 252.232-7010, 252.244-7000, 252.247-7023]</blockquote>
+  <div class="ev-explanation">Thirty-five-plus FAR and DFARS clauses are incorporated by reference in Section I alone, with no contextual explanation of how each applies to the actual work — repainting a static display aircraft. While many are standard DoD commercial-contract boilerplate, presenting them all at the same level without any prioritization guidance elevates the apparent compliance burden well beyond what the scope warrants.</div>
+</div><div class="evidence-item">
+  <blockquote>252.211-7003 Item Unique Identification and Valuation. (Jan 2023) [full text, spanning pages 21-25, defining &#x27;Concatenated unique item identifier,&#x27; &#x27;Data matrix,&#x27; &#x27;DoD item unique identification,&#x27; &#x27;Enterprise identifier,&#x27; &#x27;Serialization within the enterprise identifier,&#x27; etc.]</blockquote>
+  <div class="ev-explanation">The full text of DFARS 252.211-7003 — a complex clause governing DoD&#x27;s item unique identification (IUID) system — is reproduced across five pages of this solicitation for a paint job on a single static display aircraft. The clause itself fills in &#x27;N/A&#x27; for the line items that would actually trigger IUID marking requirements (unit acquisition cost thresholds), meaning the clause effectively does not apply operationally. Including it in full text adds significant apparent complexity without adding any real compliance requirement for this scope.</div>
+</div><div class="evidence-item">
+  <blockquote>52.240-1 Prohibition on Unmanned Aircraft Systems Manufactured or Assembled by American Security Drone Act-Covered Foreign Entities. Nov 2024</blockquote>
+  <div class="ev-explanation">This clause prohibits acquisition of UAS (drone) products from covered foreign entities. The solicitation is for painting a 1950s-era propeller-driven display aircraft that is permanently mounted on a concrete pad. There is no drone procurement here; this clause has no logical connection to the work and appears to be a copy-forward from a standard DoD small-purchase template.</div>
+</div><div class="evidence-item">
+  <blockquote>252.225-7048 Export-Controlled Items. Jun 2013 [and] 252.204-7012 Safeguarding Covered Defense Information and Cyber Incident Reporting. May 2024</blockquote>
+  <div class="ev-explanation">Export control and cyber incident reporting clauses are cited without any explanation of their applicability to a painting contract performed entirely on a government installation by workers applying commercially available polyurethane paint to a static display aircraft. While a cyber clause might be minimally relevant due to base access requirements, no explanation is provided connecting either clause to the actual work, leaving vendors to guess at their compliance obligations.</div>
+</div><div class="evidence-item">
+  <blockquote>3.0 Applicable Documents: The contractor must follow the requirements and paint scheme outlined in the Skyraider Paint Scheme document. This document will be incorporated by reference.</blockquote>
+  <div class="ev-explanation">In notable contrast to the lengthy regulatory clause lists in the solicitation form, the SOW&#x27;s own &#x27;Applicable Documents&#x27; section is admirably concise — citing only the paint scheme document. This creates a marked inconsistency: the technical requirements are tightly scoped, but the contract clauses section piles on dozens of regulations with no filtering for relevance to the actual work. The disconnect between the SOW&#x27;s lean regulatory posture and the solicitation form&#x27;s bulk clause list is characteristic of template-driven accumulation rather than deliberate curation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">FFP is well-suited to this requirement. The work is a discrete, one-time paint/refresh of a single static display aircraft. The paint scheme is fully documented and attached to the solicitation. The acceptance criterion is unambiguous — conformance to the scheme with no deviations. The materials and application standards are specified. A commercial painting contractor in the military base access market can reasonably estimate the labor hours, paint quantities, and site preparation costs needed to complete this job. There is no meaningful scope uncertainty, no evolving requirements, and no unpredictable labor quantity that would argue for T&amp;M. The note about five nearly identical CLINs (0001–0005) for the same &#x27;job&#x27; is a structural oddity but does not affect the appropriateness of the pricing type. FFP is the correct choice here, and the solicitation shows no signs of a square peg mismatch.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Sky Raider Display Refresh in accordance with the Statement of Work and Skyraider Paint Scheme attached in Section J. Pricing Arrangement: Firm Fixed Price</blockquote>
+  <div class="ev-explanation">All five CLINs (0001–0005) are priced as Firm Fixed Price. The requirement is to repaint a static display aircraft to a specific, documented paint scheme with no ambiguity about the end state.</div>
+</div><div class="evidence-item">
+  <blockquote>The scope of this effort includes repainting the Douglas AD-4N Skyraider display aircraft located in front of McLean Laboratory, building 00010, onboard NAWCWD in China Lake, California.</blockquote>
+  <div class="ev-explanation">The scope is narrow and well-defined: one specific aircraft, one location, one documented paint scheme. There is no scope uncertainty that would argue against fixed pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>Skyraider is painted in accordance with Skyraider paint scheme document with no deviations.</blockquote>
+  <div class="ev-explanation">The acceptance criterion is binary and objective — the aircraft either matches the paint scheme or it does not. This is exactly the kind of measurable deliverable that makes FFP appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>Paint the aircraft in accordance with the Skyraider Paint Scheme document, using durable, UV-resistant polyurethan paints over an epoxy primer designed to withstand extreme temperatures.</blockquote>
+  <div class="ev-explanation">The materials, method, and finish standard are specified. A qualified painting contractor can estimate labor and materials with reasonable certainty, making cost prediction feasible and FFP appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Skyraider Paint Scheme.pdf">Skyraider Paint Scheme.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9ef452f60475447bb263d8d2037acc7c_Skyraider+Paint+Scheme.pdf" download="Skyraider Paint Scheme.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N6893626Q5077.pdf">Solicitation - N6893626Q5077.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9ef452f60475447bb263d8d2037acc7c_Solicitation+-+N6893626Q5077.pdf" download="Solicitation - N6893626Q5077.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Statement of Work.pdf">Statement of Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9ef452f60475447bb263d8d2037acc7c_Statement+of+Work.pdf" download="Statement of Work.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

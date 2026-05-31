@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PROVIDE, INSTALL, AND MAINTAIN A 2.5GB WAVE SERVICE — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>PROVIDE, INSTALL, AND MAINTAIN A 2.5GB WAVE SERVICE</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e1f26e266ecd460cbe90d06faf7954db</span>
+      <a class="sam-link" href="https://sam.gov/opp/e1f26e266ecd460cbe90d06faf7954db/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2025-06-12</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE INFORMATION SYSTEMS AGENCY (DISA) › TELECOMMUNICATIONS DIVISION- HC1013</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-06-12</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>lowest price technically acceptable (LPTA)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brief combined synopsis/solicitation for a commercial telecommunications service — a 2.5GB wave service procured under NAICS 517111. The body of the notice is largely administrative boilerplate: FAR/DFARS clause references, LPTA evaluation notice, and CLIN structure guidance. The actual performance requirements, QA provisions, and any reporting obligations are contained in the attached solicitation document, which was not provided for analysis.
+
+Because telecommunications wave services are commodity infrastructure procurements, they typically carry straightforward SLA-based accountability (uptime, latency, mean time to repair) rather than elaborate process-compliance reporting regimes. The LPTA evaluation method is consistent with a binary technical standard — the service meets specification or it doesn&#x27;t — which is outcome-oriented by nature. Nothing in the visible solicitation text mandates status reports, progress reports, meeting cadences, or process documentation.
+
+However, the absence of visible compliance-theater language is partly an artifact of the attachment not being provided. Without reviewing the attached RFQ (which would contain the statement of work, technical requirements, and any QA surveillance plan), it is impossible to fully assess whether compliance-over-outcomes patterns exist. Given the nature of the requirement (a commercial telecom circuit), the probability of a heavy process-compliance overlay is low, but not zero.
+
+Severity is assessed at 1 — minimal. The visible solicitation content shows no signs of compliance-over-outcomes problems, and the service type strongly favors SLA-based outcome accountability. The finding is constrained by incomplete attachment visibility but is not flagged as insufficient content because the solicitation body itself provides enough context to make a reasonable low-severity determination.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The lowest price technically acceptable (LPTA) source selection process will be used to evaluate quote(s). Details of the specific evaluation criteria and the date/time offers are due can be found in the attachment.</blockquote>
+  <div class="ev-explanation">The solicitation uses LPTA evaluation, which for a straightforward commercial telecommunications service (2.5GB wave service) is outcome-adjacent: the technical acceptability threshold implicitly defines a performance baseline (the service either works or it doesn&#x27;t). There is no indication of elaborate process-compliance reporting layered on top.</div>
+</div><div class="evidence-item">
+  <blockquote>All quoted prices shall be identified as monthly recurring charges and/or non-recurring charges. CLINs shall include item descriptions, quantities, and units of measure as indicated in the IQO Deskbook.</blockquote>
+  <div class="ev-explanation">The pricing structure is focused on service delivery outputs (recurring charges for an active service) rather than labor hours or activity-based billing, which is a mild positive indicator for outcome orientation. No reporting burden is visible in this pricing framework.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a commercial telecommunications service — specifically a 2.5GB Wave Service — procured under NAICS 517111 (Wired Telecommunications Carriers). The solicitation is a straightforward commercial services acquisition using FAR Part 12 procedures and an LPTA evaluation methodology.
+
+After reviewing the solicitation, there is no evidence of insider rewards patterns. The solicitation does not impose narrow prior-contract dollar thresholds, federal-specific experience mandates, short lookback windows, or institutional knowledge requirements that would effectively filter out non-incumbents.
+
+The nature of this procurement is highly relevant: a Wave Service (optical/DWDM transport) is a standardized commercial telecommunications product. The market for this service is dominated by large carriers (AT&amp;T, Lumen, Verizon, Zayo, etc.) that routinely provide such services to both commercial and government customers. Any carrier with the network infrastructure to provision a 2.5GB Wave circuit at the specified location can realistically compete. The technical capability is demonstrated by possessing the physical network infrastructure, not by prior government contract history.
+
+The LPTA evaluation approach further mitigates insider rewards risk: technically acceptable proposals are evaluated primarily on price, which means incumbency advantages in evaluation scoring are minimal. There are no bonus points awarded for prior similar contracts, no personnel qualification requirements tied to federal experience, and no indication that the evaluation criteria reward institutional knowledge of the agency&#x27;s existing environment.
+
+The solicitation references the DITCO Basic Agreement and IQO Deskbook for pricing structure, which are standard DISA telecommunications contracting vehicles open to qualified carriers — not incumbent-specific mechanisms.
+
+In summary, this solicitation describes a commodity telecommunications service with no meaningful insider rewards characteristics. A qualified carrier new to this specific DISA contract could realistically compete on price and technical acceptability. Severity is assessed at 1 — minimal.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation contains insufficient substantive requirements language in the posted notice to identify significant requirement sprawl. The description text is largely administrative — it describes the procurement vehicle (combined synopsis/solicitation under FAR Subpart 12.6), evaluation method (LPTA), applicable clauses, and pricing structure (MRC/NRC), but defers nearly all substantive requirements to the attached solicitation document, which is referenced but not provided in the text analyzed. The core requirement — a 2.5GB WAVE (wavelength) telecommunications service — is a defined commercial product with industry-standard specifications. Buying a commercial telecom circuit by bandwidth and technology type (WAVE/DWDM) is outcome-oriented: the government is specifying WHAT connectivity it needs, not HOW the carrier should engineer or operate its network. This is analogous to specifying a service tier, not dictating network architecture. The use of LPTA evaluation also suggests a straightforward commercial procurement where the technical specifications are relatively fixed by the commercial market, leaving little room for sprawl to manifest meaningfully. Without the attached RFQ document — which the posting explicitly states contains &#x27;the requested quote due date, service date, description of requirement, place of performance and POC information&#x27; — a full assessment is not possible. However, based on the available text, there are no indicators of prescriptive process mandates, staffing requirements, or step-by-step workflow requirements. The solicitation reads as a standard commercial telecom circuit procurement. Severity is assessed at 1 (minimal), with the caveat that the attachment may contain additional requirements that could change this assessment.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This is a combined synopsis/solicitation for commercial products or commercial services prepared in accordance with the format in Subpart 12.6...</blockquote>
+  <div class="ev-explanation">The solicitation frames this as a commercial product/service acquisition under FAR Part 12, which inherently limits how prescriptive the government can be about delivery methods. This framing signals the government is buying a commercial telecommunications service, not dictating how a vendor should engineer or operate their network.</div>
+</div><div class="evidence-item">
+  <blockquote>PROVIDE, INSTALL, AND MAINTAIN A 2.5GB WAVE SERVICE</blockquote>
+  <div class="ev-explanation">The requirement title describes a specific commercial telecom service type (wavelength/WAVE service at a defined bandwidth), which is a technical interoperability constraint rather than prescriptive process sprawl. Specifying &#x27;2.5GB&#x27; and &#x27;WAVE&#x27; defines WHAT service is needed — a standard commercial offering — not HOW the vendor must deliver it.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools pattern in any meaningful way. The regulatory citation in the posted notice is limited to four standard FAR 52.212-series clauses that are universally applicable to commercial items acquisitions under FAR Subpart 12.6. These are not curated from a master list — they are the prescribed clauses for this acquisition type. The notice also references the &#x27;DITCO Basic Agreement&#x27; and an attached RFQ for the full terms, which means additional clauses may exist in those documents. However, based on the available text, there is no evidence of bulk, undifferentiated, or irrelevant regulatory citation. The scope is straightforward — providing, installing, and maintaining a 2.5GB Wave Service (a telecom circuit, NAICS 517111) — and the compliance framework presented matches that scope. Without access to the attachment, I cannot fully rule out a hidden rule pool in the RFQ attachment, but the posted solicitation text itself reflects restrained and appropriate citation practice. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR 52.212-1, Instructions to Offerors – Commercial Products and Commercial Services; FAR 52.212-3, Offeror Representations and Certifications – Commercial Products and Commercial Services (Alternate I); FAR 52.212-4, Contract Terms and Conditions Commercial Products and Commercial Services; FAR 52.212-5, Contract Terms and Conditions Required to Implement Statutes or Executive Orders Commercial Products and Commercial Services.</blockquote>
+  <div class="ev-explanation">The solicitation cites only four standard FAR Part 12 commercial items clauses, all of which are directly applicable to any commercial products/services acquisition. These are boilerplate FAR clauses incorporated by reference — a normal and appropriate practice, not a rule pool. There is no undifferentiated bulk list of agency-specific directives, executive orders, or policy documents appended.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a commercial telecommunications service — specifically the provision, installation, and maintenance of a 2.5Gbps optical wavelength (WAVE) circuit. The pricing structure implied by the solicitation (monthly recurring charges and non-recurring charges) is the standard commercial pricing model for this type of service and is well-aligned with the requirements. A WAVE service is a well-defined, stable commercial product: the scope is clear (deliver a circuit of specified capacity between endpoints), the cost is predictable (commercial market rates for optical services), and the ongoing maintenance obligation is routine and stable. A fixed/recurring-charge pricing model is effectively equivalent to a firm-fixed-price approach for a commercial service — the government pays a known monthly rate for a defined service level. This is precisely the right pricing structure for this type of requirement. There is no mismatch between the contract pricing approach and the nature of the requirement. The use of LPTA evaluation further confirms the commodity nature of the purchase, where price comparison on a defined deliverable is appropriate. No square peg concern exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All quoted prices shall be identified as monthly recurring charges and/or non-recurring charges.</blockquote>
+  <div class="ev-explanation">This language indicates a recurring-charge pricing structure, which is standard and appropriate for a managed telecommunications service. Monthly recurring charges (MRCs) and non-recurring charges (NRCs) are the industry-standard pricing model for commercial telecom services like a 2.5GB WAVE (wavelength) circuit.</div>
+</div><div class="evidence-item">
+  <blockquote>PROVIDE, INSTALL, AND MAINTAIN A 2.5GB WAVE SERVICE ... NAICS Code: 517111</blockquote>
+  <div class="ev-explanation">A 2.5Gbps WAVE (optical wavelength) service is a well-defined commercial telecommunications product with a predictable scope: install a circuit between defined endpoints and maintain it at a specified capacity. The NAICS code 517111 (Wired Telecommunications Carriers) confirms this is a standard commercial service purchase, making fixed/recurring pricing highly appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📎</div>
+  <div class="file-info"><div class="file-name" title="HC101325QA248_v2.zip">HC101325QA248_v2.zip</div></div>
+  <a class="dl-btn" href="../attachments/e1f26e266ecd460cbe90d06faf7954db_HC101325QA248_v2.zip" download="HC101325QA248_v2.zip" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

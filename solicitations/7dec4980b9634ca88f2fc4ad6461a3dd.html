@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EWTGPAC Technical Training Instructional Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>EWTGPAC Technical Training Instructional Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 7dec4980b9634ca88f2fc4ad6461a3dd</span>
+      <a class="sam-link" href="https://sam.gov/opp/7dec4980b9634ca88f2fc4ad6461a3dd/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-04-02</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC SAN DIEGO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-02</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor 1, Subfactor A (Technical Approach addressing PWS paragraphs 5.1 through 5.3.6)</li><li>Subfactor C (Quality Control Plan / QCP)</li><li>Past Performance (Volume II)</li><li>Price/Cost (Volume III)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The QA accountability structure centers on a separate QASP attachment and a Quality Control Plan evaluated based on descriptive completeness rather than performance outcomes. The Q&amp;A exchanges reveal that the QCP is assessed on &#x27;the degree to which it clearly identifies and describes&#x27; processes — a framing that rewards documentation quality over demonstrated results. Personnel management is tracked by headcount and availability rather than instructional effectiveness. Compliance with NAVEDTRA procedural standards series serves as the primary quality reference without visible pairing to outcome metrics like student pass rates, course completion rates, or fleet readiness improvements. However, this is not a severe case: the solicitation is for technical training instructional services, where process compliance with Navy instructional standards (NAVEDTRA) has legitimate substantive content — it is not purely bureaucratic. The QASP exists as a structured attachment, suggesting some deliberate surveillance framework rather than pure ad hoc reporting. The solicitation also lacks the hallmark severe indicators: there is no evidence of overlapping reporting cadences (weekly + monthly + quarterly reports), no prescribed multi-section report formats for activity tracking, and no meeting frequency mandates visible in the provided text. The full QASP and PWS reporting sections are not fully reproduced, which limits confidence in either direction. On balance, severity 2 is appropriate: the QA evaluation framework is noticeably process-focused and description-oriented, with no visible outcome metrics, but the solicitation does not exhibit the full constellation of severe compliance-theater indicators. The QASP attachment may contain more granular surveillance mechanisms that could push this higher if reviewed in full.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>QASP (Attachment 2 - EWTGPAC NSFS Support QASP V(1).docx)</blockquote>
+  <div class="ev-explanation">The solicitation references a dedicated Quality Assurance Surveillance Plan as Attachment 2. While the QASP document itself is not fully reproduced in the provided text, its existence as a separate attachment — titled with the activity name and version number — signals a structured QA surveillance regime. The Q&amp;A exchange (Question 18) reveals that the QCP is evaluated based on &#x27;the degree to which the QCP clearly identifies and describes…&#x27; — a subjective, description-focused standard that measures the quality of process documentation rather than performance outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Section M 4.0, Subfactor C defines the QCP evaluation as a subjective review, &#x27;the degree to which the QCP clearly identifies and describes…&#x27;. Additionally the government has limited the QCP to 2 pages.</blockquote>
+  <div class="ev-explanation">The evaluation criterion for the Quality Control Plan is explicitly framed around how well the contractor describes their QA process — not whether that process produces measurable quality outcomes. The government is evaluating the plan&#x27;s descriptive completeness, not its effectiveness at achieving training results. This is a textbook compliance-over-outcomes structure: the contractor is rewarded for articulating process steps, not for demonstrating outcome-oriented quality metrics.</div>
+</div><div class="evidence-item">
+  <blockquote>QCP is expanded to four (4) pages. (Answer to Question 18)</blockquote>
+  <div class="ev-explanation">The government&#x27;s response to a request for more QCP space was to expand from 2 to 4 pages — indicating the QCP is primarily a documentation exercise. More pages means more process description. A genuinely outcome-focused QA mechanism would define measurable performance standards (e.g., student pass rates, course completion rates, training effectiveness metrics) rather than prescribe document length for a narrative description of QA procedures.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS Section 2.12.3 states that the Government reserves the right to request none, any, or all non-key personnel during any contract option year, and to increase or reduce the number of non-key personnel based on the needs of the Government.</blockquote>
+  <div class="ev-explanation">The Government&#x27;s personnel management approach is structured around staffing presence and personnel availability rather than training outcomes. The solicitation tracks who is on-site and in what numbers, rather than whether the instructional services are achieving student learning objectives. This is a proxy-for-outcomes approach: personnel headcount compliance substitutes for measurement of instructional effectiveness.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS 5.2 and 6.1 references NAVEDTRA 130, 134B, and 135C (series). These references were superseded by NETC in 2025. Request Government confirmation if the offeror&#x27;s response should address a solution based on the superseded references or should the offeror use the updated NAVEDTRA series? Answer: Offeror&#x27;s response should address a solution based on the updated NAVEDTRA series.</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s quality framework is anchored in compliance with NAVEDTRA procedural standards series — a process-compliance reference set. While adherence to Navy instructional design standards is legitimate, the solicitation does not appear to pair these process standards with outcome measures such as student learning assessments, course effectiveness ratings, or fleet readiness improvements. Process compliance (following NAVEDTRA methodology) is the dominant accountability mechanism, with no visible counterbalancing outcome metrics.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics, landing at severity 2. The most significant factor is the 4-week ramp-up requirement, which is operationally very difficult for any non-incumbent to meet in a cleared, government-facility-access environment. Combined with a narrow domain (EWTGPAC technical training — a specialized naval expeditionary warfare training mission), a past performance requirement that will naturally favor the incumbent&#x27;s directly relevant references, and initial documentation that reflected incumbent-era operational details (superseded NAVEDTRA references), the solicitation tilts the competitive field meaningfully toward the current contractor. However, several mitigating factors prevent a severity 3 rating: the solicitation is a Total Small Business Set-Aside, which expands the nominal competitive pool; the Q&amp;A process was responsive and corrected several issues (LOIs accepted, superseded references updated, OCI language revised); past performance evaluation allows CPARS submission; and there are no explicit dollar-threshold requirements for past contracts or federal-specific experience mandates of the type that constitute the most severe form of insider rewards. A capable small business with relevant Navy training support experience could realistically compete, though it would face meaningful structural disadvantages relative to the incumbent.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Previous Contracting Effort Narrative (Attachment 7): Maximum of 3 references (2-Page Limit each) total, one of the references may be for any subcontractor that performs more than 10% of total contract effort, page count does not apply for OPPD or CPARS</blockquote>
+  <div class="ev-explanation">The past performance requirement limits references to 3, which is not inherently exclusionary, but combined with the domain specificity of EWTGPAC technical training instructional services (a narrow Navy expeditionary warfare training niche), the pool of vendors with directly relevant past performance references is likely small and skewed heavily toward the incumbent.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide an integrated team and ramp up immediately by having its team in place and fully functioning within 4 weeks of contract award.</blockquote>
+  <div class="ev-explanation">A 4-week transition window heavily favors the incumbent. A non-incumbent would need to simultaneously hire or reassemble a full team, complete facility access and CAC badging for Navy installations, and become operational — all within 28 days. The incumbent already has cleared personnel on-site. This is a de facto incumbency preference embedded in an operational requirement rather than an evaluation criterion.</div>
+</div><div class="evidence-item">
+  <blockquote>Section L 4.1.1 additional instructions to offeror states, &#x27;The narrative must address PWS paragraphs 5.1 through 5.3.6.&#x27;</blockquote>
+  <div class="ev-explanation">While the PWS text is not fully reproduced in the available document, requiring offerors to address specific PWS paragraphs covering operational details of EWTGPAC&#x27;s training programs rewards vendors with prior familiarity with the command&#x27;s specific instructional frameworks, course structures, and organizational requirements — knowledge that incumbents acquire through performance and that challengers must reconstruct from incomplete public information.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS 5.2 and 6.1 references NAVEDTRA 130, 134B, and 135C (series). These references were superseded by NETC in 2025.</blockquote>
+  <div class="ev-explanation">The fact that the PWS initially cited superseded NAVEDTRA references — only corrected via Q&amp;A — suggests the SOW was drafted with intimate familiarity with the command&#x27;s existing (potentially outdated) processes rather than written from a vendor-neutral perspective. Non-incumbents who identified this inconsistency had to ask; the incumbent would already know the applicable standards. This is a subtle indicator of incumbency-oriented drafting.</div>
+</div><div class="evidence-item">
+  <blockquote>Section L 4.3.2.1.3 requires offerors to provide payroll system screen-captures for each individual named in the Staffing Plan... For small business offerors proposing candidates who are not yet employees, will the Government also accept signed Letters of Intent as supporting documentation for the Staffing Plan... Yes, Letters of Intent is acceptable.</blockquote>
+  <div class="ev-explanation">The initial requirement for payroll screen-captures of named personnel assumes offerors already have the required workforce on staff — a condition the incumbent satisfies automatically since its existing workforce is performing the work. Non-incumbents, who must propose contingent hires, face a higher administrative burden and uncertainty. The Q&amp;A accommodation (accepting LOIs) mitigates but does not eliminate this asymmetry.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core pattern is a tension between a Firm Fixed Price contract type — which theoretically should be outcome-oriented — and a proposal structure that demands named individuals, payroll substantiation, detailed staffing plans, and task-by-task narrative responses. These elements together push the solicitation toward prescribing the vendor&#x27;s workforce composition and operational approach rather than defining training outcomes (e.g., course completion rates, student throughput, curriculum currency standards). The Q&amp;A exchanges reinforce this: multiple questions concern how to structure labor pricing and who counts as key vs. non-key personnel, not what performance standards the government will use to evaluate success. The QASP (Attachment 2) is not fully reproduced in the available text, which limits assessment of whether meaningful outcome metrics exist to balance the prescriptive elements. The solicitation does not rise to severe (3) because: the NAVEDTRA references are legitimate standards for Navy training, the Technical Exhibits appear to define training scope rather than step-by-step delivery procedures, and the page-limited QCP and past performance volumes suggest the government is evaluating capability rather than pure compliance. However, the named-personnel requirement combined with FFP pricing and a 4-week ramp mandate creates a de facto prescriptive staffing model that limits how vendors can organize and deliver the work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5.1 The Contractor shall provide qualified instructors to conduct training for Expeditionary Warfare Training Group Pacific (EWTGPAC) in accordance with the Training Requirements listed in Technical Exhibit 1, 2, and 3. Instructors shall develop, revise, update, and deliver curriculum in accordance with NAVEDTRA 130, 134B, and 135C series (or updated equivalents per Q&amp;A #12).</blockquote>
+  <div class="ev-explanation">While referencing established Navy training development standards (NAVEDTRA) is a legitimate constraint, requiring instructors to simultaneously develop, revise, update, AND deliver curriculum bundles multiple distinct workstreams into a single role definition. This prescribes a staffing model — the instructor as curriculum developer — rather than defining the outcome (trained personnel meeting competency standards). A vendor might reasonably separate these functions for efficiency.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS Section 2.12.3 states that the Government reserves the right to request none, any, or all non-key personnel during any contract option year, and to increase or reduce the number of non-key personnel based on the needs of the Government.</blockquote>
+  <div class="ev-explanation">Combined with the FFP contract type and the staffing plan requirement naming individuals, this creates a prescriptive staffing structure where the government controls headcount and composition. Rather than defining a service level (e.g., training throughput, course completion rates), the government is managing labor inputs directly. The Q&amp;A answer — estimating non-key personnel rates at 5% of weighted labor rates &#x27;for planning purposes&#x27; — underscores the government&#x27;s focus on labor structure rather than outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Section L 4.3.2.1.3 requires offerors to provide payroll system screen-captures for each individual named in the Staffing Plan, with comparable position payroll data as an alternative where individual data is unavailable.</blockquote>
+  <div class="ev-explanation">Requiring named individuals in a staffing plan for a training services contract — complete with payroll substantiation — dictates the solution at the individual labor level. This effectively requires the vendor to pre-identify their workforce rather than propose a capability. It constrains how vendors staff the contract and forecloses workforce management flexibility, particularly for a small business competing under this set-aside.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide an integrated team and ramp up immediately by having its team in place and fully functioning within 4 weeks of contract award. (Q&amp;A #23 answer)</blockquote>
+  <div class="ev-explanation">While a transition timeline is a legitimate constraint, &#x27;fully functioning within 4 weeks&#x27; combined with the named-personnel staffing plan requirement means the vendor&#x27;s entire proposed team must be identifiable and ready pre-award. This is a process prescription that effectively mandates a near-incumbent-level workforce familiarity with the work, limiting genuine competition from new entrants who would need time to recruit and onboard.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS 5.2 and 6.1 references NAVEDTRA 130, 134B, and 135C (series)... [and] Section L 4.1.1 additional instructions state &#x27;The narrative must address PWS paragraphs 5.1 through 5.3.6&#x27;</blockquote>
+  <div class="ev-explanation">Requiring offerors to narratively address each PWS paragraph from 5.1 through 5.3.6 — combined with the Technical Exhibits defining specific training requirements — suggests the PWS contains granular task-level prescriptions that offerors must respond to individually. This structure (address each task as written, not propose how you would achieve the outcome) is a hallmark of requirement sprawl, where the SOW reads as a task list rather than a statement of need.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the available text — the solicitation amendment, Q&amp;A document, and amendment attachments — this solicitation does not exhibit rule pool behavior. The document set is notably lean in regulatory citation. There is no &#x27;Applicable Documents&#x27; section listing dozens of directives, executive orders, or agency policies. The regulatory references visible in the text are contextually appropriate: NAVEDTRA training standards for a Navy instructional services contract, HSPD-12 and DoD CAC requirements for physical/logical access, FAR Part 9.5 OCI provisions, and standard FAR privacy clauses. Crucially, the Q&amp;A process actually demonstrates active regulatory curation: when offerors flagged that cited NAVEDTRA references had been superseded, the government confirmed use of updated standards rather than passively deferring to the original list. The OCI section is lengthy but represents a legitimate area of legal complexity for consulting/support contracts, and it was further refined in response to offeror concerns. The full PWS/SOW text was not available in the provided documents (attachments referenced but not extracted), so it is possible that Technical Exhibits 1-3 contain additional regulatory citations. However, the absence of any vendor complaints about regulatory overload in the 25 Q&amp;A questions — and the presence of very specific, targeted regulatory questions instead — suggests the underlying PWS does not present an overwhelming compliance burden. Severity is assessed at 1: the compliance landscape appears curated and focused, with no evidence of bulk undifferentiated regulatory citation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>PWS 5.2 and 6.1 references NAVEDTRA 130, 134B, and 135C (series). These references were superseded by NETC in 2025. Request Government confirmation if the offeror&#x27;s response should address a solution based on the superseded references or should the offeror use the updated NAVEDTRA series? Answer: Offeror&#x27;s response should address a solution based on the updated NAVEDTRA series.</blockquote>
+  <div class="ev-explanation">This Q&amp;A exchange is notable because it demonstrates the government actively curating its regulatory citations when questioned. A vendor identified that specific training standards had been superseded, and the government promptly confirmed offerors should use the updated series. This is the opposite of passive rule-pool accumulation — it reflects responsiveness to applicability concerns.</div>
+</div><div class="evidence-item">
+  <blockquote>Attachment # File Name Description: 1 EWTGPAC NSFS Support dd0254 V(1).pdf DD254 | 2 EWTGPAC NSFS Support QASP V(1).docx QASP | 3 EWTGPAC NSFS Support Technical Exhibit 1 (V1).docx Technical Exhibit 1 | 4 EWTGPAC NSFS Support Technical Exhibit 2 (V1).docx Technical Exhibit 2 | 5 EWTGPAC NSFS Support Technical Exhibit 3 (V1).docx Technical Exhibit 3</blockquote>
+  <div class="ev-explanation">The attachment list is compact and purpose-driven: a DD254 (security classification guidance, appropriate for a Navy technical training contract), a QASP, and three technical exhibits. There is no sprawling &#x27;Applicable Documents&#x27; appendix with dozens of undifferentiated regulatory citations — a key indicator of rule pools.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm Fixed Price for technical training instructional services at EWTGPAC — a requirement that on its face is plausible for FFP, since instructional services can be scoped by course, student throughput, or hours delivered. However, several structural features of this solicitation introduce meaningful doubt about whether FFP is the right fit. First, the government explicitly reserves the right to vary non-key personnel from zero to full staffing in any option year, which is a quantity-uncertainty problem that FFP handles poorly — the contractor either overbids to cover the risk or underbids and suffers losses. The government&#x27;s answer (price at 5% of weighted labor rates) is a rough heuristic, not a defined scope. Second, separate surge CLINs exist for every period, again priced by heuristic rather than defined scope, acknowledging that demand is not fully predictable. Third, the level of cost-buildup data required (indirect rates, fringe, G&amp;A, payroll substantiation) mirrors cost-reimbursement practice; the government confirmed this data is for price analysis only and does not change the FFP nature, but the fact that this level of detail is needed suggests genuine uncertainty about cost. A labor-hour or FFP-level-of-effort contract with defined minimum and maximum hours might better allocate risk given the variable staffing provisions. That said, technical training instruction is a relatively routine, recurring service where FFP is commonly and defensibly used — the government knows what courses exist, has historical data on throughput, and has an incumbent. The misalignment is real but not severe: the variable staffing and surge provisions are the primary risk factors, and these are partially mitigated by the planning heuristics provided. Severity is assessed at 2 — moderate — because the FFP choice is defensible for the core instructional mission, but the variable non-key personnel provisions and surge CLINs introduce structural pricing uncertainty that FFP does not handle well.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The resulting Task Order is Firm Fixed Price</blockquote>
+  <div class="ev-explanation">Q&amp;A item 11 explicitly confirms the task order is Firm Fixed Price (FFP). This is the operative contract type for the core instructional services CLINs.</div>
+</div><div class="evidence-item">
+  <blockquote>PWS Section 2.12.3 states that the Government reserves the right to request none, any, or all non-key personnel during any contract option year, and to increase or reduce the number of non-key personnel based on the needs of the Government. Given that the resulting Task Order is Firm Fixed Price, can the Government clarify how offerors should price non-key personnel to account for this variability...</blockquote>
+  <div class="ev-explanation">The government itself acknowledges tension between FFP and variable staffing levels. Non-key personnel quantities can vary from zero to the full complement — an inherently uncertain labor quantity that is difficult to price accurately under FFP. The government&#x27;s response (&#x27;For planning purposes, non-key personnel rates are estimated at 5% of annual weighted labor rates&#x27;) is a rough planning heuristic, not a defined scope, which signals that actual labor demand is not well-defined enough for FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>Base Year (Surge) - Technical Training Instructional Services in accordance with SOW in Section C. (Note: this includes all Option Years for Surge.)</blockquote>
+  <div class="ev-explanation">Separate surge CLINs (5001, 5101, 5201, 5301, 5401) exist for each period, and surge is priced at an estimated 5% of weighted labor rates. Surge provisions indicate that the government anticipates demand variability beyond the base staffing plan, which is a characteristic better suited to T&amp;M or labor-hour contracts where actual hours consumed drive payment, rather than FFP where the contractor bears the risk of demand spikes.</div>
+</div><div class="evidence-item">
+  <blockquote>Section L 4.3.2.1.1 requires offerors to provide cost elements that include Cost of Money, fringe rates, overhead rates, G&amp;A rates, escalation, and payroll-based labor rate substantiation. These elements are typically associated with cost-reimbursable or time-and-materials contract types. Can the Government confirm that these cost elements are required solely to support price analysis and will not affect the Firm Fixed Price nature of the resulting Task Order? — Confirmed.</blockquote>
+  <div class="ev-explanation">The solicitation requires detailed cost-buildup data more typical of cost-reimbursement or T&amp;M contracts, including indirect rates, fringe, G&amp;A, and payroll substantiation. While the government confirms FFP will govern, the complexity of the cost analysis required suggests the government itself is uncertain about what labor will cost — a signal that price risk may be poorly allocated under FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide an integrated team and ramp up immediately by having its team in place and fully functioning within 4 weeks of contract award.</blockquote>
+  <div class="ev-explanation">A 4-week ramp-up for a technical training instructional services team, where key personnel are named and letters of intent are accepted as substitutes for actual employees, creates scope-certainty risk under FFP. If staffing plans are based on contingent hires who may not materialize, the contractor may need to substitute personnel mid-performance, creating pressure for contract modifications that FFP does not easily accommodate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📎</div>
+  <div class="file-info"><div class="file-name" title="N0024426R3103 Attachments.zip">N0024426R3103 Attachments.zip</div></div>
+  <a class="dl-btn" href="../attachments/7dec4980b9634ca88f2fc4ad6461a3dd_N0024426R3103+Attachments.zip" download="N0024426R3103 Attachments.zip" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Q and A.xlsx">Q and A.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/7dec4980b9634ca88f2fc4ad6461a3dd_Q+and+A.xlsx" download="Q and A.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment - N0024426R31030001.pdf">Solicitation Amendment - N0024426R31030001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7dec4980b9634ca88f2fc4ad6461a3dd_Solicitation+Amendment+-+N0024426R31030001.pdf" download="Solicitation Amendment - N0024426R31030001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment N0024426R31030001 SF 30.pdf">Solicitation Amendment N0024426R31030001 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7dec4980b9634ca88f2fc4ad6461a3dd_Solicitation+Amendment+N0024426R31030001+SF+30.pdf" download="Solicitation Amendment N0024426R31030001 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

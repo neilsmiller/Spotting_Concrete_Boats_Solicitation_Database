@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JOYSTICK,DATA ENTRY — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>JOYSTICK,DATA ENTRY</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 a88651acb1a04e3a8a58e6323d1d8de8</span>
+      <a class="sam-link" href="https://sam.gov/opp/a88651acb1a04e3a8a58e6323d1d8de8/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333998</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP) Repair Purchase Order</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">180 days RTAT (Return Turn-Around Time); 45 days for teardown &amp; evaluation after receipt of carcass(es)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for repair of a Fly-By-Wire Submarine Flight Critical Component (FBW SFCC) — a highly regulated, safety-critical hardware item. The QA framework is therefore inherently more process-intensive than a typical services contract, and many of the process requirements (traceability, segregation, certification packages, government source inspection) are legitimate safety and configuration-control mandates for submarine combat systems, not mere bureaucratic compliance theater.
+
+That said, the accountability structure does lean noticeably toward process compliance over outcome measurement. The quality assurance sections (3.6 through 3.17 and Section 4) are dense with documentation requirements, record-keeping obligations, procedure-submission mandates, and audit-availability requirements. The primary deliverable under CDRL DI-MISC-80678 is a certification package whose core element is a statement that procedures were followed and documentation is complete. While functional performance testing is mentioned (3.12.3, item 8 in 3.17), the solicitation specifies no quantitative performance acceptance thresholds — no pass/fail criteria, no performance tolerances, no minimum functional specification that the repaired joystick must meet. The government&#x27;s acceptance mechanism is largely whether the certification paperwork is properly assembled and the processes were followed.
+
+This is a moderate (severity 2) finding rather than severe because: (1) the reporting burden is not overlapping or multi-cadence — there is no weekly/monthly/quarterly report stacking; (2) functional testing is required (3.12.3, 3.17 item 8), even if performance thresholds are not specified; (3) 100% lot inspection is required (3.14.1), which is outcome-adjacent; and (4) the process-heavy approach is partially justified by the safety-critical, submarine flight-control nature of the item. The sin is present but mitigated by the nature of the procurement. The gap is the absence of defined performance acceptance criteria that would anchor the testing requirements to measurable outcomes rather than leaving &#x27;meets the Requirements Manual&#x27; as the only benchmark, verified primarily through self-certification.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.6.3 See CDRL DI-QCIC-81110 (INSPECTION SYSTEM/QA PROCEDURE) - All suppliers of SFCC material are required to submit a copy of their current documented quality system procedures to the Procurement Contracting Officer (PCO) prior to award of any contract/purchase order.</blockquote>
+  <div class="ev-explanation">This requirement mandates submission of quality system procedures documentation — a process compliance artifact — rather than requiring demonstration that the quality system actually produces defect-free or mission-capable components. The focus is on having a documented system, not on whether that system produces measurable quality outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>3.6.2 The Contractor&#x27;s quality system must be documented and must be available for review by the Contracting Officer or his representative prior to initiation of production and throughout the life of the contract. The Prime Contractor must, upon notification, make his facilities available for audit by the contracting Officer or his authorized representative.</blockquote>
+  <div class="ev-explanation">Availability for audit and documentation of the quality system are process-compliance checks. The government is verifying that the contractor has a documented process, not that the process produces components that perform to a defined standard in service.</div>
+</div><div class="evidence-item">
+  <blockquote>3.7 Contractor Inspection Requirements - The Contractor must maintain adequate records of all inspections and tests. The records must indicate the nature and number of observations made, the number and type of deficiencies found, the quantities approved and rejected, and the nature of corrective action taken as appropriate.</blockquote>
+  <div class="ev-explanation">Record-keeping is required in detail, but the requirement is focused on maintaining documentation of activities rather than on achieving a specific defect rate, yield target, or functional performance threshold. There is no outcome metric such as &#x27;defect rate shall not exceed X&#x27; — only the obligation to document what happened.</div>
+</div><div class="evidence-item">
+  <blockquote>3.17 See CDRL DI-MISC-80678 (FBW CERTIFICATION PACKAGE OQE) - Certification test report OQE to be kept on file by the certifying activity must include the following: 1. A statement equivalent to the following: All SFCC certification attributes, inspections and performance verification testing associated with this SFCC has been accomplished and meet the Requirements Manual...</blockquote>
+  <div class="ev-explanation">The primary certification deliverable is a declaratory statement that processes were completed and documentation requirements were met — &#x27;all inspections and performance verification testing has been accomplished.&#x27; While performance testing is referenced, the acceptance criterion is the presence of a compliant certification package, not a independently verified performance result against a defined threshold.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a sole source repair purchase order for a Fly-By-Wire Submarine Flight Critical Component (FBW SFCC) — specifically a joystick/data entry device used in Virginia, Seawolf, and Columbia class submarines. The document is explicit that it is a sole source requirement (note 12) placed on an existing Basic Ordering Agreement (BOA N0010422GZD01). There are no competitive evaluation criteria, no past performance scoring rubrics, no dollar-threshold experience requirements, and no personnel qualification standards at all. The solicitation does not have the structural features that constitute insider rewards — it is not a competitive solicitation pretending to be neutral while favoring an incumbent through hidden scoring mechanics.
+
+The technical requirements (MIL-STD-1686, ISO 9001, MIL-Q-9858, NAVSEA T9044-AD-MAN-010 compliance, 100% SFCC inspection, MIC marking, traceability to OQE) are extensive but are driven by genuine safety criticality for submarine flight control systems, not by a desire to exclude newcomers from competition. The OEM authorization requirement similarly reflects supply chain integrity concerns appropriate to flight-critical hardware.
+
+Because the solicitation is openly sole source with no competitive evaluation criteria, the insider rewards framework does not have meaningful application here. The solicitation rates severity 1: there are no experience requirements, evaluation criteria, or scoring structures that could constitute an insider rewards program. The lack of competition is a separate procurement policy question (whether the sole source justification is warranted) rather than evidence of this particular sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This is a sole source requirement.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly acknowledges sole source justification, which means the government has already determined there is only one responsible source. This is not an experience requirement that excludes competitors through scoring criteria — it is an upfront acknowledgment that competition is not anticipated. The insider rewards sin concerns solicitations that masquerade as competitive while structuring requirements to favor the incumbent; here the lack of competition is openly stated rather than embedded in evaluation criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>If the offeror is not the Original End Manufacturer (OEM) of the material called out in the requirement, the OEM must be stated (Company Name and CAGE) and the offeror must provide a signed letter of authorization as a distributor on the OEM&#x27;s letterhead.</blockquote>
+  <div class="ev-explanation">This requirement limits participation to the OEM or OEM-authorized distributors, which narrows the vendor pool. However, for a flight-critical submarine component (Fly-By-Wire Ship Control System), this is a defensible safety and traceability requirement rather than an incumbency reward — it ensures the item is manufactured and certified to the correct specification. It reflects genuine technical constraints, not a scoring mechanism designed to advantage an incumbent.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a firm-fixed-price repair purchase order for a joystick data entry device used as a Fly-By-Wire Submarine Flight Critical Component (FBW SFCC). The vast majority of the document&#x27;s specificity stems from two sources: (1) mandatory quality system standards (MIL-Q-9858, ISO9001, MIL-I-45208, MIL-STD-1686) that are regulatory/safety baselines rather than prescriptive process choices, and (2) SFCC-specific requirements from NAVSEA T9044-AD-MAN-010 governing traceability, material identification, segregation, and certification of flight-critical components used in submarine ship control systems.
+
+The SOW&#x27;s repair requirements (Section 3.1) are notably sparse and outcome-oriented: clean, inspect, refurbish to the referenced technical data package (TDP), and replace non-usable parts per that TDP. The contractor retains discretion over how to execute the refurbishment within those bounds. There is no staffing prescription, no mandated tooling beyond what the TDP requires, and no step-by-step workflow imposed beyond what safety and quality assurance legitimately demand for flight-critical submarine hardware.
+
+The extensive traceability, segregation, marking, and documentation requirements (Sections 3.10–3.17) are legitimately driven by the extraordinary safety stakes of fly-by-wire submarine ship control components. These are not process sprawl — they are the minimum controls necessary to ensure the right certified parts go into nuclear submarine flight control systems. A vendor in this space would expect and require these controls; they define the problem constraints, not the solution method.
+
+The quality assurance sections (3.6–3.9) reference accepted industry and military quality system standards and give contractors flexibility to use any of several compliant frameworks (MIL-Q-9858, ISO9001, MIL-I-45208). This is the opposite of prescriptive sprawl — it defines the quality outcome standard while leaving implementation to the contractor.
+
+Overall, this solicitation is competently scoped for its context. The specificity present is proportionate to the safety-critical nature of submarine flight control components and is grounded in legitimate regulatory, safety, and traceability requirements rather than organizational dysfunction or copy-pasted incumbent procedures. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1.1 INSPECTION - Clean and determine if refurbishment is possible. At disassembly, the Contractor must record all identifying markings found on the parts of each assembly. The Contractor must maintain traceability of these markings to each unit throughout refurbishment.</blockquote>
+  <div class="ev-explanation">This is the most process-prescriptive language in the SOW, specifying disassembly steps and traceability recording during inspection. However, for a repair/refurbishment contract on a flight-critical submarine component, these are operationally necessary quality controls rather than arbitrary process mandates — the government has a legitimate interest in knowing what was found inside the unit and maintaining part-level traceability.</div>
+</div><div class="evidence-item">
+  <blockquote>3.13.2 FBW SCS SFCCs that are awaiting or undergoing receipt inspection, retained in the Navy supply system storage, or awaiting or undergoing certification, must be physically segregated from accepted, rejected or non-SFCCs to prevent commingling and unauthorized use. Segregation may be accomplished by use of separate cages, racks, bins, shelves, boxes, or roped-off areas that are distinctly marked for FBW SCS SFCCs.</blockquote>
+  <div class="ev-explanation">This specifies segregation methods (cages, racks, bins, etc.) rather than simply requiring segregation outcomes. That said, the list of acceptable methods is presented as options (&#x27;may be accomplished by&#x27;), not as mandated specifics, and the underlying requirement — preventing commingling of flight-critical submarine components — is a legitimate safety and quality control concern.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the repair of four (later five) joystick/data entry units that are Fly-By-Wire Submarine Flight Critical Components (SFCCs). The elevated regulatory burden reflects a genuinely high-consequence application — safety-critical components for nuclear submarine ship control systems. That context justifies a substantial compliance framework.
+
+However, the solicitation does exhibit moderate rule pool characteristics. The &#x27;Applicable Documents&#x27; section presents eight standards in a compact block with no contextual explanation of how each applies to this specific repair task. The inclusion of ISO 9002:1994 — a standard withdrawn over 25 years ago — is a clear marker of copy-forward accumulation without periodic review. The quality system section compounds this by offering three primary quality standards and three calibration standards as equivalent options, plus three additional alternates, with no government preference expressed. This creates a diffuse compliance landscape that a new vendor would need to independently interpret.
+
+Mitigating factors prevent a severity-3 rating: the overall document count is modest (eight standards, not 88), the solicitation is not a general IT or services contract where such citations would be clearly irrelevant, and the SFCC/FBW context provides a plausible rationale for most cited standards. The extensive Section 3 requirements (traceability, material handling, marking) are operationally tied to the SFCC program and are explained with some specificity. The list is not absurdly long nor does it contain contradictory requirements. This is a severity-2 finding: elevated but bounded regulatory citation burden, with evidence of copy-forward accumulation and lack of differentiation among alternative standards, but without the extreme volume or clear irrelevance that would warrant a severity-3 designation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DOCUMENT REF DATA=MIL-STD-1686 | | |C |951025|A| | | DOCUMENT REF DATA=ISO_9001 | | | |081115|A| | | DOCUMENT REF DATA=ISO 9002 | | | |940701|A| | | DOCUMENT REF DATA=MIL-Q-9858 | | |A |950905|A| 3| | DOCUMENT REF DATA=ISO10012 | | | |030415|A| | | DOCUMENT REF DATA=MIL-I-45208 | | |A |810724|A| 1| | DOCUMENT REF DATA=MIL-STD-45662 | | |A |880801|A| | | DOCUMENT REF DATA=ANSI/NCSL Z540.3 | | | |130326|A| | |</blockquote>
+  <div class="ev-explanation">Eight standards are listed in a bulk &#x27;Document References&#x27; block with no explanation of which applies to what aspect of the repair work. Three separate quality system standards are cited as apparent alternatives (MIL-I-45208, MIL-Q-9858, ISO 9001) and three calibration standards (MIL-STD-45662, ISO10012, ANSI-Z540.3) — but there is no guidance on how a vendor should choose among them or which is preferred, leaving the compliance burden to the contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>ISO 9002 | | | |940701|A| | |</blockquote>
+  <div class="ev-explanation">ISO 9002:1994 is cited as a referenced document, but ISO 9002 was withdrawn and merged into ISO 9001 in 2000. Citing a standard that has been defunct for over two decades suggests this list has accumulated through copy-forward practices without review for continued relevance or applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>3.6 Quality System Requirements - The Contractor furnishing items under this contract/purchase order must provide and maintain a quality system in accordance with MIL-I-45208, MIL-Q-9858, or ISO9001:2008 (except as amplified or modified herein) with the calibration system requirements of MIL-STD-45662, ISO10012, or ANSI-Z540.3. Quality systems in accordance with ISO9001:2000, ISO9001:1994, or ISO9002:1994 are acceptable alternates.</blockquote>
+  <div class="ev-explanation">Six quality and calibration standards are presented in an undifferentiated &#x27;pick one from each column&#x27; structure, plus three additional acceptable alternates listed separately. While the intent is to allow flexibility, the result is that a vendor cannot determine from the solicitation which standard the government actually expects or prefers, creating interpretive ambiguity about compliance.</div>
+</div><div class="evidence-item">
+  <blockquote>HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT (NAVICP REVIEW FEB 1991)(FEB 1999)|1|See specifications Section C and Section E.</blockquote>
+  <div class="ev-explanation">The quality clause references &#x27;Section C and Section E&#x27; for specifics but the quality requirements in the body of the document then cascade into an extensive set of SFCC-specific procedures (paragraphs 3.6 through 3.17), traceability requirements, material handling, and marking rules. While most of these are plausibly relevant to a safety-critical submarine component, there is no guidance to distinguish which provisions apply specifically to a repair action versus original manufacture — a significant interpretive burden for a repair contractor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a repair contract for a joystick data entry device used in submarine Fly-By-Wire Ship Control Systems. Repair contracts can be problematic for FFP because the scope is inherently uncertain — you do not know the condition of the carcass until you open it. However, this solicitation directly addresses that problem through a mandatory teardown and evaluation (TD&amp;E) process: the vendor has 45 days post-receipt to inspect the hardware and only then submits a firm fixed price for the full repair effort. This is a well-established and FAR-appropriate method for repair contracting (often called &#x27;evaluation and repair&#x27; or &#x27;TD&amp;E then FFP&#x27;). By the time the FFP is locked in, the scope is no longer uncertain — the contractor has examined the actual unit. The RTAT of 180 days applies after that price is established. This two-step approach is precisely the mitigation that makes FFP appropriate for repair work. The small quantity (5 units, up from 4 via amendment), the sole-source nature, and the defined technical specification (refurbishment to EB-4614) further support that this is a discrete, well-bounded task once inspection is complete. FFP is the correct contract type here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FIRM FIXED PRICE REPAIR PURCHASE ORDERS|1||</blockquote>
+  <div class="ev-explanation">The solicitation explicitly uses Firm Fixed Price (FFP) pricing for this repair purchase order.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor shall have 45 days after receipt of carcass(es) to complete a teardown &amp; evaluation (TD&amp;E) of the carcass(es) and submit a Firm-Fixed Price (FFP) quote for the full repair effort of the carcass(es).</blockquote>
+  <div class="ev-explanation">The solicitation uses a two-step pricing approach: the vendor first conducts a teardown and evaluation (TD&amp;E) of the actual hardware before committing to a firm fixed price. This materially reduces the scope uncertainty problem that would otherwise make FFP problematic for repair work. By anchoring the FFP to actual inspection findings rather than a blind estimate, the government has structured the procurement to make fixed-price workable.</div>
+</div><div class="evidence-item">
+  <blockquote>A beyond repair/beyond economical repair price shall also be provided in addition to the repair price at the time of submission of quote.</blockquote>
+  <div class="ev-explanation">Requiring a beyond-economic-repair price acknowledges variability in repair outcomes, further confirming the solicitation anticipates the TD&amp;E process will resolve scope uncertainty before price commitment.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.03_Amendment%281%29_25260-0001 %28VUR97DR%29.PDF">3.03_Amendment%281%29_25260-0001 %28VUR97DR%29.PDF</div></div>
+  <a class="dl-btn" href="../attachments/a88651acb1a04e3a8a58e6323d1d8de8_3.03_Amendment%281%29_25260-0001+%28VUR97DR%29.PDF" download="3.03_Amendment%281%29_25260-0001 %28VUR97DR%29.PDF" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

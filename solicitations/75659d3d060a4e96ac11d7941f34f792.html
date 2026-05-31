@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DLA Transportation Process Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DLA Transportation Process Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 75659d3d060a4e96ac11d7941f34f792</span>
+      <a class="sam-link" href="https://sam.gov/opp/75659d3d060a4e96ac11d7941f34f792/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DCSO › DCSO RICHMOND › DCSO RICHMOND DIVISION #2</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R408</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541611</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months) + 2 option years (12 months each); note: PWS references 4 option years but Schedule B and Q&amp;A confirm only base year plus 2 option periods are priced and evaluated</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Approach</li><li>Key Personnel</li><li>Management and Staffing Plan</li><li>Past Performance</li><li>Total Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-to-notable compliance-over-outcomes pattern, though not the most severe form possible. The accountability structure is dominated by process-tracking mechanisms: a mandatory monthly status report with eight prescribed content sections covering activities, staffing, equipment, and plans; a separate weekly activity report that cannot be consolidated with the monthly; a QCP structured around task timelines and checkpoints; and a final management report framed as a compliance-with-PWS record. Across all of these, there are no quantitative performance targets — no accuracy rates for financial data, no audit-finding closure metrics, no measures of TPPS configuration quality, no user satisfaction indicators, and no thresholds for acceptable error rates in the accrual or statistical sampling reports that are the core deliverables. The QASP references a rating table with financial disincentives, which is a meaningful accountability lever, but the rating criteria appear to be deliverable timeliness and PWS compliance rather than output quality. This is offset somewhat by the fact that the SOC 1 Type 2 audit requirement (due annually by August 15) is itself a genuine outcome-oriented accountability mechanism — an independent public accountant examines the contractor&#x27;s controls and produces findings. That external audit creates real outcome accountability that the internal QA structure lacks. Additionally, the deliverable acceptance criteria (government reviews within 10 business days, resubmission required for discrepancies) implies some quality-based review. These mitigating factors prevent a severity-3 rating. The pattern is clearly present and creates meaningful overhead — particularly the dual weekly/monthly reporting cadence covering overlapping content — but the external audit requirement provides a counterbalancing outcome focus that the internal QA process lacks entirely. Severity 2 is the appropriate rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor will document the efforts performed in the completion of each task in a detailed monthly status report due to the COR or designated government representative and KO on the 5th of each month detailing the previous month&#x27;s performance. The written monthly status report must include, at a minimum: Progress for the period: detailed progress report of activities and accomplishments during the reporting period, variance analysis, and summary of work accomplished during the reporting period. Resource status: detailed report of any staffing issues/turnover. Government-furnished equipment: detailed list of any/all equipment provided... Strategy revisions: recommended changes to include any lessons learned... Review of problems encountered... Identification of risks and mitigation plan. Identify future travel requirements. Activities planned for the next reporting period as well as the status of any deliverables including planned delivery dates and actual delivery dates.</blockquote>
+  <div class="ev-explanation">This monthly report structure is almost entirely activity- and process-focused. It tracks what the contractor did, staffing status, equipment, and planned versus actual delivery dates. Conspicuously absent is any measure of whether the work product was accurate, useful, or achieved a mission outcome — for instance, no requirement to report on the accuracy of financial data produced, audit findings resolved, or quality of reports delivered to DLA.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must provide the government with weekly reports detailing the contractor&#x27;s activities in support of the tasks outlined in the PWS. The report cannot be consolidated with other reports and must be provided NLT 5pm on Tuesday after each weekly period.</blockquote>
+  <div class="ev-explanation">This is a second, separate report cadence covering activities — the same general territory as the monthly status report. Notably, it must be provided weekly AND cannot be consolidated with the monthly report, creating overlapping process-tracking paperwork. No outcome measure is specified for the weekly report; it is purely an activity log.</div>
+</div><div class="evidence-item">
+  <blockquote>The government QASP will be used as the basis for reviewing each deliverable... the government will assign a monthly performance rating to the contractor per the table below. Based on the performance rating, the government reserves the right to reduce invoice payments... Disincentives will be applied for ratings of &#x27;Marginal&#x27; and &#x27;Unsatisfactory&#x27;</blockquote>
+  <div class="ev-explanation">The QASP-based rating system is referenced but the actual performance rating criteria in the table are not fully specified in the document text — critically, no quantitative thresholds, SLAs, error rates, or outcome benchmarks are defined. The rating appears to be applied based on deliverable completeness and timeliness (compliance with PWS requirements), not on whether the financial analyses were accurate or useful to DLA auditors. The disincentive mechanism is process-compliance-based, not outcome-based.</div>
+</div><div class="evidence-item">
+  <blockquote>The QCP must contain the tasks that are anticipated to be performed by the contractor during the performance period. It must also outline the scope, methodology, critical success factors, timelines with checkpoints, resource requirements, and any other factors required to ensure the success of the contract... The QCP must include a detailed timeline that includes a series of agreed upon &#x27;checkpoints&#x27; that will be used to monitor progress and trigger go/no-go decisions.</blockquote>
+  <div class="ev-explanation">The Quality Control Plan as defined is fundamentally a plan-adherence document. It captures tasks, timelines, checkpoints, and resource requirements — i.e., it tracks whether the contractor follows the schedule — not whether the outputs (financial reports, accrual analyses, SOC 1 controls) are accurate, complete, or useful. This is a textbook compliance-over-outcomes QA structure.</div>
+</div><div class="evidence-item">
+  <blockquote>A management report is required at the end of the contract within five business days of the performance end date. Management reports are intended to be a permanent record of all work performed to accomplish the contract objectives and must directly correlate back to the PWS objectives, the final approved QCP, and compliance with socioeconomic participation goals...</blockquote>
+  <div class="ev-explanation">The end-of-contract management report is explicitly framed as a record of work performed correlated back to the QCP and PWS compliance — not an assessment of mission outcomes. There is no requirement to report on DLA audit outcomes, improvements in transportation financial management accuracy, or reduction in IPA findings. The final accountability document is a compliance attestation, not an outcomes assessment.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe insider rewards characteristics that collectively function as an incumbent filter. The root dynamic is vendor capture: DLA&#x27;s institutional knowledge of its own TPPS configuration, data flows, and audit control environment resides in the incumbent contractor&#x27;s staff, not in the agency. When forced to write a new solicitation, DLA could only describe requirements in terms of what the incumbent does — producing key personnel qualifications that are essentially a job description for the incumbent&#x27;s team.
+
+The stacking effect is significant. Individually, a 5-year experience requirement is defensible. Requiring federal agency experience is common. Demanding SOC 1 Type 2 familiarity is reasonable for an audit-support contract. But when every element of the requirement — the specific proprietary DoD systems (TPPS, Tracker Lite, TGET, DLA Accrual reports), the 5-year depth, the federal-only restriction, the refusal to accept functional equivalents — is required simultaneously for both key personnel positions, the combination narrows the qualifying workforce to a handful of individuals who have spent years on this specific contract or its direct predecessors.
+
+The government&#x27;s own Q&amp;A responses compound the problem. The refusal to accept functionally equivalent system experience for Tracker Lite, the disclosure that all required deliverables must be built from scratch (making prior-production experience irrelevant to the actual work), and the confirmation that no institutional documentation will be transferred all point to requirements that test incumbency rather than capability.
+
+One mitigating factor: the government did broaden the acceptable degree fields for education, and the past performance criteria include a neutral rating for firms without recent federal contracts — preventing automatic disqualification for new entrants. However, these mitigations are overwhelmed by the key personnel requirements, which impose an effectively insurmountable barrier for any firm whose staff has not already spent years working on DLA&#x27;s TPPS/Tracker Lite/TGET ecosystem. The severity rating of 3 (Severe) is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Minimum of five (5) years experience required in the following: ... Third Party Payment System (TPPS) U.S. Bank Freight Payment ... DoW Shipper Systems Warehouse Management System (WMS), Distribution Standard System (DSS), Vendor Shipment Module (VSM), Global Freight Management (GFM)(WMS/DSS/VSM/GFM), System and Organization Controls SOC 1, Type 2 reports within a controlled environment ... Creating DLA Accrual reports ... Logistics Tools Suite (LTS) and more specifically the Tracker Lite application (or any resulting software system that the Air Force may use), DoW Third Party Payment System (U.S. Bank Freight Payment), and Transportation Global Edit Tablet (TGET) Tracker Lite application</blockquote>
+  <div class="ev-explanation">Both key personnel positions require five years of experience in a highly specific stack of DoD-proprietary systems: TPPS (U.S. Bank Freight Payment as used in DoD), LTS/Tracker Lite (an AFMC-owned system with limited contractor access per the solicitation&#x27;s own Q&amp;A), DFAS TGET, and multiple DoD shipper systems. These are not commercially available systems or broad-domain skills. The combination of the 5-year depth requirement with this specific DoD-proprietary system stack means that qualifying personnel must have spent years working on exactly this class of contract. The universe of individuals with 5 years of hands-on TPPS + Tracker Lite + TGET experience is vanishingly small and almost certainly draws entirely from the incumbent&#x27;s workforce or direct competitors who have held substantially identical prior contracts.</div>
+</div><div class="evidence-item">
+  <blockquote>No, the requirement stated on pages 24, and 25 of the updated PWS meets the minimum needs of the government and will remain as stated in the updated PWS. Please note that on pages 24, and 25 the PWS states, &#x27;If Tracker Lite application is not provided, then personnel must have experience in the following alternate resulting software system that has the following minimum salient characteristics: Manages flow of DLA transportation orders from shipper systems (DSS, WMS, GFM, and VSM) to TPPS/U.S. Bank Freight Payment [etc.]&#x27;</blockquote>
+  <div class="ev-explanation">When asked whether demonstrated equivalent experience in systems performing substantially similar functions could satisfy the Tracker Lite requirement, the government flatly refused. The only alternative accepted is a system with identical functional salient characteristics to Tracker Lite — essentially requiring Tracker Lite itself or its exact functional replacement. This response confirms that the key personnel requirements are not written to test capability broadly; they are written to match the incumbent&#x27;s workforce profile. A vendor with highly skilled transportation finance IT professionals who have not worked on this exact contract lineage cannot qualify their key personnel.</div>
+</div><div class="evidence-item">
+  <blockquote>None of these reports are currently in production. They are required to be built from scratch by the incoming contractor. The verbiage has been updated in section II. Performance Requirements B. Financial Statements Audits which is on page 5 of the PWS.</blockquote>
+  <div class="ev-explanation">The government disclosed that all seven base-year report/capability scope items (Accrual Report, TPPS Business Rules Review, TPPS Metrics, TPPS User Report, Statistical Sampling Script, TGET TAC/LLD Comparison Tool, Open Invoice Trending) must be built from scratch by the incoming contractor. Yet it simultaneously requires key personnel with 5 years of experience &#x27;creating DLA Accrual reports&#x27; and experience in the specific TPPS/TGET/LTS stack. This is internally contradictory: if nothing is in production, why mandate prior production experience in these exact deliverables? The requirement serves to qualify only those who have done this work before — i.e., personnel with incumbent or near-incumbent contract history — rather than those capable of building the required systems.</div>
+</div><div class="evidence-item">
+  <blockquote>The previous contract has already expired, therefore the previous contractor will not be able to provide this information ... No, neither the government nor the incumbent contractor will not be sharing this information as the previous contract expired in September 2025.</blockquote>
+  <div class="ev-explanation">The government acknowledged it will not provide existing functional specifications, system interface documentation, prior SOC 1 Type 2 reports, or any institutional documentation from the prior contract. A new entrant must independently reconstruct all institutional knowledge of DLA&#x27;s TPPS configuration, data flows, and audit control environment. Yet the key personnel requirements demand deep prior experience with exactly these systems and processes. This combination — no knowledge transfer + requirements demanding pre-existing institutional knowledge — structurally advantages any vendor whose staff already possesses that knowledge from prior performance, i.e., the incumbent or its alumni.</div>
+</div><div class="evidence-item">
+  <blockquote>Must submit a minimum of 2 contracts, but no more than 3 contracts the quoter performed within the past 3 years. Each contract submitted must include the following: ... Must be a federal government contract as a prime or subcontractor.</blockquote>
+  <div class="ev-explanation">Past performance is limited exclusively to federal government contracts within a 3-year window. Commercial contracts demonstrating equivalent transportation financial management, audit readiness, SOC 1 reporting, or DoD shipper system integration experience are categorically excluded. Combined with the highly specialized nature of the requirement (TPPS, Tracker Lite, DLA-specific accrual reporting), the 3-year federal-only window substantially narrows the qualifying past performance pool to vendors who have recently held contracts in this exact niche. A firm with 20 years of commercial transportation finance audit excellence would receive a neutral/unknown rating at best, providing no competitive advantage over a less experienced but federally-connected competitor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS is detailed by necessity — the work involves complex, specialized DoD financial systems (TPPS, TGET, LTS/Tracker Lite), financial statement audit requirements under SSAE-18, and a highly specific operating environment where interoperability with named government systems is a genuine technical constraint, not a preference. Much of the specificity is therefore legitimate: mandating SOC 1 Type 2 reports, requiring AICPA SSAE-18 compliance, specifying security investigation levels, and defining deliverable timelines are appropriate constraints on a highly regulated financial management function. The Section 508, PII/Privacy Act, and IA compliance requirements are legal mandates, not sprawl.
+
+However, genuine sprawl is present in several areas. The functional specification requirements for reports — spanning roughly 20 enumerated sub-elements — read as incumbent-derived documentation standards copied forward rather than a defined documentation outcome. The analysis methodology section prescribes specific workflows (monthly data reports, real-time action) rather than data-quality outcomes. The training requirements impose specific format, turnaround timelines, and frequency caps that constrain delivery method rather than training effectiveness. The cumulative reporting burden (monthly status reports with eight mandatory sub-elements, separate weekly reports, QCP within 10 days, management report at closeout, bridge letters, SOC 1 status updates) reflects process-compliance orientation. Notably, the Q&amp;A record confirms that all seven base-year reports/capabilities must be built from scratch, yet the PWS prescribes them in terms of named deliverables with specific parameters rather than defining the business controls they must support.
+
+The sprawl is not dominant enough to warrant a severity 3. The PWS does preserve vendor flexibility in several important areas: the labor mix is explicitly left to the contractor&#x27;s judgment (&#x27;the labor categories are only approximations&#x27;), the contractor may propose additional non-key labor categories, deliverable formats are frequently left to contractor format, and the SOC 1 scope can be met via internal controls testing as an alternative to full IPA examination. The government also appropriately answered competition questions by expanding the acceptable degree equivalents for key personnel. These are meaningful degrees of freedom. The sprawl that exists is concentrated in the documentation and reporting architecture, and in the analysis methodology section — both of which bear the hallmarks of incumbent-contract copy-paste. Overall, severity 2 is the appropriate rating: prescriptive elements are present and material, but they coexist with genuinely outcome-oriented sections, and a capable vendor could still propose meaningful process improvements in how they staff, analyze, and deliver the core mission.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor must provide TPPS maintenance and system analysis support. This will require expert level knowledge of the current DoD approved TPPS system and the DoD TPPS business process. The contractor must provide maintenance support as follows: Set up and maintain TPPS configurations related to DLA TPPS shipper organization accounts; Develop reports related to DLA management, control, and use of TPPS using data from all DoD TPPS shipper organization accounts and from other systems as needed; Develop training materials for DLA TPPS users and conduct the training as needed. The contractor must provide training materials, which can be in contractor format. New training material requests must be provided within 30 calendar days from receipt of the request. Training material updates must be provided within 15 calendar days of receipt of the request and are expected to occur no more than five times during a performance period. Perform other maintenance tasks as needed.</blockquote>
+  <div class="ev-explanation">This passage crosses from outcome-definition into process prescription by enumerating specific sub-tasks (configure accounts, develop reports, develop training materials, conduct training) rather than stating the desired outcome (e.g., &#x27;DLA TPPS configurations shall be accurate and current; users shall be trained to perform their functions&#x27;). More significantly, it dictates the method of training (contractor-developed materials), imposes specific turnaround timelines tied to the process rather than a service level, and caps update frequency — all of which constrain how a vendor may organize and deliver this work.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must collect and analyze transportation related data from shipping systems and TPPS. A systematic comparison of this data will identify discrepancies in the flow of essential data. To enable this analysis, the contractor must create monthly data reports and will act upon them in a real-time manner to identify data issues.</blockquote>
+  <div class="ev-explanation">This requirement prescribes the method of analysis (systematic comparison, monthly data reports, real-time action) rather than the outcome (e.g., &#x27;data discrepancies shall be identified and resolved within X business days&#x27;). Specifying that the contractor &#x27;must create monthly data reports&#x27; and &#x27;act upon them in a real-time manner&#x27; locks the vendor into a particular workflow, foreclosing automation pipelines, exception-based alerting, or other approaches that might be more efficient.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must inform DLA of updates needed to LTS/Tracker Lite (or any subsequent system) related to processing of DLA transactions therein or to use of DLA TPPS data in LTS/Tracker Lite. For example, LTS/Tracker Lite updates are needed when a DLA organization initially starts using TPPS. The government is responsible for coordinating any required system changes/updates with the Air Force.</blockquote>
+  <div class="ev-explanation">This requirement ties the contractor to a named, DoD-specific proprietary system (LTS/Tracker Lite) and prescribes the specific coordination function the contractor must perform around that system. While the PWS provides an alternative-characteristics clause, the overall framing presupposes that the contractor will operate within the existing LTS/Tracker Lite workflow rather than defining the outcome (accurate TAC-to-LOA conversion and data flow to TPPS) and allowing the vendor to determine how to achieve it.</div>
+</div><div class="evidence-item">
+  <blockquote>For existing reports and capabilities, the contractor must provide a functional specification... [including] Report name; Report description/purpose; Application (i.e., system) used to generate report including original data source and any intermediary applications as well as report generation application; Report developer name; Version of the report; Assumptions; Transaction/data type(s) included in the report; Functional and transactional dependencies... Filters used when generating data sets... Report selection criteria... List of report fields... Report layout: Provide screenshots... Test conditions: Provide test condition descriptions and expected results... Change log: include the revision date, report version, name of person who made the revision, and description of the revision.</blockquote>
+  <div class="ev-explanation">The functional specification requirement for both existing and new reports spans roughly 20 individually enumerated sub-elements covering content, format, and internal documentation practices. This level of prescription goes well beyond defining an auditable documentation outcome — it mandates the internal documentation architecture of the contractor&#x27;s development process. A vendor cannot satisfy this by producing equivalent documentation in a different structure; they must conform to this specific schema, which is characteristic of incumbent-derived requirements copied forward.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will document the efforts performed in the completion of each task in a detailed monthly status report due to the COR or designated government representative and KO on the 5th of each month detailing the previous month&#x27;s performance. The written monthly status report must include, at a minimum: Progress for the period... Resource status: detailed report of any staffing issues/turnover. Government-furnished equipment: detailed list of any/all equipment provided (including common access cards (CACs)) to include assigned personnel and serial numbers. Strategy revisions... Review of problems encountered... Identification of risks and mitigation plan. Identify future travel requirements. Activities planned for the next reporting period...</blockquote>
+  <div class="ev-explanation">The monthly status report requirement enumerates eight mandatory content categories, including CAC serial number tracking and future travel identification — administrative housekeeping items that are unlikely to drive mission outcomes. Combined with the separate weekly status reports, the QCP submission within 10 days of award, the management report at contract end, the bridge letter, the SOC 1 status updates, and the CPARS-linked monthly performance ratings, the cumulative reporting burden is significant. No individual reporting requirement is egregious, but together they reflect a process-compliance orientation rather than outcome accountability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the most severe form of rule pools — there is no dedicated &#x27;Applicable Documents&#x27; section listing 50+ regulations by number, and no obviously irrelevant policies (e.g., energy efficiency executive orders or ID badge policies unrelated to the work). The regulatory citations are at least plausibly connected to government financial systems contracting. However, the PWS accumulates multiple overlapping compliance frameworks — particularly in its security, IA, and privacy sections — that are presented as undifferentiated requirements without explanation of what each specifically demands of this contractor in this context. The DoD 8570.01-M workforce certification requirement is the clearest example of a boilerplate carryover that likely does not fit the actual labor categories (financial SMEs and audit program managers). The catch-all IA compliance clause bundles NIST, FISMA, and DoD standards without specifying applicable baselines. Multiple personnel security policy documents are stacked without explaining their interaction. The 17-system enumeration in the analysis and support section, while not a regulatory citation, follows the same passive-management pattern: listing everything that might conceivably be relevant rather than curating what actually is. The government&#x27;s own Q&amp;A responses reveal a narrower operational picture than the PWS text suggests, which implies the PWS was drafted with a maximalist rather than curated approach. Collectively, this represents a moderate rule-pool pattern — elevated compliance burden with some clear boilerplate carryover, but without the contradictory mandates or truly irrelevant policies that would warrant a severity 3 rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor must remain compliant with all applicable federal rules, regulations, directives, instructions, orders, and policies pertaining to information assurance (IA), information technology (IT), IT security, and protection of federal data and information systems including adherence to National Institute of Standards and Technology (NIST) policies, NIST/DoD security standards, and the Federal Information Security Management Act (FISMA).</blockquote>
+  <div class="ev-explanation">This catch-all IA compliance clause cites multiple frameworks (NIST policies broadly, NIST/DoD security standards, FISMA) as a bundled requirement without specifying which NIST Special Publications apply, which FISMA control baselines are relevant, or how they interact with the contractor&#x27;s actual work — which is largely financial data analysis and report generation, not system ownership or IT operations. A vendor cannot determine from this language what specific controls they must implement or certify.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must ensure that personnel accessing information systems have the proper and current information assurance certification to perform information assurance functions in accordance with DoD 8570.01-M, Information Assurance Workforce Improvement Program... DoD-approved information assurance workforce certifications appropriate for each category and level as listed in the current version of DoD 8570.01-M; Appropriate operating system certification for information assurance technical positions as required by DoD 8570.01-M.</blockquote>
+  <div class="ev-explanation">DoD 8570.01-M (now largely superseded by DoD 8140) is cited as a mandatory certification framework for contractor personnel. However, the PWS describes work that is financial analysis, audit support, and report generation — not IA technical positions administering government systems. The applicability of full 8570.01-M workforce certification requirements to financial SMEs and audit program managers is not explained or justified, and appears to be a boilerplate security section carried forward without review of whether it fits the actual labor categories.</div>
+</div><div class="evidence-item">
+  <blockquote>in accordance with Department of Defense (DoD) Manual 5200.02, Procedures for the DoD Personnel Security Program, DoD Instruction 5200.02, DoD Personnel Security Program, and DLA Issuance 4314, Personnel Security Program</blockquote>
+  <div class="ev-explanation">Three separate personnel security policy documents are cited together without explanation of how they interact, which takes precedence, or what specific requirements each imposes on this contractor. The DLA issuance (4314) is an internal agency document that vendors may not readily access, yet no guidance is provided on obtaining it or on what it requires beyond what the other two documents already cover.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor is required to safeguard personally identifiable information (PII) in accordance with the Privacy Act of 1974, 5 U.S.C. § 552a; DLA Privacy Program, DLAR 5410.10; and DoD Privacy Act Regulation, 5400.11-R.</blockquote>
+  <div class="ev-explanation">Three separate PII/Privacy Act compliance frameworks are cited in a single clause. While PII protection is appropriate given the financial data involved, no explanation is provided of how DLAR 5410.10 differs from or adds to DoD 5400.11-R, or what contractor-specific obligations flow from each. Vendors must independently research two agency-specific policy documents without guidance on their practical implications for this scope of work.</div>
+</div><div class="evidence-item">
+  <blockquote>Eliminating the cause may require a collaborative effort with various system program offices such as the LTS and the Tracker Lite application (or any resulting system that may be in use), DSS, VSM, WMS, Management Information System (MIS), Enterprise Business System (EBS), General Fund Enterprise Business System (GFEBS), Defense Automated Addressing Systems Center (DAASC)/Global Exchange (GEX), Financial and Air Clearance Transportation System (FACTS), Global Air Transportation Execution System (GATES), GFM, Cargo Movement Operations System (CMOS), United States Transportation Command (USTRANSCOM) Transportation Reference Data Management (TRDM) system, TGET, TPPS (currently U.S. Bank Freight Payment Transaction Processing System (FPTPS)), Integrated Development Environment/Global Transportation Network (IGC), Distribution Component Billing System (DCBS), Transportation Financial Management System (TFMS), and any other current or future systems that support TFM.</blockquote>
+  <div class="ev-explanation">While this is a systems list rather than a regulations list, it follows the same rule-pool logic: 17 named systems plus an open-ended catch-all (&#x27;any other current or future systems&#x27;) are cited as potentially requiring contractor engagement, with no prioritization, no indication of which are primary versus peripheral, and no scoping of which the contractor will actually access. The government&#x27;s own Q&amp;A confirms the contractor will primarily work with TPPS, DFAS TGET, and a handful of DoD shipper systems — making this exhaustive enumeration misleading as to the actual compliance and integration burden.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">6 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a textbook severe Square Peg. The government has chosen firm-fixed-price (FFP) — specifically lump-sum FFP CLINs per performance year — for a requirement that is profoundly scope-uncertain. The hallmarks of inappropriate FFP are all present: (1) The government cannot define the labor mix and openly says the labor categories are &#x27;only approximations.&#x27; (2) No estimated labor hours are provided in the pricing template — contractors must guess total volume. (3) All deliverable reports and capabilities must be built from scratch with no incumbent knowledge transfer, no GFI, and no functional specifications from the prior contract. (4) The contractor faces a hard August 15 SOC 1 audit deadline starting from a cold-start knowledge state, with transition costs absorbed into the already-uncertain FFP base-year CLIN. (5) The scope of work spans 20+ interconnected DoD financial systems with evolving requirements across base and option years. FAR 16.202-2 states that FFP &#x27;shall be used when the risk involved is minimal or can be predicted with an acceptable degree of certainty.&#x27; None of those conditions are met here. The appropriate vehicle for this type of work — expert labor performing analytical, audit-readiness, and software development support for a federal agency across an unpredictable task mix — is a labor-hour or T&amp;M contract with defined LCATs and fixed hourly rates, which would allow the government to pay for actual hours expended while retaining cost visibility. The irony is that the Schedule B already has the structural skeleton of a T&amp;M contract (labor categories, hours, rates) but then collapses that into a lump-sum FFP CLIN, eliminating the cost-control benefit while retaining none of the scope-certainty benefit of FFP. This mismatch is likely to result in either a contractor padding prices substantially to cover unknown scope risk, or submitting unrealistic low prices and then struggling to perform — both predictable failure modes of FFP applied to uncertain scope. Most contracting experts reviewing this solicitation would flag the contract type as the wrong choice for this requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Labor CLINs will be firm fixed price... The CLINs on the contract will be based on cell E10 of each applicable tab of Schedule B. Therefore, on the contract it will be one lump-sum fixed price per CLIN.</blockquote>
+  <div class="ev-explanation">The government confirms in Q&amp;A that the contract will use a single lump-sum FFP per CLIN per year. This is the core structural problem: the pricing mechanism is FFP, but the underlying work is highly variable and scope-indeterminate labor.</div>
+</div><div class="evidence-item">
+  <blockquote>The labor categories are only approximations; it is the contractor&#x27;s responsibility to determine the appropriate labor mix to ensure successful performance. The contractor may propose additional non-key labor categories in their quote.</blockquote>
+  <div class="ev-explanation">The government explicitly acknowledges it cannot define the labor mix with precision. Labor categories are &#x27;only approximations.&#x27; This is a hallmark indicator that FFP is the wrong contract type — FFP requires the ability to estimate costs with reasonable certainty, and the government is openly admitting it cannot do so.</div>
+</div><div class="evidence-item">
+  <blockquote>No, the requirement stated in column B and C of DLA Transportation Process Support Schedule B of the solicitation meets the minimum needs of the government and will remain as stated in the solicitation... The 4,000 - 8,000 hours has been removed from section II Performance Requirements R Contractor Personnel Requirements of the PWS.</blockquote>
+  <div class="ev-explanation">The government removed even the rough 4,000–8,000 hour estimate from the PWS after questions, leaving contractors with zero government-provided hour estimates. The Schedule B provides no &#x27;Estimated Labor Quantity&#x27; values. Contractors must guess at total labor volume across a 3-year contract (base plus two options), then submit a lump-sum FFP. Without a government estimate of labor quantity, FFP prices will be either wildly inflated (contractor risk padding) or wildly underestimated (leading to poor performance or modification pressure).</div>
+</div><div class="evidence-item">
+  <blockquote>None of these reports are currently in production. They are required to be built from scratch by the incoming contractor.</blockquote>
+  <div class="ev-explanation">All seven base-year report/capability scope items — Accrual Report, TPPS Business Rules Review, TPPS Metrics, TPPS User Report, Statistical Sampling Script, TGET TAC/LLD Comparison Tool, Open Invoice Trending — must be built from scratch. Building new analytical tools and reports is inherently scope-uncertain work. The number of iterations, complexity of data integration across numerous DoD systems, and time to acceptance are all unpredictable. This strongly favors T&amp;M or labor-hour pricing, not FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>No, neither the government nor the incumbent contractor will not be sharing this information as the previous contract expired in September 2025.</blockquote>
+  <div class="ev-explanation">No government-furnished information, no existing functional specifications, no prior SOC 1 reports, and no transition support from the incumbent are available. The incoming contractor must reconstitute all knowledge from scratch. This dramatically increases scope uncertainty — exactly the condition under which FFP is inappropriate and T&amp;M or cost-reimbursement contracts are warranted per FAR.</div>
+</div><div class="evidence-item">
+  <blockquote>The incoming contractor is expected to begin shortly after award... No it will not be waived or modified [the August 15 SOC 1 Type 2 assurance deadline]... The transition-in period is not separately funded. It will be a part of the priced CLIN for the base year.</blockquote>
+  <div class="ev-explanation">The contractor must absorb transition costs within the base-year FFP CLIN while simultaneously facing a hard August 15 SOC 1 audit deadline with no incumbent knowledge transfer and no GFI. The combination of a fixed price, an unfunded transition, a hard audit deadline, and zero knowledge transfer creates severe risk of either under-bidding (leading to poor performance) or over-bidding (wasting government funds). A labor-hour or T&amp;M structure would allow the government to pay for actual effort expended during this unpredictable phase.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="DLA TRANSPORTATION PROCESS FAR 52.212-2 EVALUATION- COMMERCIAL ITEMS ATTACH 2.docx">DLA TRANSPORTATION PROCESS FAR 52.212-2 EVALUATION- COMMERCIAL ITEMS ATTACH 2.docx</div></div>
+  <a class="dl-btn" href="../attachments/75659d3d060a4e96ac11d7941f34f792_DLA+TRANSPORTATION+PROCESS+FAR+52.212-2+EVALUATION-+COMMERCIAL+ITEMS+ATTACH+2.docx" download="DLA TRANSPORTATION PROCESS FAR 52.212-2 EVALUATION- COMMERCIAL ITEMS ATTACH 2.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="DLA Transportation Process Support_Schedule B.xlsx">DLA Transportation Process Support_Schedule B.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/75659d3d060a4e96ac11d7941f34f792_DLA+Transportation+Process+Support_Schedule+B.xlsx" download="DLA Transportation Process Support_Schedule B.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Final  QA SP4704-26-Q-0016 04-29-2026.xlsx">Final  QA SP4704-26-Q-0016 04-29-2026.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/75659d3d060a4e96ac11d7941f34f792_Final++QA+SP4704-26-Q-0016+04-29-2026.xlsx" download="Final  QA SP4704-26-Q-0016 04-29-2026.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Final DLA TRANSPORTATION PROCESS  FAR 52.212-1 INSTRUCTION TO OFFERORS ATTACHMENT 1.docx">Final DLA TRANSPORTATION PROCESS  FAR 52.212-1 INSTRUCTION TO OFFERORS ATTACHMENT 1.docx</div></div>
+  <a class="dl-btn" href="../attachments/75659d3d060a4e96ac11d7941f34f792_Final+DLA+TRANSPORTATION+PROCESS++FAR+52.212-1+INSTRUCTION+TO+OFFERORS+ATTACHMENT+1.docx" download="Final DLA TRANSPORTATION PROCESS  FAR 52.212-1 INSTRUCTION TO OFFERORS ATTACHMENT 1.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Final J3 Transportation Process Support PWS 042926.docx">Final J3 Transportation Process Support PWS 042926.docx</div></div>
+  <a class="dl-btn" href="../attachments/75659d3d060a4e96ac11d7941f34f792_Final+J3+Transportation+Process+Support+PWS+042926.docx" download="Final J3 Transportation Process Support PWS 042926.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

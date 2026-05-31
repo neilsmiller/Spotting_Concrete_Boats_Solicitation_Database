@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>58--INTERFACE UNIT,COMM — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>58--INTERFACE UNIT,COMM</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4ff9bdabb760407ab3af7cd0b79b0d14</span>
+      <a class="sam-link" href="https://sam.gov/opp/4ff9bdabb760407ab3af7cd0b79b0d14/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-03</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS PHILADELPHIA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-03</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (N0038326RQA68) is a spare parts procurement notice for a communications interface unit (NSN classification 7G20) issued by NAVSUP WSS Philadelphia. The posting consists almost entirely of standard FAR/DFARS clauses — IUID, Stop-Work Order, Wide Area Workflow, Buy American, Value Engineering, Transportation by Sea, etc. — with no Statement of Work, Performance Work Statement, Quality Assurance Surveillance Plan, reporting requirements, deliverables schedule, or any accountability structure beyond standard supply contract boilerplate. There are no attachments listed. The description is a single paragraph explaining that the requirement is for spares procurement and describing how contractual documents are considered &#x27;issued.&#x27; There is simply no QA or oversight language present to evaluate for compliance-over-outcomes patterns. A supply contract of this nature — a straightforward spare parts buy — would not typically contain the kind of service-delivery reporting and surveillance structures that give rise to Sin #2. Accordingly, there is insufficient content to meaningfully assess this sin, and no evidence of compliance-over-outcomes pathology can be identified from the available text.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (N0038326RQA68) is a straightforward spare parts procurement for a communications interface unit (NSN-based, Classification Code 7G20) issued by NAVSUP WSS Philadelphia. The description is brief and largely consists of standard FAR and DFARS clauses: Buy American Act provisions, Wide Area Workflow payment instructions, transportation clauses, IUID requirements, and similar boilerplate. There are no evaluation criteria sections, no past performance requirements, no experience thresholds, no key personnel qualifications, and no domain-specific knowledge mandates of any kind visible in the solicitation text. The &#x27;ONLY ONE OFFER&#x27; deviation clause is noted, which suggests the contracting officer anticipates limited competition — likely because this is a sole-source or near-sole-source spare parts acquisition tied to a specific NSN — but this reflects technical uniqueness of the item (a specific communications interface unit with likely a single approved source), not an artificially constructed experience requirement that excludes newcomers. That is a distinct phenomenon from Insider Rewards as defined. There are no stacked experience requirements, no dollar-threshold mandates, no federal-specific experience mandates, no evaluation bonus criteria favoring incumbents, and no institutional knowledge requirements present in the text. The solicitation contains insufficient structural detail to identify any insider rewards pattern. Severity is assessed at 1 — minimal — because the solicitation imposes no experience or evaluation criteria that could function as an incumbent filter.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (N0038326RQA68) is a spare parts procurement notice for a communication interface unit (NSN classification 7G20, NAICS 334290). The posting consists almost entirely of standard FAR/DFARS clauses — IUID, Stop-Work Order, Wide Area Workflow, Buy American, Value Engineering, etc. — with no attached Statement of Work, Performance Work Statement, or technical specifications that would contain process-level requirements. The substantive description is a single sentence: &#x27;This requirement is for the procurement (spares) of the items herein this solicitation.&#x27; There is no scope narrative, no task structure, no workflow instructions, and no staffing or methodology requirements. A spare parts buy of this nature typically specifies a deliverable (the physical item) via a part number or specification, not a service delivery process. With no SOW/PWS attachment and no substantive requirement language beyond the boilerplate clause listing, there is insufficient content to meaningfully assess requirement sprawl. The solicitation cannot be evaluated against the sin&#x27;s definition because it does not purport to direct how any work shall be performed — it is simply a buy for hardware spares.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a relatively short spares procurement solicitation for a communications interface unit (NSN-class item under NAICS 334290), yet it incorporates approximately 19 clause citations presented as an undifferentiated, pipe-delimited block with no explanatory context for how each applies to the specific work. This is a classic template-driven clause list characteristic of NAVSUP supply chain solicitations.
+
+The sin here is moderate rather than severe for two reasons. First, many of the cited clauses — IUID, WAWF payment instructions, Buy American, Transportation of Supplies by Sea, Stop-Work Order — are genuinely applicable to a Navy spare parts procurement and would be expected by any experienced defense supplier. Second, the overall count (~19 clauses) is meaningfully lower than the threshold for severe rule pools (typically 30-88+ as in the VA SMS example). An experienced defense contractor working in this space would recognize most of these clauses and understand their application.
+
+However, the solicitation does exhibit rule pool characteristics: (1) no clause receives any contextual explanation; (2) several clauses — Value Engineering, Royalty Information, and the 1984-vintage Royalty clause in particular — appear to be template carryovers with questionable applicability to a COTS spares buy; (3) three overlapping Buy American / BAPP clauses are cited in sequence without differentiation; and (4) an internal Navy workflow system requirement (WFP Mod Assist Module) is cited without public regulatory grounding, creating opacity for new entrants.
+
+The &#x27;Only One Offer&#x27; deviation citation also warrants note: this suggests the agency already anticipates a sole-source environment, which means the compliance burden lands almost entirely on a single vendor with no competitive pressure to challenge questionable inclusions. Overall, severity 2 is appropriate — elevated above minimal but not the severe, contradictory, or absurdly large lists that characterize the most problematic cases.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ITEM UNIQUE IDENTIFICATION AND VALUATION (JAN 2023)|19|||||||||||||||||||| STOP-WORK ORDER (AUG 1989)|1|| WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023)|16|... VALUE ENGINEERING (JUN 2020)|3|||| INTEGRITY OF UNIT PRICES (NOV 2021)|1|| EQUAL OPPORTUITY FOR WORKERS WITH DISABILITIES (DEV 2026-O0040)(FEB 2026)|4||||| TRANSPORTATION OF SUPPLIES BY SEA (OCT 2024)|2||| BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11|||||||||||| LIMITATION OF LIABILITY--HIGH-VALUE ITEMS (FEB 1997)|1|| SECURITY PROHIBITIONS AND EXCLUSIONS (CLASS DEVIATION 2026-O0025)(FEB 2026)|7|||||||| BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024))|5|||||| BUY AMERICAN--BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024)|1|| ALTERNATE A, ANNUAL REPRESENTATIONS AND CERTIFICATIONS (DEVIATION 2026-O0043)(FEB 2026))|13|||||||||||||| ROYALTY INFORMATION (APR 1984)|1|| NOTICE OF PRIORITY RATING FOR NATIONAL DEFENSE, EMERGENCY PREPAREDNESS, AND ENERGY PROGRAM USE (APR 2008))|2||X| ONLY ONE OFFER (DEVIATION 2026-O0048)(MAR 2026)|1||</blockquote>
+  <div class="ev-explanation">The solicitation presents approximately 19 distinct clauses and regulatory citations in a dense, undifferentiated block — all formatted identically with pipe-delimited fields and no explanatory context. A vendor cannot readily determine which clauses carry substantive compliance weight versus which are routine boilerplate, nor how each applies to the specific item being procured.</div>
+</div><div class="evidence-item">
+  <blockquote>VALUE ENGINEERING (JUN 2020)|3||||</blockquote>
+  <div class="ev-explanation">Value Engineering (FAR 52.248-1) is typically applied to complex development or production contracts where contractors can propose design changes to reduce costs. For a spares procurement of a communications interface unit — likely a commercial or NSN-catalogued item — this clause has marginal applicability. Its inclusion without explanation suggests carryover from a standard template rather than deliberate applicability review.</div>
+</div><div class="evidence-item">
+  <blockquote>ROYALTY INFORMATION (APR 1984)|1||</blockquote>
+  <div class="ev-explanation">The Royalty Information clause (FAR 52.227-6, dated 1984) requires offerors to disclose royalties anticipated in contract performance. For a spare parts procurement of an off-the-shelf communications unit, the relevance of this clause is unclear. It appears to be a template carryover rather than a requirement driven by the specific nature of this procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11||||||||||||  BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024))|5||||||  BUY AMERICAN--BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024)|1||</blockquote>
+  <div class="ev-explanation">Three separate Buy American / Balance of Payments clauses are cited in sequence with no explanation of how they interact, which takes precedence, or whether all three apply simultaneously. The duplication of substantively overlapping clauses without differentiation adds compliance ambiguity rather than clarity.</div>
+</div><div class="evidence-item">
+  <blockquote>MANDATORY USE OF WORKFLOW PRO (WFP) MOD ASSIST MODULE|1||</blockquote>
+  <div class="ev-explanation">This clause appears to be a Navy-specific internal process requirement with no publicly available regulatory text or context provided in the solicitation. A vendor unfamiliar with NAVSUP internal systems cannot assess the compliance burden of this requirement from the solicitation text alone, illustrating the pattern of agency-specific additions layered onto standard clauses without guidance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the procurement of spare communication interface units (NSN 7G20, NAICS 334290) — a discrete, tangible hardware buy. The contract type is not explicitly labeled in the body text, but all contextual indicators — spare parts procurement, unit price integrity clause, IUID clause, Buy American certificate, and the straightforward delivery structure — are consistent with a firm-fixed-price contract. FFP is entirely appropriate here: the item is defined by a part number, the quantity is fixed, delivery can be scheduled, and pricing can be established through competition or catalog pricing. There is no indication of undefined scope, variable labor, or research uncertainty that would warrant T&amp;M or cost-reimbursement. The &#x27;ONLY ONE OFFER&#x27; deviation clause suggests a sole-source or limited-competition environment, but that is a competition concern, not a pricing structure mismatch. No square peg issue is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement is for the procurement (spares) of the items herein this solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation is explicitly for spare parts procurement — a straightforward commercial/product acquisition. This is a classic use case for a firm-fixed-price contract, where the deliverable (a specific hardware item) is well-defined, quantity is stated, and price can be estimated in advance.</div>
+</div><div class="evidence-item">
+  <blockquote>ITEM UNIQUE IDENTIFICATION AND VALUATION (JAN 2023)|19||||||||||||||||||||</blockquote>
+  <div class="ev-explanation">The inclusion of IUID clauses confirms this is a product/hardware acquisition (physical items requiring unique item identification), further supporting FFP as the appropriate contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>INTEGRITY OF UNIT PRICES (NOV 2021)|1||</blockquote>
+  <div class="ev-explanation">The inclusion of the Integrity of Unit Prices clause is consistent with a firm-fixed-price structure, where discrete unit prices are established at award and govern payment.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BaseOps Usability Improvements for MRNMAP — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>BaseOps Usability Improvements for MRNMAP</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 99a888dfb2764d439e38473f2a69878f</span>
+      <a class="sam-link" href="https://sam.gov/opp/99a888dfb2764d439e38473f2a69878f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-02-26</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">TRANSPORTATION, DEPARTMENT OF › OFFICE OF THE SECRETARY › 6913G6 VOLPE NATL TRANS SYS CNTR</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-02-26</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a small, tightly scoped sole-source purchase order for proprietary software modifications with a single deliverable per CLIN and a hard delivery date of 03/12/2026. The accountability structure is minimal and appropriate: deliver the software with documentation, have the technical POC review it against the SOW, and acknowledge acceptance by email. There are no weekly status reports, no mandated meeting cadences, no progress report formats, no plan-adherence tracking, and no QA surveillance plan beyond deliverable acceptance. The SOW is highly prescriptive about *what* to build — specific UI elements, menu entries, modal windows, column names, filter behaviors — but this is specification detail appropriate for a proprietary software update where the government cannot independently modify the code. It is not a reporting or compliance theater structure. The acceptance criteria (&#x27;reviewed for compliance with the SOW, timeliness, and format&#x27;) are thin, but for a fixed-price, deliverable-based purchase order of this simplicity, they are not disproportionate. A more outcome-oriented criterion (e.g., user acceptance testing by AFCEC before final payment) would be preferable, but the absence of outcome metrics here is due to the simplicity and transactional nature of the procurement rather than organizational dysfunction substituting process compliance for accountability. The sin does not materially manifest in this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The deliverables will be reviewed for compliance with the SOW, timeliness, and format. The POC will acknowledge acceptance of each deliverable by email.</blockquote>
+  <div class="ev-explanation">This is the solicitation&#x27;s primary QA/acceptance mechanism. While it references &#x27;compliance with the SOW,&#x27; the SOW itself is highly specific about what the software must do (import/export functionality, UI elements, filter dialogs, warning messages), so &#x27;compliance with the SOW&#x27; here effectively means &#x27;did the software do what was specified&#x27; — which is closer to outcome evaluation than process compliance. The reference to &#x27;format&#x27; is minor. There is no multi-layered reporting apparatus.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most severe manifestation of the Insider Rewards pattern — a formally declared sole-source award to the incumbent. The underlying cause is proprietary software ownership: Wasmer Consulting owns the BaseOps codebase, which means no other vendor has or can obtain the technical knowledge required to modify it. This is not a case of stacked experience requirements that favor the incumbent while technically permitting others to compete; it is a case where the government&#x27;s prior acquisition decisions (contracting for development of a proprietary tool without retaining data rights or open-source provisions) have made meaningful competition structurally impossible. The sole source justification is legally defensible under FAR 13.106-1(b) given the proprietary ownership facts, but that legal defensibility does not change the procurement outcome: one vendor, no competition, and a government agency that cannot exercise meaningful bargaining power. The $1M/3-year cost estimate to switch away from Wasmer&#x27;s platform illustrates how deeply the lock-in has taken hold. Severity 3 is appropriate because a qualified vendor who has never held this contract cannot compete — not because the evaluation criteria are unfair, but because the technical requirements are structurally inseparable from the incumbent&#x27;s proprietary IP. This is insider rewards at its logical endpoint.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The U.S. Department of Transportation/John A. Volpe National Transportation Systems Center (Volpe Center) intends to solicit and award on a sole source basis to Wasmer Consulting, in accordance with FAR 13.106-1(b).</blockquote>
+  <div class="ev-explanation">The solicitation openly declares a sole-source award to the incumbent vendor. This is the most extreme form of insider rewards: not a tilted playing field but a closed one. No other vendor can compete regardless of capability.</div>
+</div><div class="evidence-item">
+  <blockquote>Since the required BaseOps software is owned by Wasmer Consulting, changes to the software must be made by them.</blockquote>
+  <div class="ev-explanation">The agency&#x27;s dependency on proprietary software held by the incumbent is the root cause of the sole-source justification. The technical requirement — modifying the BaseOps GUI — cannot be separated from the vendor&#x27;s proprietary ownership of the codebase. This is textbook vendor capture: the incumbent holds institutional and technical knowledge in a form that no competitor can replicate.</div>
+</div><div class="evidence-item">
+  <blockquote>The BaseOps user interface required by the NOISEMAP software is proprietary to Wasmer Consulting... Any work done with BaseOps source code or functionality testing can only be performed by Wasmer Consulting, and access to Wasmer Consulting is only possible through direct contract at this time.</blockquote>
+  <div class="ev-explanation">The market research confirms that the experience requirement is not just narrow — it is literally impossible for any other vendor to satisfy. The proprietary codebase means that no amount of capability, experience, or technical expertise from a competitor would qualify them. The &#x27;insider rewards&#x27; dynamic has reached its terminal state: sole source.</div>
+</div><div class="evidence-item">
+  <blockquote>An optimistic time estimate for another contractor, working with both AFCEC and the Volpe Center, to develop a new user interface that includes the new desired features is three years. The estimated cost impact of the new contractor creating the new user interface, including the required updates, is $1,000,000.</blockquote>
+  <div class="ev-explanation">The sole source justification quantifies the cost of breaking vendor lock-in at $1M and 3 years. While this is offered as justification for the sole source, it is also an admission of the severity of incumbent dependency. The government has structured its requirements around a proprietary tool to the point where competition is economically and temporally infeasible.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe requirement sprawl. The SOW functions as a detailed software design specification rather than a statement of need. Every major feature is decomposed into numbered sub-items specifying exact UI control types, label text, behavioral logic, tab structure, column names, and interaction sequences — accompanied by wireframe figures that further constrain implementation. The contractor is given virtually no design latitude: they cannot propose an alternative interaction model, a different data format, or a more efficient workflow, because every element of the solution has already been defined by the government.
+
+The context partially mitigates this finding. This is a legitimate sole-source acquisition because Wasmer Consulting owns the proprietary BaseOps software. The extreme specificity likely reflects that (1) Volpe/DoD has a precise, operational vision of what the software should do, and (2) the sole-source nature means the government is effectively acting as the product owner directing a known vendor to implement a pre-designed feature set. In that narrow context, prescriptive UI specifications are more defensible than they would be in a competitive acquisition — the government cannot &#x27;prejudge the solution&#x27; in the traditional sense when there is only one possible implementer of proprietary software.
+
+However, this context does not fully excuse the pattern. Even in a sole-source software development engagement, the government could define the functional outcomes needed (users can export airspace profile data to a spreadsheet format compatible with Excel, with filtering capability) and allow Wasmer Consulting — who built and owns the software — to propose the optimal implementation. Instead, the SOW reads like internal product requirements documents were directly copy-pasted into the contract, locking in design decisions that should remain with the software owner. The result is a solicitation that, if replicated in a competitive context, would be a textbook example of sprawl: dozens of prescriptive implementation bullets with no room for vendor innovation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>1) Add import and export entries in the File menu (See Figure 1.)
+a. Import Airspace Operations from Spreadsheet …
+ i. Opens the Import Airspace Operations to Spreadsheet Modal Window (See Importing Airspace Profile Data.)
+b. Export Airspace Operations from Spreadsheet …
+ i. Opens the Export Airspace Operations to Spreadsheet Modal Window</blockquote>
+  <div class="ev-explanation">The SOW prescribes the exact UI structure down to specific menu entry names and modal window behavior. This dictates the implementation design — a vendor cannot propose a different interaction paradigm (e.g., drag-and-drop, toolbar buttons, a wizard, or a command-line interface) even if it would achieve the same outcome more efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>2) Create Export Airspace Operations to Spreadsheet Modal Window
+a. Include File Tab (See Figure 2.)
+ i. Include default folder radio button
+ 1. Add Export Airspace Operations to default spreadsheet file radio button
+ 2. Default folder is determined in a manner consistent with other export options
+ 3. Displays default folder below radio button control
+ ii. Include select custom folder radio button with text control
+ 1. Add Export Airspace Operations to the following spreadsheet file: radio button
+ 2. Functionality consistent with other export options
+ 3. Add text control with browser functionality to select folder
+ 4. Displays selected folder in text control below radio button control</blockquote>
+  <div class="ev-explanation">This passage specifies the exact UI controls to implement — specific radio button labels, their placement, what text appears beneath them, and how folder selection works. This is software design specification, not outcome definition. The actual outcome needed is &#x27;allow users to choose an output location.&#x27; The SOW removes any design discretion from the contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>b. Include Columns Tab (See Figure 3.)
+ i. Show list of mandatory parameters to export as columns in spreadsheet
+ 1. Aircraft Name
+ a. [Spreadsheet Column Name = Aircraft]
+ 2. Airspace Profile Name
+ a. [Spreadsheet Column Name = Profile]
+ 3. Area or Route Name
+ a. [Spreadsheet Column Name = Area or Route]
+ 4. Annual Number of Day Operations
+ a. [Spreadsheet Column Name = Annual Num Day]
+ 5. Annual Number of Night Operations
+ a. [Spreadsheet Column Name = Annual Num Night]
+ 6. Annual Number of Evening Operations
+ a. [Spreadsheet Column Name = Annual Num Eve]</blockquote>
+  <div class="ev-explanation">The SOW dictates exact spreadsheet column names to the character level. While data format interoperability is a legitimate constraint, specifying every column header name as a fixed requirement eliminates any vendor flexibility in schema design — including abbreviation choices, ordering, or alternative formats that might serve users better. This is implementation specification, not outcome definition.</div>
+</div><div class="evidence-item">
+  <blockquote>iv. Clicking on the three dots at the end of each text control opens filter dialog modal window that allows for selection of conditions to match (See Figure 5.)
+ 1. Select All, Select None and Invert Selection behave as names suggest
+ 2. Once OK is clicked the selected conditions replace any existing conditions for the specified parameter.</blockquote>
+  <div class="ev-explanation">The SOW specifies exact button labels (&#x27;Select All,&#x27; &#x27;Select None,&#x27; &#x27;Invert Selection&#x27;), the specific UI trigger (three dots at end of text control), and the precise behavioral logic of the filter dialog. This is line-level UI design dictated in a government solicitation — far beyond defining what the filtering feature must accomplish.</div>
+</div><div class="evidence-item">
+  <blockquote>3) Create Import Airspace Operations from Spreadsheet Modal Window
+a. Include File Tab (See Figure 6.)
+...
+b. Include Columns Tab (See Figure 7.)
+ i. Show list of automatic parameters to import as columns in spreadsheet. Include drop down menu to the right showing the default column but allowing selection of a different column.
+ 1. Airspace Profiles Name Column
+ a. [Spreadsheet Column Name = B]
+ 2. Annual Number of Day Operations
+ a. [Spreadsheet Column Name = D]</blockquote>
+  <div class="ev-explanation">The import modal requirements mirror the export requirements in their level of prescriptive detail, specifying exact spreadsheet column letter assignments (B, D, E, F) as fixed requirements. This eliminates vendor discretion in designing the import mapping interface and locks the schema to specific column positions rather than defining the functional need — importing airspace data reliably.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. The terms and conditions document enumerates roughly 23 FAR clauses and 5 TAR clauses in reference tables with source labels (Statute, EO, Other) but zero explanatory context about how each applies to the specific work — adding two software features to a proprietary desktop noise modeling application. Several inclusions are plainly boilerplate: the Buy American Certificate, the anti-texting-while-driving encouragement clause, and the installment payments clause have no clear relevance to a small sole-source software modification. The four IT security TAR clauses raise legitimate questions about their scope when applied to a contractor-owned proprietary desktop tool rather than a federal IT system. That said, the total volume of citations (roughly 28 combined) is elevated but not extreme, and the solicitation is not structurally organized around a bulk &#x27;Applicable Documents&#x27; section with dozens of entries — the regulatory citations are concentrated in the standard terms and conditions attachment rather than a bespoke compliance annex. Many of the FAR clauses (52.212-4, 52.222-50, 52.232-33, 52.233-3, etc.) are genuinely standard commercial items clauses that belong in any FAR Part 12/13 acquisition. The primary concerns are: (1) the absence of any guidance distinguishing which requirements carry operational weight for this specific work, (2) a handful of clearly inapplicable inclusions that suggest template reuse without review, and (3) the IT security clauses applied to a proprietary desktop tool without scoping language. This pattern is consistent with passive template management rather than active curation, warranting a severity 2 — noticeable but not severely dysfunctional for a vendor familiar with federal contracting norms.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FAR 52.252-2 Clauses incorporated by reference (FEB 98) ... FAR 52.252-6 Authorized Deviations in Clauses (NOV 20) ... [followed by a table listing: 52.203-18, 52.204-7, 52.225-2, 52.225-25, 52.240-90 as provisions, then 52.203-17, 52.203-19, 52.204-13, 52.204-91, 52.209-10, 52.212-4, 52.222-19, 52.222-36, 52.222-50, 52.223-23, 52.226-8, 52.232-30, 52.232-33, 52.232-40, 52.233-3, 52.233-4, 52.240-91, 52.240-92 with Alt II, 52.240-93 as clauses]</blockquote>
+  <div class="ev-explanation">The Terms and Conditions document lists approximately 23 FAR provisions and clauses incorporated by reference with no explanatory context for how each applies to this specific software modification task. While many are standard commercial items clauses, the sheer enumeration without any curation or prioritization guidance creates an undifferentiated compliance block for a vendor responding to what is essentially a small software feature addition contract.</div>
+</div><div class="evidence-item">
+  <blockquote>52.225-2 Buy American Certificate Statute</blockquote>
+  <div class="ev-explanation">The Buy American Certificate requirement is cited for a sole-source software modification contract where the deliverable is updated software code and documentation. The Buy American Act primarily governs acquisition of manufactured goods and construction materials. Its applicability to a software services contract is, at minimum, unexplained and likely a boilerplate carryover rather than a genuinely applicable requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving EO</blockquote>
+  <div class="ev-explanation">This clause — which encourages contractors to adopt policies against texting while driving — is cited in a solicitation for software code modifications to a noise modeling application. It has no logical connection to the work being performed and appears to be a standard template carryover, exemplifying copy-forward accumulation with no review for relevance.</div>
+</div><div class="evidence-item">
+  <blockquote>52.232-30 Installment Payments of Commercial Products and Commercial Services Statute</blockquote>
+  <div class="ev-explanation">Installment payment provisions are cited in a firm-fixed-price purchase order with a single deliverable due date of 03/12/2026 and two CLINs. The solicitation structure does not suggest installment payments are contemplated, making this citation appear to be an uncurated template inclusion rather than a purposefully applied requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>TAR 1252.239-70, Security Requirements for Unclassified Information Technology Resources; TAR 1252.239-71, Information Technology Security Plan and Accreditation; TAR 1252.239-73, Limitations on the Use and Disclosure of Third-Party Contractor Reported Cyber Incident Information; TAR 1252.239-93, Information and Communication Technology Accessibility</blockquote>
+  <div class="ev-explanation">Four IT security and accessibility TAR clauses are cited with no explanation of how they apply to a proprietary desktop software modification (BaseOps runs as a desktop application, not a federal IT system or networked resource). In particular, IT Security Plan and Accreditation requirements typically apply to systems that process federal data on government networks. The applicability to a contractor-owned proprietary software tool updated on behalf of DoD is unexplained. Section 508 / ICT Accessibility (1252.239-93) may have some relevance, but no context is provided to help the vendor understand the scope of their compliance obligation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm Fixed Price for two discrete, well-specified software enhancement tasks on a proprietary tool. The SOW is unusually detailed — it specifies exact UI elements, column mappings, modal window tabs, filtering behaviors, and even conditional logic (e.g., evening operations fields only if the BaseOps case uses evening data). The deliverables are concrete: a working software update and user documentation, due on a single fixed date. The contractor is the original developer of the proprietary software, meaning there is minimal ambiguity about the codebase or the effort required to implement the described features. These are precisely the conditions under which FFP is appropriate: well-defined requirements, a known-quantity contractor with deep domain expertise, and measurable acceptance criteria (deliverables reviewed against SOW by a named technical POC). There is no indication of scope instability, open-ended research, or evolving requirements that would argue for T&amp;M or cost-reimbursement. The very short timeline (roughly two weeks from award to delivery) and the small, focused nature of the tasks further reinforce FFP as the right vehicle. No mismatch is present between the contract type and the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award a firm fixed price purchase order as a result of this Combined Synopsis/Solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type is Firm Fixed Price (FFP), which is the basis for evaluating alignment with requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 00100 – Task 1 - BaseOps Usability Improvements for MRNMAP... CLIN 00200 – Task 2 Improve Track Avoidance Area when MOA MTRs intersect Avoidance Areas (AAs) for MRNMAP</blockquote>
+  <div class="ev-explanation">Both CLINs are discrete, bounded software development tasks with specific, well-documented deliverables and a single due date of 03/12/2026, suggesting the scope is sufficiently defined for FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall add functionality to import and export airspace operations in a manner similar to the existing functionality for flight and static operations... Add a user warning when using the Check Case functionality that would warn the user when an Avoidance Area/Military Training Route intersection existed.</blockquote>
+  <div class="ev-explanation">The SOW specifies detailed, concrete requirements including exact UI elements, column names, modal window behaviors, and filter logic. This level of specification supports FFP because the contractor can estimate the work with reasonable confidence.</div>
+</div><div class="evidence-item">
+  <blockquote>Because this software is owned by Wasmer Consulting, changes to the software must be made by them... This BaseOps update builds upon detailed work completed as part of the original BaseOps development. Wasmer Consulting was the sole organization performing the original development and the tool is proprietary to them.</blockquote>
+  <div class="ev-explanation">The sole-source justification confirms that Wasmer Consulting has deep familiarity with the codebase. An incumbent with full knowledge of their own proprietary software can estimate effort for well-defined feature additions with high confidence, reinforcing the appropriateness of FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="6913G626Q300015 Terms and Conditions.pdf">6913G626Q300015 Terms and Conditions.pdf</div></div>
+  <a class="dl-btn" href="../attachments/99a888dfb2764d439e38473f2a69878f_6913G626Q300015+Terms+and+Conditions.pdf" download="6913G626Q300015 Terms and Conditions.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="6913G626Q300015_SOW.pdf">6913G626Q300015_SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/99a888dfb2764d439e38473f2a69878f_6913G626Q300015_SOW.pdf" download="6913G626Q300015_SOW.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="6913G626Q300015_SSJ_Redacted.pdf">6913G626Q300015_SSJ_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/99a888dfb2764d439e38473f2a69878f_6913G626Q300015_SSJ_Redacted.pdf" download="6913G626Q300015_SSJ_Redacted.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

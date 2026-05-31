@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facilities Technology Management (FTM) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Facilities Technology Management (FTM)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 8f49fff1fb7047d3afa964c6a3380936</span>
+      <a class="sam-link" href="https://sam.gov/opp/8f49fff1fb7047d3afa964c6a3380936/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2025-12-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">JUSTICE, DEPARTMENT OF › FEDERAL BUREAU OF INVESTIGATION › FBI - REDSTONE ARSENAL</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">—</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-12-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a 7-page RFI — a pre-solicitation market research document — not a performance work statement or solicitation with a QA surveillance plan. The document does not contain overlapping reporting cadences, prescribed report formats, mandatory meeting frequencies, or process-compliance tracking mechanisms. The accountability structure is minimal by design: the FBI is asking vendors to describe their capabilities, not yet defining how it will manage contract performance. The &#x27;Performance Standards&#x27; section contains qualitative language about objectivity and alignment with strategic goals, and deliverables are defined as documents rather than outcomes — both mild indicators of compliance-over-outcomes thinking — but these are not the developed QA/reporting apparatus that characterizes Sin #2 at severity 2 or 3. Any full solicitation that follows this RFI may well develop these problems, but the RFI itself provides insufficient scaffolding to fairly flag them. The document has just enough content to assess the sin (hence sufficient_content=true), but the patterns that define this sin are absent. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Standards
+o The Vendor must ensure that all analyses are objective, evidence-based, and free from conflicts of interest
+o Recommendations must be actionable, financially sustainable, and aligned with the FBI&#x27;s strategic goals</blockquote>
+  <div class="ev-explanation">The RFI&#x27;s only &#x27;performance standards&#x27; are qualitative descriptors (objective, evidence-based, actionable, financially sustainable) with no measurable targets, thresholds, or success criteria. However, this is an RFI — not a solicitation — so the absence of detailed performance metrics is expected and not yet a sin.</div>
+</div><div class="evidence-item">
+  <blockquote>Deliverables
+o A written Assessment Report including system comparisons, cost models, and recommendation report
+o A Presentation of Findings to FBI stakeholders, highlighting key insights and rationale for the recommended system(s)
+o Supporting documentation of all data sources, assumptions, and methodologies used in the analysis</blockquote>
+  <div class="ev-explanation">Deliverables are defined as documents and presentations — outputs rather than outcomes. There are no acceptance criteria specifying what makes the assessment report adequate (e.g., accuracy of cost models, stakeholder satisfaction, decision-readiness). This is compliance-by-deliverable rather than outcome measurement. However, in the context of an advisory/assessment engagement at RFI stage, deliverable-centric accountability is standard.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This document is a Request for Information (RFI), not a formal solicitation with binding evaluation criteria. The FBI is conducting market research and collecting capabilities statements — no award will be made based on this document. As a result, there are no formal past performance requirements, no minimum dollar thresholds, no lookback windows, and no scoring rubrics that could function as insider filters.
+
+The &#x27;Relevant Experience&#x27; section in the capabilities statement deliverable asks vendors to describe prior TRIRIGA or similar IWMS experience, federal or comparable environments, and business transformation initiatives — but these are informational prompts for market research purposes, not evaluation criteria with minimum requirements or thresholds that would exclude respondents.
+
+Critically, the RFI explicitly invites vendors without TRIRIGA-specific experience by consistently using &#x27;or similar&#x27; and &#x27;or comparable&#x27; qualifiers. There are no stated dollar thresholds, no required minimum number of prior contracts, no recency windows, and no requirement for institutional knowledge of FBI-specific systems that would be uniquely held by an incumbent.
+
+The mention of the FBI&#x27;s ITSSS-2 BPA and Best-In-Class vehicles in the cover letter questions is a practical inquiry about procurement vehicles — not an eligibility screen. Vendors not on those vehicles are not excluded from the RFI response.
+
+Overall, this RFI is structured in a reasonably open and market-research-appropriate manner. The experience language is capability-focused and not exclusionary. A competent vendor new to this specific FBI contract could realistically respond and engage with the market research process. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Past performance supporting TRIRIGA or similar enterprise facilities management systems</blockquote>
+  <div class="ev-explanation">This is the closest the RFI comes to an experience requirement that could favor an incumbent. However, the phrasing &#x27;or similar enterprise facilities management systems&#x27; explicitly broadens eligibility beyond TRIRIGA-specific experience, allowing vendors with comparable IWMS/CAFM platform backgrounds to respond competitively.</div>
+</div><div class="evidence-item">
+  <blockquote>Experience with COTS, GOTS, and custom applications in federal or comparable environments</blockquote>
+  <div class="ev-explanation">The phrase &#x27;or comparable environments&#x27; prevents this from functioning as a federal-only mandate. Vendors with strong commercial enterprise application experience can satisfy this criterion, avoiding a strict federal-experience-only filter.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This document is an RFI, not a formal solicitation with a Statement of Work or Performance Work Statement carrying binding &#x27;shall&#x27; language. The technical objectives section describes areas of interest and solicits vendor feedback — it is oriented toward learning what vendors can do, not dictating how they must do it. The Systems Assessment section is almost entirely outcome-focused: it asks for assessment reports, cost models, risk analyses, and a recommendation — defining deliverables and analytical outputs rather than prescribing methodologies. The TRIRIGA O&amp;M section lists a broad set of activities, but this is consistent with scoping an RFI to help vendors understand the work domain, and no staffing structures, specific workflows, or step-by-step procedures are mandated. The capabilities statement request (cover letter and technical approach) is a standard RFI format asking vendors to describe their own approach — the opposite of prescribing how work must be done. On balance, the document demonstrates minimal requirement sprawl. It is an early-stage market research instrument that appropriately focuses on what the FBI needs (sustained TRIRIGA operations, portfolio assessment, transition planning) without locking vendors into specific implementation approaches.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide technical and functional support for the secondary applications in the Real Property Portfolio for up to, but not limited to, 500 users, including updates, maintenance, support operations, troubleshooting, security patching, optimization, on/offboarding of applications, multi-domain integration, application integration, and associated technical and functional support. O&amp;M support also extends to testing, validation support, and quality assurance.</blockquote>
+  <div class="ev-explanation">This bullet lists a broad set of activities (updates, maintenance, troubleshooting, patching, etc.) that could be read as prescriptive task enumeration rather than outcome definition. However, given this is an RFI rather than a formal solicitation, and the list reads more as a scope description to elicit industry feedback than a binding &#x27;shall&#x27; requirement, the prescriptive weight is limited. It does not lock vendors into specific methods or staffing structures.</div>
+</div><div class="evidence-item">
+  <blockquote>Deliver a final recommendation report with a clear recommendation of the optimal system(s), supported by quantitative and qualitative analysis... Coordinate with the FBI on an agile implementation plan towards the optimal technology portfolio solution, focusing on a strategy and timeline to transition away from TRIRIGA by Sept 2027 as the priority</blockquote>
+  <div class="ev-explanation">The specification of &#x27;agile implementation&#x27; could be read as prescribing a methodology rather than an outcome, but in context it is used loosely to mean iterative/collaborative, not as a formal Scrum/SAFe mandate. The TRIRIGA transition deadline is a legitimate operational constraint (the system reaches EOL in Sept 2027), not process sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This RFI contains no dedicated &#x27;Applicable Documents,&#x27; &#x27;Referenced Standards,&#x27; or compliance requirements section whatsoever. The document is a Request for Information focused on market research and capability assessment for a facilities technology management effort. It does not cite regulatory frameworks, statutory authorities, directives, or compliance mandates in any list format. The performance standards section references only general principles (&#x27;objective, evidence-based, and free from conflicts of interest&#x27;; &#x27;actionable, financially sustainable, and aligned with the FBI&#x27;s strategic goals&#x27;) rather than specific regulatory citations. The closest thing to a compliance reference is the mention of clearance levels and classification enclaves (SECRET/UNCLASSIFIED), which is appropriate contextual information for a national security agency rather than a rule pool. Standard FAR/DFARS boilerplate is not present because this is an RFI, not a solicitation. There is simply no regulatory citation structure here to evaluate for rule pool patterns. The document is a lean, focused market research instrument that asks industry for capabilities feedback, and its scope description — TRIRIGA O&amp;M support and systems assessment — is presented in plain functional terms without layering on compliance mandates. This is a severity 1 finding: no evidence of rule pools is present.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is an RFI, so no contract type has been formally selected. The FBI is explicitly soliciting industry input on which contract type to use (FFP, T&amp;M, or Labor-Hour). However, the requirements as described present a moderate square peg risk if FFP is ultimately chosen, which the inclusion of FFP as an option suggests is under consideration.
+
+The work has two distinct components: (1) TRIRIGA O&amp;M and secondary application support, and (2) a systems assessment and agile implementation toward a TRIRIGA replacement. The first component is classic reactive IT maintenance — unpredictable in volume, driven by incidents and evolving user needs — which is textbook T&amp;M or Labor-Hour territory. FFP for open-ended O&amp;M across a complex multi-application environment with 500+ users would be poorly matched to actual workload variability. The second component involves advisory, analytical, and consulting work (system evaluations, TCO analyses, recommendation reports) followed by an agile implementation. The advisory deliverables (written reports, presentations) have enough definition that FFP could work for discrete tasks, but the agile implementation piece explicitly anticipates evolving scope, which conflicts with FFP assumptions.
+
+The Sept 2027 hard deadline for TRIRIGA transition does give the government a concrete scheduling anchor that could partially support FFP framing for certain deliverables. And because no contract type has been finalized — the government is still asking — this is not yet a committed mismatch. The severity is moderate (2) rather than severe (3) because: (a) no contract type has been imposed yet; (b) the government is actively soliciting industry input on this question, which is appropriate market research behavior; and (c) a hybrid CLIN structure (FFP for defined deliverables, T&amp;M for O&amp;M) could resolve the tension. The risk is that if the government ultimately selects FFP across the board, the O&amp;M and agile implementation components will be badly mismatched to that pricing structure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>What contract type is recommended (FFP, T&amp;M, LH)</blockquote>
+  <div class="ev-explanation">The FBI has not yet selected a contract type and is asking industry to recommend one. This means no final pricing structure has been imposed, but the solicitation lists FFP, T&amp;M, and Labor-Hour as the candidate options, making it possible to evaluate fit against the requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>The FBI requires contractor support for the primary tool, TRIRIGA, until its End of Life (EOL) in Sept 2027, potentially longer depending on mission need.</blockquote>
+  <div class="ev-explanation">The TRIRIGA O&amp;M work involves ongoing system maintenance, troubleshooting, security patching, and user support for up to 500 users. The quantity of labor required for O&amp;M tasks is inherently unpredictable — incidents, patches, and integration issues arise on demand. T&amp;M or Labor-Hour would be the natural fit here. FFP for open-ended O&amp;M risks either underpricing (leading to contractor shortfalls) or overpricing (padding for uncertainty).</div>
+</div><div class="evidence-item">
+  <blockquote>Provide technical and functional support for the secondary applications in the Real Property Portfolio for up to, but not limited to, 500 users, including updates, maintenance, support operations, troubleshooting, security patching, optimization, on/offboarding of applications, multi-domain integration, application integration, and associated technical and functional support.</blockquote>
+  <div class="ev-explanation">This broad O&amp;M scope — spanning multiple applications, integration work, and reactive troubleshooting — is difficult to scope with enough precision to support FFP pricing. The phrase &#x27;up to, but not limited to&#x27; signals an open-ended requirement. FFP here would incentivize contractors to lowball bids and then seek modifications, or to pad estimates to cover unknown workloads.</div>
+</div><div class="evidence-item">
+  <blockquote>FBI will then coordinate with the Vendor on an agile implementation towards the optimal solution</blockquote>
+  <div class="ev-explanation">Agile delivery by definition involves evolving requirements and iterative scope changes. Pairing an agile implementation approach with FFP pricing is a classic square peg: FFP assumes stable, predictable scope, while agile assumes scope will be refined through execution. T&amp;M or a hybrid IDIQ/CLIN structure with T&amp;M task orders would better accommodate this.</div>
+</div><div class="evidence-item">
+  <blockquote>Coordinate with the FBI on an agile implementation plan towards the optimal technology portfolio solution, focusing on a strategy and timeline to transition away from TRIRIGA by Sept 2027 as the priority</blockquote>
+  <div class="ev-explanation">The Sept 2027 TRIRIGA EOL deadline is concrete, which could support an argument for FFP on the transition deliverable. However, the system assessment work that precedes it is exploratory and advisory — recommending which replacement system to adopt, conducting TCO analyses, and evaluating market options. Advisory and analytical work of this kind is a poor fit for FFP, which requires a well-defined deliverable with estimable cost.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFI 15F067-26-PN-MEA04.pdf">RFI 15F067-26-PN-MEA04.pdf</div></div>
+  <a class="dl-btn" href="../attachments/8f49fff1fb7047d3afa964c6a3380936_RFI+15F067-26-PN-MEA04.pdf" download="RFI 15F067-26-PN-MEA04.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

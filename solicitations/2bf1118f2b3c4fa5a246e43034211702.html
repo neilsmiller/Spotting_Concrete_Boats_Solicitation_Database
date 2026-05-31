@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satellite Simulator RFQ for C3N — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Satellite Simulator RFQ for C3N</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 2bf1118f2b3c4fa5a246e43034211702</span>
+      <a class="sam-link" href="https://sam.gov/opp/2bf1118f2b3c4fa5a246e43034211702/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR FORCE MATERIEL COMMAND › AIR FORCE LIFE CYCLE MANAGEMENT CENTER › COMMAND, CONTROL, COMMUNICATIONS &amp; BATTLE MANAGEMENT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7C20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334220</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Acceptability</li><li>Price (Lowest Price Technically Acceptable)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a commercial product procurement — a hardware buy for satellite simulator equipment — not a services contract. The accountability structure for this type of acquisition is fundamentally different from the services contracts where Compliance Over Outcomes typically manifests. There are no weekly status reports, no monthly progress reports, no prescribed report formats, no meeting cadences, and no surveillance plan. The solicitation&#x27;s accountability mechanisms are almost entirely product-oriented: technical acceptability is evaluated against salient characteristics (does the hardware do what it needs to do?), delivery is confirmed by physical receipt, and documentation requirements are standard commercial product deliverables (manuals, warranty information, Certificate of Conformance). The LPTA evaluation structure — meeting all specified technical requirements to be considered acceptable — is outcome-focused in the sense that it asks &#x27;does the product meet the specifications?&#x27; rather than &#x27;did the vendor follow a process?&#x27; The salient characteristics themselves are detailed technical performance requirements (frequency ranges, data rates, simulation fidelity, supported waveforms and cryptographic equipment) that define what the equipment must do, which is the appropriate way to specify hardware. There is essentially nothing in this solicitation that constitutes compliance-over-outcomes behavior. The only reporting-like requirements are delivery notification (5 days prior) and shipping notification to the lab manager — both operationally necessary for hardware delivery logistics, not process compliance theater. Severity 1 is appropriate: this solicitation does not exhibit this sin in any meaningful way.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Vendor shall ensure all owners&#x27; manuals, warranty information, maintenance and care instructions, and any other information/documentation is provided to the acceptor.</blockquote>
+  <div class="ev-explanation">This is a standard commercial product documentation requirement tied to the physical deliverable, not a process compliance reporting mechanism. It ensures the government receives what it needs to use and maintain the equipment.</div>
+</div><div class="evidence-item">
+  <blockquote>The vendor shall include: A Certificate of Conformance (CoC) affirming that all supplied items meet the specifications outlined in this document.</blockquote>
+  <div class="ev-explanation">A CoC is a standard product acceptance mechanism for commercial hardware purchases. It confirms the delivered items meet specifications — this is outcome-adjacent (did the product meet specs?) rather than process compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful Insider Rewards characteristics. The RFQ uses a Lowest Price Technically Acceptable (LPTA) evaluation methodology with technical acceptability determined solely by whether the offeror&#x27;s proposed equipment meets the salient characteristics (specifications) for each CLIN quoted. There are no past performance evaluation factors, no prior contract dollar thresholds, no federal-specific experience mandates, no lookback windows, and no institutional knowledge requirements embedded in the evaluation criteria.
+
+The technical volume requires offerors to submit a technical approach, a statement acknowledging capability, and a Bill of Materials — all of which any qualified manufacturer or reseller of satellite simulation equipment could provide without ever having held a government contract. The salient characteristics themselves define specific technical performance parameters (frequencies, data rates, supported waveforms, GNSS signal types, etc.), but these are product specifications, not experience requirements. They test whether the equipment CAN do the work, not whether the vendor HAS done prior government work.
+
+The solicitation is a 100% Small Business Set-Aside for commercial hardware procurement under FAR Part 13 simplified acquisition procedures. The competitive structure — allowing awards on any combination of one to three CLINs, permitting multiple awards, and using LPTA — actually broadens competition rather than narrowing it. Any small business that can source or manufacture conforming satellite simulator hardware could meaningfully compete.
+
+The Nonmanufacturer Rule and Limitations on Subcontracting requirements are standard regulatory compliance items, not experience barriers. The OCI disclosure requirement and SPRS/NIST cybersecurity assessment are likewise routine. None of these function as incumbency filters.
+
+The one notable document gap is that the original Attachment 1 (Salient Characteristics) was encrypted and inaccessible; however, a revised version (Attachment 1 - 4May26) was available and provided sufficient detail to conduct this analysis. Based on all available content, this solicitation scores at severity 1 — the requirements are product-specification-based rather than experience-based, and a qualified vendor new to this specific contract could realistically compete on equal footing with any incumbent.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a commercial product procurement (hardware buy) rather than a services contract. The salient characteristics document specifies technical performance parameters — operating frequencies, supported waveforms, data rates, channel counts, interface standards, constellation emulation capabilities — that define WHAT the equipment must do, not HOW the vendor must design or manufacture it. Requirement sprawl is most damaging in services contracts where process prescription eliminates vendor innovation; hardware procurements appropriately define technical specifications that a compliant product must meet.
+
+The detailed bullet lists (e.g., MUOS call types and data rates, DAMA/IW operating modes and I/O rates, GPS trajectory simulation capabilities) read as capability checklists that a vendor&#x27;s existing commercial product either meets or does not. These are outcome-defining constraints — they describe the end-state performance envelope — not step-by-step instructions for how to build the device. Vendors retain full latitude in design, architecture, and manufacturing approach.
+
+A few elements approach prescriptive territory: specifying interoperability with particular crypto devices (KY-57, KY-58, KY-99, KY-100, KIV-7, etc.) and specific interface standards (MIL-STD-188-181B/C, MIL-STD-182A, etc.) could be read as constraining. However, these are legitimate interoperability constraints — the TDN Lab operates specific government-furnished equipment that the simulators must work alongside. These are precisely the kind of technical interoperability requirements that fall outside the sprawl definition.
+
+The solicitation does not prescribe staffing structures, workflows, or step-by-step processes — the hallmarks of true requirement sprawl. It is a competently scoped commercial product acquisition with appropriate technical specificity. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Vendor shall deliver all radio equipment and ancillary equipment on this order to the delivery location specified in this SOW. Any installation and assembly will be completed by TDN Lab personnel.</blockquote>
+  <div class="ev-explanation">This delegates installation to the government rather than prescribing how the vendor must install — it is an outcome boundary (deliver the equipment), not a process mandate on the vendor.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor shall ensure all owners&#x27; manuals, warranty information, maintenance and care instructions, and any other information/documentation is provided to the acceptor.</blockquote>
+  <div class="ev-explanation">This is a standard deliverable requirement specifying what documentation must accompany a product purchase. It does not prescribe how the vendor designs, builds, or delivers the equipment itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pool pattern. The regulatory and standards citations are sparse and focused throughout the document. The Salient Characteristics document — the primary technical specification — organizes requirements by system type (MUOS, DAMA/IW, GPS) and within each section cites only the standards directly relevant to that hardware&#x27;s operational context: UHF frequency ranges, specific MIL-STDs for SATCOM waveforms, cryptographic keyfill equipment, and GNSS signal standards. There is no &#x27;Applicable Documents&#x27; bulk list, no copy-forward accumulation of agency policies, and no inclusion of obviously irrelevant regulations. The MIL-STD list for the DAMA/IW emulator is the densest regulatory cluster in the document, but all six standards plausibly govern UHF SATCOM communications interfaces, and they are flagged as &#x27;desired&#x27; rather than mandatory — demonstrating active curation rather than passive dumping. The SPRS/NIST citation in the RFQ letter lacks specificity about which NIST framework applies, but this is a minor ambiguity in what is otherwise a clean, commercially-oriented hardware procurement. A vendor reading this solicitation can readily identify the compliance landscape because it is genuinely narrow: TAA compliance for supply chain, SPRS/NIST for cybersecurity vetting, and specific communications standards tied directly to the hardware&#x27;s operational purpose. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>MIL-STD Interfaces desired
+o MIL-STD-188-181B/C
+o MIL-STD -182A
+o MIL-STD -183B
+o MIL-STD -183
+o MIL-STD -183A
+o MIL-STD -185A</blockquote>
+  <div class="ev-explanation">This is the longest regulatory/standards list in the solicitation — six MIL-STD citations for the DAMA/IW emulator. However, these are genuinely relevant military communications standards for UHF SATCOM waveforms, and critically, they are marked &#x27;desired&#x27; rather than mandatory, which appropriately signals their priority relative to other hard requirements. This is contextual citation, not a rule pool.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will assess Supply Chain and Cybersecurity compliance of all Offerors via Supplier Performance Risk System (SPRS) and the National Institute of standards and Technology (NIST).</blockquote>
+  <div class="ev-explanation">SPRS and NIST are cited without specifying which NIST publication applies (e.g., NIST SP 800-171), which is a minor ambiguity. However, for a small business hardware procurement involving military communications equipment, SPRS and NIST cybersecurity frameworks are genuinely applicable, and the citation is brief rather than a bulk dump. This is a minor gap in specificity, not a rule pool pattern.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a commercial hardware buy — specifically, the purchase of up to three types of satellite simulator/emulator systems with well-defined salient characteristics. The contract type is Firm Fixed Price (FFP), which is the correct and standard choice for this kind of acquisition. The requirements are hardware products with enumerated technical specifications (operating frequencies, supported waveforms, data rates, etc.), a defined quantity (one unit per CLIN), and a defined delivery location. There is no labor component, no evolving scope, and no uncertainty about what is being purchased — the government knows exactly what it wants and is asking vendors to confirm they can provide it at a fixed price. FFP is precisely appropriate here: the risk of cost overrun falls on the vendor (the manufacturer/reseller), the government gets cost certainty, and competition (LPTA evaluation) will keep prices honest. The Nonmanufacturer Rule and Limitations on Subcontracting provisions further reinforce that this is treated as a product acquisition, not a services contract. There is no indication that a different contract type would be preferable. This is a minimal-severity finding with no actionable concern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government reserves the right to make one (1), multiple, or no Firm Fixed Price award.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states that any resulting award will be Firm Fixed Price (FFP). This is the appropriate contract type for this acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>This Statement of Work (SOW) consists of the purchase of three types of satellite simulator/emulator hardware and accessories for the TDN Lab Refresh project.</blockquote>
+  <div class="ev-explanation">The requirement is a straightforward commercial hardware procurement — discrete, tangible items with defined technical specifications. FFP is the textbook-appropriate contract type for purchasing commercial equipment.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - Salient Characteristics.pdf">Attachment 1 - Salient Characteristics.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2bf1118f2b3c4fa5a246e43034211702_Attachment+1+-+Salient+Characteristics.pdf" download="Attachment 1 - Salient Characteristics.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - Salient Characteristics_4May26.pdf">Attachment 1 - Salient Characteristics_4May26.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2bf1118f2b3c4fa5a246e43034211702_Attachment+1+-+Salient+Characteristics_4May26.pdf" download="Attachment 1 - Salient Characteristics_4May26.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 - Price Format Sheet.xlsx">Attachment 3 - Price Format Sheet.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/2bf1118f2b3c4fa5a246e43034211702_Attachment+3+-+Price+Format+Sheet.xlsx" download="Attachment 3 - Price Format Sheet.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 - Synopsis Notice.pdf">Attachment 4 - Synopsis Notice.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2bf1118f2b3c4fa5a246e43034211702_Attachment+4+-+Synopsis+Notice.pdf" download="Attachment 4 - Synopsis Notice.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ Letter - Satelliste Simulators.pdf">RFQ Letter - Satelliste Simulators.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2bf1118f2b3c4fa5a246e43034211702_RFQ+Letter+-+Satelliste+Simulators.pdf" download="RFQ Letter - Satelliste Simulators.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

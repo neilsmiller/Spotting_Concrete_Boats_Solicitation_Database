@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMPUTER SUBASSEMBL — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>COMPUTER SUBASSEMBL</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 7be00d01ff8344f8933a7dfda3b4ae69</span>
+      <a class="sam-link" href="https://sam.gov/opp/7be00d01ff8344f8933a7dfda3b4ae69/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">One year induction period from date of order; option quantity exercisable within 365 days</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward depot-level repair solicitation for a single military computer subassembly (NSN 7021-01-659-6181). The accountability structure is lean and does not exhibit the hallmarks of the compliance-over-outcomes sin in any serious way.
+
+The QA section (Section E, paragraphs 4.1-4.4) is brief and standard for a Navy repair purchase order. It assigns inspection responsibility to the contractor, defers to manufacturer specifications for acceptance standards, and requires record retention. There are no overlapping reporting cadences, no prescribed weekly or monthly status report formats, no activity-tracking deliverables, and no meeting frequency requirements. The entire QA framework is one page.
+
+The primary performance metric — Repair Turnaround Time measured from physical receipt to government acceptance — is an outcome measure. It tells the contractor when the job must be done, not how to document the process of doing it. The government also requires a buy/repair comparison price (new unit price vs. repair price), which introduces cost-effectiveness accountability.
+
+The Commercial Asset Visibility (CAV) reporting requirement (Section F) does add a procedural reporting layer: contractors must report transactions within five business days and maintain an active CAV account. This is a logistics tracking mechanism, not a quality assurance measure, and it serves a legitimate supply chain visibility purpose. It is not outcome-suppressing in the way the sin definition contemplates.
+
+The records retention requirement (365 days of inspection records) is the closest thing to a compliance-over-outcomes concern, but it is a single, modest, standard requirement rather than a multi-layered documentation burden.
+
+The solicitation contains no SOW narrative with elaborate reporting requirements, no quality surveillance plans specifying activity checklists, and no plan-adherence tracking mechanisms. The absence of an explicit functional acceptance test specification (beyond &#x27;manufacturer specifications&#x27;) is a mild weakness — it leaves acceptance criteria somewhat ambiguous — but this reflects the nature of a repair order for a commodity item where OEM standards govern, not compliance theater substituting for outcome measurement.
+
+Overall, this solicitation&#x27;s accountability structure is appropriate and proportionate for its scope. Severity 1 is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein. Except as otherwise specified in the contract/purchase order, the Contractor may use his own or any other facilities suitable for the performance of the inspection requirements specified herein, unless disapproved by the Government. The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">Inspection responsibility is assigned to the contractor with government oversight rights retained. This is outcome-oriented — the focus is on whether supplies conform to requirements — but the mechanism for measuring conformance is left vague, relying on manufacturer specifications rather than explicit performance criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4 Inspection/Testing Repaired Items - The Contractor shall perform all inspection and testing requirements as specified in the original manufacturer&#x27;s specifications and drawings.</blockquote>
+  <div class="ev-explanation">Testing is tied to manufacturer specifications, which is an outcome-based standard (does the item work as the manufacturer intended?) rather than a process checklist. However, this standard is defined by reference rather than explicitly stated, meaning the government cannot easily verify what specific performance thresholds apply.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3 Records - Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">This is a records-keeping requirement with a compliance character — the contractor must maintain documentation of inspection activity. However, it is a single, modest requirement and does not constitute a reporting burden or displace outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government is seeking a Repair Turnaround Time (RTAT) of: 101 Days ... Repair Turnaround Time (RTAT): the resultant contractual delivery requirement is measured from asset Return to the date of asset acceptance under the terms of the contract.</blockquote>
+  <div class="ev-explanation">RTAT is a concrete, measurable delivery metric — an outcome standard, not a process compliance measure. This partially offsets concerns about the QA section&#x27;s vagueness by establishing at least one quantifiable performance expectation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard NAVSUP WSS repair solicitation for a single computer subassembly (NSN 7021-01-659-6181). The solicitation structure is a simple RFQ seeking competitive repair bids evaluated on past performance and price. Reviewing the document for insider rewards indicators:
+
+1. **Experience requirements**: The solicitation contains no explicit experience thresholds — no dollar minimums, no required number of prior contracts, no federal-specific experience mandates, and no short lookback windows. There are no key personnel qualifications that would require specific prior contract experience.
+
+2. **Evaluation criteria**: Section M establishes a straightforward two-factor evaluation: past performance (primary) and price (secondary). Past performance is evaluated via SPRS color ratings (Dark Blue through Red) based on quality performance within an FSC group. This is a standard government-wide performance database assessment — it evaluates how well vendors have performed, not whether they have specifically held this contract before. Vendors with no SPRS history receive a &#x27;neutral&#x27; rating, meaning they are not disqualified. This is explicitly non-exclusionary.
+
+3. **Technical requirements**: The repair requirements reference the OEM&#x27;s CAGE (1VPW8) and part number, and require repair per original manufacturer specifications and drawings. This is appropriate for a repair contract — any competent repair shop with the technical capability and access to the relevant technical documentation could compete. The CAV RP reporting requirement is a standard NAVSUP logistics tracking system with a defined onboarding process open to any contractor.
+
+4. **The authorized distributor notice**: The boilerplate note in Section 6.3 references authorized distributors, but this is standard NAVSUP WSS language and appears in the &#x27;Notes&#x27; section rather than as a stated eligibility requirement. For a repair contract (not a new-buy), this language is ambiguous at best, but it does not establish the kind of stacked, incumbent-favoring criteria that characterize insider rewards at severity 2 or 3.
+
+5. **No institutional knowledge requirements**: There are no requirements for familiarity with agency-specific systems, organizational structures, or processes that would only be available to an incumbent.
+
+Overall, this solicitation does not exhibit meaningful insider rewards patterns. The evaluation approach — SPRS-based past performance with a neutral default for vendors without history, plus competitive pricing — is accessible to qualified repair vendors who have not previously held this specific contract. The severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This authorized distributor requirement could be read as potentially limiting, but in the context of a repair contract for a specific military electronics subassembly (CAGE 1VPW8, part 01-P55253R001), this language appears in the &#x27;Notes to Distributors&#x27; section and is a standard NAVSUP WSS boilerplate notice. For a repair contract specifically, the requirement is that the contractor perform repair per the OEM&#x27;s specifications and drawings — not that they be an authorized distributor of new parts. The note is somewhat ambiguous for a repair solicitation but does not clearly function as an incumbent filter in the way insider rewards typically operate.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard NAVSUP WSS repair solicitation for a single NSN item (Computer Subassembly) using well-established Navy contracting templates. The scope is narrow and clearly defined: teardown, evaluate, repair, and return to &#x27;A&#x27; condition within 101 days. The requirements section appropriately defers to the contractor&#x27;s own repair/overhaul standards and manufacturer specifications rather than prescribing step-by-step repair procedures. The quality assurance provisions (Sections 4.1-4.4) establish contractor responsibility for inspection outcomes without dictating inspection workflows. The packaging requirements (Section 5, WSSTERMDZ03) are detailed but represent legitimate DoD logistics standards (MIL-STD-2073, MIL-STD-129) that are interoperability and regulatory constraints, not process sprawl. The CAV RP reporting requirement specifies a particular government system the contractor must interface with, which is a legitimate interoperability constraint. The mercury-free requirement, configuration management provisions, and IUID marking requirements are all regulatory/safety mandates or traceability standards — not prescriptive process choices. The solicitation contains no staffing prescriptions, no tool mandates, no workflow procedures that would prevent a contractor from innovating or automating its repair process. The bulk of the document is standard FAR/DFARS clauses incorporated by reference. There is minimal evidence of requirement sprawl; the few prescriptive elements present are either legitimate regulatory constraints or standard Navy repair contract templates that define the outcome (functional, &#x27;A&#x27;-condition asset returned within RTAT) rather than the solution method.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures.</blockquote>
+  <div class="ev-explanation">This language defers to the contractor&#x27;s own standard practices and approved documents rather than mandating a specific step-by-step process. It is outcome-oriented (repair to contractor&#x27;s established standards) and does not prescribe a particular repair method, leaving the contractor free to apply its best technical approach.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall perform all inspection and testing requirements as specified in the original manufacturer&#x27;s specifications and drawings.</blockquote>
+  <div class="ev-explanation">This references an external technical standard (manufacturer specifications) as the performance baseline rather than inventing a novel process requirement. It defines WHAT must be achieved (compliance with manufacturer specs) without dictating HOW the contractor must organize its inspection workflow.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem. The compliance landscape is not an overwhelming 88-document dump, but several patterns indicate undifferentiated, copy-forward regulatory inclusion without meaningful curation for the specific work being acquired — the physical repair of a single computer subassembly.
+
+The strongest indicators are: (1) Section 3 defines the technical requirements almost entirely by reference to undisclosed external documents and an open-ended catch-all (&#x27;including but not limited to... any other contractor or government approved documents&#x27;), leaving the contractor to independently determine the applicable standards; (2) cybersecurity clauses including CMMC, NIST SP 800-171, and multiple security prohibition clauses are included for a physical hardware repair contract with no explanation of what covered defense information is at issue — and the CMMC level field is left blank; (3) the full Configuration Management - Maritime clause is incorporated, with its elaborate ECP and variance approval workflows appropriate for a development or production program, not a routine repair; (4) the mercury contamination clause, while plausibly relevant to submarine equipment, runs to several paragraphs of boilerplate background text that suggests copy-forward from a master template rather than tailored application.
+
+Mitigating factors prevent a severity 3 rating: the solicitation does not present a numbered list of dozens of regulations, the FAR/DFARS clauses are largely standard and incorporated by reference (not reproduced in full unnecessarily), the core repair requirement is clearly stated, and most cited standards (MIL-STD-130 marking, MIL-STD-2073 packaging, CAV reporting) are genuinely applicable to Navy depot repair work. There are no outright contradictory regulations — no policy cited that prohibits the work being solicited.
+
+The problem here is not a severe rule pool but a moderate one: the combination of an open-ended applicable documents framework, copy-forward configuration management and cybersecurity clauses without applicability explanations, and the absence of any curation guidance elevates compliance uncertainty for a new vendor beyond what the work requires. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2. APPLICABLE DOCUMENTS
+2.1 Applicable Documents - The document(s) listed below form a part of this contract/purchase order including modifications or exclusions.
+2.1.1 &quot;Document References&quot; listed below must be obtained by the Contractor. Ordering information is included as an attachment to this contract/purchase order.</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s applicable documents section provides no list of specific documents beyond a generic instruction to obtain them from an attachment. No context is provided for how any document applies to the repair work. The contractor is directed to an attachment (Attachment 1) that contains ordering information for document categories rather than a curated list of specifically applicable standards.</div>
+</div><div class="evidence-item">
+  <blockquote>CAGE___Ref. No.
+&lt;1VPW8 01-P55253R001&gt;
+...All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures.</blockquote>
+  <div class="ev-explanation">The technical requirements section defines the performance standard by reference to a cage code and part number, then appends a broad open-ended list of document types (&#x27;including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents&#x27;). This is an undifferentiated compliance sweep — the contractor cannot determine which specific documents actually govern the repair without independent research.</div>
+</div><div class="evidence-item">
+  <blockquote>3.4 Mercury Free - The material supplied under this contract/purchase order is intended for use on submarines/surface ships and therefore shall contain no metallic mercury...The most probable causes of contamination are direct-connected manometers, mercury vacuum pumps, mercury seals, or the handling of mercury in the immediate vicinity.</blockquote>
+  <div class="ev-explanation">The mercury contamination clause runs to several paragraphs with detailed procedural requirements including polyethylene bag enclosure testing at 70°F minimum for 8 hours and specific vapor concentration thresholds (0.01 mg/cu meter). While mercury-free requirements are relevant to submarine/surface ship components, the clause reads as a copy-forward boilerplate from a larger master template, with detailed background context (&#x27;Mercury is corrosive to gold, silver, nickel, stainless steels...&#x27;) that reads more like an educational insert than an operational requirement. No evidence is provided that this particular computer subassembly has any mercury contamination risk.</div>
+</div><div class="evidence-item">
+  <blockquote>52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS (CLASS DEVIATION 2026-O0025)(FEB 2026)
+252.204-7012 SAFEGUARDING COVERED DEFENSE INFORMATION AND CYBER INCIDENT REPORTING (MAY 2024)
+252.204-7021 CONTRACTOR COMPLIANCE WITH THE CYBERSECURITY MATURITY MODEL CERTIFICATION LEVEL REQUIREMENTS (NOV 2025)
+252.240-92 SECURITY REQUIREMENTS (CLASS DEVIATION 2026-O0025)
+252.240-90 SECURITY PROHIBITIONS AND EXCLUSIONS REPRESENTATIONS AND CERTIFICATIONS (DEV 2026-O0025)
+252.240-7997 NIST SP 800-171 DOD ASSESSMENT REQUIREMENTS</blockquote>
+  <div class="ev-explanation">Five separate cybersecurity/information security clauses are cited for a contract whose sole deliverable is the physical repair of a hardware subassembly. While some cyber hygiene requirements may be appropriate for any DoD contractor, the solicitation provides no explanation of what covered defense information this repair contractor will process or why CMMC certification is required to physically repair a circuit card assembly. The CMMC level required is left blank (&#x27;&lt;&gt;&#x27;), suggesting these clauses were inserted as standard templates without evaluation of applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>WSSTERMCZ05 CONFIGURATION MANAGEMENT - MARITIME
+1.0 Configuration Management
+1.1 The cognizant systems command (SYSCOM), Naval Sea Systems Command (NAVSEA) or Naval Information Warfare Systems Command (NAVWAR), Program Manager will maintain configuration control and change authority...
+2.1.1 Class I (Major) Changes...ECPs must be prepared in accordance with DI-SESS-80639E, Engineering Change Proposal (ECP).
+3.1.1 Critical/Major Variances: The Contractor must submit all critical/major variance requests via DCMA or SUPSHIP and the PCO, to the SYCOM Program Office or their delegated representative...</blockquote>
+  <div class="ev-explanation">The full configuration management maritime clause — covering Class I and Class II engineering change proposals, Request for Variance procedures, DI-SESS-80639E compliance, and SYSCOM approval workflows — is incorporated without any explanation of how these procedures apply to a routine repair contract. A repair-only RFQ for a computer subassembly is unlikely to generate Class I engineering changes or require NAVSEA/NAVWAR Program Manager configuration baseline management. This appears to be a copy-forward clause from a production or development contract template.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a Navy depot-level repair solicitation for a specific computer subassembly (NSN 7021-01-659-6181, CAGE 1VPW8, P/N 01-P55253R001). The solicitation invites firm-fixed-price quotes, with &#x27;Estimated&#x27; and &#x27;Not-to-Exceed&#x27; as alternatives. For this type of contract — repair of a known, serialized hardware item to OEM specifications with a defined turnaround time — FFP is the standard and appropriate pricing structure. The scope is well-bounded: one CLIN, one NSN, one repair standard, one RTAT target. The solicitation also appropriately addresses the key uncertainty inherent in depot repair: it includes a Beyond Repair (BR/BER) T&amp;E fee provision, allowing the contractor to recover teardown costs if an asset is found uneconomically repairable. This is a standard and effective mitigation for the main pricing risk in repair contracts (uncertainty about whether the item is repairable). The solicitation also asks offerors to compare their repair price against the cost of buying new — a sound cost discipline mechanism. There is no evidence of a mismatch between the contract type and the requirements. NAVSUP WSS routinely uses FFP for reparables of this type, and nothing in this solicitation suggests the repair scope is so unpredictable that a T&amp;M or cost-reimbursement approach would be warranted. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>*Check one: Firm-fixed-Price ___ Estimated ___ Not-to Exceed (NTE): ___</blockquote>
+  <div class="ev-explanation">The solicitation explicitly offers firm-fixed-price as the primary pricing option for the repair contract, which is the appropriate choice for a defined depot-level repair task with a known item (COMPUTER SUBASSEMBL, NSN 7021-01-659-6181), a specified RTAT of 101 days, and a single CLIN with defined acceptance criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>TEARDOWN, EVALUATE, REPAIR AND/OR MODIFY ... OPTION QTY UP TO 100% OF ITEM 0001</blockquote>
+  <div class="ev-explanation">The scope is bounded: repair a specific hardware subassembly to manufacturer specifications, with a defined quantity and an option for up to 100% additional quantity. This is exactly the kind of discrete, estimable task for which FFP is appropriate — the contractor knows the item, knows the repair standard, and can price the risk accordingly.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.01_RFQ_Solicitation_25337-0031.pdf">3.01_RFQ_Solicitation_25337-0031.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7be00d01ff8344f8933a7dfda3b4ae69_3.01_RFQ_Solicitation_25337-0031.pdf" download="3.01_RFQ_Solicitation_25337-0031.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.02_Amend%281%29_25337-0031.pdf">3.02_Amend%281%29_25337-0031.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7be00d01ff8344f8933a7dfda3b4ae69_3.02_Amend%281%29_25337-0031.pdf" download="3.02_Amend%281%29_25337-0031.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

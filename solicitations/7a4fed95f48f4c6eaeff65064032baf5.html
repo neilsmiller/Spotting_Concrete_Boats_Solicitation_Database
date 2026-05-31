@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DE01--A/V Support and Service for VASNHS Auditorium — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DE01--A/V Support and Service for VASNHS Auditorium</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 7a4fed95f48f4c6eaeff65064032baf5</span>
+      <a class="sam-link" href="https://sam.gov/opp/7a4fed95f48f4c6eaeff65064032baf5/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-22</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › 261-NETWORK CONTRACT OFFICE 21 (36C261)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DE01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334310</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-22</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year: 6/15/2026 to 6/14/2027; Option Year 1: 6/15/2027 to 6/14/2028; Option Year 2: 6/15/2028 to 6/14/2029</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Submission (Factor 1)</li><li>Past Performance (Factor 2)</li><li>Pricing (Factor 3)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows a notably low compliance-over-outcomes burden for a federal services contract. The PWS is compact and direct. There is no layered reporting structure — no weekly status reports, no monthly progress reports, no prescribed report formats with mandated sections, no overlapping meeting cadences. The accountability mechanisms present are predominantly outcome-oriented: a 5-business-hour remote response SLA, a 3-business-day on-site emergency response standard, and a functional reliability threshold (no more than 3 malfunctions per quarter per component). The re-performance clause (Section 12) ties contractor obligations to system function, not to process adherence. The complaint-response requirement (3 working days) is lightweight administrative overhead. The only real process-compliance element is the field service report requirement tied to invoice payment, which is standard and proportionate for a maintenance contract where service documentation is the evidence of work performed. Taken together, the solicitation&#x27;s accountability structure genuinely asks &#x27;did the A/V systems work?&#x27; more than &#x27;did the contractor follow procedures?&#x27; — and is appropriately structured for the limited scope of the requirement. Severity 1 is warranted.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>A technician will visit the site quarterly (for up to 3 days total each visit) to do a whole AV system checkup, to include software updates, and firmware as needed. Vendor shall have a certified technician available for on-site emergency repairs within 3 business days.</blockquote>
+  <div class="ev-explanation">The quarterly site visit requirement is structured around scheduled activity (the visit itself, software updates, firmware checks) rather than a measured outcome like &#x27;all systems operating within manufacturer specifications&#x27; or &#x27;zero unresolved faults at end of visit.&#x27; However, the response time standard of 3 business days for emergency repairs is a concrete, outcome-adjacent performance standard — it sets an expectation for responsiveness rather than just activity.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide remote network access assistance to the system and users&#x27; needs within 5 business hours after request.</blockquote>
+  <div class="ev-explanation">This is an explicit response-time SLA — a genuine performance standard measurable against actual outcomes. It cuts against the compliance-over-outcomes pattern and is the opposite of compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>Repeated malfunctions of any system component or subsection more than three (3) times within one (1) quarter is not acceptable. The Contractor is responsible for repairing all faulty equipment and identifying the nature and cause of repeated failures.</blockquote>
+  <div class="ev-explanation">This is a functional performance threshold — a system reliability standard that ties accountability to actual equipment behavior rather than to adherence to a maintenance schedule. It is outcome-oriented language, not process compliance.</div>
+</div><div class="evidence-item">
+  <blockquote>Payment of invoices may be delayed if appropriate field service reports are not completed and submitted as specified herein.</blockquote>
+  <div class="ev-explanation">Conditioning payment on field service report submission introduces a process-compliance gating mechanism. However, in the context of an A/V maintenance contract where the field service report documents what work was performed (and thus is the basis for payment verification), this is a reasonable administrative control rather than evidence of compliance theater displacing outcome accountability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate-to-elevated case of insider rewards, driven primarily by the combination of certification-at-submission requirements with a compressed 7-day response window, institutional knowledge requirements embedded in the technical submission, and evaluation criteria that explicitly reward prior familiarity with the specific installed system. The core problem is that several requirements conflate &#x27;has worked this exact system before&#x27; with &#x27;is capable of working this system&#x27; — particularly the as-built documentation requirement and the &#x27;past configuration and programming with installed equipment&#x27; evaluation factor. A qualified SDVOSB AV integrator with Crestron Master Programmer credentials and Q-SYS experience could plausibly compete — the solicitation does not impose specific prior-contract dollar thresholds or a narrow federal-experience-only mandate, and the VA&#x27;s Q&amp;A response appropriately relaxed the certification requirement for manufacturers without formal certification programs. These are meaningful mitigating factors that prevent a severity-3 rating. However, the submission-deadline rigidity on certifications, the institutional knowledge embedded in the SOW, and the evaluative preference for prior experience with &#x27;currently installed equipment&#x27; collectively tilt the field toward whoever last held this work. The 7-day response window compounds all of this — it is practically impossible for any vendor who was not already prepared to respond to assemble the required documentation in time. The severity is rated 2: the playing field is tilted toward the incumbent but is not formally closed to a well-prepared non-incumbent who happens to hold the required certifications.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Vendor and/or Service Technicians must have and show proof of the following credentials: A. Be a Crestron Master Programmer with factory certification credentials. B. Be an Extron certified vendor. C. Carry and produce factory training/certifications for Blackmagic, VADDIO, Sony Cameras, NVX digital matrix, and QSC Audio devices. D. Provide evidence that they have used Q-SYS 9.6 Designer Software for A/V systems of this type and provide and/or develop as-built configurations of the VASNHS custom software programming that is being used for all rooms listed in this requirement.</blockquote>
+  <div class="ev-explanation">The requirement to provide &#x27;as-built configurations of the VASNHS custom software programming&#x27; is a near-pure institutional knowledge requirement. An incumbent or the original installer would have access to existing as-built documentation; a new vendor would need to develop it from scratch — a significant disadvantage since they cannot demonstrate prior possession of this knowledge at proposal time. The phrase &#x27;this type&#x27; in &#x27;A/V systems of this type&#x27; is also vague in ways that could be interpreted to require prior work on this or a nearly identical federal system.</div>
+</div><div class="evidence-item">
+  <blockquote>VA RESPONSE: All certifications must be provided when solicitation is due. No documentation can be provided after offers are due.</blockquote>
+  <div class="ev-explanation">Requiring all certifications at the time of quote submission (with only a 7-day response window from posting) significantly advantages any vendor who has been tracking this requirement and maintaining current certifications. A capable AV integrator who learns of the opportunity at posting date would have no practical ability to obtain new Crestron Master Programmer certification — a multi-course, multi-exam process — before the deadline. This collapses the submission window to those who already hold these credentials, which skews heavily toward whoever last performed this work.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor will be evaluated favorably for existing Crestron certifications, having distinct experience with remote network access to system and for users interaction and web-based portal. Distinct experience with Q-SYS 9.6 or above designer software platform and the proposed hosting laptop.</blockquote>
+  <div class="ev-explanation">The evaluation factor explicitly rewards &#x27;existing&#x27; certifications and &#x27;distinct experience&#x27; with the specific software platform. &#x27;Distinct experience&#x27; is an evaluative term that advantages vendors who have demonstrably worked on this or similar systems before. Combined with the certification submission-at-offer requirement, this evaluation criterion structurally advantages the incumbent over equally capable vendors who simply haven&#x27;t worked this specific system before.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor will be evaluated based on past configuration and programming with installed equipment.</blockquote>
+  <div class="ev-explanation">This evaluation sub-factor requires demonstrated prior configuration of the specific &#x27;currently installed equipment&#x27; at VASNHS. A new vendor with equivalent technical capability but no prior access to this specific facility&#x27;s equipment cannot demonstrate &#x27;past configuration and programming with installed equipment&#x27; — only the incumbent or original installer can. This effectively scores institutional familiarity, not general capability.</div>
+</div><div class="evidence-item">
+  <blockquote>In conducting the past performance evaluation, the Government reserves the right to use the Contracting Officer&#x27;s knowledge of and previous experience with this requirement.</blockquote>
+  <div class="ev-explanation">Explicitly reserving the right to use the Contracting Officer&#x27;s personal knowledge of this requirement in past performance evaluation is a classic incumbency-favoring provision. It allows subjective assessment based on familiarity with the current contractor&#x27;s performance — knowledge that no new entrant can match by definition. While not unusual as a boilerplate provision, in combination with the other criteria here it reinforces the pattern.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS is relatively short and scoped to a specific, existing AV installation — which legitimately justifies some degree of specificity about the installed equipment. The core need (maintain operational Crestron-based AV systems in a VA medical facility) is clear and reasonable. However, several requirements cross the line from outcome definition into solution prescription. The Crestron-brand mandate, the on-site laptop requirement, the quarterly visit schedule, and the layered certification stack all tell vendors how to perform the work rather than what operational state the systems must achieve. The most significant issue is that these prescriptive elements, taken together, strongly suggest the SOW was written around an incumbent&#x27;s current operating model — note the very specific references to &#x27;VASNHS custom software programming,&#x27; the existing laptop already in the control room, and the Q-SYS 9.6 software &#x27;furnished by the COR.&#x27; A new vendor who uses remote monitoring, cloud-based diagnostics, or a different maintenance scheduling approach would find multiple clauses that block their preferred methodology even if those approaches could deliver equal or better system uptime. The solicitation is not severely dominated by process mandates — there is no elaborate staffing structure, no step-by-step workflow, and service response times are reasonable SLAs. But the brand lock-in, physical tool requirement, and mandated visit cadence collectively create meaningful constraint on how vendors may approach the work. Severity 2 is appropriate: sprawl is present and consequential, but the solicitation is not an operating manual, and an experienced SDVOSB AV integrator willing to work within the Crestron ecosystem can still structure their service approach in meaningful ways.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor will provide only Crestron (and Crestron supportable) brand name service solution and equivalent devices as agreed upon by the COR.</blockquote>
+  <div class="ev-explanation">This mandates a specific brand ecosystem (Crestron) rather than defining a functional outcome such as &#x27;maintain full operational capability of the installed AV systems.&#x27; A competent AV integrator might legitimately propose alternative control solutions that interoperate with existing hardware, but this language forecloses that possibility. That said, there is a partial mitigating rationale: the installed system is Crestron-based, so interoperability with existing GFE is a genuine constraint. Still, &#x27;Crestron only&#x27; goes further than necessary — it dictates the solution rather than the interoperability requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor will supply on site laptop (to be hosted in the Auditorium Control room) hosting any established proprietary programming software (furnished by the COR) and troubleshooting capabilities using the Q-SYS 9.6 or above designer software platform.</blockquote>
+  <div class="ev-explanation">This prescribes a specific physical implementation — a contractor-supplied on-site laptop located in a particular room — rather than stating the outcome needed (e.g., &#x27;contractor shall maintain the capability to diagnose and reprogram the QSC system on-site within a defined response window&#x27;). A vendor with remote access tools or alternative diagnostic workflows cannot propose them; they must supply a specific piece of hardware in a specific location.</div>
+</div><div class="evidence-item">
+  <blockquote>A technician will visit the site quarterly (for up to 3 days total each visit) to do a whole AV system checkup, to include software updates, and firmware as needed. Vendor shall have a certified technician available for on-site emergency repairs within 3 business days.</blockquote>
+  <div class="ev-explanation">The quarterly visit cadence and duration (&#x27;up to 3 days total each visit&#x27;) prescribes how maintenance is to be structured rather than defining the outcome — that all systems remain in good operating condition with current firmware. A vendor who could achieve the same assurance through remote monitoring plus fewer but more targeted visits cannot propose that approach. The emergency response SLA (&#x27;within 3 business days&#x27;) is a legitimate outcome-based requirement, but coupling it with a mandated quarterly schedule imposes a process constraint.</div>
+</div><div class="evidence-item">
+  <blockquote>Vendor and/or Service Technicians must have and show proof of the following credentials: A. Be a Crestron Master Programmer with factory certification credentials. B. Be an Extron certified vendor. C. Carry and produce factory training/certifications for Blackmagic, VADDIO, Sony Cameras, NVX digital matrix, and QSC Audio devices.</blockquote>
+  <div class="ev-explanation">Requiring specific manufacturer certifications as a minimum qualification — rather than demonstrated ability to maintain the installed systems — prescribes the workforce composition in detail. The Q&amp;A amendment partially recognized this problem by allowing experience substitutes for manufacturers without formal programs, but the Crestron Master Programmer and Extron certified vendor requirements remain credential-specific mandates that constrain which firms can compete rather than defining the outcome of competent maintenance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics, primarily through copy-forward boilerplate that was not reviewed for relevance to the specific scope of AV maintenance work. The clearest examples are: (1) NFPA-99/FDA/Joint Commission citations in a safety standards clause — these standards govern clinical environments and medical devices, not auditorium AV systems; (2) an extensive records management section citing the Federal Records Act, FOIA, Privacy Act, and NARA regulations as if the contractor were managing clinical health records, when the actual deliverables are firmware updates and quarterly site visits; (3) SPI liquidated damages provisions that assume meaningful patient data exposure with no explanation of what sensitive data an AV technician would actually encounter; and (4) stale COVID-19 screening language that appears never to have been reviewed post-pandemic. The solicitation does not present a formal &#x27;Applicable Documents&#x27; list of 20+ items in the most severe sense — there is no dedicated regulatory dump section. Most of the boilerplate is embedded in standard contract clauses rather than a standalone compliance appendix. This distinguishes it from severity 3. The FAR/VAAR clauses cited (52.212-4, 52.240-91, VAAR 852.204-72, etc.) are standard commercial acquisition clauses appropriate for a VA contract, even if their full text adds volume. The core technical requirements in the SOW are reasonably focused and relevant. The problem is not an overwhelming standalone list but rather individual compliance sections — particularly records management, security, and contractor responsibilities — that appear templated from medical equipment maintenance or health IT contracts and applied without calibration to AV support work. A vendor new to VA contracting would face meaningful compliance interpretation burden trying to understand whether NFPA-99, Joint Commission standards, SPI liquidated damages, and FOIA obligations actually apply to their technicians servicing a Crestron system. Severity 2 is appropriate: elevated but not impenetrable, with no outright contradictions between cited regulations and the solicitation&#x27;s purpose.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All work shall be performed, and equipment shall function in conformance with all VA safety standards, manufacturer&#x27;s/industry standards, the latest published edition of NFPA-99, FDA, OSHA, Joint Commission, and other applicable national standards.</blockquote>
+  <div class="ev-explanation">NFPA-99 is the Health Care Facilities Code, written for medical gas systems, electrical systems in patient care areas, and similar clinical infrastructure. Citing it for AV support and maintenance in an auditorium and conference rooms is a questionable carryover — auditorium AV systems are not health care facilities infrastructure under NFPA-99&#x27;s scope. FDA is similarly inapplicable to commercial AV equipment. &#x27;Joint Commission&#x27; standards govern hospital accreditation of clinical services, not AV technicians servicing Crestron controllers. These citations appear to be boilerplate copied from a medical equipment maintenance template without review for relevance to AV work.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall comply with all applicable records management laws and regulations, as well as National Archives and Records Administration (NARA) records policies, including but not limited to the Federal Records Act (44 U.S.C. Chapters. 21, 29, 31, 33), NARA regulations at 36 CFR Chapter XII Subchapter B, and those policies associated with the safeguarding of records covered by the Privacy Act of 1974 (5 U.S.C. 552a).</blockquote>
+  <div class="ev-explanation">The records management section runs approximately 600 words and cites the Federal Records Act, FOIA, NARA regulations, Privacy Act, and 18 U.S.C. 2701 — all applied to an AV maintenance contractor whose principal deliverables are quarterly site visits, firmware updates, and remote troubleshooting support. While some records management is appropriate for any federal contractor, this level of citation density — including requirements to take VHA records management training and flow requirements down to subcontractors — appears to be a copy-forward block not calibrated to the actual data created or handled under this contract.</div>
+</div><div class="evidence-item">
+  <blockquote>A requirement to pay liquidated damages in the event of a data breach: &#x27;In the event of a data breach or privacy incident involving any SPI the contractor processes or maintains under this contract, the contractor shall be liable to VA for liquidated damages for a specified amount per affected individual to cover the cost of providing credit protection services to those individuals.&#x27; See VA Handbook 6500.6, Appendix C, paragraph 7.a., 7.d.</blockquote>
+  <div class="ev-explanation">Liquidated damages provisions tied to SPI (Sensitive Personal Information) breaches are appropriate for contracts that process veterans&#x27; health records or PII at scale. An AV technician servicing an auditorium&#x27;s Crestron control system and QSC audio gear has minimal logical exposure to SPI — the contract involves no patient data processing. Citing this requirement without explaining what SPI the contractor would handle or why credit monitoring obligations would be triggered suggests the security requirements section was pasted wholesale from a health IT template.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor employees are subject to daily screening for COVID-19 and may be denied entry to VA facilities if they fail to pass screening protocols.</blockquote>
+  <div class="ev-explanation">This COVID-19 screening requirement, which references an active screening tool and self-screening protocols, appears to be a copy-forward from pandemic-era contract language. With the COVID-19 public health emergency having ended, this clause is likely a stale boilerplate carryover that was never removed from the template. It adds compliance text with no operational substance.</div>
+</div><div class="evidence-item">
+  <blockquote>The security prohibitions clause (52.240-91) spans approximately 10 pages and includes detailed definitions and prohibitions covering: TikTok/ByteDance applications, Kaspersky Lab products, Huawei/ZTE/Hytera/Hikvision/Dahua telecommunications equipment, FASC-prohibited unmanned aircraft systems (drones), OFAC restrictions on Cuba/Iran/Sudan/Burma/North Korea transactions, Sudan divestment prohibitions, and Iran Revolutionary Guard Corps transaction prohibitions.</blockquote>
+  <div class="ev-explanation">While 52.240-91 is a standard clause, its full-text inclusion at 10 pages for an AV maintenance contract at a single VA facility reflects the broader pattern of undifferentiated compliance burden. Several subsections — particularly the drone procurement prohibitions, Iran sanctions, and Sudan divestment requirements — have no plausible connection to servicing Crestron and QSC audio equipment in North Las Vegas. No context is provided to help a vendor understand which provisions are operationally relevant versus which are standard clause language that simply doesn&#x27;t apply to this scope.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a firm-fixed-price structure for an A/V maintenance and support service contract covering a known, installed system (Crestron-based A/V in a specific auditorium and six conference rooms at a single VA facility). FFP is the appropriate contract type here for several reasons. First, the scope is well-defined and bounded: quarterly on-site visits of known maximum duration (3 days each), remote support with defined response times, software/firmware updates, and RMA coordination — all for a specific, documented system. Second, the government has provided installation drawings and schematics as attachments, meaning offerors have access to the system architecture and can scope their costs accurately. Third, the system is already installed (GFE) and the contractor is not building anything new, just maintaining and supporting what exists. A competent AV integrator with the specified certifications can reasonably estimate the labor and travel costs for this work. Fourth, the service labor standards wage determination (WD 2015-5593 Rev 30) provides a cost floor, which further enables accurate pricing. The one area that could theoretically argue for T&amp;M — unplanned emergency repairs — is addressed by capping on-site visits and defining emergency response expectations, and the &#x27;re-performance&#x27; clause provides a remedy mechanism if repairs are inadequate. Overall, this is a straightforward recurring maintenance contract with predictable scope, making FFP the correct and well-matched contract type. No meaningful misalignment exists between the pricing structure and the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Audio Visual Support Services in accordance with the Statement of Work
+Contract Period: Base
+POP Begin: 06-15-2026
+POP End: 06-14-2027
+...1.00 YR</blockquote>
+  <div class="ev-explanation">The contract is structured as a fixed-price annual service contract (one unit priced per year) with two option years at the same structure. This is a firm-fixed-price approach for a recurring maintenance and support service.</div>
+</div><div class="evidence-item">
+  <blockquote>A technician will visit the site quarterly (for up to 3 days total each visit) to do a whole AV system checkup, to include software updates, and firmware as needed. Vendor shall have a certified technician available for on-site emergency repairs within 3 business days.</blockquote>
+  <div class="ev-explanation">The core recurring obligations are well-defined and predictable: four quarterly visits of fixed duration (up to 3 days each), plus on-call emergency response. This regularity and bounded scope makes FFP appropriate — a qualified vendor can estimate labor costs for these activities in advance.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide remote network access assistance to the system and users&#x27; needs within 5 business hours after request.</blockquote>
+  <div class="ev-explanation">Remote support is also a bounded, recurring obligation. The government has defined response time standards, which supports a fixed-price structure where the vendor prices in the expected volume of remote support calls based on a known system environment.</div>
+</div><div class="evidence-item">
+  <blockquote>Payments will be broken into four quarterly payments and paid in arrears.</blockquote>
+  <div class="ev-explanation">The quarterly payment structure is consistent with a fixed-price service contract: the government pays a predictable, pre-agreed amount each quarter for services rendered, not for time actually spent or costs actually incurred.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C26126Q0594 0001_1.docx">36C26126Q0594 0001_1.docx</div></div>
+  <a class="dl-btn" href="../attachments/7a4fed95f48f4c6eaeff65064032baf5_36C26126Q0594+0001_1.docx" download="36C26126Q0594 0001_1.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C26126Q0594.docx">36C26126Q0594.docx</div></div>
+  <a class="dl-btn" href="../attachments/7a4fed95f48f4c6eaeff65064032baf5_36C26126Q0594.docx" download="36C26126Q0594.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="36C26126Q0594.pdf">36C26126Q0594.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7a4fed95f48f4c6eaeff65064032baf5_36C26126Q0594.pdf" download="36C26126Q0594.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="AV - VTC Systems Installation Drawings.pdf">AV - VTC Systems Installation Drawings.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7a4fed95f48f4c6eaeff65064032baf5_AV+-+VTC+Systems+Installation+Drawings.pdf" download="AV - VTC Systems Installation Drawings.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="VASNHCS AV VTC Systems.pdf">VASNHCS AV VTC Systems.pdf</div></div>
+  <a class="dl-btn" href="../attachments/7a4fed95f48f4c6eaeff65064032baf5_VASNHCS+AV+VTC+Systems.pdf" download="VASNHCS AV VTC Systems.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

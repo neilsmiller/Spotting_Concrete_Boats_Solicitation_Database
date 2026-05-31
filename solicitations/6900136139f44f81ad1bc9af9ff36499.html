@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EWTGPAC Technical Training Instructional Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>EWTGPAC Technical Training Instructional Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 6900136139f44f81ad1bc9af9ff36499</span>
+      <a class="sam-link" href="https://sam.gov/opp/6900136139f44f81ad1bc9af9ff36499/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-03-19</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC SAN DIEGO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-19</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year of 12 months with up to four (4) 12-month option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Quality Control Plan (QCP)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, warranting a severity of 2. The accountability structure is anchored in the monthly status report (Section 2.14.1), which mandates detailed activity tracking — planned vs. actual task performance, personnel turnover, travel accounting, subcontractor utilization — without any corresponding requirement to report on training effectiveness, student throughput rates, certification outcomes, or fleet readiness improvements. The QASP description reinforces this pattern: its enumerated elements (staffing, subcontractor management, finance, government interface) are administrative and process-oriented. The only performance evaluation mechanism in the PWS is the semi-annual instructor observation, which assesses delivery technique rather than training outcomes.
+
+However, the severity does not reach 3 for several reasons. First, the reporting burden is modest — one monthly report, not overlapping weekly/monthly/quarterly cadences. There are no required standing meetings, no prescribed report formats beyond basic section headings, and no waterfall-style project management plan tracking. Second, the contract&#x27;s nature partially mitigates the concern: this is an instructional services contract where the primary &#x27;deliverable&#x27; is the training event itself, and Section 5.2.3 does require assessment of student performance against prescribed performance standards with feedback and remediation. Third, Section 2.13.3 establishes ongoing instructor certification and evaluation requirements that constitute genuine quality oversight of the core service. The sin is present — outcome metrics for fleet readiness and training effectiveness are conspicuously absent from both the reporting requirements and the QASP — but the solicitation is not dominated by compliance theater. It represents an incomplete outcome-accountability structure more than a fully compliance-captured one.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall submit a monthly progress report to the COR and the Contracting Officer or their designee, no later than the 10th day of the following month for the work accomplished from the first (1st) through the final calendar day of the previous month on the status of all tasks. This report shall be provided in electronic form using MS Office applications. The monthly report shall include, at a minimum: Contractor&#x27;s name, contract number, period that the report covers; Comparison of planned and actual task order performance; Task progress during the past month, plans for the forthcoming month; Problems or delays (actual or anticipated) requiring Government action and summary of action required; Travel costs, including purpose of trips, duration, and related actions; Personnel turnover, utilization of subcontractors, and future staffing projections; Deliverables (by task) accepted or rejected...</blockquote>
+  <div class="ev-explanation">The monthly report is structured around process-adherence tracking: planned vs. actual schedule comparison, task progress narratives, personnel utilization, and travel accounting. These elements monitor whether the contractor is following the plan rather than whether the training is producing better-prepared sailors. There is no requirement to report student performance trends, course pass/fail rates, fleet readiness outcomes, or any measure indicating whether the training achieved its purpose.</div>
+</div><div class="evidence-item">
+  <blockquote>The QASP defines how the performance standards will be applied, the frequency of surveillance, and the minimum acceptable defect rate(s). The QASP shall include staffing actions, subcontractor management, finance, and government interface with EWTGPAC Schoolhouse staff.</blockquote>
+  <div class="ev-explanation">The QASP&#x27;s described content — staffing actions, subcontractor management, finance, and government interface — is almost entirely process and administrative in character. A QASP oriented toward outcomes for a training contract would center on student performance metrics, course effectiveness measures, or fleet readiness indicators. Instead, the enumerated QASP elements focus on whether the contractor is properly staffed and administratively compliant.</div>
+</div><div class="evidence-item">
+  <blockquote>The government shall evaluate the Contractor&#x27;s performance under this contract in accordance with the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government must do to ensure that the Contractor has performed in accordance with the performance standards.</blockquote>
+  <div class="ev-explanation">&#x27;Performed in accordance with the performance standards&#x27; is process-conformance language, not outcomes language. The QASP is explicitly described as verifying adherence to specified standards rather than evaluating whether the training mission was accomplished. For a contract whose stated objective is to certify ship NSFS platform capability and improve fleet readiness, there is no mention of tracking those downstream outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Receive satisfactory technical evaluations, from a certified course instructor, on a minimum of two separate presentations as an instructor trainee... valuation at least once semi-annually by a representative of the Academics Department...</blockquote>
+  <div class="ev-explanation">While instructor evaluation is a reasonable quality mechanism, it measures process compliance (instructor technique and certification adherence) rather than training outcomes. Semi-annual observation of presentation technique does not assess whether students retained knowledge, applied skills at sea, or whether ship NSFS readiness improved. This is the closest the PWS comes to a performance standard, but it evaluates the instructor&#x27;s delivery process, not the effectiveness of the training on the fleet.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate-to-significant insider rewards characteristics, though it stops short of a severe rating because the requirements are genuinely mission-driven rather than invented to protect the incumbent. The underlying subject matter — Naval Surface Fire Support training on specific legacy gun weapon systems aboard U.S. Navy cruisers and destroyers — is genuinely narrow, and the qualifications reflect real operational requirements. There is no apparent dollar threshold or lookback window manipulation, and the set-aside to small business under SeaPort NxG MAC shows some structural competition is intended.
+
+However, the cumulative effect of the personnel qualification requirements is significantly incumbency-favoring. The stacking of pay grade range (E-5 to E-8), specific rating (Non-AEGIS Fire Controlman), specific weapon systems (MK 86/MK 34), specific shipboard roles, and prior EWTGPAC/EWTGLANT instructor experience across multiple key personnel positions creates a very narrow pool of qualifying individuals. The explicit &#x27;or two years as an NSFS instructor at EWTGPAC or EWTGLANT&#x27; alternative in paragraph 2.11.1.5 is a textbook incumbency proxy — it credits prior service at the exact organization issuing the contract. The incumbent GDIT team, having held this contract since at least 2019, almost certainly has personnel who already meet these criteria and are already EWTGPAC-certified instructors.
+
+The 12-day response window (posted March 19, response deadline March 31) and May 1 anticipated award date compound the problem: a non-incumbent would need to identify, recruit, clear-verify, and propose qualified personnel with this very specific background in under two weeks. This timeline is realistic only for a vendor with the team already assembled — i.e., the incumbent.
+
+The mitigating factors that prevent a severity-3 rating are: (1) the narrow qualifications are genuinely driven by the mission (legacy NSFS systems on specific vessel classes are truly specialized); (2) no dollar thresholds or federal-specific experience mandates are imposed at the firm level (only at the individual personnel level); (3) there are no evaluation bonus points for prior similar contracts; and (4) the SeaPort NxG MAC restriction provides some structural competition framework. The sin here is real but reflects the genuine difficulty of the requirement as much as intentional incumbency protection.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Possess a minimum of two (2) years&#x27; experience as a member of a certified NSFS team assigned to a US Navy Cruiser (CG) or Destroyer (DDG), or a minimum of two (2) years assigned as an NSFS instructor at EWTGPAC or EWTGLANT</blockquote>
+  <div class="ev-explanation">This requirement narrows the eligible personnel pool to individuals who have served on specific naval vessel classes in a specific fire support role — or who have previously worked as instructors at the exact command being supported (EWTGPAC or its Atlantic counterpart). The &#x27;or EWTGPAC/EWTGLANT instructor&#x27; alternative explicitly rewards prior employment at the very institution issuing the contract, which is a direct incumbency proxy.</div>
+</div><div class="evidence-item">
+  <blockquote>At least two of the key personnel assigned to this effort must possess experience as a CG or DDG E-5 to E-8 Non-AEGIS Fire Controlman with experience in the MK 86 or MK 34 Gun Weapon System (GWS) as a member of ship&#x27;s company assigned to at least one of the following roles: Gun Console Operator (GCO), Gun Safety, or Combat Systems Training Team member for gun system employment duties during Naval Surface Fire Support operations.</blockquote>
+  <div class="ev-explanation">This requirement specifies a particular Navy enlisted pay grade range (E-5 to E-8), a particular rating (Non-AEGIS Fire Controlman), specific weapon systems (MK 86 or MK 34 GWS), and specific shipboard roles — all of which must have been held concurrently by the same individual. The combination of pay grade, rating specialty, and weapon system specificity creates a very small universe of qualifying individuals, heavily favoring a vendor who already has these personnel on staff (i.e., the incumbent, General Dynamics IT).</div>
+</div><div class="evidence-item">
+  <blockquote>Services are currently being satisfied by General Dynamics Information Technology, Inc. under contract number N0017819D7693, task order number N0017823F3012, and the current Option Year will expire 30 April 2026.</blockquote>
+  <div class="ev-explanation">The explicit identification of the incumbent confirms the context in which these narrow personnel requirements must be evaluated. GDIT has had years to build a team of precisely qualified personnel meeting the highly specific rating/pay grade/weapon system requirements. A new entrant must recruit and retain individuals with the same narrow credentials, disadvantaging them relative to GDIT&#x27;s existing team.</div>
+</div><div class="evidence-item">
+  <blockquote>All contractors shall meet all requirements of EWTGPAC&#x27;s instructor qualification process... Receive satisfactory technical evaluations, from a certified course instructor, on a minimum of two separate presentations as an instructor trainee. These will be used to evaluate the instructor&#x27;s knowledge of the subject matter and shall be done during class in session. Complete all EWTGPAC instructor certification requirements per EWTGPAC&#x27;s Academics Department and receive final instructor certification from the Academics Department head and Director of Training.</blockquote>
+  <div class="ev-explanation">The EWTGPAC-specific instructor certification process — administered by EWTGPAC&#x27;s own academic leadership and conducted in a live class environment — creates an institutional knowledge barrier. While not purely an incumbency requirement, personnel who have already completed this certification process (as GDIT&#x27;s team has) face no onboarding delay, while a new contractor&#x27;s personnel must go through a certification process controlled by the government client before they can perform. This creates a structural transition disadvantage that favors the incumbent&#x27;s pre-certified workforce.</div>
+</div><div class="evidence-item">
+  <blockquote>At least two of the key personnel assigned to this effort must possess experience in the MK 86 or MK 34 equipment operation and associated equipment interfaces/network management to train members of a Combat Information Center (CIC) Watch Team... At least two of the key personnel assigned to this effort must be capable of providing thorough classroom instruction for GWS theory and effective GWS practical lab environment instruction to train students to set up Gun Weapons System for proper utilization of the NGFS sub-mode for all applicable AEGIS baselines.</blockquote>
+  <div class="ev-explanation">Three separate &#x27;at least two&#x27; key personnel requirements are stacked — each demanding highly specific weapon system, platform, and operational knowledge. Requiring two individuals to meet criteria 2.11.1.12, two to meet 2.11.1.13, and two to meet 2.11.1.14 (with potential overlap in a team of only three key personnel) creates an extremely narrow personnel profile that a non-incumbent would struggle to staff, particularly on the short timeline between solicitation posting (March 19) and anticipated award (May 1, 2026).</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This PWS exhibits moderate requirement sprawl. It is not a severe case — the document does have genuine outcome-oriented language (training to SFRTM standards, performance evaluation against prescribed performance standards, certification of ship NSFS platform capability) and many of the specific requirements are legitimately grounded in the highly technical and safety-relevant nature of shipboard weapons training. The mandatory use of AIM II, the prescribed curriculum structure, the Excel-based tracking mandate, and the detailed administrative workflow requirements in 5.2.5 are the clearest examples of process prescription displacing outcome definition. The personnel qualification section (2.11.1.1–2.11.1.14) walks a line between legitimate qualification standards for specialized military training — where subject matter expertise is genuinely non-fungible — and an incumbent-capture profile that functionally describes the existing workforce. The specificity of rank band (E-5 to E-8), weapon system (MK 86 or MK 34 specifically), and platform type (Non-AEGIS) across at least three key personnel slots suggests these requirements may have been reverse-engineered from the current contractor&#x27;s team rather than derived from minimum mission requirements. The solicitation does not read like a pure operating manual, and a competent vendor could still propose a meaningful teaming and delivery approach. However, in several specific areas the government has substituted &#x27;do it our way&#x27; for &#x27;achieve this result,&#x27; which is the hallmark of moderate sprawl. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5.3.2 Assist in the development and revision of the NSFS curriculum using on-line/web-based authoring tools. The Contractor shall use Authoring Instructional Material (AIM II), or a Navy-designated replacement system, to produce Master Lesson Files that include objectives, lesson guides that are sequenced by objectives, student guides, media that is used in the classroom, tests that measure student&#x27;s knowledge and performance, and supporting &#x27;Front Matter&#x27; and reference material.</blockquote>
+  <div class="ev-explanation">This requirement mandates a specific government tool (AIM II) and dictates the exact internal structure of deliverables (objectives, lesson guides sequenced by objectives, student guides, media, tests, front matter). A vendor with superior curriculum development tools or methodology cannot propose them — they must use AIM II and structure content exactly as prescribed. The outcome needed is current, effective curriculum; the tool and document architecture are implementation choices that have been locked in.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2.5 Prepare designated classroom and lab (CIC) with all appropriate media, equipment, reference material, and student material and handouts prior to each course convening. This includes assisting EWTGPAC instructors with student check-in and graduation, maintaining and updating initial and final class rosters, and liaising with EWTGPAC&#x27;s Academics Department for all student training and graduation administration.</blockquote>
+  <div class="ev-explanation">This prescribes a specific administrative workflow — room setup, check-in assistance, roster maintenance, departmental liaison — rather than defining the outcome (courses execute on time with students properly enrolled and tracked). A vendor who could achieve the same administrative outcome through a digital check-in system or automated roster integration is precluded from proposing such approaches.</div>
+</div><div class="evidence-item">
+  <blockquote>5.4.1 Identify any issues for further analysis for the NSFS Course of Instruction. The Contractor shall track any action items on a common access automated data processing spreadsheet such as Microsoft Excel or other specified compliant format.</blockquote>
+  <div class="ev-explanation">Specifying Microsoft Excel as the tool for action item tracking prescribes an implementation method rather than an outcome. The government&#x27;s need is visibility into open issues; requiring a specific tool (or tool class) forecloses the use of ticketing systems, project management platforms, or other approaches that might provide superior tracking and auditability.</div>
+</div><div class="evidence-item">
+  <blockquote>2.11.1.1 Graduation from the Navy basic instructor course, Marine Corps Formal School Instructor course (M10XRGM) or an equivalent military instructor certification course... 2.11.1.4 Possess a minimum of two (2) years of experience as an instructor, with experience in instructional design. 2.11.1.5 Possess a minimum of two (2) years&#x27; experience as a member of a certified NSFS team assigned to a US Navy Cruiser (CG) or Destroyer (DDG)...</blockquote>
+  <div class="ev-explanation">While some personnel qualification standards are legitimate for highly technical training roles, the combination of prescribing exact credential types, specific military course graduation, minimum years in highly specific sub-roles (E-5 to E-8 Non-AEGIS Fire Controlman, MK 86 or MK 34 GWS), and specific rank bands across 14 separate sub-paragraphs effectively defines the staffing solution in granular detail. This goes well beyond stating the outcome (qualified instructors capable of delivering NSFS training to prescribed standards) and instead functions as a staffing blueprint that narrows the competitive field to personnel with nearly identical backgrounds to the incumbent&#x27;s team.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2.6 Prepare Course &#x27;After Instruction Reports&#x27; (AIRs) upon the completion of each course per the EWTGPAC Academic Standard Operating Procedure (SOP). [combined with] 2.14.1 Monthly Program, Status, and Management Report... shall include, at a minimum: 2.14.1.1 through 2.14.1.7 [seven enumerated sub-elements]</blockquote>
+  <div class="ev-explanation">The reporting structure — AIRs after every course plus monthly reports with seven prescribed content elements — represents a process mandate layered on top of a performance mandate. The outcome needed is that the government has visibility into training quality and contract execution. The specific report formats, content elements, and frequency are process choices that have been codified as requirements, reducing vendor flexibility to structure their management reporting around their own quality systems.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Part VI of the PWS presents 25 regulatory and doctrinal citations under the heading &#x27;Applicable Publications&#x27; with a blanket compliance obligation and no contextual guidance on how individual documents apply to the specific work. This is a moderate (severity 2) rule pool, not a severe one, for several reasons: the list is 25 items rather than the 50-88 seen in worst-case examples; the majority of citations are at least plausibly connected to Navy training administration or NSFS tactics; and the PWS body text does reference specific NAVEDTRA standards (130, 134B, 135C) in context, providing some signal about which publications are operationally central. However, the list includes documents that appear inapplicable to contractor performance (MTS designation instructions, Instructor of the Quarter programs, Marine Corps ground combat fire support coordination), and the bulk citation format provides no prioritization. The doctrinal references (6.1.18–6.1.25) are presented as a homogeneous compliance block when some are clearly instructional source material and others (MCWP 3-16, JP 1-02) are background references at best. A new vendor unfamiliar with Navy training infrastructure would face meaningful ambiguity about their actual compliance obligations — particularly around which NAVEDTRA publications govern their curriculum work and what, if anything, the MTS instructions require of them. This is characteristic of copy-forward accumulation from prior contract iterations rather than active curation, but it does not rise to severe because there are no clear contradictions with the solicitation&#x27;s purpose and no obviously absurd inclusions.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.1.1 NAVEDTRA 130B Task Based Curriculum Development Manual
+6.1.2 NAVEDTRA 132 Navy School Testing Program Management Manual
+6.1.3 NAVEDTRA 133 Human Performance Requirements Review Management Manual
+6.1.4 NAVEDTRA 134A Navy Instructor Manual
+6.1.5 NAVEDTRA 135C Navy School Management Manual
+6.1.6 NAVEDTRA 136 Integrated Learning Environment Course Development and Life Cycle Maintenance
+6.1.7 NAVEDTRA 137 Job Duty Task Analysis Process Manual
+6.1.8 NAVEDTRA 10500 Catalog of Navy Training Courses</blockquote>
+  <div class="ev-explanation">Eight NAVEDTRA publications are cited en bloc without distinguishing which are operationally mandatory versus advisory references. For example, NAVEDTRA 133 (Human Performance Requirements Review) and NAVEDTRA 137 (Job Duty Task Analysis Process) are curriculum development process manuals that apply to building new courses from scratch — but the PWS describes the contractor&#x27;s curriculum role primarily as maintenance and revision support, not full course development. No explanation is given for which of these eight publications governs day-to-day instruction versus which governs periodic curriculum review, leaving vendors to determine applicability independently.</div>
+</div><div class="evidence-item">
+  <blockquote>6.1.9 EWTGPACINST 1650.7G Instructor of the Quarter/Year
+6.1.10 NETCINST 1500.28 Master Training Specialist (MTS)
+6.1.11 EWTGPACINST 1650.2C Master Training Specialist (MTS)</blockquote>
+  <div class="ev-explanation">Three instructions related to instructor recognition programs (Instructor of the Quarter/Year award) and Master Training Specialist designation are cited as documents the contractor &#x27;must abide by.&#x27; These are administrative programs governing military personnel career development and recognition. Contract employees are not eligible for Navy instructor-of-the-quarter awards or MTS designation under these instructions. Citing them as compliance requirements for a contractor workforce, without any explanation of how they apply, is a hallmark of copy-forward accumulation from a government-employee context.</div>
+</div><div class="evidence-item">
+  <blockquote>6.1.18 ATP 4(F) Allied Naval Gunfire Support
+6.1.19 ATP 8(B) Vol 2 – Tactics, Techniques and Procedures for Amphibious Operations
+6.1.20 NTTP 3-02.2/MCWP 3-31.6 – Supporting Arms in Amphibious Operations
+6.1.21 NWP 3-30.32 – Surface Ship Gunnery
+6.1.22 ACP 125 Radio Telephone Procedures
+6.1.23 ACP 125 U.S. Supplement II – Radiotelephone Procedures for the Conduct of Artillery and Naval Gunfire
+6.1.24 JP 1-02 - Department of Defense Dictionary of Military and Associated Terms
+6.1.25 MCWP 3-16 - Fire Support Coordination in the Ground Combat Element</blockquote>
+  <div class="ev-explanation">Eight tactical and doctrinal references are listed together without differentiation. Some (NWP 3-30.32, ACP 125) are clearly relevant to NSFS training content. Others are less obviously so — MCWP 3-16 addresses fire support coordination in the ground combat element, which is a Marine Corps land warfare publication. The PWS describes training Navy cruiser and destroyer gunfire teams, not Marine ground combat elements. JP 1-02 is a terminology dictionary. No guidance is provided on how vendors should apply these references to course content or which ones have instructional primacy.</div>
+</div><div class="evidence-item">
+  <blockquote>6.1 The Contractor must abide by all applicable regulations, publications, manuals, and local policies and procedures</blockquote>
+  <div class="ev-explanation">The framing language imposes a blanket compliance obligation across all 25 listed documents without any prioritization, categorization, or explanation of applicability. The phrase &#x27;must abide by all&#x27; applies equally to an instructor recognition award instruction (EWTGPACINST 1650.7G) and a core training standard (NAVEDTRA 135C). This undifferentiated compliance burden prevents vendors from understanding which documents carry operational weight and which are background references — a textbook characteristic of rule pools.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">FFP is appropriate here. The requirement is for a defined set of training and curriculum support services — specifically up to 40 training events per year with bounded duration, delivered at known locations to known audiences using established curricula (NAVEDTRA 130, 134B, 135C). The labor categories are well-specified (Training Specialists with enumerated qualifications), the period of performance is fixed at 1 base year plus 4 option years, and the government has historical experience with this exact requirement from the incumbent (General Dynamics IT under a prior task order). The scope is sufficiently stable and the volume of work (number of training events per year) is predictable enough to support FFP pricing. There is some variability in travel destinations and training event length (1–5 days), but Table 1 in the PWS provides anticipated travel, and the PWS&#x27;s flexible staffing provisions (non-key personnel can be increased or reduced by the government) help manage fluctuations without requiring a contract type change. The incumbent performance history also gives both parties a solid basis for cost estimation. A T&amp;M or cost-reimbursement vehicle would be less appropriate here — the work is known, the labor types are defined, and there is no research or open-ended exploratory component that would make costs inherently unpredictable. The PWS even notes continuity of workforce as essential, further supporting a fixed-price structure where the contractor is incentivized to manage staffing efficiently. Overall, FFP is a well-matched contract type for this training services requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.4 Type of Contract. This is a &quot;Firm Fixed Price&quot; Contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly specifies FFP pricing for this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>5.2 Provide classroom and laboratory (Combat Information Center—CIC) Team Trainer Instruction. Provide instruction for forty NSFS/NFCS Team Training events, each event lasting between one (1) and five (5) days, per calendar year in accordance with NAVEDTRA 130, 134B, and 135C (series).</blockquote>
+  <div class="ev-explanation">The core deliverable is a defined quantity of training events per year (up to 40 events, each 1–5 days), which provides a concrete and estimable scope of labor. This makes the work predictable enough to price on a fixed basis.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="EWTGPAC NSFS Support PWS May 26 - Apr 31 %28Rev 1%29.docx">EWTGPAC NSFS Support PWS May 26 - Apr 31 %28Rev 1%29.docx</div></div>
+  <a class="dl-btn" href="../attachments/6900136139f44f81ad1bc9af9ff36499_EWTGPAC+NSFS+Support+PWS+May+26+-+Apr+31+%28Rev+1%29.docx" download="EWTGPAC NSFS Support PWS May 26 - Apr 31 %28Rev 1%29.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

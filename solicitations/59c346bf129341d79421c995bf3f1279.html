@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RECEIVER-TRANSMITTE — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>RECEIVER-TRANSMITTE</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 59c346bf129341d79421c995bf3f1279</span>
+      <a class="sam-link" href="https://sam.gov/opp/59c346bf129341d79421c995bf3f1279/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA AVIATION › DLA AVIATION PHILADELPHIA › DLA AVIATION AT PHILADELPHIA, PA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (SPRPA126QRB48) is a brief supply acquisition notice for a receiver-transmitter (NSN/part number item) under DLA Aviation. The posting consists almost entirely of standard FAR/DFARS clause citations in fill-in-the-blank format, with no Statement of Work, Performance Work Statement, Quality Assurance Surveillance Plan, deliverables schedule, reporting requirements, or performance metrics of any kind. The only quality-related language is a reference to a &#x27;HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT&#x27; clause invoking &#x27;ISO 9000 OR EQUIVALENT&#x27; — which is a standard clause for supply contracts requiring the contractor to maintain a documented quality system, not a compliance-over-outcomes reporting structure. There are no meeting cadences, status report requirements, prescribed report formats, or surveillance plans present in the text. This appears to be a straightforward commercial supply buy (likely a spare or replacement part) under Emergency Acquisition Flexibilities authority, restricted to government-approved sources. There is simply insufficient content to assess Sin #2 — the solicitation does not describe any QA or accountability mechanisms beyond the boilerplate ISO 9000 clause reference, which is appropriate for a supply item and does not constitute compliance-over-outcomes behavior.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a severe insider rewards pattern driven primarily by the approved-source restriction, which functions as an absolute eligibility gate. The combination of (1) requiring government-approved source status for technical acceptability, (2) requiring pre-existing authorized distributor letters for distributors, (3) withholding technical drawings that would allow new entrants to assess their capability, and (4) a 7-day response window under emergency authority creates a stacked set of conditions that collectively make meaningful competition by non-incumbents impossible. These factors are individually significant but together constitute a closed system: only vendors already embedded in DLA&#x27;s approved source network can participate. While approved-source restrictions are sometimes legitimate for safety-critical or interoperability-constrained items, the solicitation provides no explanation of why the restriction is technically necessary, no avenue for qualification, and no public disclosure of who the approved sources are — amplifying the incumbency effect. The severity is assessed at 3 because the cumulative effect of these requirements does not merely tilt the playing field; it structurally excludes any vendor without a prior DLA-recognized relationship from competing at all.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors are advised that offers received from sources which are not government-approved sources of supply will be deemed technically unacceptable, and therefore ineligible for award.</blockquote>
+  <div class="ev-explanation">This requirement restricts award exclusively to vendors who are already on a government-approved source list. Any qualified vendor — regardless of manufacturing capability, quality systems, or technical competence — is automatically disqualified if they are not already on the approved source list. This is a textbook insider reward: the eligibility criterion is not capability but prior approval status, which only incumbents or previously vetted sources possess.</div>
+</div><div class="evidence-item">
+  <blockquote>Any distributors of approved source(s) MUST submit a copy of their authorized distributor letter, on the source&#x27;s letterhead, to the buyer point of contact indicated on the solicitation via email, at time of proposal submittal.</blockquote>
+  <div class="ev-explanation">Even the distributor pathway is gated through pre-existing relationships. A distributor can only participate if they already have an authorized distributor arrangement with an approved source. A new distributor without that pre-existing relationship — even one fully capable of sourcing and delivering the item — cannot compete. This stacks an additional insider filter on top of the approved-source restriction.</div>
+</div><div class="evidence-item">
+  <blockquote>This solicitation is being issued under Emergency Acquisition Flexibilities (EAF) Authority formally known as Special Emergency Procurement Authority (SEPA).</blockquote>
+  <div class="ev-explanation">The invocation of emergency procurement authority, combined with a 7-day response window, dramatically narrows the practical field of competitors to those already familiar with the item, the approved source list, and DLA&#x27;s procurement processes. New entrants would have insufficient time to obtain approval or establish distributor relationships, even if the approved-source restriction were waived. The emergency designation reinforces rather than mitigates the incumbency lock.</div>
+</div><div class="evidence-item">
+  <blockquote>Drawings are not available for this Request for Quotation.</blockquote>
+  <div class="ev-explanation">The absence of technical drawings means that only vendors already intimately familiar with the specific part — i.e., approved sources and their established distributors — can meaningfully respond. A new vendor with genuine manufacturing capability cannot qualify or bid without the technical data that would allow them to assess feasibility. This denies any non-incumbent the baseline information needed to compete.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation (SPRPA126QRB48) is a brief Request for Quotation for a receiver-transmitter supply item under DLA Aviation. The posting consists almost entirely of boilerplate FAR/DFARS clause references, administrative contact information, and a short notice about Emergency Acquisition Flexibilities authority and approved source restrictions. There is no Statement of Work, Performance Work Statement, or detailed technical requirements section attached or embedded in the text. The solicitation is a standard commercial/spare parts supply procurement — the &#x27;work&#x27; is simply delivering a specific NSN item, and the document contains no process-level instructions, staffing mandates, or step-by-step task descriptions that could constitute requirement sprawl. The approved-source restriction and ISO 9000/equivalent quality standard are standard DLA supply chain controls, not prescriptive process requirements in the sprawl sense. Because no SOW or substantive requirements narrative is present, there is insufficient content to meaningfully assess requirement sprawl. The notice confirms drawings are not even available, further indicating this is a minimal supply solicitation rather than a service or complex supply contract where sprawl typically manifests.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard DLA supply solicitation for a receiver-transmitter component — a relatively bounded, transactional procurement. The solicitation presents roughly 18 clauses in a uniform, pipe-delimited list format with no explanatory context for how individual clauses apply to this specific item or procurement scenario. Almost all parameter fields are blank or marked TBD, which compounds the problem: vendors cannot tell from the face of the solicitation which provisions carry real compliance weight versus which are boilerplate inclusions from a master template. However, this is also a context where moderation is warranted. DLA supply solicitations of this type routinely incorporate standard FAR/DFARS clauses by reference, and most of the cited provisions — Buy American, IUID, Wide Area Workflow, Equal Opportunity — are legitimately applicable to defense supply procurement as a class. The clause count (~18) is elevated relative to the simplicity of the transaction but does not reach the severity of a 20+ &#x27;Applicable Documents&#x27; bulk dump with clearly irrelevant policies. The most significant concerns are: (1) the three overlapping Buy American/FTA/BOP clauses with no guidance on their interaction; (2) Value Engineering and Royalty Information inclusions that appear to be copy-forward boilerplate with questionable relevance to a simple supply buy; and (3) the complete absence of contextual explanation for any clause. On balance, this is a moderate (severity 2) instance — the clause count is elevated and some inclusions are questionable, but most are at least plausibly relevant to defense supply procurement and there are no glaring contradictions or absurd inclusions of the kind seen in the most egregious rule pool cases.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>ITEM UNIQUE IDENTIFICATION AND VALUATION (JAN 2023)|19|||||||||||||||||||| INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)|2||| HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT|8|||x|ISO 9000 OR EQUIVALENT||||| FMS DELIVERY AND SHIPPING INSTRUCTIONS|3|x|TBD|TBD| WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023)|16|... VALUE ENGINEERING (JUN 2020)|3|||| INTEGRITY OF UNIT PRICES (NOV 2021)|1|| EQUAL OPPORTUNITY FOR VETERANS (DEV 2026-O0040)(FEB 2026)|4||||| EQUAL OPPORTUITY FOR WORKERS WITH DISABILITIES (DEV 2026-O0040)(FEB 2026)|4||||| TRANSPORTATION OF SUPPLIES BY SEA (OCT 2024)|2||| BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11|||||||||||| SECURITY PROHIBITIONS AND EXCLUSIONS (CLASS DEVIATION 2026-O0025)(FEB 2026)|7|||||||| BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024))|5|||||| BUY AMERICAN--BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024)|1|| ALTERNATE A, ANNUAL REPRESENTATIONS AND CERTIFICATIONS (DEVIATION 2026-O0043)(FEB 2026))|13|||||||||||||| ROYALTY INFORMATION (APR 1984)|1|| NOTICE OF PRIORITY RATING FOR NATIONAL DEFENSE, EMERGENCY PREPAREDNESS, ANDENERGY PROGRAM USE (APR 2008))|2||x|</blockquote>
+  <div class="ev-explanation">The solicitation presents approximately 18 discrete clauses and regulatory citations in a pipe-delimited list format with no contextual explanation for how each applies to this specific procurement. Fields are largely blank (TBD or empty), providing no guidance to vendors on the substantive compliance expectations behind each clause. This is a characteristic presentation of an undifferentiated clause dump.</div>
+</div><div class="evidence-item">
+  <blockquote>VALUE ENGINEERING (JUN 2020)|3||||</blockquote>
+  <div class="ev-explanation">Value Engineering (FAR 52.248-1) is a clause typically applicable to development or production contracts of meaningful scale and duration where a contractor might propose cost-saving changes. For a simple supply procurement of a receiver-transmitter component — likely a catalog or NSN buy — the practical applicability of Value Engineering is questionable. Its inclusion without explanation of whether VE proposals are actually invited or expected adds compliance ambiguity for offerors.</div>
+</div><div class="evidence-item">
+  <blockquote>ROYALTY INFORMATION (APR 1984)|1||</blockquote>
+  <div class="ev-explanation">The Royalty Information clause (FAR 52.227-6) requires offerors to identify royalties embedded in their pricing. For a standard supply item procurement under DLA, this clause is rarely operationally significant and its 1984 vintage suggests it may be a copy-forward inclusion that has never been reviewed for continued relevance to this type of buy.</div>
+</div><div class="evidence-item">
+  <blockquote>BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM-BASIC (FEB 2024)|11||||||||||||... BUY AMERICAN-FREE TRADE AGREEMENTS-BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024))|5|||||| BUY AMERICAN--BALANCE OF PAYMENTS PROGRAM CERTIFICATE-BASIC (FEB 2024)|1||</blockquote>
+  <div class="ev-explanation">Three separate Buy American/FTA/Balance of Payments clauses are cited in sequence with no explanation of how they interact, which one governs in case of conflict, or whether the distinction between the &#x27;basic&#x27; certificate and the FTA certificate matters for this specific item&#x27;s country of origin. Vendors must independently parse which clause set applies to their specific supply chain situation.</div>
+</div><div class="evidence-item">
+  <blockquote>TRANSPORTATION OF SUPPLIES BY SEA (OCT 2024)|2|||</blockquote>
+  <div class="ev-explanation">The Transportation of Supplies by Sea clause (DFARS 252.247-7023) applies when supplies may be transported by ocean vessel. For a small electronics component procurement (a receiver-transmitter, NAICS 334290), ocean transport applicability depends on the sourcing location. The clause is included without any explanation of whether ocean shipment is actually anticipated, leaving vendors uncertain about whether Cargo Preference Act compliance obligations are triggered for their particular supply arrangement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the purchase of a discrete hardware item — a receiver-transmitter (NAICS 334290, classification 7G20) — under Emergency Acquisition Flexibilities authority. The contract type is firm-fixed-price, as evidenced by the inclusion of the FAR 52.246-2 Inspection of Supplies–Fixed-Price clause. FFP is the correct and standard pricing mechanism for a supply acquisition of this nature. The requirement is well-defined: deliver a specific, identifiable piece of hardware from a government-approved source. There is no labor uncertainty, no evolving scope, and no ambiguity about what is being procured. The quantity is fixed at time of order. FFP maximizes competitive discipline and gives the government cost certainty for a straightforward supply purchase. There is no mismatch between the pricing structure and the requirements. This is a severity 1 — the contract type is appropriate for what is being bought.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)</blockquote>
+  <div class="ev-explanation">This clause (FAR 52.246-2) is used exclusively in fixed-price supply contracts, confirming the pricing structure is firm-fixed-price for the delivery of a physical supply item.</div>
+</div><div class="evidence-item">
+  <blockquote>Drawings are not available for this Request for Quotation. Offerors are advised that offers received from sources which are not government-approved sources of supply will be deemed technically unacceptable.</blockquote>
+  <div class="ev-explanation">The solicitation restricts award to pre-approved sources and explicitly calls out a discrete, identifiable hardware item (a receiver-transmitter, NSN/classification 7G20). This is a standard commercial/military spare parts acquisition with a defined deliverable — a specific unit of supply — making FFP entirely appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

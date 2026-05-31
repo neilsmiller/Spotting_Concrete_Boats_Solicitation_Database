@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Federal Bureau of Prisons Inmate Tablet Implementation Initiative — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Federal Bureau of Prisons Inmate Tablet Implementation Initiative</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b1636cabaff249a48b6eb4e747325b6b</span>
+      <a class="sam-link" href="https://sam.gov/opp/b1636cabaff249a48b6eb4e747325b6b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Sources Sought</span>
+      <span class="pill">2025-12-30</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">JUSTICE, DEPARTMENT OF › FEDERAL PRISON SYSTEM / BUREAU OF PRISONS › PRIVATIZATION - CO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Sources Sought</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-12-30</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">3-year base period followed by five one-year option periods</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>best value basis for the Government</li><li>verifiable corporate experience implementing, supplying, and operating inmate use tablets in a State Department of Corrections (DOC) or Federal Correctional setting for a minimum three-year period</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a pre-solicitation notice only — a brief announcement that a solicitation will be issued on or about January 16, 2026. There are no attachments, no Statement of Work (SOW), no Performance Work Statement (PWS), no Quality Assurance Surveillance Plan (QASP), and no reporting requirements specified. The notice contains only high-level program description elements (hardware/software/network deployment for ~150,000 inmates at 115 institutions), basic compliance mandates (FISMA, FedRAMP, TAA, Section 508), contract structure (FFP, 3-year base plus five 1-year options), and eligibility criteria (3-year DOC/federal correctional experience). There is no content describing QA processes, reporting cadences, deliverable structures, meeting requirements, or performance metrics of any kind. Without a PWS, SOW, or evaluation criteria document, it is impossible to assess whether this solicitation will define success through compliance-focused process reporting or outcome-oriented performance standards. Assessment must await the full solicitation, anticipated to post January 16, 2026.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation contains a textbook insider rewards structure. The &#x27;decisional rule criterion&#x27; — a pass/fail eligibility requirement, not merely a scored preference — demands three years of verifiable experience operating inmate tablets specifically in correctional settings. This is not a capability test; it is a prior-contract test. The government is not asking &#x27;can you deploy and manage 150,000 tablets securely?&#x27; — it is asking &#x27;have you already done this, in this exact domain, for three years?&#x27; The answer to that question narrows the eligible field to essentially the current incumbent and the small number of established correctional tablet vendors who have been in the market since at least early 2023. A competent systems integrator with deep device management experience, a telecom company with large-scale deployment history, or a corrections technology firm that recently entered the tablet market cannot compete — not because they lack capability, but because they lack this specific prior contract history. The requirement is structurally indistinguishable from writing &#x27;must be the incumbent or a direct competitor.&#x27; The severity rating of 3 is warranted: this is not a tilted playing field but a closed one. The decisional rule framing confirms this is not scored favorably but is a binary qualifier — fail this criterion and you are out, regardless of technical superiority, pricing, or any other factor. The very narrow domain specificity (inmate tablets, not corrections IT broadly), the operational continuity requirement (three years, not episodic project experience), and the pass/fail application of this criterion together constitute a severe insider rewards pattern that will predictably result in minimal meaningful competition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The BOP has established a decisional rule criterion requiring all offerors to clearly demonstrate they have verifiable corporate experience implementing, supplying, and operating inmate use tablets in a State Department of Corrections (DOC) or Federal Correctional setting for a minimum three-year period as of the date the Request for Proposals (RFP) is issued.</blockquote>
+  <div class="ev-explanation">This is a decisive pass/fail (&#x27;decisional rule&#x27;) requirement, not merely an evaluation preference. It demands prior experience specifically in correctional settings — not general institutional IT, not comparable large-scale device deployments, not even law enforcement or detention contexts broadly. The vendor must have been operating inmate tablets in a DOC or federal prison for three continuous years. This is a highly specialized niche: the number of vendors who have deployed and operated tablet programs across state or federal correctional facilities for three-plus years is vanishingly small, almost certainly limited to the current incumbent and one or two direct competitors. A company with extensive enterprise device management experience, or even a corrections technology company without a tablet-specific track record, cannot compete regardless of capability.</div>
+</div><div class="evidence-item">
+  <blockquote>verifiable corporate experience implementing, supplying, and operating inmate use tablets in a State Department of Corrections (DOC) or Federal Correctional setting</blockquote>
+  <div class="ev-explanation">The requirement stacks three distinct operational functions — implementing, supplying, AND operating — in a single, narrowly defined domain (inmate tablets in corrections). A vendor who has supplied tablets to corrections facilities but not operated them, or who has operated correctional software but not tablet hardware, would be disqualified. This stacking of functions within a single narrow domain further compresses the eligible vendor pool beyond what any single element would do alone.</div>
+</div><div class="evidence-item">
+  <blockquote>a minimum three-year period as of the date the Request for Proposals (RFP) is issued</blockquote>
+  <div class="ev-explanation">The three-year continuous operational experience requirement in this specific domain effectively anchors eligibility to vendors who were already active in this market by approximately early 2023. Combined with the extreme narrowness of the domain (inmate tablets, not corrections IT generally), this lookback window ensures that no new entrant — even one with directly transferable capabilities from adjacent markets — could satisfy the requirement. New entrants are categorically excluded by design.</div>
+</div><div class="evidence-item">
+  <blockquote>The intent of this award is to provide each inmate with an individual tablet... approximately 150,000 inmates at 115 FBOP institutions throughout the United States</blockquote>
+  <div class="ev-explanation">The enormous scale of this deployment (150,000 devices across 115 institutions nationwide, with a base period plus five option years) makes the decisional rule requirement even more exclusionary. Very few vendors have operated any correctional tablet program at anything close to this scale. Even vendors with three years of DOC tablet experience at smaller state systems may struggle to demonstrate comparable scale. The combination of the decisional rule criterion with the scale of the requirement creates a near-perfect incumbent filter.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a pre-solicitation notice only — it contains no attached Statement of Work (SOW), Performance Work Statement (PWS), or detailed requirements document. The description is a brief narrative summary of anticipated contract scope covering hardware, software, network infrastructure, and deployment support for an inmate tablet program. While it includes some technology constraints (FedRAMP certification, AWS GovCloud or Azure GovCloud hosting, FISMA compliance, Section 508, TAA compliance), these are regulatory and security baselines that fall squarely within the legitimate constraints category — they define what standards must be met, not how the vendor must organize its work or deliver services step-by-step. The notice does not include bullet lists of prescribed processes, staffing structures, workflow mandates, or other hallmarks of requirement sprawl. Meaningful assessment of Requirement Sprawl requires the actual solicitation and its attachments (SOW/PWS, technical requirements, evaluation criteria), which are stated to be forthcoming on or about January 16, 2026. Without that content, there is insufficient detail to evaluate whether the solicitation dictates how work must be performed versus what outcomes are required.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a pre-solicitation notice, not a full solicitation with an attached Statement of Work, Performance Work Statement, or detailed specifications document. The notice is brief — approximately one page — and while it does cite several compliance frameworks (FISMA, FedRAMP/AWS GovCloud/Azure GovCloud, DOJ and OMB cybersecurity directives, Section 508, TAA), these are stated in passing as general requirements rather than presented as a structured &#x27;Applicable Documents&#x27; section. The citations that do appear are plausibly relevant to the actual work: FISMA and FedRAMP are standard requirements for federal IT systems handling sensitive data; Section 508 is appropriate given the stated accessibility requirements for deaf and hard-of-hearing users; TAA compliance is standard for IT hardware procurement; and DOJ/OMB cybersecurity directives are logically applicable to a DOJ component. There is no bulk &#x27;Applicable Documents&#x27; list, no undifferentiated accumulation of regulations, and no obviously irrelevant or contradictory citations. The actual solicitation (anticipated January 16, 2026) with its full compliance sections, SOW/PWS, and contract terms is not yet available for review. A meaningful assessment of Rule Pools requires the full solicitation document, particularly any dedicated regulatory citation section or Applicable Documents annex. Marking sufficient_content as false because the pre-solicitation notice does not contain the depth of regulatory citation detail needed to assess this sin pattern.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">FFP is an appropriate contract type for this requirement. The solicitation describes a commercial product implementation: hardware (tablets), software, network infrastructure, and deployment support delivered to a defined population (approximately 150,000 inmates) at a defined number of facilities (115). The quantity is known, the deliverable is concrete, and the technology being procured (commercial tablets with FedRAMP-certified cloud hosting) is mature and widely available in the correctional market. The decisional rule criterion — requiring offerors to have verified experience implementing inmate tablets in a DOC or federal correctional setting for at least three years — further suggests the government expects competitive vendors with the cost experience needed to price this work accurately under FFP. There is no indication of research components, evolving requirements, or unbounded labor scope that would argue for T&amp;M or cost-reimbursement. A reasonable concern is that integration across 115 geographically dispersed facilities over an 8-year period (3-year base plus five one-year options) could introduce unforeseen complexity, but the government&#x27;s use of option periods provides natural checkpoints and the commercial nature of the product mitigates this risk. On balance, most contracting experts would view FFP as the correct pricing vehicle for a hardware deployment of defined scope, and no meaningful mismatch is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Federal Bureau of Prisons (FBOP), located at 320 First St. NW, Washington DC, anticipates issuance of solicitation for a single award of a firm-fixed price (FFP) contract for Inmate Use Tablet Implementation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states FFP as the contract type. This is the pricing structure being evaluated.</div>
+</div><div class="evidence-item">
+  <blockquote>The Implementation will consist of providing all necessary hardware, software, network infrastructure, and deployment support to implement a tablet program to be utilized by approximately 150,000 inmates at 115 FBOP institutions throughout the United States. The intent of this award is to provide each inmate with an individual tablet.</blockquote>
+  <div class="ev-explanation">The core deliverable is well-defined: provide tablets (hardware and software) along with supporting infrastructure to approximately 150,000 inmates across 115 institutions. The scope is discrete and quantifiable — a known number of devices at a known number of facilities — which supports the use of FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

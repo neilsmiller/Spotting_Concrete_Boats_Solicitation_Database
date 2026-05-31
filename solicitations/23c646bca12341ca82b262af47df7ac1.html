@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANSA/EPILYSIS/META Software — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>ANSA/EPILYSIS/META Software</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 23c646bca12341ca82b262af47df7ac1</span>
+      <a class="sam-link" href="https://sam.gov/opp/23c646bca12341ca82b262af47df7ac1/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2025-12-09</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › ACC-CTRS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">513210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-12-09</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months) + 2 option years (12 months each)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a brief combined synopsis/solicitation notice for a sole-source commercial software license procurement (ANSA/EPILYSIS/META). The posting contains no Statement of Work, Performance Work Statement, Quality Assurance Surveillance Plan, reporting requirements, deliverables list, or any other contractual accountability mechanisms. The description is limited to identifying the software product, the proposed contractor, the period of performance structure (1 base year + 2 option years), and the sole-source justification authority. There are no attachments accessible for review beyond the referenced redacted justification document. Because this is fundamentally a commercial software license purchase — not a services contract — the compliance-over-outcomes framework has limited applicability to begin with: the &#x27;deliverable&#x27; is the software license itself, and performance is largely defined by whether the license grants access to the specified product with maintenance and support. Without any SOW, PWS, QASP, or reporting requirements to evaluate, there is insufficient content to assess whether QA processes measure compliance versus outcomes.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Insider Rewards pattern as defined. The Insider Rewards sin concerns the use of experience requirements, evaluation criteria, or knowledge expectations that effectively exclude non-incumbent vendors while nominally maintaining competition. Here, there is no competition at all — the agency is making a sole-source award under FAR 6.302-1 on brand-name grounds for proprietary software licenses (ANSA/EPILYSIS/META, produced exclusively by BETA CAE Systems). There are no experience thresholds, no past performance scoring rubrics, no federal-contract dollar minimums, and no institutional knowledge requirements because the solicitation does not contemplate a competitive evaluation process. The vendor pool is restricted to one vendor by explicit statutory authority, not by insider-favoring evaluation criteria. This may raise concerns under other analytical frameworks (e.g., sole-source overuse, lack of market research, vendor dependency), but it does not constitute an Insider Rewards pattern. Severity is assessed at 1 — the solicitation contains no experience-based exclusionary criteria because it contains no competitive evaluation at all.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Unless evidence is produced otherwise by an authorized reseller of manufacturers software, this procurement will be awarded without discussions as a sole source award to BETA CAE Systems USA Inc.</blockquote>
+  <div class="ev-explanation">This is an explicit sole-source justification rather than an experience-based incumbent preference. The award is being made directly to the named vendor on brand-name grounds, bypassing competition entirely. This is not an &#x27;Insider Rewards&#x27; dynamic in the traditional sense — it does not use experience criteria or evaluation scoring to filter out non-incumbents. It simply does not open competition at all, citing FAR 6.302-1.</div>
+</div><div class="evidence-item">
+  <blockquote>The statutory authority permitting other than full and open competition is 10 U.S.C.2304(c)(1), as implemented by FAR 6.302-1 Only One Responsible Source and No Other Supplies or Services Will Satisfy Agency Requirements. Specifically, FAR 6.302-1(c) provides that a brand name item can be obtained if the use of the brand name is essential to the Government&#x27;s requirements; thereby precluding consideration of a product manufactured by another company.</blockquote>
+  <div class="ev-explanation">The sole-source rationale is rooted in brand-name specificity (proprietary BETA CAE software), not in experience requirements or evaluation criteria that reward prior incumbency. This is a different structural pattern from the Insider Rewards sin — there are no stacked experience thresholds, no federal-contract mandates, and no evaluation criteria scoring incumbency proxies.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial software license procurement for a specific brand-name product (ANSA/EPILYSIS/META by BETA CAE Systems). The requirement sprawl sin is largely inapplicable in this context. The solicitation is not asking a vendor to perform a service or deliver a solution — it is purchasing a specific named commercial product, which is inherently prescriptive by design. The government has identified a specific software tool it needs and is procuring licenses for it under a sole-source justification (FAR 6.302-1, Only One Responsible Source). In this procurement model, the &#x27;how&#x27; and the &#x27;what&#x27; are the same thing: the government needs ANSA/EPILYSIS/META software, and only BETA CAE Systems can provide it. There is no service delivery workflow being prescribed, no staffing structure being mandated, no step-by-step process being imposed on a contractor. The platform specifications (Linux, Windows, OpenGL) are legitimate technical interoperability constraints reflecting the Army&#x27;s existing IT environment. The maintenance and support scope (telephone, online, documentation updates) is a standard commercial software support bundle, not a prescriptive operating procedure. The solicitation lacks the detailed SOW/PWS language that would typically generate requirement sprawl findings — it is a brief combined synopsis/solicitation for a commercial item, which by its nature cannot exhibit sprawl in the same way a complex services contract would. Severity is assessed at 1 (minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>procurement of commercial licenses for ANSA/EPILYSIS/META Local Network License, ver.25.X on PC	eflon with Linux glibc3.3 or later, OpenGL PCs with Windows 7/8/10/11, OpenGL maintenance service and support(telephone, On-line), software and documentation revisions and updates</blockquote>
+  <div class="ev-explanation">This specifies the exact software product, version, and platform compatibility requirements. However, this is not requirement sprawl in the problematic sense — it is a brand-name commercial software procurement where the specific product IS the requirement. The technical platform specifications (Linux glibc3.3, Windows 7/8/10/11, OpenGL) are interoperability constraints reflecting the Army&#x27;s existing computing environment, not prescriptive process mandates imposed on a service vendor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a brief combined synopsis/solicitation for a commercial software license purchase (ANSA/EPILYSIS/META) under a sole-source justification. The notice contains essentially no &#x27;Applicable Documents&#x27; section, no bulk list of regulations or directives, and no compliance frameworks beyond the FAR/DFARS references that are standard for any federal procurement. The only substantive regulatory citation — 10 U.S.C. 2304(c)(1) and FAR 6.302-1 — is directly relevant and contextualized. The solicitation text is short and transactional, appropriate for a commercial software license buy. There is no evidence of rule pools whatsoever. The attachments referenced (a redacted J&amp;A and an RFQ) are not provided in full text, so some detail is unavailable, but the solicitation notice itself does not exhibit bulk, undifferentiated regulatory citation. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The statutory authority permitting other than full and open competition is 10 U.S.C.2304(c)(1), as implemented by FAR 6.302-1 Only One Responsible Source and No Other Supplies or Services Will Satisfy Agency Requirements.</blockquote>
+  <div class="ev-explanation">The solicitation cites a single, specific statutory authority for the sole-source justification with a clear explanation of why it applies. This is the opposite of a rule pool — it is a focused, contextualized regulatory citation directly tied to the acquisition strategy.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a clear, well-aligned use of firm-fixed-price contracting. The government is purchasing commercial software licenses (ANSA/EPILYSIS/META) with a specific version, defined platform configurations, and bundled maintenance and support. All of these characteristics — a named commercial product, a defined deliverable, a predictable price, and a stable scope — are exactly what FAR guidance identifies as appropriate conditions for FFP. The FAR explicitly contemplates FFP for commercial item purchases (FAR Part 12), and software license procurement is one of the most routine use cases for FFP in federal contracting. There is no labor-intensity ambiguity, no undefined scope, and no technical uncertainty that would argue for T&amp;M or cost-reimbursement. The inclusion of maintenance and telephone/online support is typical for commercial software agreements and does not introduce the kind of variable, open-ended labor that would make T&amp;M preferable. This is a severity 1 finding — the contract type is appropriate for the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>intends to award a sole source, firm-fixed price purchase order for the procurement of commercial licenses for ANSA/EPILYSIS/META Local Network License, ver.25.X</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a firm-fixed-price (FFP) contract type for the procurement of commercial software licenses. This is a textbook appropriate use of FFP: the government is purchasing a defined commercial product (named software, specific version, specific platform configurations) at a negotiated price, with no ambiguity about what is being delivered.</div>
+</div><div class="evidence-item">
+  <blockquote>Period of Performance: This acquisition will include one (1) 12-month base year and two (2) 12-month option years.</blockquote>
+  <div class="ev-explanation">The multi-year structure with annual option periods is a standard and appropriate approach for software license renewals. The scope (annual license renewal plus maintenance/support) is stable and predictable year over year, which further supports FFP as the right vehicle. There is no indication of scope uncertainty that would warrant a different pricing structure.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

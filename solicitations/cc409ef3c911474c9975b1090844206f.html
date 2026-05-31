@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPRMM1-26-Q-GD21-DISPLAY UNIT — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>SPRMM1-26-Q-GD21-DISPLAY UNIT</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 cc409ef3c911474c9975b1090844206f</span>
+      <a class="sam-link" href="https://sam.gov/opp/cc409ef3c911474c9975b1090844206f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA MARITIME › DLA MARITIME MECHANICSBURG › SPRMM1 DLA MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7K20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334112</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>lowest priced technically acceptable</li><li>item risk</li><li>price risk</li><li>supplier risk</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a simplified acquisition Request for Quotation for a single Display Unit (NSN 7025-01-643-1771), a part-numbered, manufactured hardware item destined for Norfolk Naval Shipyard. The solicitation is a standard DLA Maritime procurement vehicle — not a services or IT contract — and the compliance-over-outcomes sin is most relevant to complex service or IT performance contracts with ongoing reporting obligations.
+
+The solicitation contains no ongoing reporting cadences, no prescribed report formats or sections, no weekly/monthly/quarterly status reports, no meeting frequency requirements, and no plan-adherence tracking mechanisms. The accountability structure is appropriate for what this is: a buy-once, inspect-and-accept hardware procurement. Quality is assessed through ISO 9001 compliance and origin inspection/acceptance, which is conventional and proportionate for a military spare part.
+
+The solicitation does reference process-compliance mechanisms (ISO 9001, MIL-STD-2073 packaging, supply chain traceability documentation under DLATERMC03), but these are regulatory and safety baselines for naval hardware — not substitutes for outcome measurement. The acceptance criterion is effectively &#x27;does the delivered unit conform to CAGE 06RP6 part number DG-005881-02 specification&#x27; — that is a form/fit/function outcome test.
+
+There are no meaningful performance targets or SLAs to speak of because none are applicable: this is a one-time supply transaction, not a performance-based service. The absence of outcome metrics is not a sin in this context — it reflects the nature of the procurement. Severity 1 is appropriate: the reporting burden is minimal, the QA structure is conventional for military hardware, and no compliance-over-outcomes pattern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.2 Quality System Requirements - The supplier shall provide and maintain a quality system acceptable to the Government. The quality system requirements shall be in accordance with ISO 9001.</blockquote>
+  <div class="ev-explanation">The QA requirement references ISO 9001, a process-compliance standard. However, for a commercial off-the-shelf hardware procurement of a single unit, this is a standard and reasonable higher-level quality system requirement — not evidence of compliance theater displacing outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4 Records of Inspection - Records of all inspection work performed by the Contractor, as referenced elsewhere in this contract, shall be kept complete and available to the Government during the performance of the contract and for a period of four years after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">This is a record-keeping requirement focused on process documentation rather than outcomes. However, for a single-unit, part-numbered hardware buy, inspection records are the primary means of verifying item conformance — this is appropriate traceability, not a sign of reporting burden crowding out outcomes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a DLA Maritime spare parts buy for a single display unit (NSN 7025-01-643-1771) destined for Norfolk Naval Shipyard. The solicitation structure is a standard DLA simplified acquisition using an SF-18 Request for Quotation with LPTA evaluation. There are no experience requirements, no past performance evaluation factors, no dollar-threshold mandates, no federal-specific experience requirements, and no evaluation bonus points for incumbency proxies. The only potential competition-narrowing element is the authorized distributor requirement in Note 6.2, but this is a routine DLA supply chain traceability and authenticity control applicable to all part-numbered items — it reflects the need to ensure the part is genuine and traceable, not a mechanism to reward an incumbent service contractor. The procurement note L04 (Offers for Part Numbered Items) explicitly provides pathways for exact product, alternate product, superseding part numbers, and previously-approved products, further broadening rather than narrowing participation. A qualified vendor new to this specific NSN could realistically compete by obtaining authorized distributor status or offering under the alternate product pathway. No insider rewards pattern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.2 Notice To Distributors/Offerors - Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement limits competition to authorized distributors of the original manufacturer (CAGE 06RP6, part number DG-005881-02). While this could theoretically narrow the field, it is a standard and appropriate control for DLA spare parts procurements — it ensures part authenticity and traceability rather than rewarding an incumbent contractor. Any vendor who obtains authorized distributor status from the OEM can compete. This is not an incumbency proxy; it is a supply chain integrity measure.</div>
+</div><div class="evidence-item">
+  <blockquote>Award will be made to the responsible offeror submitting the lowest priced, technically acceptable offer. A technically acceptable offer is one in which the offeror complies with the instructions contained in Section L of the solicitation and does not take exception, nor object, to any of the terms of this solicitation.</blockquote>
+  <div class="ev-explanation">The evaluation methodology is lowest-price technically acceptable (LPTA) based solely on compliance with solicitation terms and price. There are no past performance scoring factors, no points awarded for prior similar contracts, no dollar-threshold experience requirements, and no federal-specific experience mandates. This is the opposite of an insider rewards structure — it allows any authorized distributor who can meet the technical and packaging requirements to win on price alone.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a standard DLA Maritime simplified acquisition (RFQ) for a single NSN spare part — a Display Unit for Norfolk Naval Shipyard. The nature of the procurement fundamentally shapes the analysis: this is not a services contract or a complex systems development effort. It is a buy of a specific, already-qualified military item in quantity one.
+
+The solicitation does not exhibit meaningful requirement sprawl because it does not describe a service to be performed or a problem to be solved through vendor innovation. Instead, it identifies a specific approved part number and asks vendors to supply it. The &#x27;how&#x27; in this context is necessarily fixed: deliver the approved item in conformance with applicable standards. There is no solution space for the vendor to innovate in — the item is already designed and qualified by CAGE 06RP6 under part number DG-005881-02.
+
+The voluminous packaging, marking, and quality requirements (MIL-STD-2073, MIL-STD-129, ISO 9001, DFARS IUID requirements, configuration management terms) are standard DLA boilerplate clauses applied uniformly across the maritime supply chain. They reflect legal, regulatory, and operational safety constraints — not prescriptive choices about how a vendor should deliver a service. The configuration management terms (WSSTERMCZ05) governing engineering change proposals and variances are appropriate governance mechanisms for a safety-critical naval item.
+
+The solicitation does include mechanisms that actually reduce rigidity: DLATERML04 (offers for part-numbered items) explicitly provides pathways for exact product, alternate product, superseding part numbers, and previously-approved products. DLATERMC04 accommodates surplus material offers. These provisions show the government is not locking out alternative supply paths.
+
+In summary, this is a competently scoped spare parts solicitation. The specificity present reflects the legitimate constraints of military supply chain management for naval platform components — not organizational dysfunction, incumbent capture, or the substitution of process compliance for outcome definition. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1 Cage Code/Reference Number Items - The DISPLAY UNIT furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. &lt;06RP6 DG-005881-02&gt;</blockquote>
+  <div class="ev-explanation">This specifies an approved source and part number, which could be read as prescribing the exact product rather than defining functional requirements. However, for a military spare parts procurement via DLA, identifying an approved source and part number is a legitimate technical constraint — not sprawl. The government needs a specific NSN item for a specific naval platform and must ensure interoperability and safety qualification. The L04 clause explicitly provides a mechanism for alternate and previously-approved products, showing the government has left a door open for alternatives where qualified.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall preserve, package, pack and mark all items as cited below... MIL-STD 2073 PACKAGING APPLIES... [followed by multi-page detailed packaging requirements covering preservation methods, packing levels, marking requirements, DLR labels, SMIC codes, palletization, wood packaging material, shelf-life markings, and reusable container requirements]</blockquote>
+  <div class="ev-explanation">The packaging section is extremely detailed and prescribes specific methods, materials, and procedures. However, this is not requirement sprawl in the meaningful sense — military packaging standards for naval supply system items are legally mandated constraints tied to supply chain integrity, hazmat compliance (49 CFR), and operational readiness on ships. The specificity protects the government&#x27;s distribution system, not the incumbent&#x27;s business model. A contractor has no meaningful freedom to innovate in how they package a DLA spare part.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-severity rule pool pattern. The formal &#x27;Applicable Documents&#x27; list in Section C is deceptively minimal (only MIL-STD-129 and ISO 9001), but the true regulatory burden is scattered throughout the boilerplate terms (WSSTERMDZ03, WSSTERMCZ05, DLATERMC03, etc.), where over two dozen distinct standards, specifications, and regulatory frameworks accumulate without prioritization or applicability guidance.
+
+The most significant manifestation is the packaging section (WSSTERMDZ03), which cites 14+ standards for what is effectively a single-unit shipment of a hardware display unit to a domestic installation. Many provisions — OCONUS packing levels, hazardous materials air shipment requirements, foreign military sales container rules, palletization for loads over 1,500 pounds, and multiple QPL barrier materials — are plainly inapplicable to this procurement but appear without conditional language that would let a vendor safely disregard them.
+
+The cybersecurity regime (DFARS 252.204-7012, NIST SP 800-171, three 52.240-series clauses) is a plausible copy-forward from a master template. While not absurd for DoD contracts generally, its full weight applied to a one-unit physical hardware buy illustrates the accumulation dynamic: nothing gets removed, everything carries forward.
+
+Mitigating factors keep this at severity 2 rather than 3: there are no genuinely contradictory regulations (no equivalent of the &#x27;do not use SMS&#x27; cited in an SMS solicitation), the regulatory volume — while elevated — is not extreme relative to standard DLA Maritime boilerplate, and most cited documents have at least a plausible connection to naval supply chain and packaging requirements. The solicitation is a standard DLA spare-parts RFQ rather than a complex services procurement, and experienced defense suppliers in this space will recognize most of the cited standards from prior transactions. A new entrant, however, would face meaningful uncertainty about which of the 24+ cited standards actually carry enforcement weight for this specific one-unit order.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DOCUMENT REFERENCES
+SPEC NO. SLASH NO. PART NO REV DATE DISTR CD AMEND CHG NTC SUPP
+MIL-STD-129 P 29 OCT 04 A 03
+ISO9001 17 APR 01 A</blockquote>
+  <div class="ev-explanation">The formal &#x27;Applicable Documents&#x27; list in Section C is extremely sparse — only two documents cited — with no explanation of how each applies. MIL-STD-129 governs marking and is referenced elsewhere in packaging. ISO 9001 governs the quality system. But the list itself offers zero context or applicability guidance, just raw citations.</div>
+</div><div class="evidence-item">
+  <blockquote>WSSTERMDZ03 PRESERVATION, PACKAGING, PACKING AND MARKING... MIL-STD-2073-1... MIL-PRF-131, MIL-PRF-81705, MIL-PRF-22191, MIL-PRF-3420 and MIL-PRF-22019... ASTM D3951-18 (2023)... ANSI/ESD S20.20-2021... MIL-STD-129... MIL-STD-147... MH1-2016... ISPM 15... MIL-PRF-61002... NAVSUP PUB 505/AFMAN 24-204... 49 CFR... FED-STD-313</blockquote>
+  <div class="ev-explanation">The packaging section alone cites over a dozen distinct standards and regulations — MIL-STD-2073-1, five separate QPL barrier material specs (MIL-PRF-131, -81705, -22191, -3420, -22019), ASTM D3951, ANSI/ESD S20.20, MIL-STD-129, MIL-STD-147, MH1-2016, ISPM 15, MIL-PRF-61002, NAVSUP PUB 505/AFMAN 24-204, 49 CFR, and FED-STD-313 — for a single-unit purchase of one display unit. No applicability guidance is provided to distinguish which apply conditionally (e.g., hazmat rules, OCONUS packing levels) versus unconditionally.</div>
+</div><div class="evidence-item">
+  <blockquote>52.246-11 HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT (DEC 2014)... &lt;ISO9001&gt;
+4.2 Quality System Requirements - The supplier shall provide and maintain a quality system acceptable to the Government. The quality system requirements shall be in accordance with ISO 9001.
+4.2.1 &lt;Suppliers currently using and maintaining Inspection System Requirements to MIL-I-45208 are granted permission to utilize MIL-I-45208 if desired.&gt;</blockquote>
+  <div class="ev-explanation">ISO 9001 is cited redundantly in at least three separate locations (the Applicable Documents table, Section E quality requirements, and the FAR 52.246-11 clause) without consolidation or explanation. MIL-I-45208 — a cancelled military standard from the 1990s — is offered as an accepted alternative, suggesting the regulatory framework has accumulated over time without review of whether older references remain appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>252.204-7012 SAFEGUARDING COVERED DEFENSE INFORMATION AND CYBER INCIDENT REPORTING... NIST SP 800-171... FedRAMP Moderate baseline... 52.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS... 52.240-92 SECURITY REQUIREMENTS... 52.240-93 BASIC SAFEGUARDING OF COVERED CONTRACTOR INFORMATION SYSTEMS... 252.240-7997 NIST SP 800-171 DOD ASSESSMENT REQUIREMENTS</blockquote>
+  <div class="ev-explanation">This is a solicitation for a single physical display unit (NSN 7025-01-643-1771, quantity 1) to be shipped to Norfolk Naval Shipyard. The solicitation nonetheless includes an extensive cybersecurity compliance regime: DFARS 252.204-7012 (covering NIST SP 800-171 and FedRAMP), three separate security clauses (52.240-91, -92, -93), and a NIST SP 800-171 DoD Assessment Requirements clause. While some cyber clauses are routine in DoD contracts, the full 800-171 regime — including cyber incident reporting, malicious software handling, media preservation, and forensic analysis requirements — applied to a buy of one hardware component strains proportionality and suggests copy-forward inclusion without tailoring.</div>
+</div><div class="evidence-item">
+  <blockquote>Solicitation notes cite: MIL-STD-129, DFARS 252.211-7006 PASSIVE RFID, MIL-STD-2073, 49 CFR, FED STD 313, ISO9001, MIL-STD-130, MIL-STD-147, ISPM 15, MH1-2016, ANSI/ESD S20.20-2021, ASTM D3951-18, MIL-PRF-131, MIL-PRF-81705, MIL-PRF-22191, MIL-PRF-3420, MIL-PRF-22019, MIL-PRF-61002, NAVSUP PUB 505/AFMAN 24-204, NIST SP 800-171, DI-SESS-80639E, DI-SESS-80640E, DD Form 1692, DD Form 1694</blockquote>
+  <div class="ev-explanation">Across the solicitation, at least 24 distinct regulatory documents, standards, and data item descriptions are cited for a quantity-one hardware purchase. No single section organizes them or explains their relative importance or conditionality. Several — like the reusable container NSN tables, palletization standards for unit loads over 1,500 pounds, and foreign military sales container provisions — are clearly inapplicable to a single-unit shipment to a domestic naval shipyard, yet appear without qualification.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simple supply procurement: DLA Maritime Mechanicsburg is buying one unit of a specific display unit (NSN 7025-01-643-1771, CAGE 06RP6, part number DG-005881-02) for delivery to Norfolk Naval Shipyard. The contract type is clearly fixed-price — the solicitation requests a unit price for a defined quantity, uses LPTA award criteria, and incorporates FAR 52.246-2 (Inspection of Supplies — Fixed-Price) and FAR 52.249-1 (Termination for Convenience — Fixed-Price Short Form). This is an entirely appropriate contract type for the requirement. The government knows exactly what it wants: one specific part, identified by part number and NSN, from an approved source. The scope is completely stable and well-defined. There is no ambiguity about scope, no evolving requirements, and no labor-intensity that would suggest T&amp;M. A firm-fixed-price arrangement is the textbook correct choice for a commercial supply buy of a discrete, identified hardware item. There is no square peg issue here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Award will be made to the responsible offeror submitting the lowest priced, technically acceptable offer.</blockquote>
+  <div class="ev-explanation">The evaluation criterion for lowest-priced technically acceptable offer is characteristic of a fixed-price acquisition. Combined with the unit price structure (quantity 1, unit price requested), this confirms a firm-fixed-price approach.</div>
+</div><div class="evidence-item">
+  <blockquote>NSN 7HH 7025-01-643-1771 DISPLAY UNIT... QTY 1... FOR REFERENCE ONLY 06RP6 DG-005881-02</blockquote>
+  <div class="ev-explanation">This is a straightforward supply procurement of a single, specific, part-numbered display unit destined for Norfolk Naval Shipyard. The item is identified by NSN, CAGE code, and part number — a well-defined deliverable with no ambiguity about what is being purchased.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="2.01 SPRMM126.QGD21.PDF">2.01 SPRMM126.QGD21.PDF</div></div>
+  <a class="dl-btn" href="../attachments/cc409ef3c911474c9975b1090844206f_2.01+SPRMM126.QGD21.PDF" download="2.01 SPRMM126.QGD21.PDF" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

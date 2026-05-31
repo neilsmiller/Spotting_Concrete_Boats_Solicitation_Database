@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INTERNET SERVICES — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>INTERNET SERVICES</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 8ba950041b084dd9af4d52e6edfc335d</span>
+      <a class="sam-link" href="https://sam.gov/opp/8ba950041b084dd9af4d52e6edfc335d/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2025-07-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › US EMBASSY NIAMEY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG11</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">51711</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-07-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>lowest price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation lacks sufficient content to meaningfully assess compliance over outcomes patterns. The posted documents consist of: (1) a W-14 IRS tax form for foreign contracting parties, (2) a sample amendment document incorporating standard FAR tax-related clauses (52.229-11, 52.229-12, 52.225-25), and (3) a C-SCRM Questionnaire and Software Producer Attestation Form focused on cybersecurity supply chain risk management. None of these attachments contain a Statement of Work (SOW), Performance Work Statement (PWS), Quality Assurance Surveillance Plan (QASP), deliverables schedule, reporting requirements, or any performance standards. The solicitation description is a brief cover letter for an internet services RFQ at the U.S. Embassy Niamey, referencing a Standard Form 1449 and pricing sections, but these core documents were not included in the provided text. Without the SOW/PWS or any accountability framework, it is impossible to assess whether the solicitation relies on compliance-focused QA mechanisms versus outcome-based performance measures. The C-SCRM questionnaire does ask yes/no process compliance questions (e.g., &#x27;Does your organization identify its key supply chain threats?&#x27;), but this is a pre-award vendor vetting tool, not a post-award QA surveillance mechanism, and therefore does not constitute evidence of this sin pattern.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation text provided does not contain sufficient content to meaningfully assess insider rewards. The available documents consist of: (1) a brief cover letter/RFQ notice describing administrative submission requirements, (2) an IRS Form W-14 tax withholding form, (3) a sample amendment incorporating standard FAR clauses related to tax withholding (52.229-11 and 52.229-12) and other routine clauses, and (4) a C-SCRM questionnaire focused on cybersecurity supply chain risk management practices. None of these attachments contain the actual Statement of Work, Performance Work Statement, Section L (Instructions to Offerors) evaluation criteria, Section M (Evaluation Factors), personnel qualifications, or past performance requirements that would be necessary to assess whether experience requirements favor incumbents. The solicitation references a &#x27;Section 3&#x27; with instructions and &#x27;Section I - Pricing&#x27; and &#x27;Section 5 - Representations and Certifications,&#x27; but none of these sections are included in the provided text. The description of the procurement is limited to &#x27;internet services&#x27; at the U.S. Embassy Niamey — a relatively simple commodity procurement — but without the actual solicitation body, it is impossible to evaluate whether experience requirements, evaluation factors, or knowledge expectations function as insider rewards. Accordingly, sufficient_content is set to false and no evidence items are identified.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation lacks sufficient content to meaningfully assess requirement sprawl. The posted documents consist of: (1) a brief cover letter describing submission instructions and administrative requirements for an internet services RFQ, (2) a W-14 tax form and an amendment incorporating tax-related FAR clauses (52.229-11, 52.229-12), and (3) a C-SCRM questionnaire and software producer attestation form. None of these attachments contain a Statement of Work, Performance Work Statement, or any technical specifications describing how internet services are to be delivered. The actual scope of work — bandwidth requirements, service levels, technical specifications, performance standards, or any description of what the contractor is expected to provide — is entirely absent from the posted materials. The four attachments referenced in the solicitation header do not include the core solicitation sections (Section B pricing structure beyond a placeholder, Section C or SOW, Section L instructions to offerors beyond submission mechanics, or Section M evaluation criteria). Without the substantive requirements sections, it is impossible to assess whether the solicitation prescribes HOW work should be done versus WHAT outcomes are needed. The documents provided are administrative and compliance-focused forms, not technical requirements.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics, primarily driven by two dynamics. First, the C-SCRM attachment imports the entirety of NIST SP 800-218&#x27;s Secure Software Development Framework — a detailed, practitioner-level software engineering compliance framework — into a procurement for internet connectivity services. The mismatch between the framework&#x27;s intended audience (software producers managing an SDLC) and the likely vendors (ISPs or connectivity providers in Niger) is significant. The attachment includes no scoping language to limit its application; vendors are expected to attest to compiler hardening, fuzz testing, and SBOM practices that are simply inapplicable to their business. Second, the amendment document is visibly a copy-forward template that was not cleaned up before issuance: it contains multiple editorial notes explicitly telling the contracting officer NOT to include certain clauses unless specific thresholds or work types apply (over $5.5M, construction work), yet those clauses appear in the issued document anyway. This pattern — clauses accumulated from prior iterations, thresholds not checked, inapplicable framework sections not scoped — is the hallmark of passive rule pool management. The solicitation does not rise to severity 3 because the core FAR clause set is otherwise standard and focused, the tax withholding provisions (52.229-11/12) are genuinely applicable to a foreign procurement context, and the total regulatory volume, while elevated, is not as extreme as a 88-document applicable documents list. The C-SCRM attachment is the primary driver of the moderate finding: it represents a substantial compliance interpretation burden for vendors who are not software producers, imposed without any effort to scope or contextualize the requirements to the actual service being procured.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CYBERSECURITY SUPPLY CHAIN RISK MANAGEMENT (C-SCRM) C-SCRM Questionnaire and C-SCRM Software Producer Attestation Form State Department Secure Software Development Attestation Form</blockquote>
+  <div class="ev-explanation">The solicitation requires offerors to complete a full C-SCRM questionnaire and Software Producer Attestation Form referencing NIST SP 800-218&#x27;s Secure Software Development Framework. This is a framework designed for software development organizations managing a software development lifecycle (SDLC). The procurement is for internet services (NAICS 51711) — likely a connectivity or ISP service in Niger. A local or regional internet service provider is not a software developer and the SSDF attestation, which asks about secure coding practices, compiler configurations, code review, fuzz testing, and SBOM generation, has no logical connection to providing internet bandwidth or connectivity services.</div>
+</div><div class="evidence-item">
+  <blockquote>PO.3.2: Follow recommended security practices to deploy, operate, and maintain tools and toolchains... PW.6.2: Determine which compiler, interpreter, and build tool features should be used... PW.8.2: Scope the testing, design the tests, perform the testing...</blockquote>
+  <div class="ev-explanation">The Software Producer Attestation embedded in the C-SCRM attachment runs to dozens of NIST SP 800-218 practices and tasks covering compiler hardening, fuzz testing, penetration testing, SBOM maintenance, and vulnerability disclosure programs. These requirements are designed for entities that produce software. An internet services vendor in Niamey providing connectivity to an embassy is not producing software and cannot meaningfully attest to these practices. The framework is pasted in wholesale without any scoping language indicating which items apply to this specific service.</div>
+</div><div class="evidence-item">
+  <blockquote>52.203-7 Anti-Kickback Procedures (Jun 2020) [NOTE TO CO: use in solicitations over $5.5M, if your solicitation is not over $5M, do not use in the amendment] ... 52.203-13 Contractor Code of Business Ethics and Conduct (Jun 2020) [NOTE TO CO: use in solicitations over $5.5M, if your solicitation is not over $5M, do not use in the amendment] ... 52.210-1 Market Research (Jun 2020) [NOTE TO CO: use in solicitations over $5.5M, if your solicitation is not over $5M, do not use in the amendment]</blockquote>
+  <div class="ev-explanation">The amendment template includes clauses with explicit editorial notes to the contracting officer stating they should not be used below $5.5M thresholds — yet these clauses appear to have been incorporated into the amendment without those editorial notes being acted upon or the clauses being removed. This is a textbook copy-forward accumulation artifact: the template was pasted without review, leaving threshold-gated clauses in a solicitation for an embassy internet service contract that almost certainly falls well below $5.5M.</div>
+</div><div class="evidence-item">
+  <blockquote>52.228-15 Performance and Payment Bonds-Construction (Jun 2020) [NOTE TO CO: use this clause if your solicitation is for construction, if not do include in the amendment]</blockquote>
+  <div class="ev-explanation">A construction bond clause appears in the amendment for an internet services contract. The editorial note instructs the CO not to include it if the solicitation is not for construction — but it appears in the document regardless. This is a direct example of an irrelevant regulatory citation included through copy-forward negligence rather than deliberate applicability review.</div>
+</div><div class="evidence-item">
+  <blockquote>52.223-18 Encouraging Contractor Policies to Ban Text Messaging While Driving (Jun 2020) ... 52.232-16 Progress Payments (Jun 2020)</blockquote>
+  <div class="ev-explanation">FAR 52.223-18 (texting while driving) and 52.232-16 (progress payments, which are typically used on large construction or manufacturing contracts with significant upfront costs) are included in the amendment clause update list without any contextual explanation of their relevance to an internet services contract at a U.S. Embassy in Niger. Progress payments under FAR 52.232-16 are a financing mechanism for large contracts; their inclusion in what appears to be a relatively small commercial services procurement suggests these clauses were added from a master template without applicability review.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward procurement of commercial internet services for the U.S. Embassy in Niamey, Niger. The solicitation uses an RFQ process with lowest-price award, strongly indicating a firm-fixed-price contract type. Internet connectivity services are a well-defined commercial commodity: the scope is clear (provide internet access at a specific location), pricing is stable and predictable (monthly recurring fees for defined bandwidth tiers), and the market is competitive. FFP is unambiguously the correct contract type here. There is no mismatch between contract type and requirements — this is precisely the kind of routine, predictable commercial service for which fixed-price competition is designed. The C-SCRM questionnaire and W-14 tax forms are administrative overlays that do not change the fundamental nature of the procurement. No square peg issue exists.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The U.S. Government intends to award a contract/purchase order to the responsible company submitting an acceptable offer at the lowest price.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly uses lowest-price award language, which is characteristic of a firm-fixed-price (FFP) procurement. This is consistent with the purchase of a commercial service — internet connectivity — where pricing is stable and well-understood in the market.</div>
+</div><div class="evidence-item">
+  <blockquote>RFQ for internet services... NAICS Code: 51711</blockquote>
+  <div class="ev-explanation">Internet access services (NAICS 51711 — Wired Telecommunications Carriers) are a commercial commodity service. Vendors can price these services with high confidence because bandwidth, service tiers, and installation costs are well-defined. FFP is the standard and appropriate vehicle for commodity telecommunications services.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="C-SCRM Questionnaire and C-SCRM Software Producer Attestation Form - .xlsx">C-SCRM Questionnaire and C-SCRM Software Producer Attestation Form - .xlsx</div></div>
+  <a class="dl-btn" href="../attachments/8ba950041b084dd9af4d52e6edfc335d_C-SCRM+Questionnaire+and+C-SCRM+Software+Producer+Attestation+Form+-+.xlsx" download="C-SCRM Questionnaire and C-SCRM Software Producer Attestation Form - .xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Sample Amendment Zadroga - Non-Commercial.docx">Sample Amendment Zadroga - Non-Commercial.docx</div></div>
+  <a class="dl-btn" href="../attachments/8ba950041b084dd9af4d52e6edfc335d_Sample+Amendment+Zadroga+-+Non-Commercial.docx" download="Sample Amendment Zadroga - Non-Commercial.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="SS-Internet_CI w CSCRM Niamey FY25.doc">SS-Internet_CI w CSCRM Niamey FY25.doc</div></div>
+  <a class="dl-btn" href="../attachments/8ba950041b084dd9af4d52e6edfc335d_SS-Internet_CI+w+CSCRM+Niamey+FY25.doc" download="SS-Internet_CI w CSCRM Niamey FY25.doc" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="W-14 forms.pdf">W-14 forms.pdf</div></div>
+  <a class="dl-btn" href="../attachments/8ba950041b084dd9af4d52e6edfc335d_W-14+forms.pdf" download="W-14 forms.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Children&#x27;s Waiting Room Internet — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Children&#x27;s Waiting Room Internet</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 11f8bc900fb5452cb04ee7db62a30100</span>
+      <a class="sam-link" href="https://sam.gov/opp/11f8bc900fb5452cb04ee7db62a30100/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › MISSION INSTALLATION CONTRACTING COMMAND</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base period of 12 months (01 August 2026 – 31 July 2027) plus four (4) option years of 12 months each, through 31 July 2031</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Price</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a narrow, commodity commercial service: two fiber internet connections to children&#x27;s waiting rooms on a military installation. The scope is deliberately simple, and the PWS reflects that simplicity. The primary accountability mechanism is a measurable performance standard (200–500 Mbps speed requirement) and a 24-hour outage response SLA — both outcome-focused. Reporting requirements are minimal: a call list refreshed quarterly, repair records after each service call, and a 48-hour advance notice for maintenance outages. There is no elaborate reporting cadence, no prescribed report formats with required sections, no weekly status meetings, and no plan-adherence tracking. The PWS does contain boilerplate language — safety plans, AT Level I training, ID badge requirements, conflict of interest provisions — that is standard Army contract language and does not represent compliance theater specific to this acquisition. The QASP is referenced but not provided, which is a minor gap; however, given the simplicity of the requirement, the absence of elaborate process surveillance language throughout the document suggests the QASP is likely straightforward. The solicitation leans toward outcome accountability where it matters most: service availability and speed. This is a severity 1 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Internet speed shall be reliable and able to attain no less than 200Mbps and not exceed 500Mbps.</blockquote>
+  <div class="ev-explanation">This is a concrete, measurable performance standard — a speed floor and ceiling — that defines acceptable service in outcome terms. It tells the vendor what the connection must actually deliver, not just how to manage it.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall provide onsite technical support should there be an outage not deemed to be the fault of the government... Contractor will begin work on &#x27;service interruptions&#x27; no later than 24 hours after the interruption is reported.</blockquote>
+  <div class="ev-explanation">This establishes a response-time SLA for outages, which is an outcome-oriented accountability mechanism. The government can verify whether the contractor actually restored service within 24 hours, not merely whether they filed the right paperwork.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall periodically ensure that the system is operating at maximum band width and provide resolution if the connection is found to be deficient.</blockquote>
+  <div class="ev-explanation">This is somewhat vague (&#x27;periodically&#x27;) and lacks a defined measurement interval or threshold for &#x27;deficient,&#x27; which slightly weakens outcome accountability. However, it still points toward performance rather than process compliance.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government will evaluate the Contractor&#x27;s performance under this contract in accordance with (IAW) the Quality Assurance Surveillance Plan (QASP). This plan is a Government only document primarily focused on what the Government must do to assure that the Contractor has performed IAW the requirements of the contract.</blockquote>
+  <div class="ev-explanation">The QASP is referenced but not provided. This means the actual surveillance methodology — and whether it measures process or outcomes — is unknown. The description of the QASP as focused on &#x27;what the Government must do to assure the Contractor has performed IAW the requirements&#x27; leans toward compliance verification, but without the document itself, severity cannot be elevated based on this language alone.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows no meaningful insider rewards problem. The requirement is for commercial internet service (fiber connections delivering 200–500 Mbps) at two clinic locations on Fort Bliss — a commodity service available from multiple commercial ISPs in the El Paso/Fort Bliss area. The experience requirements are minimal and appropriately scoped: past performance references are optional in quantity (&#x27;up to three&#x27;), broadly defined (&#x27;internet-related services&#x27;), and carry no dollar thresholds or federal-specificity mandates. The technical evaluation factors — bandwidth, reliability, downtime, regulatory compliance — are objective, performance-based criteria that any capable ISP could demonstrate. The geographic constraint (&#x27;Contractor shall need to have a presence at Fort Bliss proper&#x27;) is a practical operational requirement driven by installation access, not an incumbency screen. The core test — could a qualified vendor who has never held this contract compete? — clearly answers yes. Any commercial ISP with fiber infrastructure in the Fort Bliss area and a track record of delivering reliable broadband service could mount a credible bid. The solicitation does not require prior federal contracts of specific dollar sizes, does not mandate federal-specific experience, does not award bonus points for prior similar contracts, and does not require institutional knowledge of agency-specific systems. This is a competently written small purchase solicitation for a commodity service.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors shall provide up to three recent and relevant contracts performed within the last five years. Past performance should relate to internet-related services.</blockquote>
+  <div class="ev-explanation">The past performance requirement is broad and capability-focused. It asks for up to three contracts (not a minimum number), within a five-year window (generous), relating generally to &#x27;internet-related services&#x27; (a large category). No dollar thresholds are specified, no federal-specific experience is mandated, and the domain is not narrowly defined. A commercial ISP that has never held a federal contract could readily cite relevant commercial work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl — a clear Severity 2. The core requirement is genuinely simple: provide commercial fiber internet service at two clinic locations on Fort Bliss at 200–500 Mbps, with uptime and maintenance support. The outcome is well-defined and measurable. However, the PWS has been built on a boilerplate template clearly designed for much larger, more complex service contracts — likely facilities maintenance or labor-intensive support services — and applied with minimal tailoring to a straightforward ISP procurement. The result is sections on safety plans, employee hygiene, motor vehicle operator licensing, conflict of interest disclosures, iWATCH training, anti-terrorism Level I training, inclement weather operations, and extensive personnel conduct requirements that are either irrelevant to commercial internet provisioning or grossly disproportionate to the actual scope of work. Some prescriptive elements are legitimate: bandwidth minimums (200–500 Mbps) are outcome constraints; 24-hour response to service interruptions is a measurable SLA; 48-hour advance notice for maintenance outages defines an acceptable outcome. These represent competent performance-based drafting. But the volume of process-prescriptive boilerplate — particularly the staffing conduct requirements, the safety plan mandate, the quarterly call list requirement, and the enumerated IT sub-tasks — imposes compliance overhead on vendors without protecting any government interest specific to this acquisition. This is a textbook case of copy-paste drafting where the &#x27;how&#x27; of a prior contract template becomes the requirement for a new one. A small ISP bidding on this contract must demonstrate compliance with a 9-page document of administrative procedures to provide what is essentially a commodity internet connection. The sprawl is real but not severe: the core technical requirements remain outcome-focused, and the prescriptive elements, while burdensome, do not fundamentally prevent a competent vendor from proposing a workable solution. Severity 2 is the appropriate rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor will provide IT support for connection(s) of all equipment to include configuration connection to and from both end points, tablet configuration and camera set up to routing device.</blockquote>
+  <div class="ev-explanation">This prescribes specific tasks the contractor must perform (tablet configuration, camera setup) beyond the core internet service delivery outcome. A performance-based approach would simply require that the contractor ensure all endpoints achieve the specified connectivity. Instead, specific sub-tasks are enumerated, constraining how the contractor structures its service offering.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide a call list, refreshed as necessary, but no longer than each quarter throughout the duration of its contract with the Government.</blockquote>
+  <div class="ev-explanation">This mandates a specific administrative artifact and its update frequency rather than defining an outcome related to service reliability or responsiveness. Whether a call list is the right mechanism for ensuring contractor reachability is a process decision that should belong to the contractor.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall establish and maintain a safety plan of which a draft plan shall be submitted to the KO at the time of proposal. Contractor&#x27;s final Safety Plan shall be submitted no later than (NLT) 10 calendar days after contract award.</blockquote>
+  <div class="ev-explanation">Requiring a formal safety plan submission for a two-location commercial internet service installation is process overhead disproportionate to the scope and risk of the work. This is a boilerplate requirement carried over from construction or complex services contracts and applied wholesale here without tailoring to the actual risk profile of the engagement.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor employees shall be appropriately dressed including any necessary individual protective clothing and equipment. Employees will maintain a normal level of personnel hygiene while in the work area.</blockquote>
+  <div class="ev-explanation">Prescribing employee appearance and hygiene standards for a commercial ISP contract is process-level overreach copied from a labor-intensive services template. The outcome the government needs is reliable internet service delivered professionally — not compliance with a dress and hygiene code that is irrelevant to internet service provisioning.</div>
+</div><div class="evidence-item">
+  <blockquote>All work needs to follow current standards IAW: UFC 4-510-01 1 November 2012 / BISCI Telecommunications/Cabling Installation</blockquote>
+  <div class="ev-explanation">While referencing technical standards is legitimate, citing a 2012 UFC alongside BICSI standards without specifying which provisions apply or what outcomes they are meant to achieve creates ambiguity and may unnecessarily restrict installation methods that meet current industry best practices but postdate the referenced standard.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. The PWS&#x27;s Part 5 &#x27;Applicable Publications&#x27; section lists nine regulatory citations without any explanation of how each applies to commercial internet service provision — a compliance dump rather than a curated list. The most significant finding is a direct internal contradiction: DD254 (the classified information specification form) is listed as a mandatory form in the same document that explicitly states the contractor will not access classified information. This is a textbook copy-forward artifact. Several additional citations — including DoD 5200.08-R, 32 CFR 147.24, and 29 CFR 1926 — range from questionable to implausible in their relevance to WiFi service for a pediatric waiting room. In the solicitation itself, two DFARS clauses (prohibition on detainee interrogation and sea transportation of supplies) are incorporated by reference with no apparent connection to the work. However, the rule pool problem here is moderate rather than severe for several reasons: the total volume of citations is relatively contained (nine publications in Part 5, not 88); some inclusions are genuinely relevant (EM 385-1-1, 29 CFR 1910, AR 385-10, UFC 4-510-01, BISCI cabling standards); and the FAR/DFARS clauses incorporated by reference are largely standard boilerplate that experienced small business ISPs would recognize. The compliance burden is elevated but not impenetrable. The primary driver of the severity-2 rating is the DD254 contradiction and the inclusion of clearly inapplicable security and physical security regulations without context, both of which suggest the PWS was assembled from templates without substantive review for relevance to this specific, narrow acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Engineering Manual (EM) 385-1-1, General Safety Requirements
+29 CFR 1910, Occupational Health and Safety
+DoD 5200.08-R, Physical Security Program
+32 CFR 147.24, The National Agency
+AR 190-13, The Army Physical Security
+AR 385-10, The Army Safety Program
+DA Pam 385-40, Army Accident Investigations and Reporting
+UFC 4-510-01 1 November 2012
+BISCI Telecommunications/Cabling Installation</blockquote>
+  <div class="ev-explanation">Part 5 of the PWS lists nine regulatory publications with no explanation of how each applies to providing commercial internet service to two children&#x27;s waiting rooms. Several are questionable inclusions: DoD 5200.08-R (Physical Security Program) and 32 CFR 147.24 (National Agency Check standards) are security vetting and physical security regulations with no apparent relevance to an ISP providing WiFi to a pediatric waiting area. AR 190-13 (Army Physical Security) similarly governs installation physical security programs, not commercial internet provisioning. None of these citations is accompanied by any explanation of applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>DD254 – Department of Defense Contract Security Classification Specification, available at http://www.dtic.mil/dtic/pdf/formsNguides/dd0254.pdf</blockquote>
+  <div class="ev-explanation">The PWS (Part 5.2) lists DD254 — the DoD form used to classify contracts involving classified information — as a mandatory form for this acquisition. Yet Section 1.16.3 of the same PWS explicitly states: &#x27;The Contractor will not access, view, possess, or use classified information under this contract.&#x27; Requiring the classified information specification form for a contract that explicitly involves no classified information is a direct contradiction within the document, and is a textbook example of a boilerplate carryover with no relevance to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>252.237-7010 Prohibition on Interrogation of Detainees by Contractor Personnel. Jan 2023
+252.247-7023 Transportation of Supplies by Sea. Oct 2024</blockquote>
+  <div class="ev-explanation">These two clauses incorporated by reference in the solicitation have no discernible connection to providing commercial fiber internet service to two clinic waiting rooms on Fort Bliss. The prohibition on interrogation of detainees applies to law enforcement and detention contexts; transportation of supplies by sea applies to maritime logistics. Neither has any logical relevance to an ISP contract. Their inclusion suggests a standard DFARS clause template was applied without review for applicability to this specific acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>29 CFR 1926, Safety and Health regulations for Construction</blockquote>
+  <div class="ev-explanation">Section 1.17.1 cites 29 CFR 1926 — OSHA&#x27;s construction safety standards — as an applicable requirement. While the contractor will install fiber connections, the primary ongoing service is internet provision, not construction. Construction OSHA standards are designed for building and heavy construction sites, not for a technician connecting fiber runs inside a medical clinic. This citation may be defensible for the installation phase but is presented as a blanket ongoing requirement with no scoping or temporal limitation.</div>
+</div><div class="evidence-item">
+  <blockquote>1.15.3. For contractors that do not require CAC, but require access to a DoD facility or installation. Contractor and all associated sub-contractors employees shall comply with adjudication standards and procedures using the National Crime Information Center Interstate Identification Index (NCIC-III) and Terrorist Screening Database (TSDB) (Army Directive 2014-05/AR 190-13)...</blockquote>
+  <div class="ev-explanation">This section invokes NCIC-III and TSDB screening procedures — counterterrorism and criminal background check databases — for what is a commercial internet service contract. While some installation access screening is appropriate, the specific invocation of the Terrorist Screening Database alongside Army Directive 2014-05 and AR 190-13 for an ISP technician visiting a children&#x27;s waiting room reflects a boilerplate security section applied without calibration to the actual risk profile of the work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward commercial internet service procurement — two fiber connections at two fixed locations on Fort Bliss, billed monthly at a fixed rate. The requirement is among the most predictable and well-defined categories of government procurement: the scope is fixed (two locations, defined bandwidth range), the deliverable is continuous (always-on connectivity), and the pricing model mirrors how commercial ISPs actually sell their services. There is no ambiguity about what is being purchased, no variable labor component that would favor T&amp;M, and no technical uncertainty that would warrant cost-reimbursement. FFP is the textbook appropriate contract type here — it mirrors the commercial market, puts delivery risk on the vendor, and gives the government cost certainty for what is essentially a utility service. The five option years further reinforce the appropriateness of FFP: once the fiber is run and the service is live, the monthly cost is essentially fixed. There is no square peg issue here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This will be a Firm Fixed Price (FFP) contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates a firm-fixed-price contract type for all CLINs.</div>
+</div><div class="evidence-item">
+  <blockquote>Internet speed shall be reliable and able to attain no less than 200Mbps and not exceed 500Mbps. The Contractor shall provide internet/wireless connections to the Mendoza Soldier Family Care Clinic CWR area and one to the WBAMC East Clinic CWR area.</blockquote>
+  <div class="ev-explanation">The scope is narrow and well-defined: two fiber internet connections at two fixed locations with a clear bandwidth specification. This is exactly the kind of predictable, recurring commercial service for which FFP is appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>Period of Performance: This will be a firm, fixed price contract for base period of 12 months plus four (4) option periods of 12 months each, beginning on 01 August of FY26.</blockquote>
+  <div class="ev-explanation">Monthly internet service charges are inherently stable and predictable — a commercial ISP bills a fixed monthly rate regardless of usage volume. FFP aligns naturally with how commercial internet service is actually priced in the marketplace.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Combined Synopsis and Solicitation.pdf">Combined Synopsis and Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/11f8bc900fb5452cb04ee7db62a30100_Combined+Synopsis+and+Solicitation.pdf" download="Combined Synopsis and Solicitation.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="PANMCC-26-P-0000-038443_PWS - CWR Commercial Internet_Final.docx">PANMCC-26-P-0000-038443_PWS - CWR Commercial Internet_Final.docx</div></div>
+  <a class="dl-btn" href="../attachments/11f8bc900fb5452cb04ee7db62a30100_PANMCC-26-P-0000-038443_PWS+-+CWR+Commercial+Internet_Final.docx" download="PANMCC-26-P-0000-038443_PWS - CWR Commercial Internet_Final.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

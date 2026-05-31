@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HPSA Zip Code Crosswalk — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>HPSA Zip Code Crosswalk</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 f4e863fde3e149c5ba42ab09bd0ec7fe</span>
+      <a class="sam-link" href="https://sam.gov/opp/f4e863fde3e149c5ba42ab09bd0ec7fe/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">HEALTH AND HUMAN SERVICES, DEPARTMENT OF › CENTERS FOR MEDICARE AND MEDICAID SERVICES › OFC OF ACQUISITION AND GRANTS MGMT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541512</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base period June 1, 2026 - May 31, 2027, plus four (4) one-year option periods</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>technical</li><li>business</li><li>cost realism</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate compliance-over-outcomes pattern. The QA structure — monthly status reports, weekly progress meetings, and a process-narrative work plan — is oriented toward verifying that the contractor followed the prescribed methodology and documented their work, rather than verifying that the resulting crosswalk files are accurate and produce correct Medicare HPSA bonus payments. The core deliverable (Excel lists of HPSA-eligible ZIP codes) drives real financial stakes: incorrect ZIP codes mean either missed bonus payments to deserving physicians or erroneous payments to ineligible ones. Yet the solicitation defines quality assessment as format, coverage, and readability, and explicitly acknowledges this will be done &#x27;subjectively.&#x27; There are no defined accuracy thresholds (e.g., a maximum allowable error rate compared to manual review), no independent validation requirement, and no outcome linkage to downstream payment accuracy. The Appendix A documentation (the 2014 process description) provides considerable methodological detail, which partially mitigates the concern — the government clearly understands what good work looks like. And the deliverable cadence itself (annual files with a fixed November 1 deadline) is simple enough that elaborate reporting would be disproportionate. However, the gap between process-focused QA language and the high-stakes accuracy requirements of the deliverable is meaningful. This is not a severe case — there is no overlapping multi-cadence reporting burden, and the meeting requirements are modulated (&#x27;as needed basis&#x27;) — but the complete absence of any quantitative accuracy standard or outcome metric for the crosswalk files themselves is a genuine accountability gap. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Weekly progress meetings shall be held between (but not limited to) the contractor and the COR on an as needed basis. The dates and times of the meetings shall be established mutually between all parties. These meetings shall be used to review the status of the project work plan, and to discuss outstanding issues.</blockquote>
+  <div class="ev-explanation">The meetings are structured around reviewing the project work plan status — a process-adherence mechanism — rather than evaluating whether the crosswalk data is accurate, timely, or useful to Medicare contractors. No outcome criteria are referenced for these discussions.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide to CMS monthly status reports which will document the progress of work, the status of open action items, the identification of existing or potential problem areas, root cause, impact, and corrective action plans.</blockquote>
+  <div class="ev-explanation">Monthly status reports are oriented entirely toward process documentation: progress against plan, open items, problem tracking. There is no companion requirement to report on data quality metrics, error rates, or downstream payment accuracy — the actual outcomes that matter for HPSA bonus payment correctness.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide to CMS a project work plan that demonstrates the correctness of the data obtained. The project work plan shall include a key document that will provide a detailed explanation of the process used to capture the data from HRSA, verify its accuracy, and show that the data has been correctly cross walked to the USPS ZIP Codes.</blockquote>
+  <div class="ev-explanation">The QA mechanism is a process narrative — demonstrating the method used — rather than a quantitative outcome standard. There is no specification of an acceptable error rate, an independent validation methodology, or a benchmark against which crosswalk accuracy would be measured.</div>
+</div><div class="evidence-item">
+  <blockquote>CMS will subjectively assess the contractor&#x27;s performance in the Deliverable/Reporting area, which may include, but not be limited to: Format (grammatically, and typographically correct). Coverage (contains all required deliverable and reporting requirements). Quality (usability and readability of the content).</blockquote>
+  <div class="ev-explanation">The stated quality assessment criteria focus on formatting, coverage of report sections, and readability — all presentation-layer compliance indicators. The word &#x27;subjectively&#x27; signals the absence of defined outcome standards. Critically absent: any measure of ZIP code accuracy, geographic analysis correctness, or impact on Medicare payment accuracy.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards profile. The task is genuinely specialized — GIS-based geospatial crosswalking of HPSA designations to ZIP codes — and some degree of domain expertise is legitimately required. However, several requirements are written around the incumbent&#x27;s known operational environment rather than around vendor-neutral capability specifications.
+
+The most notable pattern is the combination of: (1) a specific named toolset (SAS statistical software, MapInfo/GIS), (2) a requirement for pre-existing historical data archives dating to 2004, and (3) familiarity with the structure of specific USPS and HRSA files. Individually, each might be defensible. Collectively, they describe a vendor who already has the data, already uses these tools, and already knows these file structures — a description that fits the incumbent more than any generic GIS services firm.
+
+Appendix A (the 2014 process documentation) is particularly telling: it reads as a detailed technical record of the incumbent&#x27;s methodology, including specific file names, intermediate table names, and processing steps. Providing this documentation is helpful for competition, but the SOW requirement to &#x27;automate the currently manual&#x27; process and to &#x27;support and correct&#x27; the inherited work product implicitly rewards a vendor who understands this specific processing pipeline in depth.
+
+Mitigating factors keep this at severity 2 rather than 3: the solicitation does not specify dollar thresholds for prior contracts, does not impose a lookback window for past performance, does not require a specific number of prior similar federal contracts, and does not award explicit evaluation bonus points for incumbent-proxy experience. The evaluation factors section in the solicitation document is empty of detail, which limits the analysis but also means no explicit incumbent-favoring scoring rubric is visible. The set-aside for Women-Owned Small Businesses suggests at least some intent toward broader competition. A capable GIS firm with HPSA domain knowledge and SAS/MapInfo capability could, in principle, compete — but the combination of tool-specific and data-archive requirements creates meaningful friction for any non-incumbent.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Be able to access and manipulate the HPSA database from HRSA using SAS statistical software for use in cross-walking HPSAs to ZIP Codes.</blockquote>
+  <div class="ev-explanation">This requirement specifies a particular software tool (SAS statistical software) by name rather than describing the analytical capability needed. SAS is a proprietary, expensive platform. While this alone is not an insurmountable barrier, it signals that the requirement is written around the incumbent&#x27;s known toolset rather than the underlying capability of statistical data manipulation and geospatial crosswalking.</div>
+</div><div class="evidence-item">
+  <blockquote>Be able to access historical data on ZIP Code boundaries and/or characteristics dating from the current quarter back to 2004.</blockquote>
+  <div class="ev-explanation">This requirement implicitly favors a vendor that has already been accumulating and maintaining this historical dataset — i.e., the incumbent. A new vendor would need to reconstruct or purchase this historical data, adding cost and complexity. The requirement does not describe what &#x27;access&#x27; means in terms of acceptable data sources, effectively privileging whoever already holds the archive.</div>
+</div><div class="evidence-item">
+  <blockquote>Be familiar with the structure of the USPS ZIP Code file and familiarity with working with ZIP Codes for Puerto Rico and U.S. outlying areas (American Samoa, Guam, Virgin Islands).</blockquote>
+  <div class="ev-explanation">&#x27;Familiarity with the structure of the USPS ZIP Code file&#x27; is phrased as an existing institutional knowledge requirement rather than a demonstrable technical capability. While GIS professionals could reasonably acquire this knowledge, combined with the outlying territories requirement and the SAS/GIS toolchain requirements, it begins to describe a very specific operational profile that maps closely to the incumbent&#x27;s known working environment.</div>
+</div><div class="evidence-item">
+  <blockquote>Produce all updates to the HPSA files, by automating the part of the Geographic Information System (GIS) data extraction and matching process that is currently manual.</blockquote>
+  <div class="ev-explanation">This requirement assumes detailed knowledge of which parts of the current process are manual — information that is most readily available to the incumbent contractor who built and operates that process. Appendix A (the 2014 process documentation) confirms the current manual/automated split, but a new vendor would need to reverse-engineer this from the provided documentation. The requirement effectively asks vendors to improve on the incumbent&#x27;s existing process without fully disclosing the current baseline.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide support and make necessary corrections to the work product should errors be detected... Be able to adjudicate questions, requests, and disputes from various sources.</blockquote>
+  <div class="ev-explanation">The Appendix A documentation references the incumbent&#x27;s prior methodology in detail (including references to &#x27;the previous contractor&#x27; and specific file naming conventions). The SOW&#x27;s expectation that the new contractor will support and correct an inherited work product and adjudicate disputes about it implicitly rewards the vendor with the deepest familiarity with those prior files — most likely the incumbent.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core need — producing an annual ZIP code crosswalk against HRSA HPSA designations — is well-defined and relatively narrow. The SOW is not excessively long and does describe outcomes clearly in several places (the three Excel deliverable files, the annual delivery date, the 99% geographic overlap threshold). These outcome-oriented elements are real and meaningful.
+
+However, several sections cross from outcome specification into process and tool prescription. The SAS software mandate is the clearest example: it locks vendors into a specific analytics platform for what is fundamentally a data processing task. The Appendix A documentation (incorporated by reference) describes the prior contractor&#x27;s 13-step GIS workflow in granular detail — naming specific proprietary software (MapInfo Professional, TomTom MultiNet), specific file naming conventions, specific SQL join sequences, and specific QC steps. While Appendix A is framed as documentation rather than a binding SOW requirement, its presence as an attachment and the SOW&#x27;s instruction to replicate the prior process creates strong de facto pressure on offerors to mirror the incumbent&#x27;s approach. The Excel-only output format and URL-specific data source references further narrow solution space unnecessarily.
+
+The reporting requirements (weekly meetings plus monthly status reports for an annual deliverable) also reflect process-over-outcome thinking, though they are not the most significant sprawl element here.
+
+Overall, the solicitation reads as a competent but incumbent-anchored document. The prior contractor&#x27;s methodology has been documented in unusual detail and partially embedded in the requirements, which is a classic pattern of &#x27;how the last vendor did it&#x27; becoming the requirement for the next one. Vendors can still propose alternative GIS approaches in theory, but the weight of the document pulls toward replication. Severity 2 is appropriate: sprawl is present and meaningful but does not dominate the entire solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Be able to access and manipulate the HPSA database from HRSA using SAS statistical software for use in cross-walking HPSAs to ZIP Codes.</blockquote>
+  <div class="ev-explanation">This mandates a specific tool (SAS statistical software) rather than specifying the outcome (accurate manipulation of the HPSA database). A vendor could achieve the same result using Python, R, or other data analysis platforms. Locking in SAS removes flexibility and may exclude capable vendors who use equally or more capable alternatives.</div>
+</div><div class="evidence-item">
+  <blockquote>Produce all updates to the HPSA files, by automating the part of the Geographic Information System (GIS) data extraction and matching process that is currently manual.</blockquote>
+  <div class="ev-explanation">While automation is a legitimate efficiency goal, this requirement presupposes the current workflow architecture — a partially manual GIS extraction process — and directs the contractor to automate a specific slice of it rather than specifying the outcome (e.g., accurate, timely crosswalk files delivered within X days of HRSA data updates). A vendor cannot redesign the end-to-end pipeline if a better approach exists.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide a Microsoft Excel list of 5-digit ZIP Codes displayed as a major to minor sort by ZIP Code and state that fall fully within a HRSA designated primary medical care HPSA [repeated verbatim for mental health and dental HPSA deliverables].</blockquote>
+  <div class="ev-explanation">Mandating Microsoft Excel as the delivery format is a tool prescription. The legitimate requirement is a structured, machine-readable list of qualifying ZIP codes. A vendor might propose a more accurate or maintainable format (e.g., CSV, database extract, API endpoint) but cannot do so here. This is a minor but illustrative constraint on solution design.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall use the HRSA website at www.hrsa.gov, Data and Statistics, Primary Healthcare, HPSA (or the contractor may receive this data as a download from HRSA) at http://datawarehouse.hrsa.gov/data/datadownload/hpsadownload.aspx to identify the metropolitan and non-metropolitan, primary medical care, mental health, and dental areas...</blockquote>
+  <div class="ev-explanation">The solicitation specifies the exact data source URL and access method rather than defining the input requirement (current, authoritative HRSA HPSA designation data). While the HRSA source is the correct one, hardcoding a specific URL and access pathway into contract language precludes a vendor from using an HRSA API, data feed, or other access mechanism that might be more reliable or current.</div>
+</div><div class="evidence-item">
+  <blockquote>Weekly progress meetings shall be held between (but not limited to) the contractor and the COR on an as needed basis... The contractor shall provide to CMS monthly status reports which will document the progress of work, the status of open action items, the identification of existing or potential problem areas, root cause, impact, and corrective action plans.</blockquote>
+  <div class="ev-explanation">Requiring both weekly meetings and monthly status reports for what is a narrow, well-defined annual data deliverable task is process overhead that prescribes a management cadence without reference to project phase or actual need. For a contract whose primary output is three Excel files delivered once a year, this reporting structure is disproportionate and reflects process prescription rather than outcome orientation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin in any meaningful sense. The regulatory citation landscape is spare: approximately 12 standard FAR clauses incorporated by reference, a handful of full-text representation provisions (52.204-24, 52.204-26, 52.204-29) that are standard telecommunications and supply chain security representations required across federal acquisitions, and one SOW attachment with one appendix. There is no &#x27;Applicable Documents&#x27; list, no domain-specific regulatory appendix, and no accumulation of agency-specific policies layered on top of the FAR baseline. The SOW itself cites only the directly operative statutory authorities (MMA 2003 Section 413(a), Social Security Act Section 1833(m), ARRA 2009) and the relevant data sources (HRSA, USPS, Census Bureau) — exactly what a well-curated requirements document should do. The one mildly questionable inclusion is FAR 52.226-8 (text messaging while driving), which has no obvious relevance to a GIS data contractor working at its own facility, but this is a single standard clause included by default rather than evidence of systemic regulatory overload. The compliance burden presented to prospective offerors is modest and well within normal parameters for a commercial services contract of this scope. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.204-19 | Incorporation by Reference of Representations and Certifications. | Dec 2014
+52.204-23 | Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab Covered Entities. | Dec 2023
+52.204-25 | Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment. | Nov 2021
+52.222-50 | Combating Trafficking in Persons. | Oct 2025
+52.226-8 | Encouraging Contractor Policies to Ban Text Messaging While Driving. | MAY 2024
+52.232-1 | Payments. | Apr 1984
+52.232-39 | Unenforceability of Unauthorized Obligations. | Jun 2013
+52.232-40 | Providing Accelerated Payments to Small Business Subcontractors. | Mar 2023
+52.233-3 | Protest after Award. | Aug 1996
+52.233-4 | Applicable Law for Breach of Contract Claim. | Oct 2004
+52.240-1 | Prohibition on Unmanned Aircraft Systems... | Nov 2024
+52.244-6 | Subcontracts for Commercial Products and Commercial Services. | Oct 2025</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s regulatory citations consist of a compact set of standard FAR clauses incorporated by reference — roughly 12 clauses total. This is a normal, unremarkable FAR clause set for a commercial services contract of this nature. There is no domain-specific regulatory pile-on, no agency policy appendix, and no applicable documents list beyond the SOW and its appendix. The clause count is well within norms for a simplified acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 | Encouraging Contractor Policies to Ban Text Messaging While Driving. | MAY 2024</blockquote>
+  <div class="ev-explanation">This clause is the one citation that could be questioned in a data crosswalk contract with no field travel component. However, FAR 52.226-8 is a standard clause frequently included by default in CMS commercial service solicitations rather than being selectively curated, and its inclusion here represents minor boilerplate accumulation at most — not a material compliance burden or evidence of a rule pool. It does not contradict the solicitation&#x27;s purpose and imposes no meaningful technical obligation on a GIS/data shop.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The contract type (FFP) is well-matched to this requirement. The deliverables are sharply defined — three Excel files of ZIP codes produced on a fixed annual schedule — and the methodology for producing them is thoroughly documented in Appendix A. This is essentially a repeatable data processing task: acquire HRSA designation files, acquire ZIP code boundary files, run geospatial overlap calculations, apply USPS dominance rules, and output sorted Excel lists. The process has been performed by prior contractors since at least 2011 (as referenced in the SOW appendix), meaning cost estimation is feasible and competition should discipline pricing. There is no meaningful ambiguity about scope that would require T&amp;M or cost-reimbursement. The only variable inputs (HRSA designation updates, USPS dominance file updates) are well-understood and handled through a defined repeatable process. FFP is the correct contract type here: it incentivizes the contractor to automate and streamline the GIS workflow (as explicitly requested in the SOW), rewards efficiency, and aligns vendor incentives with the government&#x27;s interest in timely, accurate file delivery. No mismatch is present between the stated contract type and the nature of the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government anticipates awarding a Firm Fixed Price contract for this SOW, which will have a total period of performance consisting of a base period (June 1, 2026 - May 31, 2027) and four (4) one-year option periods.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm Fixed Price contract type. This is the starting point for assessing fit.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide a Microsoft Excel list of 5-digit ZIP Codes displayed as a major to minor sort by ZIP Code and state that fall fully within a HRSA designated primary medical care HPSA... Provide a Microsoft Excel list of 5-digit ZIP Codes displayed as a major to minor sort by ZIP Code and state that fall fully within a HRSA designated mental health HPSA... Provide a Microsoft Excel List of 5-digit ZIP Codes displayed as a major to minor sort by ZIP Code and state that fall fully within a HRSA designated geographic dental HPSA.</blockquote>
+  <div class="ev-explanation">The deliverables are clearly defined, discrete, and concrete: three Excel files of ZIP codes, sorted in a specified format. This is exactly the kind of well-scoped deliverable that suits FFP — the output is binary (delivered or not) and its format is precisely specified.</div>
+</div><div class="evidence-item">
+  <blockquote>Delivery dates will be November 1st of each year, or the first working weekday after November 1st of each year for the first file delivered each year.</blockquote>
+  <div class="ev-explanation">The schedule is fixed and predictable, with annual delivery milestones. This predictability supports FFP, as the government and contractor can both estimate the cost of meeting a known annual cycle.</div>
+</div><div class="evidence-item">
+  <blockquote>Produce all updates to the HPSA files, by automating the part of the Geographic Information System (GIS) data extraction and matching process that is currently manual.</blockquote>
+  <div class="ev-explanation">The methodology is mature and well-documented (Appendix A provides a detailed 2014 process description). The work is largely repeatable data processing — downloading HRSA files, running GIS overlaps, and producing Excel outputs — which is amenable to cost estimation and FFP pricing.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment J.1 - HPSA Zip Code Crosswalk Statement of Work %28SOW%29.pdf">Attachment J.1 - HPSA Zip Code Crosswalk Statement of Work %28SOW%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f4e863fde3e149c5ba42ab09bd0ec7fe_Attachment+J.1+-+HPSA+Zip+Code+Crosswalk+Statement+of+Work+%28SOW%29.pdf" download="Attachment J.1 - HPSA Zip Code Crosswalk Statement of Work %28SOW%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment J.2 SOW Appendix A.pdf">Attachment J.2 SOW Appendix A.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f4e863fde3e149c5ba42ab09bd0ec7fe_Attachment+J.2+SOW+Appendix+A.pdf" download="Attachment J.2 SOW Appendix A.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFP -  - Cover Letter.pdf">RFP -  - Cover Letter.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f4e863fde3e149c5ba42ab09bd0ec7fe_RFP+-++-+Cover+Letter.pdf" download="RFP -  - Cover Letter.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - 75FCMC26Q0071.pdf">Solicitation - 75FCMC26Q0071.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f4e863fde3e149c5ba42ab09bd0ec7fe_Solicitation+-+75FCMC26Q0071.pdf" download="Solicitation - 75FCMC26Q0071.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment 75FCMC26Q00710002 SF 30.pdf">Solicitation Amendment 75FCMC26Q00710002 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/f4e863fde3e149c5ba42ab09bd0ec7fe_Solicitation+Amendment+75FCMC26Q00710002+SF+30.pdf" download="Solicitation Amendment 75FCMC26Q00710002 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

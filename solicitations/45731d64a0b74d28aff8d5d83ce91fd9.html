@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procurement Analyst Construction — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Procurement Analyst Construction</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 45731d64a0b74d28aff8d5d83ce91fd9</span>
+      <a class="sam-link" href="https://sam.gov/opp/45731d64a0b74d28aff8d5d83ce91fd9/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-20</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › NATIONAL GUARD BUREAU › JFHQ USPFO MI › USPFO MI PROCUREMENT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R707</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541611</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-20</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year of 12 months with 4 option years and a 6-month option per FAR 52.217-8</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Narrative detailing conformance to the Solicitation and the Performance Work Statement PWS, specifically section 5 of the PWS, not to exceed 25 pages, single sided</li><li>Line item pricing to include total of Base year and all options</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">6 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-to-notable compliance-over-outcomes problem, driven primarily by the structure of the Performance Requirements Summary (PRS) and the QA surveillance framework. The PRS covers every major functional area of the contract — procurement analysis, A&amp;E reviews, invoice tracking, modifications, closeouts, automation, and file documentation — and in every single case, the AQL reduces to one of three things: (1) timeliness of submission, (2) minor errors that get corrected, or (3) coordination with the COR before being late. No AQL asks whether the procurement advice improved acquisition outcomes, whether competition rates improved, whether the contracting office&#x27;s error rate declined, or whether customers were better served. The surveillance methodology — on-site inspections, QCP review, and complaint investigation — is entirely process-oriented. The government is checking whether the contractor shows up, follows its own quality plan, and avoids generating complaints. That is compliance monitoring, not performance evaluation. However, the severity does not reach 3 for several reasons. First, the contract is for a single professional-support FTE performing inherently judgment-based advisory work, which makes outcome measurement genuinely difficult. The government cannot easily quantify &#x27;quality of contracting advice&#x27; the way it can measure system uptime or ticket resolution time. Second, the reporting burden itself is light — there is no weekly status report requirement, no prescribed report formats, no overlapping reporting cadences. The deliverables schedule (Technical Exhibit 2) is focused on administrative compliance items (training certificates, CAC returns, badge media), not narrative progress reports. Third, the 3-day turnaround standard and 15-day review completion standard, while process-focused, do provide some concrete performance anchors. The problem here is not excessive reporting theater — it is the absence of any substantive quality criteria in the AQLs. The government has defined success entirely as &#x27;documents submitted on time with correctable errors,&#x27; which means a contractor who submits technically deficient procurement advice on schedule will receive satisfactory ratings while one who pushes back on a flawed acquisition approach may appear non-compliant. This is a meaningful structural flaw that warrants a severity 2 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government will evaluate the contractor&#x27;s performance under this contract in accordance with the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government will do to ensure that the contractor has performed in accordance with the performance standards. It defines how the performance standards will be applied, the frequency of surveillance, and acceptable quality level(s) or defect rate(s).</blockquote>
+  <div class="ev-explanation">The QASP is defined as verifying contractor compliance with &#x27;performance standards&#x27; — but the actual AQLs in the PRS reveal those standards are almost entirely documentation-completion thresholds, not outcome measures. The framing of &#x27;performed in accordance with the performance standards&#x27; is process-compliance language, not outcome language.</div>
+</div><div class="evidence-item">
+  <blockquote>AQL: Minor delays (with prior coordination with COR). Errors in documentation are corrected.</blockquote>
+  <div class="ev-explanation">This AQL for Analysis, Review and Planning Services defines acceptable quality as &#x27;errors are corrected&#x27; — a documentation correction standard. It says nothing about whether the procurement advice was sound, whether the market research led to better competition, or whether the contracting officer was better served. The acceptable quality level measures paperwork compliance, not advisory quality.</div>
+</div><div class="evidence-item">
+  <blockquote>AQL: PWS, SOW, SOO are completed within 3 working days of receipt.</blockquote>
+  <div class="ev-explanation">The sole AQL for A&amp;E/Construction/Simplified Procurement Services is a turnaround-time metric — documents delivered within 3 days. There is no standard for whether the resulting PWS/SOW/SOO is well-written, legally sound, or produces better competition outcomes. Timeliness of submission substitutes entirely for quality of work product.</div>
+</div><div class="evidence-item">
+  <blockquote>AQL: Invoice recording can be late with prior coordination with COR, may contain minor typing errors that do not affect contract</blockquote>
+  <div class="ev-explanation">The AQL for contractor invoice tracking measures whether the spreadsheet was updated on time and whether typing errors exist — pure administrative compliance. There is no measure of whether invoices were validated accurately against deliverables, whether overpayments were caught, or whether the government&#x27;s financial interests were protected.</div>
+</div><div class="evidence-item">
+  <blockquote>The COR will evaluate the contractor&#x27;s performance through intermittent on-site inspections, review of the contractors QCP, and receipt and investigation of customer complaints.</blockquote>
+  <div class="ev-explanation">The three enumerated surveillance methods are: physical presence checks, review of the contractor&#x27;s own quality control plan, and complaint investigation. None of these methods assess substantive contracting output quality — e.g., whether solicitations drafted by the contractor resulted in adequate competition, whether modifications were legally defensible, or whether market research identified cost-saving alternatives. Surveillance is structured around procedural adherence and reactive complaint handling.</div>
+</div><div class="evidence-item">
+  <blockquote>Accurate reviews, assessments and reports reflect compliance with specified goals/objectives, possible solutions provided, are accurate and meet suspense&#x27;s ... AQL: Minor delays with prior coordination with COR</blockquote>
+  <div class="ev-explanation">Even the broadest performance objective in the PRS — covering sections 5.3.5 through 5.3.9 including litigation support and complex procurement — defines its AQL solely as &#x27;minor delays with prior coordination.&#x27; The substance of the work (quality of legal analysis, soundness of procurement strategy, adequacy of solutions offered) is not measured at all.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal insider rewards risk. The experience requirements in Section 5.6 are stated as general capability descriptors — no minimum years of experience, no dollar thresholds, no minimum number of prior completed contracts, and no short lookback windows. The Q&amp;A at Q12 explicitly confirms &#x27;no&#x27; minimum years of experience are required. There is no past performance evaluation factor that awards bonus points for specific prior contract types or sizes. The government confirmed this is a new requirement with no incumbent (Q1/A1, Q4/A4), which removes the most common driver of insider-reward dynamics: agency dependence on an incumbent&#x27;s institutional knowledge. The requirement for familiarity with SRM/MILCON and Government construction acquisition is domain-specific but represents a legitimate capability test rather than an incumbency proxy — this knowledge is widely available through DoD acquisition training and prior federal construction contracting work at any agency. The DAWIA preference is at the foundational level and is explicitly non-mandatory. The evaluation narrative requirement (25 pages detailing conformance to PWS Section 5) is capability-focused and does not require prior contract references at specific dollar levels or timeframes. A competent small business with relevant government construction contracting experience who has never held this specific contract could realistically compete. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Experience working in Government construction acquisition.</blockquote>
+  <div class="ev-explanation">This is the closest the solicitation comes to a federal-specific experience mandate, but it is stated as a general capability requirement without specifying a minimum number of years, a dollar threshold, a lookback window, or a minimum number of prior contracts. A vendor who has supported federal construction procurement — at any agency, at any scale — would plausibly satisfy this requirement. It does not function as an incumbent filter.</div>
+</div><div class="evidence-item">
+  <blockquote>Strong working knowledge of Sustainment, Restoration and Modernization (SRM) and Military Construction (MILCON) projects.</blockquote>
+  <div class="ev-explanation">This is a domain-specific knowledge requirement that narrows the eligible pool somewhat, as SRM/MILCON are DoD-specific program categories. However, it is listed as a required general knowledge item rather than as a scored evaluation criterion with thresholds, and the knowledge is broadly taught through DAU and relevant industry experience. A qualified contractor who has not previously held this specific contract could plausibly demonstrate this knowledge through other DoD construction-related work.</div>
+</div><div class="evidence-item">
+  <blockquote>Defense Acquisition Workforce Improvement Act (DAWIA) certification or equivalent desired.</blockquote>
+  <div class="ev-explanation">DAWIA certification is listed as &#x27;desired,&#x27; not required, and the Q&amp;A clarifies the preferred level is Foundational/Level I — the entry level. This is the least restrictive formulation possible for a certification requirement of this type and does not function as an insider filter.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core technical requirements in Section 5.0 represent a mixed picture: some passages are reasonably outcome-oriented (e.g., the Performance Requirements Summary defines acceptable quality levels by results like &#x27;reviews completed within 15 days&#x27; and &#x27;invoices recorded within 2 days&#x27;), but several task descriptions cross into prescribing specific methods, tools, and workflow sequences rather than outcomes. The spreadsheet mandate in 5.3.2, the named-tool requirements in 5.4.2 (PowerPoint, Excel), and the step-by-step notification and tracking workflows in 5.3.1.1 are the clearest examples of process prescription over outcome definition. The management structure requirements in 1.4.9 are disproportionately detailed for a single-FTE engagement. However, the sprawl is not pervasive enough to warrant severity 3. Much of Section 1.0 consists of legitimate security, access, and regulatory compliance requirements (CAC procedures, OPSEC training, HSPD-12) that are genuine government-mandated constraints rather than process prescriptions. The QASP-style PRS table (Technical Exhibit 1) shows genuine outcome orientation in how performance will be measured. The solicitation reads more like a template-heavy government boilerplate document — where prescriptive language crept in from standard sections and incumbent-like task descriptions — than a fully operationally-prescribed manual. A vendor would feel meaningfully constrained in specific workflow areas (invoice management, file documentation, automation tools) but could still bring judgment and approach to the broader analytical and planning work in Sections 5.1 and 5.2. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5.3.1.1 Perform post award contract actions on a group of contracts, such as those with cost reimbursement; and/or those with incentive arrangements. Track contractor performance for compliance with terms and conditions of contracts and notifies the COR and contracting officer of untimely submissions based on technical progress reports and performance metrics.</blockquote>
+  <div class="ev-explanation">This requirement prescribes a specific monitoring workflow — the contractor shall &#x27;track&#x27; and &#x27;notify&#x27; — rather than defining an outcome such as &#x27;ensure contract compliance is maintained.&#x27; A vendor cannot substitute a different tracking methodology or automate alerts differently; the PWS mandates the sequence of actions.</div>
+</div><div class="evidence-item">
+  <blockquote>5.3.2 Review and track monthly contractor invoices for accuracy and maintain individual spreadsheets for each contract/order. Provide invoice findings/review to the COR for inspection and approval by the contracting officer, to return, with proper documentation, within established time frame.</blockquote>
+  <div class="ev-explanation">The mandate to &#x27;maintain individual spreadsheets for each contract/order&#x27; dictates a specific tool and format (spreadsheets, one per contract) rather than an outcome (accurate invoice tracking and timely payment). A vendor who could achieve better accuracy through a database, automated workflow tool, or integrated system is locked into a manual spreadsheet approach.</div>
+</div><div class="evidence-item">
+  <blockquote>5.4.2 Develop Power Point presentations for briefings, and trainings; excel spreadsheets for tracking documents, and input into developed or existing databases.</blockquote>
+  <div class="ev-explanation">This explicitly names commercial tools — PowerPoint and Excel — rather than specifying the communication or tracking outcome. Mandating specific commercial software products unnecessarily constrains a vendor&#x27;s ability to use equivalent or superior tools.</div>
+</div><div class="evidence-item">
+  <blockquote>5.5.3 Maintain contract files in Paperless Contract Files (PCF) to include contract change orders, partial and progress payments and other documents as necessary. Process contracts for closeout in PCF and Procurement Integrated Enterprise Environment (PIEE)</blockquote>
+  <div class="ev-explanation">While PCF and PIEE are government-mandated systems (a legitimate constraint), this section bundles that requirement with detailed procedural steps (what documents to include, the sequence of actions) that go beyond system interoperability into operational workflow prescription. This reflects a pattern of telling the contractor exactly how to execute rather than what file integrity outcome is required.</div>
+</div><div class="evidence-item">
+  <blockquote>1.4.9 The contactor shall designate a CM who shall ensure performance under this contract. The name of this person, and an alternate who shall act for the contractor when the CM is absent, shall be designated in writing to the KO. The CM or alternate shall have full authority to act for the contractor on all contract matters relating to daily operation of this contract. The CM shall work through the COR to resolve issues, receive technical instructions, and ensure adequate performance of services. The CM shall ensure that contractor employees do not perform any services outside the scope of the contract without an official modification issued by KO.</blockquote>
+  <div class="ev-explanation">This paragraph dictates a specific internal management structure — a named CM, a named alternate, a defined communication channel through the COR — rather than simply requiring that the contractor maintain effective communications and management oversight. For a 1-FTE contract, this level of organizational prescription is disproportionate and constrains how a small business structures its management.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics, warranting a severity 2 rating. The primary indicator is Section 6.0&#x27;s undifferentiated table of 11 regulatory publications presented without any explanation of how each applies to the specific work of a single office-based procurement analyst. The FAR and DFARS citations are clearly germane; the NISPOM (32 CFR Part 117), which governs classified contractor programs, is more ambiguous for a position that requires only a Tier 1 (NACI-equivalent) investigation. No context is provided to distinguish mandatory-and-central from advisory-and-peripheral citations. The training cascade in 1.4.5.8 adds nine separately tracked compliance requirements with varying deadlines, some of which — particularly Fire Extinguisher training — appear to be boilerplate carryovers from facility maintenance contracts rather than requirements purposefully selected for this role. The PPE requirement (hard hat, reflective vest, steel-toed boots) for an office-based analyst is the most visible artifact of copy-forward accumulation from a different contract template. The OPSEC training requirement appearing in three distinct paragraphs with partial duplication further suggests the document has grown through successive iterations without holistic review. That said, the document does not reach severity 3: the regulatory list is relatively compact (11 publications, not 40+), most citations are at least plausibly relevant to installation access and IT security for a DoD contractor, and there are no outright contradictions between cited policies and the solicitation&#x27;s stated purpose analogous to the SMS example in the definition. The compliance burden is elevated and includes some clear carryover boilerplate, but a vendor experienced in DoD service contracting could navigate it without facing an impenetrable interpretation problem.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Publication (Chapter/Page) | Date of Publication | M or A | Website
+Federal Acquisition Regulation | | M | https://www.acquisition.gov/?q=browsefar
+Defense Federal Acquisition Regulation Supplement | | M | ...
+DoDM 1000.13-M-V1 DoD Identification (ID) Cards (Enclosure 2, paragraph 3.b) | 01/23/2014 (Change 1: 07/28/2020) | A | ...
+DoDMAN 5200.02_DAFMAN 16-1405 Air Force Personnel Security Program | 1 Aug 2018 GM:29 Nov 2023 | M | ...
+DoDI 5200.46 DoD Investigative and Adjudicative Guidance for Issuing the Common Access Card (CAC) | 09/09/14 (Change 2: 11/2/2020) | A | ...
+Homeland Security Presidential Directive (HSPD)-12 | 08/27/2004 | A | ...
+DoDI 5400.11 Department of Defense Privacy and Civil Liberties Programs | 01/29/2019 Chg 1 12/8/2020 | A | ...
+DoD 5400.11-R Department of Defense Privacy Program | 05/14/2007 | A | ...
+32 CFR Part 117 NISPOM Rule | February 24, 2021 | A | ...
+AFMAN 17-1301 Computer Security (COMPUSEC) | 02/12/2020 | M | ...
+AFI 10-701 Operations Security | 7/24/2019 (Change 1: 06/09/2020) | A | ...</blockquote>
+  <div class="ev-explanation">Section 6.0 presents 11 regulatory publications in a table without explaining how each specifically applies to the work of a single procurement analyst providing contracting support. The table merely lists the FAR, DFARS, multiple DoD directives on CAC/ID cards, HSPD-12, two DoD privacy directives, the NISPOM, and two Air Force security/OPSEC publications. No narrative connects any of these to specific PWS tasks. A vendor must independently parse each document to determine its operational significance to the role.</div>
+</div><div class="evidence-item">
+  <blockquote>1.4.5.8.1 Antiterrorism Awareness Level I Training (AT Level I) see para 1.4.5.3... 1.4.5.8.2 Department of the Air Force (DAF)-Operations Security (OPSEC) Awareness Training (MLMW0432)... 1.4.5.8.3 OPSEC Awareness for Military Members, DoD Employees and Contractors – Center for Development of Security Excellence (CDSE)... 1.4.5.8.4 Counterintelligence Awareness and Security Brief – CDSE... 1.4.5.8.5 DoD Combating Trafficking in Persons Training (CTIP)... 1.4.5.8.6 DoD Mandatory Controlled Unclassified Information (CUI) Training... 1.4.5.8.7 AFQTPXXXXX-222RA, Records Management-User Training... 1.4.5.8.8 DoD Initial Orientation and Awareness Training... 1.4.5.8.10 Fire Extinguisher training</blockquote>
+  <div class="ev-explanation">Nine distinct mandatory training requirements are cited across paragraphs 1.4.5.3 and 1.4.5.8.1 through 1.4.5.8.10, each with separate timelines and annual recurrence rules. While some are clearly applicable (IA Cyber Awareness for network access, AT Level I for installation access), others — such as Fire Extinguisher training (1.4.5.8.10) — appear to be boilerplate carryovers from facility maintenance or manual-labor contracts rather than requirements logically tailored to a desk-based procurement analyst. No context is provided to explain why each of the nine is required for this specific role.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4 PPE provided by contractor: Hard hat – reflector vest – safety glasses – steel toed work boots.</blockquote>
+  <div class="ev-explanation">This requirement for construction-site PPE appears incongruous in a contract for a single office-based procurement analyst working in an administrative contracting office (Bldg 105). While OSHA compliance is cited generically in 1.4.6.3 and 4.4, no explanation is provided for why hard hats, reflective vests, and steel-toed boots are required for clerical/analytical procurement support duties. This looks like a copy-forward inclusion from a different contract template that has not been reviewed for relevance to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>1.4.5.8.3 OPSEC Awareness for Military Members, DoD Employees and Contractors – Center for Development of Security Excellence (CDSE) website... Within 30 days of employee start on contract. Initial and annually thereafter.
+1.4.5.8.2 Department of the Air Force (DAF)-Operations Security (OPSEC) Awareness Training (MLMW0432). Annual requirement... Initial and annually thereafter.
+1.4.5.11 Requirement for OPSEC Training. Contract employees within 30 days of employees&#x27; initial assignment to the contract... OPSEC Awareness for Military Members, Dod Employees and Contractors GS130-16 located on the Defense Counterintelligence and Security Agency website... and the OPSEC Annual training- DAF-Operations Security Awareness Training located on My Learning</blockquote>
+  <div class="ev-explanation">OPSEC training requirements appear to be cited in three separate places (1.4.5.8.2, 1.4.5.8.3, and 1.4.5.11), with overlapping and partially duplicative requirements pointing to both the CDSE platform and the DAF MyLearning platform. This duplication — requiring essentially the same training category from two different sources with no clear differentiation — suggests the applicable publications section has accumulated requirements across successive template iterations without reconciliation or review.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is buying one FTE of professional contracting support services for an indeterminate, dynamically prioritized workload covering the full acquisition lifecycle. The government explicitly cannot predict volumes, acknowledges workload is &#x27;dynamic,&#x27; and defines the requirement as &#x27;capacity equivalent to one FTE.&#x27; In substance, this is a labor-hour arrangement. However, the solicitation requests &#x27;line item pricing to include total of Base year and all options,&#x27; which is consistent with a firm-fixed-price or fixed-price level-of-effort structure rather than a labor-hour contract with specified hourly rates. A labor-hour contract — the appropriate vehicle when you are buying a person&#x27;s time and expertise without knowing how that time will be allocated — would require the solicitation to specify fixed hourly rates by labor category and impose a ceiling price, giving the government both cost visibility and a spending cap. A true FFP contract is defensible for a single-FTE staffing arrangement because the government can treat the annual cost of one qualified employee as estimable, and the &#x27;Firm-fixed-price, level-of-effort term contract&#x27; (FAR 16.207) is specifically designed for this scenario. Under FAR 16.207, the contractor agrees to provide a specified level of effort over a stated period for a fixed dollar amount — which is precisely what this solicitation seems to intend. The mismatch is therefore moderate rather than severe: the contract type is likely FFP level-of-effort, which is a recognized and defensible vehicle for single-FTE professional services. The concern is that the solicitation&#x27;s language is ambiguous — it does not explicitly invoke FAR 16.207 or specify hourly rates — and the dynamic, unpredictable workload described in the Q&amp;A creates real risk that either the contractor absorbs unfair loss during high-complexity periods or the government overpays during low-activity periods without the transparency that a labor-hour ceiling would provide. Severity is assessed as 2: the choice is defensible, but the failure to clearly structure pricing (hourly rate with ceiling vs. lump-sum FFP) for an admittedly unpredictable workload represents a moderate misalignment that could complicate contract administration.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The PoP shall be 1 Base Year of 12 months with 4 option years and a 6-month option per FAR 52.217-8.</blockquote>
+  <div class="ev-explanation">This is a multi-year labor services contract with a base year plus four option years plus a 6-month extension — a structure typical of level-of-effort service contracts. The long duration and option structure suggest the government is purchasing ongoing capacity rather than a defined deliverable, which is relevant to contract type selection.</div>
+</div><div class="evidence-item">
+  <blockquote>Quote requirements: Line item pricing to include total of Base year and all options.</blockquote>
+  <div class="ev-explanation">The solicitation requests &#x27;line item pricing&#x27; covering a base year and all options. This language is most consistent with a firm-fixed-price (FFP) or fixed-price level-of-effort structure, as it asks for a total price per period rather than hourly rates by labor category — the hallmark of a T&amp;M or labor-hour contract.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government cannot provide specific historical workload metrics, as future requirements are dynamic and historical data represents the aggregate output of the entire Government contracting office. For this requirement, the Government is procuring a level of effort and capacity equivalent to one Full-Time Equivalent (FTE).</blockquote>
+  <div class="ev-explanation">The government explicitly acknowledges that workload is &#x27;dynamic&#x27; and that it cannot quantify volumes for deliverables. This is a textbook scenario where T&amp;M or labor-hour pricing would be appropriate — the government is buying expert capacity, not a predictable output. Locking this into a fixed price creates risk: if the workload is lighter than expected, the government overpays; if heavier, the contractor is squeezed.</div>
+</div><div class="evidence-item">
+  <blockquote>While the PWS encompasses the full potential range of duties the Contractor may be required to support, the Government does not expect all complex and administrative tasks to be performed concurrently. The total workload required under this contract will not exceed the capacity of one FTE.</blockquote>
+  <div class="ev-explanation">The government&#x27;s own answer confirms that the scope is defined only as &#x27;one FTE&#x27;s worth of work&#x27; with priorities communicated dynamically. This is a labor-hour contract in substance — the government is buying person-hours — but the pricing structure as presented (total price per period) resembles FFP. A labor-hour or T&amp;M contract with a specified hourly rate and a ceiling would better match this reality.</div>
+</div><div class="evidence-item">
+  <blockquote>5.1.1 Provide aid in the planning and coordination of procurement activities in pre-award and post-award functions (excluding negotiation), using a wide range of contracting methods and types, for all services and commodity acquisitions and in particular complex and diversified architectural-engineering engineering services and construction.</blockquote>
+  <div class="ev-explanation">The scope spans the full contracting lifecycle — from market research through closeout — including complex A&amp;E and construction acquisitions and litigation support. This breadth makes it virtually impossible to estimate a fixed price accurately, since the mix of high-complexity and routine tasks will vary unpredictably month to month. A fixed-price structure penalizes the contractor when complex tasks dominate and rewards them when workload is light, misaligning incentives.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="PWS  - Procurement Analyst 17 Apr 26 Final.pdf">PWS  - Procurement Analyst 17 Apr 26 Final.pdf</div></div>
+  <a class="dl-btn" href="../attachments/45731d64a0b74d28aff8d5d83ce91fd9_PWS++-+Procurement+Analyst+17+Apr+26+Final.pdf" download="PWS  - Procurement Analyst 17 Apr 26 Final.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="QUESTIONS AND ANSWERS.pdf">QUESTIONS AND ANSWERS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/45731d64a0b74d28aff8d5d83ce91fd9_QUESTIONS+AND+ANSWERS.pdf" download="QUESTIONS AND ANSWERS.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - W50S8526QA009 Professional Appearance.pdf">Solicitation - W50S8526QA009 Professional Appearance.pdf</div></div>
+  <a class="dl-btn" href="../attachments/45731d64a0b74d28aff8d5d83ce91fd9_Solicitation+-+W50S8526QA009+Professional+Appearance.pdf" download="Solicitation - W50S8526QA009 Professional Appearance.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment - W50S8526QA0090001 Professional Appearance.pdf">Solicitation Amendment - W50S8526QA0090001 Professional Appearance.pdf</div></div>
+  <a class="dl-btn" href="../attachments/45731d64a0b74d28aff8d5d83ce91fd9_Solicitation+Amendment+-+W50S8526QA0090001+Professional+Appearance.pdf" download="Solicitation Amendment - W50S8526QA0090001 Professional Appearance.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment W50S8526QA0090001 SF 30.pdf">Solicitation Amendment W50S8526QA0090001 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/45731d64a0b74d28aff8d5d83ce91fd9_Solicitation+Amendment+W50S8526QA0090001+SF+30.pdf" download="Solicitation Amendment W50S8526QA0090001 SF 30.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

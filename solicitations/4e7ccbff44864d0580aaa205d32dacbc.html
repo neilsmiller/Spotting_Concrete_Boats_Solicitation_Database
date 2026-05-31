@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D--HUDL Sports Streaming Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>D--HUDL Sports Streaming Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4e7ccbff44864d0580aaa205d32dacbc</span>
+      <a class="sam-link" href="https://sam.gov/opp/4e7ccbff44864d0580aaa205d32dacbc/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › BUREAU OF INDIAN AFFAIRS › INDIAN EDUCATION ACQUISITION OFFICE</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DE01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (04/20/2026 to 04/19/2027) + 4 option years, with a maximum total duration of 5 years 6 months</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>The products shall conform with the products and specifications in the solicitation</li><li>Contractor shall demonstrate its capability in meeting the delivery time frame of 30 days ARO</li><li>The contractor shall demonstrate its ability to meet the delivery deadline by providing proof of its capability to deliver fully manufactured items, which are in stock, and ready to ship</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a commercial off-the-shelf sports streaming service (HUDL) for a single BIE school. The Statement of Work is one page and contains no QA surveillance plan, no reporting cadence, no prescribed report formats, no meeting requirements, and no plan-adherence tracking. The only accountability mechanism beyond standard FAR commercial item terms is the invoice attachment requirement for a written progress report confirming work was performed — a minimal, payment-focused requirement that does not constitute compliance theater.
+
+The solicitation does not define outcome metrics or SLAs either, but the nature of the acquisition (a subscription software service with defined functionality) means the &#x27;outcome&#x27; is largely self-evident: either the streaming service works or it doesn&#x27;t. There is no complex performance work statement with deliverable milestones that would require a QA surveillance structure.
+
+This is not a case of compliance crowding out outcomes — it is simply a lean commercial acquisition with minimal administrative requirements. The sin cannot be meaningfully flagged here. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Invoice approval: Written Progress Report to validate the work was performed or goods were received, completed, and accepted by the Contracting Officer&#x27;s Representative (COR) or AQM_COR.</blockquote>
+  <div class="ev-explanation">This is the only reporting-like requirement in the solicitation. It is tied directly to invoice payment validation — confirming work was performed and accepted — rather than measuring process compliance. It is minimal and outcome-adjacent (did the work happen?) rather than a process-monitoring mechanism.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for HUDL Sports Streaming Services at St. Stephens Indian School is a straightforward commercial item acquisition using FAR Parts 12 and 13 simplified acquisition procedures. The evaluation criteria (FAR 52.212-2) are minimal and capability-focused: conformance with product specifications, ability to meet a 30-day delivery timeframe, and price reasonableness. There are no experience requirements imposing specific dollar thresholds, no federal-specific experience mandates, no lookback windows, and no stacked criteria that would favor an incumbent. The Statement of Work is extremely brief — one page describing a need for a compatible sports streaming service &#x27;similar to the ones used in our region, southwest 1-A&#x27; — and while the reference to regional comparability could theoretically narrow the field to vendors who already operate in that region, it reads more as a functional compatibility requirement (NFHS compliance) than an incumbency filter. The evaluation asks for product specifications and proof of authorized distributor/reseller status, both of which are standard commercial item evaluation elements accessible to any qualified vendor. The solicitation includes FAR 52.211-6 (Brand Name or Equal), which signals openness to equivalent products rather than locking in a specific incumbent&#x27;s platform. There is no past performance evaluation factor, no personnel qualification requirements, and no institutional knowledge element. The ISBEE set-aside does restrict the vendor pool to Indian Economic Enterprises, but this is a statutory requirement (Buy Indian Act), not an incumbency mechanism. Overall, this solicitation presents no meaningful insider rewards concerns — a qualified vendor new to this contract could realistically compete on price and product conformance.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is exceptionally lean — the Statement of Work is a single page with four brief sections (Background, Objectives, Scope, Tasks). The requirements are stated at a high level of abstraction: obtain a streaming service, track statistics, comply with NFHS, stream and record varsity games. There are no step-by-step process prescriptions, no staffing requirements, no dictated workflows, and no tool mandates beyond the implicit reference to &#x27;similar&#x27; services used in the region. The evaluation criteria reference product specifications and delivery timelines, not operational procedures. The bulk of the document (pages 5–17) consists entirely of standard FAR/DIAR clauses incorporated by reference — boilerplate that is legally required and has nothing to do with requirement sprawl. If anything, this solicitation errs in the opposite direction: it is so sparse that it may create ambiguity about what &#x27;success&#x27; looks like, but that is a different problem (closer to unclear outcomes) than prescriptive process mandates. The one quasi-prescriptive element — &#x27;similar to the ones used in our region, southwest 1-A&#x27; — could be read as incumbent-steering but is vague enough that vendors retain broad latitude to propose solutions. There is no meaningful requirement sprawl present in this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The task will be to deliver a compatible streaming service similar to the ones used in our region, southwest 1-A, to stream and record all varsity games.</blockquote>
+  <div class="ev-explanation">This language gestures toward a specific type of solution (&#x27;similar to the ones used in our region&#x27;) but stops well short of mandating a particular platform, workflow, or implementation method. It is borderline — it could be read as steering toward an incumbent — but it does not enumerate steps, staffing, or processes the vendor must follow. It reads more as market context than a prescriptive process mandate.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem, driven almost entirely by uncurated copy-forward of standard clause templates onto an acquisition that is narrow and straightforward in scope: a commercial SaaS sports streaming subscription for a single school. The Statement of Work is one page and describes obtaining access to a commercial online streaming platform (effectively a software license). Against that simple backdrop, the solicitation incorporates a substantial clause set that includes Service Contract Labor Standards provisions, a food donation clause, a text-messaging-while-driving policy, and Buy American supplies clauses — none of which have obvious applicability to a cloud software subscription. The SCLS wage and leave clauses (52.222-41 through 52.222-62) are particularly notable: they exist for labor-intensive service contracts with identifiable service employee workforces, not for vendor-hosted SaaS platforms. No context or explanation is provided anywhere in the solicitation for why any clause was selected; they are presented as an undifferentiated compliance block. That said, several mitigating factors prevent a severity 3 rating: (1) the clause set is the standard FAR 52.212-5 commercial items clause framework, which agencies apply by checking boxes rather than drafting from scratch — so the accumulation reflects structural FAR mechanics more than egregious agency-specific policy dumping; (2) the total clause count, while elevated for this scope, is not extraordinary by federal contracting norms; (3) there is no dedicated &#x27;Applicable Documents&#x27; appendix listing dozens of agency-specific directives — the problematic clauses are embedded in the standard 52.212-5 structure; and (4) there are no outright contradictions between cited regulations and the solicitation&#x27;s purpose (unlike the VA SMS example in the definition). The core problem is passive management: no one reviewed which boxes to check in 52.212-5 for a SaaS subscription, and several clearly inapplicable clauses were left checked. This elevates compliance burden and signals template-copy behavior, warranting a severity 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.222-41, Service Contract Labor Standards (Aug 2018)... 52.222-42, Statement of Equivalent Rates for Federal Hires... 52.222-43, Fair Labor Standards Act and Service Contract Labor Standards-Price Adjustment (Multiple Year and Option Contracts)... 52.222-44, Fair Labor Standards Act and Service Contract Labor Standards-Price Adjustment... 52.222-55, Minimum Wages for Contractor Workers Under Executive Order 14026... 52.222-62, Paid Sick Leave Under Executive Order 13706</blockquote>
+  <div class="ev-explanation">Six separate Service Contract Labor Standards and wage/leave clauses are incorporated for what is essentially a software subscription service (a streaming platform license). SCLS clauses apply to contracts for services performed by service employees — they are designed for janitorial, security, food service, and similar labor-intensive services. A sports streaming software subscription (HUDL) is a commercial product/SaaS arrangement with no service employee workforce. The applicability of these clauses to a subscription platform is highly questionable, and no explanation is provided for why they were included.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-6, Promoting Excess Food Donation to Nonprofit Organizations (Jun 2020) (42 U.S.C. 1792)</blockquote>
+  <div class="ev-explanation">This clause requires contractors operating food service contracts to donate excess food to nonprofit organizations. It has no conceivable relevance to a sports streaming software subscription at a high school. Its inclusion suggests the clause list is a copy-forward template that was never reviewed for applicability to this specific acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>52.225-1, Buy American-Supplies (Oct 2022) (41 U.S.C. chapter 83)</blockquote>
+  <div class="ev-explanation">The Buy American Act for supplies applies to the acquisition of physical goods manufactured domestically. This solicitation is for a cloud-based sports streaming and statistics platform (a service/software subscription). Applying a supplies-oriented Buy American clause to a SaaS platform subscription is a category mismatch that suggests the clause list was not curated for the actual nature of the procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024) (E.O. 13513)</blockquote>
+  <div class="ev-explanation">This clause addresses contractor workplace safety policies around distracted driving. It has no meaningful connection to delivering a sports streaming software service to a school. Its presence — alongside the food donation clause — is a clear indicator that the clause set was pulled wholesale from a template without review for relevance to this narrow, straightforward acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>The products shall conform with the products and specifications in the solicitation... Contractor shall demonstrate its ability to meet the delivery deadline by providing proof of its capability to deliver fully manufactured items, which are in stock, and ready to ship.</blockquote>
+  <div class="ev-explanation">The evaluation criteria and instructions use physical product/goods language (&#x27;fully manufactured items,&#x27; &#x27;in stock,&#x27; &#x27;ready to ship&#x27;) despite the acquisition being for a digital streaming service. This reflects the same template-copy problem driving the regulatory clause accumulation: boilerplate designed for physical goods purchases was applied to a software services acquisition without substantive review or curation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial services procurement for a sports streaming subscription (HUDL) for a single BIE school. The requirement is simple and well-defined: provide access to a streaming platform to record and track varsity sports games for one year, with options for four additional years. Firm Fixed Price is the correct contract type for this acquisition. The government knows exactly what it is buying — a commercial subscription service with a known market price — and the period of performance is defined. There is no labor uncertainty, no evolving scope, and no reason to expect the requirements to change in ways that would require cost-reimbursement or T&amp;M. The multi-year structure (base + 4 options) is appropriate for a recurring subscription service and does not introduce pricing complexity. FFP places appropriate risk on the vendor, aligns with FAR Part 12 commercial item procedures, and gives the government full cost certainty for a predictable, stable service. No mismatch exists between the contract type and the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Department of the Interior (DOI), Bureau of Indian Education (BIE), Division of Acquisitions anticipates awarding a single Firm Fixed Priced type contract as a result of this opportunity.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states Firm Fixed Price as the contract type. This is confirmed by the inclusion of FAR 52.216-1 (Contract Type – Firm-fixed-price contract) in the provisions list.</div>
+</div><div class="evidence-item">
+  <blockquote>The scope of this project is to obtain access to online streaming services to track varsity games... The task will be to deliver a compatible streaming service similar to the ones used in our region, southwest 1-A, to stream and record all varsity games.</blockquote>
+  <div class="ev-explanation">The requirement is for a commercial subscription-based streaming service (HUDL is a well-known commercial sports streaming/analytics platform). The scope is narrow and well-defined: provide access to a streaming service for one school. Commercial software subscriptions are paradigmatic FFP purchases — the price is set by the vendor&#x27;s commercial catalog, the deliverable is access to the service, and there is no ambiguity about what is being bought.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment_1_Statement_of_Work.pdf">Attachment_1_Statement_of_Work.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4e7ccbff44864d0580aaa205d32dacbc_Attachment_1_Statement_of_Work.pdf" download="Attachment_1_Statement_of_Work.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment_2_Pricing_Schedule.xlsx">Attachment_2_Pricing_Schedule.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/4e7ccbff44864d0580aaa205d32dacbc_Attachment_2_Pricing_Schedule.xlsx" download="Attachment_2_Pricing_Schedule.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment_3_IA_-_IEE_Representation_Form.pdf">Attachment_3_IA_-_IEE_Representation_Form.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4e7ccbff44864d0580aaa205d32dacbc_Attachment_3_IA_-_IEE_Representation_Form.pdf" download="Attachment_3_IA_-_IEE_Representation_Form.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140A2326Q0096.pdf">Sol_140A2326Q0096.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4e7ccbff44864d0580aaa205d32dacbc_Sol_140A2326Q0096.pdf" download="Sol_140A2326Q0096.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140A2326Q0096_Amd_0002.pdf">Sol_140A2326Q0096_Amd_0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4e7ccbff44864d0580aaa205d32dacbc_Sol_140A2326Q0096_Amd_0002.pdf" download="Sol_140A2326Q0096_Amd_0002.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

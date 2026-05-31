@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R--GEOPHYSICAL SURVEY BRCR, TUPE, CONGRAVES — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>R--GEOPHYSICAL SURVEY BRCR, TUPE, CONGRAVES</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 6a5ed11005a94e30b2df3d0d884bd24b</span>
+      <a class="sam-link" href="https://sam.gov/opp/6a5ed11005a94e30b2df3d0d884bd24b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2025-08-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › NATIONAL PARK SERVICE › SER WEST(52000)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541360</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2025-08-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12 months</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>cost</li><li>technical approach</li><li>relevant experience</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful Compliance Over Outcomes problems. The scope is a straightforward, bounded professional services engagement — a non-invasive geophysical survey of approximately 2.7 acres across three sites — with a clearly defined deliverable structure: a final report, field documentation (forms, notes, photographs, GPS data, GIS shapefiles), updated CRIS/MDAH site forms, and physical curation of artifacts if generated. These are outcome-oriented deliverables with real-world utility. There is no reporting apparatus of the kind that constitutes this sin: no weekly status reports, no prescribed report formats with mandated sections, no overlapping reporting cadences, and no plan-adherence tracking divorced from actual results. The invoicing structure — COR approval of submittals before payment, itemized by task with percent-complete — is standard and appropriate. The 12-month period of performance with a kick-off meeting and initial schedule is minimal project management overhead for a field survey of this nature. The solicitation does carry significant construction-contract boilerplate (payroll records, weekly WH-347s, daily inspector logs, progress meetings) that appears to have been copied from a construction template and is largely irrelevant to a professional archaeological services contract. However, this represents a document-assembly problem or template mismatch rather than a deliberate compliance-over-outcomes accountability structure. The boilerplate is not operationally meaningful for this scope of work and is unlikely to be enforced as written. The core accountability mechanism — COR acceptance of scientific deliverables before payment — is outcome-focused. The solicitation would benefit from explicit quality criteria for the final report (e.g., what constitutes an acceptable geophysical data set, data density standards, report peer review), but the absence of explicit outcome metrics in a small, specialized CRM survey is not unusual and does not rise to the level of this sin. Overall severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All submittals under this contract must be approved by the COR prior to any interim or final payment. Invoices will be submitted first to the COR and may be submitted monthly. Invoices shall include an itemized cost summary of staff work and direct expenses in a level of detail that matches the task agreement proposal, with invoicing based on percent complete for each task and subtask line.</blockquote>
+  <div class="ev-explanation">Invoice approval is tied to COR acceptance of submittals, which is a deliverable-based payment gate rather than pure process compliance. Percent-complete invoicing is standard cost-tracking, not outcome measurement, but it functions as a checkpoint tied to actual work products rather than meeting attendance or report generation.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will design and present a research design and budget estimation to the Parkway for review and approval prior to work... Proposals must include detailed field survey methods, data collection, artifact analysis methods and a curation plan in keeping with NPS and Mississippi Department of Archives and History (MDAH) standards.</blockquote>
+  <div class="ev-explanation">The requirement for a pre-approved research design is a process gate, but it is appropriate for this type of scientific survey work where methodology must be vetted before irreversible fieldwork begins. It is not a recurring compliance reporting burden.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards patterns. The experience requirements are capability-focused and domain-appropriate without the stacking mechanisms that characterize this sin. There are no specific dollar thresholds for prior contracts, no minimum contract count requirements, no federal-government-only experience mandates, and no short lookback windows. The requirement to demonstrate &#x27;prior experience and good past performance conducting archeological geophysical surveys at historic sites and cemeteries&#x27; is a reasonable capability test — the work involves sensitive cemetery and battlefield sites where specialized geophysical expertise genuinely matters. The personnel qualification standards (Secretary of the Interior&#x27;s Professional Qualification Standards, MDAH compliance) are industry-wide credentials, not incumbent-specific knowledge. The project is also a relatively small, well-scoped task (2.7 acres across 3 sites) with a clear SOW, and there is no evidence of an entrenched incumbent whose institutional knowledge is embedded in the contract structure. The evaluation criteria mention cost, technical approach, and relevant experience — a balanced set that allows non-incumbents to compete on merits. The solicitation is appropriately set aside for small businesses in the CRM/geophysical survey space, which is a well-populated market of qualified firms. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contactor shall demonstrate prior experience and good past performance conducting archeological geophysical surveys at historic sites and cemeteries.</blockquote>
+  <div class="ev-explanation">This is the primary experience requirement in the solicitation. It references a legitimate domain specialty — archaeological geophysical surveys at historic sites and cemeteries — but imposes no specific dollar thresholds, no minimum number of prior contracts, no federal-government-only mandate, and no short lookback window. The requirement is capability-focused: it tests whether the vendor has relevant technical expertise, not whether they have previously held this specific NPS contract.</div>
+</div><div class="evidence-item">
+  <blockquote>The archeological geophysical survey must be conducted by qualified archeological professionals who meet the Secretary of the Interior&#x27;s Professional Qualification Standards. The Principal Investigator and Field Director shall both meet these requirements in compliance with MDAH standards.</blockquote>
+  <div class="ev-explanation">This personnel qualification requirement references the Secretary of the Interior&#x27;s Professional Qualification Standards and Mississippi Department of Archives and History (MDAH) standards. These are established professional credentials applicable to any qualified CRM firm operating in this domain, not incumbent-specific knowledge requirements. A new vendor with appropriately credentialed staff could readily satisfy this requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful requirement sprawl. The Statement of Work is outcome-oriented throughout: it defines what NPS needs (a non-invasive geophysical survey of approximately 2.7 acres across three sites, a research design, field documentation, a final report, updated CRIS records) without specifying how the contractor must conduct the survey. The choice of geophysical methods, survey transect spacing, equipment type, data processing approach, and field team structure are all left to the contractor. The core deliverables (research design, field documentation, final report with MDAH submission, bound/unbound and digital copies, artifact curation) are reasonable and standard for this type of professional archaeological services contract. The qualification requirements (Secretary of the Interior&#x27;s Professional Qualification Standards, MDAH compliance) are regulatory/professional standards, not process prescriptions. The contract clauses document does import a heavy boilerplate construction contract template — complete with payroll records (WH-347), subcontracting SF-1413, weekly payrolls, Buy American construction materials, utility service provisions, and references to a &#x27;Project Inspector&#x27;s Daily Log&#x27; — that is incongruous with a professional services geophysical survey. However, this appears to be a template mismatch (a construction contract template applied to a services contract) rather than genuine requirement sprawl as defined by this sin. The SOW itself, which is the operative scope document, remains appropriately outcome-focused. A vendor reads the SOW and understands clearly what they must deliver, without being told how to deliver it. The template boilerplate is a different structural problem (template misapplication) but does not impose prescriptive how-to requirements on the geophysical survey methodology. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor will design and present a research design and budget estimation to the Parkway for review and approval prior to work.</blockquote>
+  <div class="ev-explanation">This is a mild process prescription — it requires a specific sequence (design first, get approval, then work) — but it is a reasonable project management constraint for a sensitive archaeological survey at historic/cemetery sites, not meaningful sprawl. It does not dictate the content of the research design or the methods to be used.</div>
+</div><div class="evidence-item">
+  <blockquote>Proposals must include detailed field survey methods, data collection, artifact analysis methods and a curation plan in keeping with NPS and Mississippi Department of Archives and History (MDAH) standards.</blockquote>
+  <div class="ev-explanation">This requires the proposal to address certain topics, which could be read as prescriptive, but it actually leaves method selection entirely to the vendor — it says &#x27;in keeping with NPS and MDAH standards,&#x27; which are professional standards, not process mandates. Vendors retain full discretion over which geophysical methods (GPR, magnetometry, resistivity, etc.) to propose.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate-to-elevated rule pool problem rooted in template misapplication rather than deliberate over-regulation. The actual scope of work — a non-invasive archeological geophysical survey of 2.7 acres by professional CRM archeologists — is a professional services engagement. However, the contract vehicle and clause set were drawn almost entirely from a construction contract template (note the SF 1442 form, the construction-format table of contents, and the preponderance of FAR Part 36 clauses). This produces a systematic mismatch: roughly 15-20 of the approximately 40 cited clauses are construction-specific and have questionable or no applicability to the actual work. The Davis-Bacon suite (11 clauses), the construction bonds and performance clauses, the Buy American Act for construction materials (reproduced in full with blank price tables), the lead-based paint prohibition, and the hazardous waste environmental statutes in the safety clause are all artifacts of the construction template. The solicitation provides no contextual explanation for any clause — it is an undifferentiated list. A CRM firm new to NPS contracting would face genuine uncertainty about whether they need to submit weekly certified payrolls, obtain performance bonds, complete SF-1413 forms for subcontractors, and comply with CERCLA and RCRA. That said, the severity is moderated to 2 rather than 3 because: (1) the total clause count, while elevated, is not in the extreme range seen in severe cases; (2) there are no internally contradictory requirements of the type that would force absurd compliance engineering; (3) the SOW itself is well-written, focused, and clearly describes the actual work; and (4) the problem appears to be template laziness rather than deliberate obfuscation. The clause set is a construction boilerplate misapplied to a professional services scope — a common NPS/DOI pattern for small field-work contracts — rather than an accumulation of dozens of agency-specific policy documents without review.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.222-06 Construction Wage Rate Requirements | 52.222-07 Withholding of Funds | 52.222-08 Payrolls and Basic Records | 52.222-09 Apprentices and Trainees | 52.222-10 Compliance with Copeland Act Requirements | 52.222-11 Subcontracts (Labor Standards) | 52.222-12 Contract Termination-Debarment | 52.222-13 Compliance with Construction Wage Rate Requirements and Related Regulations | 52.222-14 Disputes Concerning Labor Standards | 52.222-15 Certification of Eligibility | 52.222-27 Affirmative Action Compliance Requirements for Construction</blockquote>
+  <div class="ev-explanation">This solicitation is for a non-invasive archeological geophysical survey — a professional services/research activity conducted by CRM firms with specialized scientific equipment. Yet it incorporates a dense cluster of Davis-Bacon Act construction labor standards clauses (52.222-06 through 52.222-27). These clauses govern construction wage rates, apprentices and trainees, and certified payroll for construction workers. A geophysical survey team walking fields with ground-penetrating radar and magnetometers is not a construction workforce. The applicability of the full Davis-Bacon suite to this scope is at minimum questionable, and the solicitation provides no explanation of why these clauses apply.</div>
+</div><div class="evidence-item">
+  <blockquote>52.228-2 Additional Bond Security | 52.228-11 Pledges of Assets | 52.228-12 Prospective Subcontractor Requests for Bonds | 52.236-05 Material and Workmanship | 52.236-07 Permits and Responsibilities | 52.236-17 Layout of Work | 52.236-26 Preconstruction Conference | 52.246-13 Inspection Dismantling, Demolition, or Removal of Improvements | 52.225-9 Buy American Act-Construction Materials</blockquote>
+  <div class="ev-explanation">Multiple FAR Part 36 construction clauses — including Layout of Work, Preconstruction Conference, Inspection of Dismantling/Demolition, and Buy American for Construction Materials — are included in a solicitation for a non-invasive archeological survey that explicitly states no excavation will occur. The Buy American Act clause is reproduced in full (pages 12-14) with blank price comparison tables for domestic vs. foreign construction materials. There are no construction materials being procured. These clauses appear to be a wholesale carry-forward from a construction contract template rather than a curated selection for a professional services/research scope.</div>
+</div><div class="evidence-item">
+  <blockquote>H.3 SAFETY: The Contractor is responsible for establishing and maintaining compliance with all applicable laws, regulations, rules, and standards, including without limitation... the Comprehensive Environmental Response, Compensation and Liability Act (CERCLA) as amended by Superfund Amendments and Reauthorization Act (SARA); Emergency Planning and Community Right-to-Know Act (EPCRA); Clean Air Act (CAA); Clean Water Act (CWA) and Toxic Substances Control Act (TSCA); and Solid Waste Disposal Act (SWDA), as amended by Resource Conservation and Recovery Act (RCRA).</blockquote>
+  <div class="ev-explanation">The safety clause cites CERCLA/SARA (hazardous waste site remediation), EPCRA (emergency planning for chemical releases), TSCA (toxic substance manufacturing/handling), and RCRA (solid waste disposal) for a project in which a CRM firm will walk across 2.7 acres of open land with geophysical instruments and write a report. None of these environmental statutes have any meaningful operational relevance to a non-invasive geophysical survey. They appear to be a boilerplate safety clause copied from a heavier construction or remediation contract template.</div>
+</div><div class="evidence-item">
+  <blockquote>G.6 PAYROLL RECORDS: The Prime Contractor is responsible for furnishing the Contracting Officer with one copy of the Weekly Payroll Form WH-347... H.5 PAYROLLS: The Contractor must furnish copies of his weekly payrolls to the CO. Payroll submission is required weekly, seven (7) days after close of payroll period.</blockquote>
+  <div class="ev-explanation">Weekly certified payroll submission (WH-347) is a Davis-Bacon construction requirement. It is duplicated in both Section G.6 and H.5, creating redundant compliance obligations. For a small CRM firm conducting a brief geophysical survey of 2.7 acres, weekly certified payroll reporting is a compliance burden designed for multi-month construction projects with large, varied trade workforces — not for a handful of archeological professionals spending days in the field. No explanation is provided for why this requirement applies.</div>
+</div><div class="evidence-item">
+  <blockquote>1452.236-70 Prohibition Against Use of Lead-based Paint | 52.227-04 Patent Indemnity Construction Contracts | 52.237-4 Alt I Payment by Government to Contractor Alt I | 52.243-5 Changes and Changed Conditions</blockquote>
+  <div class="ev-explanation">The lead-based paint prohibition (a construction renovation clause), patent indemnity for construction contracts, and Changed Conditions (a subsurface/concealed conditions clause for construction) are included in a solicitation for a non-invasive geophysical survey. Patent indemnity for construction contracts has no logical application to a research services engagement. The lead-paint clause is relevant only when renovation or disturbance of pre-1978 painted surfaces is contemplated — which contradicts the explicitly non-invasive nature of this work. These inclusions confirm the clause set was copied wholesale from a construction contract template without review for relevance to the actual scope.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a firm-fixed-price contract for a non-invasive archeological geophysical survey of 2.7 acres across three historically documented sites in Mississippi. The FFP structure is generally defensible here: the core deliverable is a bounded, concrete output (geophysical survey data and a final report covering a known acreage at three identified sites), the sites are geographically defined, and the contractor population in the CRM/geophysics space can reasonably estimate costs for this type of work. Non-invasive surveys using instruments like ground-penetrating radar or magnetometry are routine enough that experienced vendors can price them with reasonable confidence. These factors support FFP as an appropriate choice.
+
+However, there are moderate concerns. The SOW defers the research design to post-award, meaning the specific survey methods, data collection protocols, and analysis approaches are not locked down at the time of proposal. This is somewhat unusual for an FFP arrangement and introduces methodological scope that vendors must price speculatively. Additionally, fieldwork is explicitly conditioned on weather and soil conditions, introducing scheduling uncertainty that the contractor must absorb in their fixed price. Taken together, these factors could result in either inflated bids (contractors pricing in contingency) or under-bids followed by modification pressure if conditions or the NPS-approved research design prove more demanding than anticipated.
+
+That said, the core scope is stable enough — known acreage, known sites, non-invasive methods, defined deliverables (bound and unbound reports, GIS data, site forms) — that FFP is not clearly wrong. The 12-month period of performance provides buffer for weather-related delays. The severity is assessed as 2 (Moderate): the FFP choice is defensible given the bounded deliverable, but the post-award research design development and weather-contingent fieldwork create real scope uncertainty that a different structure (e.g., a labor-hour contract with defined LCATs and a not-to-exceed ceiling) might manage more transparently. Most contracting experts would not call this an egregious mismatch, but would note the tension.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This acquisition shall result in award of a firm fixed price contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly specifies a firm-fixed-price (FFP) contract type for this archeological geophysical survey requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will design and present a research design and budget estimation to the Parkway for review and approval prior to work. The Parkway will provide access to background documentation related to the project upon contractor request.</blockquote>
+  <div class="ev-explanation">The SOW requires the contractor to develop the research design after award, before work begins. This means the full scope of survey methods and data collection approaches are not defined at the time of bidding, introducing methodological uncertainty that is somewhat inconsistent with a FFP structure where scope should be well-defined upfront.</div>
+</div><div class="evidence-item">
+  <blockquote>Field work will occur when weather and soil conditions are conducive for archeological geophysical equipment.</blockquote>
+  <div class="ev-explanation">Field work timing is contingent on weather and soil conditions, introducing schedule uncertainty. Under a FFP contract, this variability in when work can actually be performed adds risk that the contractor must price in, potentially inflating bids or leading to disputes if conditions are unusually poor.</div>
+</div><div class="evidence-item">
+  <blockquote>The non-invasive archeological geophysical survey of approximately 2.7 acres across three separate sites</blockquote>
+  <div class="ev-explanation">Despite some scope uncertainties, the core deliverable is relatively well-defined: a non-invasive geophysical survey of a known, bounded acreage (2.7 acres) at three specific sites. This tangible, discrete deliverable with clear geographic boundaries is a meaningful mitigating factor supporting FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>The Period of Performance has been set at 12 months... The schedule shall propose 12 months from Notice to Proceed to final PS&amp;E delivery.</blockquote>
+  <div class="ev-explanation">A 12-month period of performance for a 2.7-acre non-invasive survey (no excavation, no physical disturbance) seems generous and suggests schedule uncertainty. Under FFP, a generous timeline should protect the government, but the combination of undefined research design at award, weather-dependent fieldwork, and a lengthy PoP means the government has limited leverage to drive efficient performance.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="A04_SOW_BRCR_TUPE_Confederate_Graves_Geophys.docx">A04_SOW_BRCR_TUPE_Confederate_Graves_Geophys.docx</div></div>
+  <a class="dl-btn" href="../attachments/6a5ed11005a94e30b2df3d0d884bd24b_A04_SOW_BRCR_TUPE_Confederate_Graves_Geophys.docx" download="A04_SOW_BRCR_TUPE_Confederate_Graves_Geophys.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="BRCR_map_0001.pdf">BRCR_map_0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6a5ed11005a94e30b2df3d0d884bd24b_BRCR_map_0001.pdf" download="BRCR_map_0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation_Clauses.pdf">Solicitation_Clauses.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6a5ed11005a94e30b2df3d0d884bd24b_Solicitation_Clauses.pdf" download="Solicitation_Clauses.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📎</div>
+  <div class="file-info"><div class="file-name" title="TUPE_photo1_0001.jpg">TUPE_photo1_0001.jpg</div></div>
+  <a class="dl-btn" href="../attachments/6a5ed11005a94e30b2df3d0d884bd24b_TUPE_photo1_0001.jpg" download="TUPE_photo1_0001.jpg" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📎</div>
+  <div class="file-info"><div class="file-name" title="TUPE_photo2_0001.jpg">TUPE_photo2_0001.jpg</div></div>
+  <a class="dl-btn" href="../attachments/6a5ed11005a94e30b2df3d0d884bd24b_TUPE_photo2_0001.jpg" download="TUPE_photo2_0001.jpg" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

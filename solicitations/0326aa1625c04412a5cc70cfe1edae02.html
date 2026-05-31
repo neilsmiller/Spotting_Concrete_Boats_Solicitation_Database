@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Next Generation (NextGen) Passport Personalization Printers Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Next Generation (NextGen) Passport Personalization Printers Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 0326aa1625c04412a5cc70cfe1edae02</span>
+      <a class="sam-link" href="https://sam.gov/opp/0326aa1625c04412a5cc70cfe1edae02/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › ACQUISITIONS - AQM MOMENTUM</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DB02</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Services</li><li>Quality of Services</li><li>Timeliness of Performance</li><li>Price/Cost Control</li><li>Business Relations</li><li>Customer Satisfaction</li><li>Overall Contract Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a severe case of compliance-over-outcomes. The accountability structure is built almost entirely from reporting cadences and prescribed processes: weekly WARs with 12 mandated sub-sections, monthly CSRs tied to a prescribed template, twice-monthly quality management meetings, twice-per-shift printer operational status reports, and separate weekly systems status reports. That is at minimum five overlapping reporting mechanisms operating at daily, weekly, and monthly intervals simultaneously.
+
+The reporting content throughout is oriented toward plan adherence and activity documentation: schedule variance percentages, SDLC milestone dates, what maintenance was performed, what issues were encountered. The QA structure for print quality — the core deliverable of this contract — reduces to a process loop of printing prescribed numbers of test books on a prescribed schedule and shipping them for Government review, with no defined acceptance thresholds embedded in the solicitation.
+
+The solicitation does contain some outcome-oriented language worth acknowledging. The four-hour restoration requirement for inoperable printers at issuance sites, the 24/7 service desk requirement, and the printer throughput minimums (300+ books/hour for high-capacity, 100+ for low-capacity) are genuine performance standards. The SLA reference in C.3.8.1.1.3 (return to full operation within 4 hours of notification) is a real outcome metric. These elements partially mitigate the compliance-over-outcomes problem.
+
+However, these outcome metrics are narrow and operational — they define minimum availability and throughput floors for the hardware. The broader accountability structure for the contractor&#x27;s management, quality, software development, and support services is almost entirely process-compliance reporting. There is no user satisfaction measurement, no software quality metric, no aggregate uptime reporting requirement with defined thresholds, and no structured evaluation of whether the overall program is achieving its purpose. The volume and frequency of process-documentation requirements — particularly the twice-per-shift operational reports and the multi-layered written reporting cadences — would consume significant contractor bandwidth in documentation rather than performance improvement. The severity is 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall submit WARs delivered using a format or media approved by the COR. The first WAR is due NLT 15 business days after the contract is awarded. All subsequent reports should be sent on Wednesday of each week, capturing activities completed the week prior. The WAR must include both performance and transition activities... [including] Description of progress made during period reported, including problem areas encountered... Plans and recommendations for activities during the following reporting period... Schedule, Risk, Issues, Scope, and Cost Status... Key Accomplishments... High Priority/Severity Issues... Project Completion and Calculated Schedule Variance Percentage... Standard Integrated Service Lifecycle (ISL)/SDLC Milestones (planned/actual dates and status)... Major Project Milestones... Key Dependencies... Decision points for the Government... Advanced notification of timeline slippage</blockquote>
+  <div class="ev-explanation">Weekly Activity Reports with 12 prescribed sub-sections focus entirely on tracking activities performed, schedule adherence, and plan deviations. The sub-sections ask &#x27;did you follow the plan?&#x27; (schedule variance, milestone dates, SDLC milestones) rather than &#x27;is the output meeting user needs?&#x27; No performance outcome or quality metric is embedded in the WAR requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall prepare and submit/present the CSR in a format or media approved by the COR. The first CSR is due NLT 15 days after the first full reporting month. All subsequent reports should be sent NLT 20 days after the last day of each calendar month or the next business day if the 20th falls on a weekend.</blockquote>
+  <div class="ev-explanation">Monthly Contract Status Reports are required on top of the weekly WARs. The PWS cross-references a prescribed template (Attachment C) but defines no outcome measures or performance thresholds that the CSR must report against. This creates a second overlapping reporting cadence—monthly layered on weekly—that duplicates the activity-tracking focus of the WAR without adding outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall attend Quality Management Meetings two (2) times per month. These meetings shall discuss high level operational and quality issues with all stakeholders (contractor, COR/GTM, Document Design Team, and several other interested groups that are part of the production process).</blockquote>
+  <div class="ev-explanation">Twice-monthly quality meetings are required on top of written weekly and monthly reports. The description of meeting content (&#x27;discuss high level operational and quality issues&#x27;) is process-oriented and vague, with no stated outcome criteria to be evaluated in those meetings. Combined with the other reporting requirements, this adds a third recurring accountability touchpoint that monitors process activity rather than measured results.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide Printer Operational Status Reports two (2) times per shift on production days to monitor, record and report on the health of the printers for each Passport Agency location, Passport Center, and Support Site locations. The contractor shall provide a weekly Systems Status Report including but not limited to operational issues, process improvements, and preventative maintenance performed for personalization printers at each site location.</blockquote>
+  <div class="ev-explanation">Twice-per-shift operational reports—potentially four or more per day across a two-shift operation—combined with a separate weekly Systems Status Report create an extraordinarily high-frequency reporting burden at the operational level. These reports track what maintenance was performed and what issues occurred, not whether printers are meeting throughput or uptime targets. There are no defined thresholds (e.g., acceptable defect rates, uptime percentages) against which these reports are measured.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall print test books within 5 working days of the first of the month for Inkjet and Laser Settings at each Passport Agency location, Passport Center, and Support Site locations. The contractor shall: Print one (1) test book per laser per month using the Blank Book Inkjet and Laser Test Book... Print six (6) test books per laser per month using the Full Artwork Test Book... [with] adjustment requirements... the contractor shall adjust settings of the affected printer(s)... ship the samples overnight... The COR/GTM or Designee shall notify the contractor if additional laser or inkjet adjustments are required.</blockquote>
+  <div class="ev-explanation">The quality assurance mechanism for print quality is a process-compliance loop: print prescribed numbers of test books on a prescribed schedule, ship them to a central repository, and await Government feedback. The PWS specifies the process for generating and routing samples in detail but does not define measurable acceptance standards (e.g., acceptable color delta values, failure rate thresholds, or pass/fail criteria) that would make this an outcome-oriented QA mechanism. Success is defined by completing the process, not by achieving a measurable quality target.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate-to-substantial insider rewards characteristics, stopping short of severe primarily because some mitigating factors exist: the government states market research showed at least two capable vendors, a contingent lease is acceptable for the facility requirement, and the solicitation does not impose explicit dollar thresholds or lookback windows on past performance profiles. However, several factors tilt the playing field meaningfully toward the incumbent. First, the core deliverables — IAI printers, IAI Print Controller, Chip Encoder software — are controlled by a single manufacturer/reseller, making experience with those specific products nearly impossible for a non-incumbent to demonstrate. Second, the PWS explicitly requires &#x27;knowledge and expertise of IAI,&#x27; naming a proprietary vendor rather than specifying a performance outcome. Third, the past performance questionnaire evaluates experience with named IAI products specifically, not with passport personalization systems generically. Fourth, the lab facility requirement imposes significant upfront capital and compliance burden on new entrants who lack an existing certified facility. Fifth, deep familiarity with TDIS and the ICD integration architecture is effectively required to write a competitive technical proposal, yet this knowledge lives primarily with the incumbent. The stacking of proprietary-product experience, named-vendor expertise, facility pre-establishment requirements, and intimate system-integration knowledge creates a playing field that is tilted but not completely closed — a qualified systems integrator with access to IAI equipment and willingness to invest in facility preparation could compete, as the Q&amp;A responses suggest the government believes. Severity is assessed at 2: moderate. The requirements favor incumbency in meaningful ways but do not rise to the level of an explicit incumbent filter through contract dollar thresholds and recency windows.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Overall understanding of and ability to provide IAI BMOne and BMPro passport printers to include Print Controller and Chip Encoder software</blockquote>
+  <div class="ev-explanation">The past performance questionnaire explicitly names IAI BMOne and BMPro as the specific printer models to evaluate prior experience against. This is not a generic &#x27;passport personalization printer&#x27; capability question — it is a question about experience with a specific proprietary product line. Only vendors who have previously worked with IAI printers can demonstrate this experience, which is almost certainly only the incumbent or its teammates.</div>
+</div><div class="evidence-item">
+  <blockquote>Knowledge and expertise of IAI as needed, to support system hardware and software.</blockquote>
+  <div class="ev-explanation">The PWS lists &#x27;knowledge and expertise of IAI&#x27; as an explicit requirement for technicians performing preventive maintenance. IAI (Industrial Automation and Intelligence) is the sole or near-sole manufacturer of the NextGen printers. Requiring vendor-specific institutional knowledge of a proprietary manufacturer&#x27;s systems as a performance requirement — rather than specifying a capability outcome — effectively filters for anyone who has already worked with this specific vendor&#x27;s equipment.</div>
+</div><div class="evidence-item">
+  <blockquote>We&#x27;ve researched sources for the IAI Next Generation Personalization (NGP) Printers and understand that there is currently only one reseller of the NGP Printers for the Department of State... we understand there is only one provider of the NextGen software suite to include Print Controller, Printer Controller Startup Manager and Chip Encoder software.</blockquote>
+  <div class="ev-explanation">Vendors themselves identified that there is effectively one reseller and one software provider for the core deliverables. The government&#x27;s response — &#x27;DOS declines the request&#x27; and &#x27;Market research showed two or more entities with apparent capability&#x27; — does not resolve the competitive concern raised. When the core hardware and software deliverables are controlled by a single or near-single source, experience requirements tied to those specific products function as incumbent filters regardless of how they are formally structured.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide a Passport Development Lab/Testing Facility in support of the NextGen Passport Personalization Printers requiring OpenNet connectivity... Retain a lab facility with a minimum of 1,200 sq ft located within 30 miles of the CST Office at 19th and G Streets NW, Washington DC.</blockquote>
+  <div class="ev-explanation">Requiring a vendor to already possess or be able to lease a 1,200 sq ft lab facility within a 30-mile radius of a specific Washington DC address — with loading dock, DS-approved safe, CCTV, badge access, HVAC to precise specs (68-69°F, 45-55% RH), and OpenNet connectivity — is a substantial capital and operational investment that advantages an incumbent already operating such a facility. New entrants must acquire, configure, and certify this facility before contract performance begins, creating a significant barrier relative to an incumbent already operating it.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide support for the Print Controller software to successfully communicate with the TDIS... Develop and support the application to enable Passport staff to perform Government Acceptance Testing (GAT) for personalization printers in a standalone environment independent of the Print Controller and TDIS.</blockquote>
+  <div class="ev-explanation">The PWS requires the contractor to have deep working knowledge of TDIS (Travel Document Issuance System), the DOS-internal passport issuance system, and how the proprietary IAI Print Controller interfaces with it. This is institutional knowledge that only the incumbent or a closely aligned vendor would possess. New entrants would need to reverse-engineer these interfaces or rely on government documentation that may be incomplete — a significant asymmetric disadvantage in technical proposal scoring.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe requirement sprawl (severity 3). The PWS reads substantially as an operating manual rather than a statement of need. Across multiple domains — maintenance procedures, quality control sampling, reporting cadence, meeting frequencies, training role task lists, and transition activities — the document prescribes specific actions, exact quantities, named roles with enumerated duties, and step-by-step workflows. The 342 &#x27;shalls&#x27; noted by an offeror in Q&amp;A #10 is itself a symptom: the document substitutes procedural mandates for outcome definitions at nearly every turn.
+
+The root cause pattern is classic incumbent capture: the specificity of tasks like &#x27;replacing purge tray, running automatic head cleaner, replacing carbon filter, cleaning inside of printer, and replacing ink bags&#x27; reflects the current operator&#x27;s documented procedures being written directly into the requirement. No outcome-oriented drafter independently arrives at those exact steps — they come from watching what the incumbent does today.
+
+Mitigating factors exist: some requirements are legitimately outcome-focused (the 4-hour restoration SLA, ICAO compliance standards, FIPS/NIST security baselines, printer throughput minimums of 300 and 100 books/hour). These are genuine performance standards. The technical specifications for print quality (spatial resolution, optical density, gray levels) are appropriately framed as measurable standards. Security requirements referencing 12 FAM, NIST SP800-53, and FCC Class A emissions are legitimate constraints, not sprawl.
+
+However, these legitimate requirements are embedded within a larger document that is dominated by prescriptive process dictates. The net effect is a solicitation that leaves vendors with very limited room to propose innovative staffing models, automation, or improved quality management approaches. Vendors can essentially only propose to staff the roles as described and perform the tasks as written — which is the defining characteristic of severe requirement sprawl.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Perform all maintenance activities to include, but not limited to replacing purge tray, running automatic head cleaner for Low-Capacity Personalization Printer and manual upgrade head cleaner for High-Capacity Personalization Printers, replacing carbon filter, cleaning inside of printer, and replacing ink bags and disposing of ink.</blockquote>
+  <div class="ev-explanation">This is a step-by-step operational procedure lifted directly from incumbent operations. It dictates the exact sequence of physical maintenance tasks rather than defining an outcome (e.g., &#x27;maintain printers in operational condition with uptime SLA of X%&#x27;). A competent vendor cannot propose a different, potentially more efficient maintenance regimen — they are locked into this specific task list.</div>
+</div><div class="evidence-item">
+  <blockquote>Print one (1) test book per laser per month using the Blank Book Inkjet and Laser Test Book with layout and print schedule specified by COR/GTM or Designee. Print six (6) test books per laser per month using the Full Artwork Test Book with layout and print schedule specified by COR/GTM or Designee.</blockquote>
+  <div class="ev-explanation">This specifies exact quantities and cadences for quality control checks rather than defining a quality outcome (e.g., &#x27;maintain print quality within ICAO tolerances&#x27;). Prescribing precisely 1 and 6 test books per laser per month forecloses vendor judgment about what sampling methodology would best ensure quality, and reads as a copy from the incumbent&#x27;s current operating procedures.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide Printer Operational Status Reports two (2) times per shift on production days to monitor, record and report on the health of the printers for each Passport Agency location, Passport Center, and Support Site locations. The contractor shall provide a weekly Systems Status Report including but not limited to operational issues, process improvements, and preventative maintenance performed for personalization printers at each site location.</blockquote>
+  <div class="ev-explanation">Mandating the exact frequency of reporting (twice per shift, plus weekly) across all sites is process prescription, not outcome definition. A vendor with good telemetry or automated monitoring might deliver better situational awareness with a different reporting cadence. This forecloses that option entirely.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall attend Quality Management Meetings two (2) times per month... The contractor shall participate and collaborate on Continuous Quality Improvement Projects up to a maximum of five (5) times per year per location.</blockquote>
+  <div class="ev-explanation">Prescribing the exact number of meetings and quality improvement events per month and per year per location dictates the vendor&#x27;s management processes rather than defining quality outcomes. These are internal coordination mechanisms that a vendor should be free to structure based on what actually drives quality performance.</div>
+</div><div class="evidence-item">
+  <blockquote>Responsibilities for the Training Instructor include, but are not limited to: A refined curriculum for the print controller / Research curriculum actively and remain up to date on print controller software developments / Conduct training at various passport agencies, passport centers, and support site locations / Support CA/CST training initiatives, and interface via email with operators as needed on an ad hoc basis / Conduct satisfaction surveys regarding the effectiveness and completeness of training courses to improve the curriculum / Travel to various passport agencies... / Collaborate with USG Training Coordinator... / Create printed and instructional materials... / Actively seek current training methods and best practices... / Schedule and conduct meetings with CA/CST... / Develop KBAs... / Assist in planning, creating, and implementing each year&#x27;s training courses...</blockquote>
+  <div class="ev-explanation">This block enumerates over ten specific tasks for a single named role (Training Instructor), effectively writing the job description rather than defining the outcome: trained, proficient printer operators across all sites. A vendor cannot propose e-learning, centralized training hubs, or other modern delivery methods — they must staff this specific role performing this specific list of activities.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics — a severity 2 finding. The compliance citation pattern shows several hallmarks of accumulation over time: a 13-item list of frameworks in the Constraints section with no prioritization or explanation of how each applies, open-ended FAM/FAH references spanning large volumes of policy without section specificity, CMMI requirements without maturity level or scope definition, and NIST SP 800-53 cited without an impact baseline. These create a real but not catastrophic compliance interpretation burden. The solicitation does not rise to severity 3 because most cited standards are at least plausibly relevant to the work (passport personalization printers do genuinely involve ICAO standards, ITIL service management, Section 508, and FISMA-related security controls), there are no clearly absurd or contradictory inclusions of the type seen in severe cases (e.g., no prohibition on the very capability being procured), and many of the technical specifications are quite specific and well-scoped. The FAR/DFARS clauses appear to be incorporated normally. The primary concern is the Constraints section&#x27;s undifferentiated list of frameworks and the open-ended FAM/FAH citation, which collectively force vendors — especially those new to DOS — to conduct extensive policy research before they can confidently price a proposal. Incumbents familiar with which IRM Directives are actively enforced and which CA-CCB processes are nominal versus rigorous will have a meaningful informational advantage.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Conduct NextGen Passport Personalization Printer related services in accordance with the SOW requirements and in compliance with all relevant U.S. Government and DOS regulations, policies, acts, guidelines processes and documents, to include the following: CA/CST SAFe Agile &amp; SDLC, CA/CST EA standards and target architecture, DOS Managing State Projects (MSP) methodology, Project Management Institute&#x27;s (PMI) Guide to the Project Management Body of Knowledge (PMBOK Guide), Information Technology Infrastructure Library (ITIL) v3, International Standards Organization (ISO) 20000 IT Service Management Quality Assurance methodology, Enterprise Change Management (ECM) Process, IT-CCB and CA-CCB, CA Service Oriented Architecture (SOA) environment and service development that aligns and complies with CST standards, CA data sharing Memorandums of Understanding and Interconnection Security Agreements and inter-agency security standards, CA/CST Ticket Management System, IRM Directives</blockquote>
+  <div class="ev-explanation">This single list bundles together at least 13 distinct frameworks, methodologies, and internal policy documents with no explanation of how each applies to this specific contract. Some items — like PMBOK, ITIL v3, ISO 20000, and SAFe Agile — are well-known industry frameworks that plausibly apply to a managed services contract, but their simultaneous citation without prioritization or conflict resolution guidance creates an undefined compliance burden. Others, like &#x27;IRM Directives&#x27; (plural, unspecified), &#x27;CA data sharing Memorandums of Understanding,&#x27; and &#x27;CA-CCB,&#x27; are internal agency documents that vendors cannot independently review or price against.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall comply with Departmental security policies and procedures, as outlined in the Foreign Affairs Manual (FAM) and the Foreign Affairs Handbook, including but not limited to 12 FAM, 12 FAH, and 5 FAH (reference Web site: https://fam.state.gov/default.aspx).</blockquote>
+  <div class="ev-explanation">The FAM/FAH reference is extremely broad — these are large compilations of State Department policy spanning many topic areas. Citing &#x27;12 FAM, 12 FAH, and 5 FAH&#x27; without specifying which sections are operative leaves vendors to parse extensive policy documents to determine their specific obligations. The &#x27;including but not limited to&#x27; language makes the compliance scope open-ended and potentially unlimited.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide related services in accordance with this SOW so these services will withstand scrutiny by the DOS Office of the Inspector General (OIG) and the Government Accountability Office (GAO). Provide a standards-based, best practices approach to providing the services and support based on Capability Maturity Model Integration (CMMI).</blockquote>
+  <div class="ev-explanation">Requiring CMMI compliance is a significant organizational certification burden that is not explicitly scoped — the solicitation does not specify a CMMI maturity level, appraisal method, or which process areas apply. Similarly, the OIG/GAO withstand-scrutiny language is aspirational rather than regulatory and adds an undefined compliance dimension vendors cannot price.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall comply with federal security controls, including but not limited to those specified in NIST SP800-53 Rev 4 or later.</blockquote>
+  <div class="ev-explanation">NIST SP 800-53 Rev 4 has been superseded by Rev 5 (released 2020, finalized 2021), and the solicitation&#x27;s &#x27;or later&#x27; language means vendors must determine which version applies. More broadly, SP 800-53 contains hundreds of security controls across 20 control families, and citing it without identifying an impact baseline (Low/Moderate/High) or specifying which control families are relevant to printer systems gives vendors no meaningful guidance on compliance scope.</div>
+</div><div class="evidence-item">
+  <blockquote>Comply with ICAO Document 9303 ... ISO/IEC 14443 ... FCC Class A emission standards ... OSHA requirements ... Section 508 (36 CFR Part 1194) ... 1194.21 Software applications and operating systems</blockquote>
+  <div class="ev-explanation">While many of these standards are genuinely relevant to passport printing hardware and software, they are presented as a scattered list across multiple PWS sections without a consolidated compliance matrix or prioritization. The mixing of hardware safety standards (OSHA, FCC Class A), international travel document standards (ICAO 9303, ISO/IEC 14443), and IT accessibility requirements (Section 508) without contextual bridging between them and specific deliverables is characteristic of an uncurated, accumulative compliance approach rather than a deliberately structured one.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation is predominantly structured as FFP across its CLINs, which is appropriate for discrete deliverables like printer procurement, shipping, and installation. However, the contract covers a broad and heterogeneous scope: FFP is used alongside labor-intensive support services, undefined future facility requirements, and evolving software development tasks. The most significant tension is between the FFP pricing structure and (a) the explicitly undefined &#x27;New Print Facility&#x27; CLINs where scope will only become known during performance, and (b) the software development and security remediation tasks where the volume of work is inherently unpredictable. For the on-site technician support labor, T&amp;M or labor-hour pricing would better reflect the variable nature of shift coverage, emergency callouts, and site-count changes. The Q&amp;A exchanges also reveal a potentially single-source supply situation for both hardware and software, meaning the competitive pricing discipline that makes FFP work well is weakened. That said, the severity is assessed at 2 rather than 3 because: the core deliverables (printers, installation, consumables, warranty) are commercially analogous items where FFP is defensible; the government partially acknowledges the undefined facility CLINs by deferring pricing until performance; and the solicitation does include optional CLIN structures that provide some flexibility. The mismatch is real but not catastrophic — it is the kind of hybrid scope that frequently produces contract modifications rather than outright failure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CLIN 0006 states: &#x27;shipping for high capacity printer with or without temporary storage (FFP)-optional&#x27; and CLIN 007 requests: &#x27;shipping for low capacity printer with or without temporary storage (FFP)-optional&#x27;</blockquote>
+  <div class="ev-explanation">Shipping and storage CLINs are priced as FFP, which is appropriate for these discrete, well-defined deliverables. FFP is the right vehicle for logistics tasks with reasonably predictable costs.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide full-time technician printer maintenance support for personalization printers as required at Passport Agency locations, Passport Centers, and at Support Sites within the DC Metropolitan area. The contractor shall designate a local technician to provide full-time coverage during the regular workdays Monday-Friday for 8 hours per work shift.</blockquote>
+  <div class="ev-explanation">Full-time technician support at multiple locations involves labor with variable quantities — the number of sites, shifts, and emergency callouts can fluctuate. This type of on-site, time-driven labor is typically priced on a T&amp;M or labor-hour basis, not FFP. If this labor is priced FFP, the contractor absorbs scheduling uncertainty, which may inflate bid prices or lead to disputes.</div>
+</div><div class="evidence-item">
+  <blockquote>The spreadsheet has multiple lines under each CLIN (SLINs). How will the Government evaluate a summarized FFP CLIN that contains optional activities for an undefined new print facility. [Response:] Optional CLINs referencing &#x27;New Print Facility&#x27; do not need to be priced at this time. Additional information regarding &#x27;New Print Facility&#x27; location(s) will be made available during contract performance as required.</blockquote>
+  <div class="ev-explanation">The government acknowledges that key scope elements — specifically new print facility support requirements — are undefined at award. Locking those tasks into a FFP structure when the scope is explicitly unknown at time of award is a textbook square-peg scenario: the contractor cannot accurately price undefined work, and the government will likely need modifications to bring those CLINs into effect.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide Software Development and Technical Labor Support for the NextGen Passport Personalization Printers within the Non-Production Environment (NPE)... Fix performance, security, and code issues identified by the Government in NPE. The Government plans to use static code analysis to identify issues and will work with the Contractor to determine required fixes before moving to IV&amp;V.</blockquote>
+  <div class="ev-explanation">Software development and bug remediation tasks are inherently scope-uncertain. The volume of security findings, code defects, and required fixes cannot be predicted at contract award. If these tasks are priced as FFP rather than T&amp;M or labor-hour, either the government overpays (padded estimates) or the contractor is squeezed when the backlog exceeds estimates.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide extended supplemental warranty at a fixed price, in accordance with their proposal, for each high and low-capacity Personalization Printer and other required contractor-provided equipment. The extended supplemental warranty will include complete preventive and remedial maintenance including parts and labor at all Domestic Passport Sites.</blockquote>
+  <div class="ev-explanation">Wrapping all preventive and remedial maintenance — including unpredictable remedial callouts and parts replacement — into a single FFP extended warranty is reasonable for standard commercial equipment, but this is highly customized, security-critical equipment with no competitive parts market. The Q&amp;A reveals concerns about a single-source supplier, meaning the contractor cannot competitively price parts risk. This may inflate the fixed warranty price or leave the government exposed if remedial demand exceeds the contractor&#x27;s assumptions.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="19AQMM24R0113 Amend 0001.pdf">19AQMM24R0113 Amend 0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0326aa1625c04412a5cc70cfe1edae02_19AQMM24R0113+Amend+0001.pdf" download="19AQMM24R0113 Amend 0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Appendix 2 - Section C PWS Tracked Changes Amendment 0003.docx">Appendix 2 - Section C PWS Tracked Changes Amendment 0003.docx</div></div>
+  <a class="dl-btn" href="../attachments/0326aa1625c04412a5cc70cfe1edae02_Appendix+2+-+Section+C+PWS+Tracked+Changes+Amendment+0003.docx" download="Appendix 2 - Section C PWS Tracked Changes Amendment 0003.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment B - CA Domestic Operational and Test Sites - Place of Delivery and Support.docx">Attachment B - CA Domestic Operational and Test Sites - Place of Delivery and Support.docx</div></div>
+  <a class="dl-btn" href="../attachments/0326aa1625c04412a5cc70cfe1edae02_Attachment+B+-+CA+Domestic+Operational+and+Test+Sites+-+Place+of+Delivery+and+Support.docx" download="Attachment B - CA Domestic Operational and Test Sites - Place of Delivery and Support.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment F - Past Performance Questionnaire.xlsx">Attachment F - Past Performance Questionnaire.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/0326aa1625c04412a5cc70cfe1edae02_Attachment+F+-+Past+Performance+Questionnaire.xlsx" download="Attachment F - Past Performance Questionnaire.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="NextGen Questions and Answers 9 5 2024 Final.xlsx">NextGen Questions and Answers 9 5 2024 Final.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/0326aa1625c04412a5cc70cfe1edae02_NextGen+Questions+and+Answers+9+5+2024+Final.xlsx" download="NextGen Questions and Answers 9 5 2024 Final.xlsx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

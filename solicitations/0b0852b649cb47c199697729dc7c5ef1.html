@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MC-CBRN Medical Emergency Manager — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>MC-CBRN Medical Emergency Manager</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 0b0852b649cb47c199697729dc7c5ef1</span>
+      <a class="sam-link" href="https://sam.gov/opp/0b0852b649cb47c199697729dc7c5ef1/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR EDUCATION AND TRAINING COMMAND › JOINT BASE SAN ANTONIO › FA3016  502 CONS CL</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541690</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed-Price (FFP) with Cost-Reimbursable Not-To-Exceed (NTE) travel CLIN</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">One Year: 18 May 2026 to 17 May 2027</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor 1 – Price</li><li>Factor 2 – Technical</li><li>Factor 3 – Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate compliance-over-outcomes problem. The Service Summary (Section 6.1, Table 2) is the central accountability mechanism for the contract, and it is structured almost entirely around process compliance: activity completion percentages, timeliness of document submission, and error counts. The performance thresholds — 90% monthly/bi-annually measured by &#x27;periodic/valid customer complaint&#x27; — are attached to coordination activities and advisory functions without defining what those percentages actually count or how they relate to mission outcomes. The budget objective&#x27;s timeliness/error-count rating scale is the most egregious example, reducing financial planning work to a document submission exercise.
+
+However, the solicitation does not rise to severity 3. Several mitigating factors keep this at moderate: (1) The solicitation is genuinely performance-based in structure — it is labeled a PWS, uses a Service Summary, and at least attempts to define performance thresholds rather than relying purely on input monitoring. (2) For a single-person advisory role, some process compliance metrics are inherently appropriate — there is no &#x27;system uptime&#x27; equivalent for a Medical Emergency Manager. (3) The reporting requirements are not excessive; there are no weekly status reports, overlapping cadences, or prescribed report formats cluttering the accountability structure. The QA surveillance plan referenced in Section 7.2 is not reproduced in the available text, so some outcome-oriented surveillance could exist in a QASP that was not provided. (4) The nature of the work — coordinating, reviewing, advising — makes clean outcome metrics harder to define, though not impossible (e.g., percentage of installation MEMs assessed as proficient, exercise after-action findings resolved within a timeframe, etc.).
+
+The core finding is that the government has defined success as completing the coordination and advisory activities at a 90% rate, rather than asking whether the MC-CBRN program actually improved. This is compliance-focused accountability, but the absence of overlapping reporting cadences, prescribed report formats, and plan-deviation tracking keeps this from being a severe case.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Objective 1: Review and provide guidance on Medical Emergency Management Policy and Tactics, Techniques and Procedures. | PWS Para 3.2, 3.3, 3.4, 3.8, 3.10 | Performance Threshold: 90% (monthly) | Method of Surveillance: Periodic/Valid customer complaint</blockquote>
+  <div class="ev-explanation">The 90% threshold is attached to activities (reviewing, providing guidance, coordinating) rather than to any outcome metric. There is no definition of what &#x27;90%&#x27; actually measures — 90% of tasks completed? 90% of requests answered? The method of surveillance is &#x27;periodic/valid customer complaint,&#x27; which monitors process adherence rather than whether the guidance actually improved MC-CBRN program effectiveness or mission readiness.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Objective 2: Monitor FCC capabilities and coordinate support. | PWS Para 3.5, 3.6 | Performance Threshold: 90% (bi-annually) | Method of Surveillance: Periodic/Valid customer complaint</blockquote>
+  <div class="ev-explanation">Same structural problem: the threshold is an undefined percentage applied to coordination activities. Bi-annual surveillance by &#x27;periodic/valid customer complaint&#x27; tells the government whether the contractor showed up and did the coordination tasks, not whether Federal Coordinating Center capabilities actually improved or whether the NDMS bed availability reporting produced any useful outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Objective 3: Assist in preparation and execution MAJCOM Program Element Code (PEC) 28036F budget requirements. | Performance Threshold: Excellent – Submitted on time with no errors and no complaints received... Unsatisfactory – Submitted late or with more than three (3) technical errors per page...</blockquote>
+  <div class="ev-explanation">This is the clearest example of compliance-over-outcomes in the document. The entire rating scale — Excellent through Unsatisfactory — measures timeliness and error counts in document submission, not whether the budget was well-conceived, whether the PEC 28036F resources were allocated effectively, or whether the budget execution served the MC-CBRN mission. Success here literally equals &#x27;submitted on time with no errors,&#x27; which is a pure process compliance standard.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Objective 4: Provide HSMR training support and oversight to installation MEMs. | PWS Para 3.9, 3.11, 3.12 | Performance Threshold: 90% (monthly) | Method of Surveillance: Periodic/Valid customer complaint</blockquote>
+  <div class="ev-explanation">Training support effectiveness should ideally be measured by whether installation MEMs improved their capabilities, whether exercises identified and resolved gaps, or whether HSMR programs became more capable. Instead, the threshold is an unspecified 90% monthly activity rate monitored by customer complaints — a process compliance check that cannot distinguish between training that was delivered and training that was effective.</div>
+</div><div class="evidence-item">
+  <blockquote>7.5. Contractor&#x27;s Quality Control Plan (QCP): The contractor shall provide and maintain a current QCP, which shall ensure the requirements of the contract are provided as specified. One copy of the QCP shall be provided to the CO as part of the technical proposal. The QCP shall be considered acceptable unless the CO notifies the contractor before award.</blockquote>
+  <div class="ev-explanation">The QCP requirement focuses entirely on ensuring contract requirements are &#x27;provided as specified&#x27; — a process compliance framing. There is no language directing that the QCP address how the contractor will measure whether the MC-CBRN program actually improved, whether subordinate units became more capable, or whether the MAJCOM-level support produced measurable readiness outcomes. The &#x27;acceptable unless notified otherwise&#x27; standard also sets an extremely low bar for quality assurance.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards patterns. The qualification requirements in PWS Para 3.13 are capability-focused and modest: three years of experience in a broadly defined field, &#x27;DoD or similar&#x27; senior expertise (explicitly not DoD-exclusive), general software proficiency, and freely obtainable FEMA online certifications. There are no dollar-threshold requirements for prior contracts, no demands for a specific number of completed federal contracts within a short lookback window, and no institutional-knowledge requirements that could only be satisfied by the incumbent. The Q&amp;A document confirms this is a new standalone contract (not a recompete), the prior work was performed under a centralized multi-MAJCOM contract, and there is no incumbent employee in place — which further reduces the structural conditions for insider rewards. The evaluation framework adds a further mitigating factor: past performance by new entrants receives a &#x27;Neutral/Pass&#x27; rating, and technical evaluation focuses on the offeror&#x27;s approach and the proposed candidate&#x27;s qualifications rather than prior contract performance at specific dollar levels. The requirement to submit a candidate resume is the closest element to an incumbency signal — a vendor who has already identified and employed a qualified person has a practical advantage — but this is inherent to any single-FTE staffing contract and does not constitute a structural insider-rewards pattern. Overall, a qualified small business that can identify a candidate meeting the PWS Para 3.13 criteria could realistically compete for this award without having previously held this or a similar contract. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.13.1. At least 3 years of experience in the emergency management medical field.</blockquote>
+  <div class="ev-explanation">This is a modest, capability-focused experience floor. Three years in emergency management medical work is not narrowly tied to federal contracting, incumbent-specific systems, or dollar thresholds. A wide range of professionals — including those with military, hospital, or civilian emergency management backgrounds — would qualify.</div>
+</div><div class="evidence-item">
+  <blockquote>3.13.2. DoD Experience or similar senior-level expertise in strategic planning, social marketing, program development and evaluation.</blockquote>
+  <div class="ev-explanation">The &#x27;or similar senior-level expertise&#x27; language explicitly allows for non-DoD equivalents. This is not a federal-exclusivity mandate; it offers a pathway for commercially experienced personnel. The phrasing tilts slightly toward DoD familiarity but does not foreclose non-incumbent competition.</div>
+</div><div class="evidence-item">
+  <blockquote>3.13.7. Complete and maintain the following Federal Emergency Management Agency Independent Study (IS) Courses within, and provide certificate of completion to the Contracting Officer Representative(COR), the past five years: IS-100.c...IS-200.c...IS-700.b...IS-800.c</blockquote>
+  <div class="ev-explanation">These are freely available online FEMA courses that any candidate can complete. They do not require prior contract performance history and impose no financial threshold or lookback window on prior contracts. This is a minimal, obtainable credential requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>Subfactor 1: Recruit, Hire and Retain Qualified Personnel — Offerors shall demonstrate an acceptable approach to recruit, hire and retain qualified and certified personnel capable of satisfying the requirements included in the Performance Work Statement (PWS) Para 3.13.</blockquote>
+  <div class="ev-explanation">The evaluation standard is whether the offeror can demonstrate an approach to meeting the PWS qualifications — not whether they have already held contracts of a specific dollar value or in a narrowly defined federal domain. A new entrant with a qualified candidate can satisfy this subfactor.</div>
+</div><div class="evidence-item">
+  <blockquote>In the case of an Offeror without a record of relevant past performance, or for whom information is not available, the Offeror will receive a &#x27;Neutral&#x27; rating, which is considered &#x27;Pass&#x27;.</blockquote>
+  <div class="ev-explanation">This is a mitigating factor. The solicitation explicitly protects new entrants from being penalized for lacking past performance history. A &#x27;Neutral&#x27; pass rating means incumbency or prior similar contracts are not prerequisites for award consideration.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS is self-labeled as &#x27;performance based&#x27; and does include a Service Summary table with defined performance thresholds and surveillance methods — which is a meaningful structural positive. The performance objectives (90% monthly thresholds, periodic surveillance) reflect genuine outcome orientation in places.
+
+However, Section 3 (Description of Services) and Section 4 (Hours of Operation) substantially undermine the performance-based framing. The twelve enumerated task bullets in Section 3 read as a job description for a government employee rather than a statement of required outcomes. They specify what specific activities the contractor shall perform — coordinating, reviewing, collecting, monitoring, attending, facilitating — rather than defining end states or measurable results. This pattern is characteristic of a solicitation drafted by cataloging the incumbent&#x27;s current activities, which the Q&amp;A confirms was a centralized contract previously held by Systems Plus, Inc. The task list in Section 3 very likely reflects how that work was performed historically.
+
+The tool prescription (Microsoft Office/Project by name), exact work hours, and detailed trip report content requirements further reflect a &#x27;do it the same way&#x27; orientation. The staffing structure — &#x27;one Full Time Medical Emergency Manager&#x27; — is prescribed in the PWS rather than derived from a workload analysis that vendors could address with alternative approaches.
+
+Mitigating factors prevent a severity-3 rating: the document does include a Service Summary with performance thresholds, the scope is narrow enough (one FTE, advisory role) that extreme solution diversity was never realistic, and most of the prescriptive elements are procedural rather than technically complex. The security, HIPAA, and access control requirements are legitimate regulatory mandates, not sprawl. The net result is a solicitation that constrains vendor approach in meaningful but not pervasive ways — vendors know exactly what activities they must perform and how many people must perform them, but the government has not fully foreclosed flexibility in how those outcomes are achieved. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.1. Coordinating with AFMEDCOM and ACC for MC-CBRN program requirements, issues, and consultative support.
+3.2. Support day-to-day activities of the MC-CBRN program and serve as reach back support to installation MEMs.
+3.3. Reviewing unit Medical Contingency Response Plans (MCRPs), prior to publication to validate medical response capabilities and verify compliance with AF directives.
+3.4. Collecting and evaluating MC-CBRN guidance change requests from subordinate units.
+3.5. Maintaining situational awareness of subordinate Federal Coordinating Center capabilities by reviewing annual self-assessment checklists and exercise after action reports.
+3.6. Coordinating support for Federal Coordinating Center staff assistance visits and National Disaster Medical System (NDMS) bed availability reporting, as scheduled or requested.</blockquote>
+  <div class="ev-explanation">This block of twelve enumerated task bullets in Section 3 prescribes specific activities the contractor &#x27;shall&#x27; perform rather than defining outcomes. For example, &#x27;reviewing annual self-assessment checklists&#x27; specifies the mechanism of maintaining situational awareness rather than the outcome (e.g., &#x27;ensure accurate situational awareness of FCC capabilities&#x27;). A vendor with a different analytical methodology — say, automated dashboards or direct reporting tools — would be constrained to use the prescribed review mechanism. The outcome sought (MAJCOM-level MC-CBRN program oversight) could be achieved through multiple approaches, but the solicitation locks in a task-by-task operational approach resembling the incumbent&#x27;s current workflow.</div>
+</div><div class="evidence-item">
+  <blockquote>3.13.5. Experience in current software programs: Microsoft Office to include Project, and Internet search browsers/tools.</blockquote>
+  <div class="ev-explanation">Mandating experience with Microsoft Office and Microsoft Project as a qualification requirement prescribes a specific toolset rather than a capability outcome. The actual need is that the contractor can effectively manage programs, create documentation, and conduct analysis. Requiring Microsoft-specific tools forecloses vendors who might use equivalent or superior alternatives (e.g., Google Workspace, Monday.com, or other project management platforms). This is a classic tool-prescription pattern associated with requirement sprawl, as it reflects the current incumbent&#x27;s operational environment rather than an outcome-based capability requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>4. HOURS OF OPERATION
+Normal Hours of Operation, the contractor shall perform the services required under this contract Monday - Friday, 0730-1630, excluding Federal holidays and other designated non-duty days. However, if flextime or a compressed work schedule is in effect, work hours shall correspond with Government personnel duty hours.</blockquote>
+  <div class="ev-explanation">Prescribing exact work hours (0730-1630) dictates how the contractor staffs and manages its employee rather than defining availability or responsiveness outcomes. For a largely advisory and assistance role where the primary deliverable is programmatic support and expertise, an outcome-based approach would specify something like &#x27;contractor personnel must be responsive to COR requests within [X] hours during government business hours.&#x27; The precise clock-in/clock-out mandate removes any flexibility for the contractor to structure its workforce differently while still meeting the mission need.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2.9. Trip Reports. The contractor shall post trip reports within 5 business days of the conclusion of travel. Trip Reports shall contain such information as the dates, locations, purpose and travelers involved in any travel taken in the performance of this contract. The trip report shall identify any issues or risks revealed that may have an impact on the systems and/or programs germane to this contract plus any action item that shall be accomplished by any party in order to accomplish the goals of this contract.</blockquote>
+  <div class="ev-explanation">While trip reporting is a reasonable deliverable, prescribing both the format content and the internal organizational structure of each trip report is process-level specification beyond what is needed to ensure accountability. The government&#x27;s interest is in knowing what happened during travel and what follow-up is required. Specifying the exact fields and content of trip reports — in conjunction with the broader pattern of process-level prescription throughout the document — reflects the document&#x27;s general tendency to describe how things must be done rather than what the contractor must achieve.</div>
+</div><div class="evidence-item">
+  <blockquote>5.3. Appearance. Contractor personnel shall present a neat well-groomed appearance. Contractor personnel shall report for duty in a professional manner, in appropriate attire and having complied with socially acceptable standards of personal hygiene. Expected dress is business casual or business attire.</blockquote>
+  <div class="ev-explanation">While dress and appearance standards are not unusual in government facilities, codifying them in a PWS for an advisory role extends the solicitation&#x27;s reach into managing employee behavior at a granular level. Combined with the prescribed work hours, mandatory specific training curricula, exact staffing structure (one FTE), and task-by-task work prescriptions, this illustrates a pattern of the PWS functioning as an operating manual for a single government-directed employee rather than a performance-based statement of need.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools. The compliance burden is elevated above what is warranted for a single-FTE advisory services contract, and several specific citations are either facially inapplicable or presented without any contextual explanation of relevance. The most notable issues are: (1) DoDM 8140.03 IA workforce certification requirements applied to a non-IT role; (2) a dense cluster of security directives in section 5.8.5 including EMSEC (emissions security for hardware) with no explanation of applicability; (3) standard clause Attachment 3 that includes maritime transport, detainee interrogation, and Berry Amendment clauses clearly carried over from a template; and (4) TJC (Joint Commission) invoked in the training section without explanation. However, this does not rise to severity 3. The solicitation has a legitimate classified environment (Secret/T3 clearance required) that justifies a meaningful portion of the security compliance citations. The HIPAA BAA is appropriate given the MHS context. The FAR/DFARS clauses in Attachment 3 are standard contract boilerplate that agencies routinely incorporate by reference. The PWS does provide some contextual framing for why certain requirements exist (e.g., the HIPAA BAA explains the MHS covered-entity relationship in detail). The rule pool problem here is real but bounded — it is the pattern of uncurated clause templates and unexplained multi-directive citations in the security sections, not a wholesale &#x27;Applicable Documents&#x27; dump. Severity 2 is appropriate: noticeable regulatory accumulation with some clearly inapplicable inclusions, but the core compliance landscape remains navigable for an experienced federal contractor in the defense health space.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>5.5. The Contractor shall ensure that personnel accessing information systems have the proper and current information assurance certification to perform information assurance functions in accordance with DoDM 8140.03, Cyberspace Workforce Qualification and Management Program... 5.5.1. DoD-approved information assurance workforce certifications appropriate for each category and level as listed in the current version of DoDM 8140.03; and 5.5.2. Appropriate operating system certification for information assurance technical positions as required by DoDM 8140.03.</blockquote>
+  <div class="ev-explanation">This is a one-person advisory/program management position that uses government-furnished computers and does not perform information assurance functions. Applying the full DoDM 8140.03 cyberspace workforce qualification framework — which governs IT security professionals managing network infrastructure — to a Medical Emergency Manager doing CBRN program coordination is at minimum over-inclusive and likely inapplicable. No context is provided for why IA certifications are relevant to this role.</div>
+</div><div class="evidence-item">
+  <blockquote>5.8.5. Additional Security Requirements. In accordance with DoDM 5200.01, Information Security Program and AFMAN 16-1404, the contractor shall comply with AFSSI 7700, Emission Security (EMSEC) Program; applicable AFKAGs, DAFIs, and AFSSIs for Communication Security (COMSEC); and DAFI 10-701, Operations Security (OPSEC) Instructions. The contractor will comply with DoD Standard 22/Force Protection Condition Measures, DoD Standard 25/Level I-AT Awareness Training, and associated tasking contained in DoDI O-2000.16 Vol 1, DoD Antiterrorism (AT) Program Implementation: DoD AT Standards.</blockquote>
+  <div class="ev-explanation">A single paragraph cites at least seven distinct directives or standards — DoDM 5200.01, AFMAN 16-1404, AFSSI 7700, AFKAGs, DAFI 10-701, DoD Standard 22, DoD Standard 25, and DoDI O-2000.16 — with no explanation of how each applies to a MAJCOM-level program coordinator position. EMSEC (emissions security for electronic equipment) is particularly notable: it governs radio frequency emanations from hardware, which is irrelevant to a person reviewing contingency plans and attending working group meetings on government-furnished equipment.</div>
+</div><div class="evidence-item">
+  <blockquote>5.8.2. Freedom of Information Act Program (FOIA). The contractor shall comply with DoD Manual 5400.07_AFMAN33-302... The contractor shall comply with DAFI 33-332, Privacy and Civil Liberties Program... The contractor shall remove or destroy official records only in accordance with DAFI 33-322, Records Management and Information Governance Program.</blockquote>
+  <div class="ev-explanation">Three separate records and privacy policy citations are stacked here without explanation of which specific FOIA obligations, Privacy Act systems of records, or records retention schedules apply to this work. The contractor is a single program manager coordinating CBRN policies — the specific FOIA, privacy, and records management obligations that would actually arise in this role are not distinguished from the generic regulatory citation.</div>
+</div><div class="evidence-item">
+  <blockquote>Attachment 3 — Applicable Clauses and Provisions lists, among others: 252.225-7012 Preference for Certain Domestic Commodities; 252.247-7023 Transportation of Supplies by Sea; 252.237-7010 Prohibition on Interrogation of Detainees by Contractor Personnel; 52.223-23 Sustainable Products; 252.239-7016 Telecommunications Security Equipment, Devices, Techniques, and Services.</blockquote>
+  <div class="ev-explanation">Several clauses in Attachment 3 have no apparent connection to a single-person advisory services contract performed at a desk on JBSA-Randolph. &#x27;Transportation of Supplies by Sea&#x27; (252.247-7023) applies to contracts involving maritime cargo — inapplicable here. &#x27;Prohibition on Interrogation of Detainees&#x27; (252.237-7010) governs detention facility operations — not relevant to CBRN program management. &#x27;Preference for Certain Domestic Commodities&#x27; (252.225-7012, the Berry Amendment) applies to clothing, tents, and certain manufactured goods — not advisory services. These appear to be drawn from a standard clause template without curation for this scope.</div>
+</div><div class="evidence-item">
+  <blockquote>2.1. Annual Training Requirements. Contract employees shall complete all mandatory and annual training required in accordance with (IAW) DoD, Air Force Instructions, and regulatory agencies (TJC, Health Insurance Portability and Accountability Act (HIPAA), Air Force Computer Security Policy, and AF Safety Policy). They shall complete all additional training as dictated by the work-center specific to the duties.</blockquote>
+  <div class="ev-explanation">This provision invokes TJC (The Joint Commission — a hospital accreditation body), HIPAA, AF Computer Security Policy, and AF Safety Policy simultaneously, with no explanation of why Joint Commission standards apply to a non-clinical MAJCOM program management role. TJC accreditation requirements govern healthcare facilities and clinical operations; their application to a contractor coordinating emergency management policy at a headquarters level is not self-evident and is not explained.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">6 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a Firm Fixed-Price contract for a single-FTE advisory and assistance position performing MAJCOM-level emergency management support. The FFP designation is not obviously wrong — the labor quantity is highly predictable (one person, defined government hours, fixed location), which satisfies the FAR&#x27;s primary condition for FFP use. The government is essentially buying a known quantity of labor with defined qualifications, and competition will provide price discipline. This differs meaningfully from a T&amp;M contract, which would be appropriate if the scope or volume of work were unpredictable.
+
+However, there is a moderate mismatch worth flagging. The requirement is for A&amp;AS advisory services — an inherently knowledge-work engagement where the value delivered depends heavily on the quality of the specific individual rather than on a defined deliverable or output. The PWS tasks (reviewing MCRPs, coordinating with AFMEDCOM, serving as SME on working groups, assisting with budget development) are all judgment-intensive activities with no discrete, measurable end-products. There is no output-based deliverable structure — the Service Summary performance thresholds are largely process-based (&#x27;90% monthly,&#x27; &#x27;periodic/valid customer complaint&#x27;) rather than outcome-based. This means FFP is buying hours of presence rather than a defined result, which shares characteristics with a labor-hour contract.
+
+The evaluation methodology compounds this concern: price is the primary award factor, and technical/past performance together are less important than price. For a single-person advisory role where the quality of the individual is the entire value proposition, a price-led FFP evaluation risks awarding to a cheaper candidate who nominally meets minimum qualifications but delivers less value. A labor-hour contract with specified LCAT rates would have made the pricing transparent and comparable while preserving some government cost control, though for a single FTE at fixed hours the practical difference is minimal.
+
+The one-year-only period of performance (confirmed in Q&amp;A) and the lack of option years reduces the stakes of the pricing structure mismatch — there is no long-term lock-in risk. The travel CLIN is appropriately structured as cost-reimbursable NTE.
+
+Overall, FFP is defensible for a single-FTE, defined-hours engagement, but the advisory/A&amp;AS nature of the work and the price-dominant evaluation approach create moderate structural tension. This is a severity 2 — the contract type is not obviously wrong, but a labor-hour structure would have been a better fit for transparent pricing of advisory labor, and the price-dominant evaluation framework increases the risk that the government optimizes for cost over capability in a role where individual expertise is the entire product.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to evaluate the complete quote and award a Firm Fixed-Price (FFP) contract based on the initial submissions without conducting interchanges (INs)</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates a Firm Fixed-Price contract structure for the primary service CLIN. This is the pricing type under analysis.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0002 is a Cost-Reimbursable Not-To-Exceed(NTE) CLIN. It is an independent line item solely for the direct reimbursement of all pre-approved travel costs and not tied to the FFP CLIN.</blockquote>
+  <div class="ev-explanation">The contract has a hybrid structure: FFP for the labor CLIN and cost-reimbursable NTE for travel. The travel CLIN is appropriately structured. The labor CLIN&#x27;s FFP designation is the focus of the mismatch concern.</div>
+</div><div class="evidence-item">
+  <blockquote>1.2. Workload. Workload estimate anticipated for one Full Time Medical Emergency Manager... This is a performance based, non-personal advisory and assistance (A&amp;AS) services requirement in support of the MC-CBRN program within AETC/SG in accordance with established program goals and objectives for medical emergency management.</blockquote>
+  <div class="ev-explanation">The requirement is for a single, full-time person performing A&amp;AS advisory work at a fixed location (JBSA-Randolph). The workload is defined as one FTE working standard government hours. This actually supports FFP: the labor quantity (one person, standard hours) is predictable, which is the primary condition for FFP suitability.</div>
+</div><div class="evidence-item">
+  <blockquote>Normal Hours of Operation, the contractor shall perform the services required under this contract Monday - Friday, 0730-1630, excluding Federal holidays and other designated non-duty days.</blockquote>
+  <div class="ev-explanation">The hours of performance are rigidly defined — standard government workday, Monday through Friday. This predictability in labor quantity strengthens the case for FFP, since there is essentially no uncertainty in how many hours will be worked.</div>
+</div><div class="evidence-item">
+  <blockquote>In the event that an occasional special project may occur, the contractor shall be required to work beyond the normal duty hours stated herein if required by the COR. If that should occur, the COR may alter the work schedule to accommodate the additional hours needed.</blockquote>
+  <div class="ev-explanation">The PWS allows for schedule adjustments and occasional extended hours, but crucially frames this as schedule rebalancing rather than additional compensation — hours beyond normal duty are offset by reducing other hours within the same two-week 80-hour window. This does not introduce cost uncertainty under FFP, as total hours remain bounded.</div>
+</div><div class="evidence-item">
+  <blockquote>Technical and past performance, when combined, are less important than price.</blockquote>
+  <div class="ev-explanation">Price is the dominant evaluation factor. This is consistent with FFP as it signals the government views the labor as a commodity service where cost competition is primary. However, combined with the A&amp;AS advisory nature of the work — where quality of the specific individual matters enormously — price-led evaluation under FFP creates risk that the winning contractor will propose a lower-quality candidate at a lower price, with no adjustment mechanism if the person underperforms.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 - PWS.pdf">Attachment 1 - PWS.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b0852b649cb47c199697729dc7c5ef1_Attachment+1+-+PWS.pdf" download="Attachment 1 - PWS.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 3 - Applicable Provisions and Clauses%28Revision 01%29.pdf">Attachment 3 - Applicable Provisions and Clauses%28Revision 01%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b0852b649cb47c199697729dc7c5ef1_Attachment+3+-+Applicable+Provisions+and+Clauses%28Revision+01%29.pdf" download="Attachment 3 - Applicable Provisions and Clauses%28Revision 01%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 6 - Questions and Answers %28Added%29.pdf">Attachment 6 - Questions and Answers %28Added%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b0852b649cb47c199697729dc7c5ef1_Attachment+6+-+Questions+and+Answers+%28Added%29.pdf" download="Attachment 6 - Questions and Answers %28Added%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Combined Synopsis Solicitation %28Revision 01%29.pdf">Combined Synopsis Solicitation %28Revision 01%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b0852b649cb47c199697729dc7c5ef1_Combined+Synopsis+Solicitation+%28Revision+01%29.pdf" download="Combined Synopsis Solicitation %28Revision 01%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Combined Synopsis Solicitation - MC-CBRN Medical Emergency Manager.pdf">Combined Synopsis Solicitation - MC-CBRN Medical Emergency Manager.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0b0852b649cb47c199697729dc7c5ef1_Combined+Synopsis+Solicitation+-+MC-CBRN+Medical+Emergency+Manager.pdf" download="Combined Synopsis Solicitation - MC-CBRN Medical Emergency Manager.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

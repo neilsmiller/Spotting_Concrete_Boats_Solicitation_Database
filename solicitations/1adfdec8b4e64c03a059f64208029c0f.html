@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polaris GWAC Service-Disabled Veteran-Owned Small Business Pool — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Polaris GWAC Service-Disabled Veteran-Owned Small Business Pool</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 1adfdec8b4e64c03a059f64208029c0f</span>
+      <a class="sam-link" href="https://sam.gov/opp/1adfdec8b4e64c03a059f64208029c0f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-01-22</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">GENERAL SERVICES ADMINISTRATION › FEDERAL ACQUISITION SERVICE › GSA/FAS ITC OFFICE OF ACQUISITION OPERATIONS, INTERAGENCY CONTRACTS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541512</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-01-22</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">IDIQ</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">5-year base ordering period with one 5-year option (cumulative term up to 10 years)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Relevant Experience (Primary Relevant Experience Projects)</li><li>Emerging Technology Relevant Experience</li><li>Past Performance</li><li>Systems, Certifications, and Clearances</li><li>Organizational Risk Assessment</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a master GWAC vehicle solicitation (Polaris SDVOSB Pool), not a task order solicitation with a Statement of Work defining actual IT services to be performed. The available document text — the SF33, Q&amp;A documents, amendment SF30, FPDS sample attachment, and GSA Form 527 — describes the GWAC vehicle structure, proposal evaluation criteria, and offeror responsibility requirements. It does not contain a PWS, SOW, QA Surveillance Plan, or detailed deliverables section that would be the normal location for compliance-over-outcomes problems.
+
+At the GWAC vehicle level, the accountability structure is necessarily administrative: offerors must maintain SAM registration, remit CAF, submit a C-SCRM plan, and provide program and contract managers. These are appropriate administrative controls for an indefinite-delivery vehicle, not performance surveillance substitutes. The Q&amp;A confirms that the Contractor Program Manager is not required to serve at the task order level, and that subcontractors and teaming arrangements are governed at the task order level — meaning the substantive performance accountability (including any QA surveillance) will be defined at the task order level by ordering agencies, not in this master vehicle.
+
+The evaluation framework (Section M.6 Polaris Scoring Table, referenced throughout Q&amp;A) is points-based and focused on demonstrated relevant experience, past performance ratings, systems/certifications, and organizational risk — this is a vendor capability assessment, not an ongoing performance accountability structure.
+
+Because the available text does not include the master contract&#x27;s Section F (Deliverables) in full, Section H special requirements in full, or Section E (Inspection and Acceptance) in full, I cannot rule out compliance-over-outcomes language entirely. However, based on what is available, there is no evidence of the stacked reporting cadences, prescribed report formats, or process-surveillance-without-outcome-metrics that characterize this sin. A GWAC vehicle solicitation at this level is structurally unlikely to exhibit severe compliance-over-outcomes patterns — those patterns emerge at the task order level where actual work is defined. Severity is assessed as 1 (minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Deliverable 13 refers to the remittance of CAF while Deliverable 11 is the reporting of this remittance.</blockquote>
+  <div class="ev-explanation">The Q&amp;A clarifies a distinction between two deliverables related to the Contract Access Fee (CAF), indicating the solicitation does include some structured reporting requirements at the master contract level. However, this is a GWAC vehicle-level administrative deliverable (fee remittance reporting), not a performance surveillance mechanism — it is a financial compliance item that is legitimate and narrow in scope.</div>
+</div><div class="evidence-item">
+  <blockquote>As noted in G.17.1, GSA will provide a C-SCRM Plan template to contractors post-award, prior to the submission dates indicated in Section F.6, Deliverables.</blockquote>
+  <div class="ev-explanation">The solicitation references a Cyber Supply Chain Risk Management (C-SCRM) Plan deliverable, which is a process/compliance-type requirement. However, this is a one-time post-award deliverable and reflects a legitimate security baseline requirement rather than an ongoing surveillance mechanism measuring process compliance over outcomes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The Polaris SDVOSB Pool solicitation presents a moderate case of insider rewards — not severe, because GSA made several deliberate design choices to broaden access (allowing commercial and subcontract experience, permitting subcontractor projects to count toward the minimum three, allowing projects across multiple pools, no minimum score for award). These are genuine mitigating factors that distinguish Polaris from a classically exclusionary solicitation.
+
+However, the scoring architecture systematically advantages established federal IT prime contractors in several compounding ways: (1) multiple high-value scoring categories are exclusively available for federal prime contract experience; (2) point values scale with contract dollar size, favoring vendors who have won large-dollar federal awards; (3) bonus points for cost-reimbursement contract type, multi-award IDIQ task orders, multiple federal customers, OCONUS performance, cybersecurity, and emerging technology all require documentation formats (FPDS reports, CPARS ratings) that only exist for federal contracts; (4) the verification burden for non-federal experience is substantially higher and the evidence is treated as less authoritative.
+
+The cumulative effect is that a vendor with deep commercial IT capability — even a highly sophisticated one — will systematically score lower than a comparable vendor with equivalent capability but a history of federal prime contracts. This is not because the commercial vendor is less capable of delivering IT services, but because the scoring table is calibrated to federal contracting experience as a proxy for capability. A qualified SDVOSB with primarily commercial or subcontract IT experience would find it very difficult to compete against an established federal IT prime, even with strong technical capability.
+
+This falls short of severity 3 because non-incumbents with federal experience but not this specific contract can realistically compete — the solicitation is not narrowly tailored to a single incumbent&#x27;s profile. It is a GWAC vehicle with broad scope, which further limits the incumbency capture dynamic. Severity 2 is appropriate: the playing field is tilted toward established federal IT prime contractors, but the door is not closed to qualified new entrants with some federal contracting history.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Offeror must submit a MINIMUM OF THREE (3) and may submit a MAXIMUM OF FIVE (5) distinct Primary Relevant Experience Projects... Projects must have at least six (6) months of performance by the date proposals are due.</blockquote>
+  <div class="ev-explanation">While the minimum of three projects and six-month performance threshold are not extreme in isolation, when combined with other requirements (NAICS-specific, dollar-size scoring, recency window of five years), they begin to stack against new entrants who have not already accumulated a portfolio of qualifying IT services contracts.</div>
+</div><div class="evidence-item">
+  <blockquote>Project value for completed federal Projects is determined by the total obligated dollars... scoring elements include dollar size thresholds that generate additional points based on project value ranges.</blockquote>
+  <div class="ev-explanation">The scoring table awards additional points based on project dollar size (visible in the Amendment 0001 excerpt showing tiered scoring for multiple federal government customers and cost-reimbursement projects). Vendors whose past work skewed toward smaller or commercial contracts are disadvantaged relative to incumbents who have already won large-dollar federal IT contracts — not because they lack capability, but because their prior contracts were smaller or non-federal.</div>
+</div><div class="evidence-item">
+  <blockquote>These points are only available for Relevant Experience Projects performed as a prime contractor to the Federal Government. Task orders with a state or local government are not eligible for this additional scoring. (L.5.2.2.3, L.5.2.2.4)</blockquote>
+  <div class="ev-explanation">Multiple scoring elements — multi-government customer experience, cost-reimbursement contract type, multi-award IDIQ task order experience, and OCONUS performance — are exclusively available for federal prime contracts. A vendor with substantial commercial IT experience or state/local government experience is structurally disadvantaged across multiple scoring categories simultaneously, not just one. This stacks in favor of established federal contractors.</div>
+</div><div class="evidence-item">
+  <blockquote>L.5.2.2.7 Relevant Experience Project Providing Cybersecurity Services... L.5.2.3 Emerging Technology Relevant Experience... each Project must have included the performance of one of the Emerging Technologies listed in L.5.2.3.1</blockquote>
+  <div class="ev-explanation">Bonus points for cybersecurity services and specific emerging technology categories require that prior contracts explicitly called out these services in the SOW/PWS. Vendors who performed these capabilities under contracts that did not explicitly name them in the statement of work cannot claim the points, even if they performed the work. This rewards vendors with federal contracting experience in explicitly-scoped SOWs — a characteristic more common among incumbent federal IT contractors than commercial newcomers.</div>
+</div><div class="evidence-item">
+  <blockquote>Only in the event CPARS information is not available will an Offeror be allowed to submit Attachment J.P-4, Past Performance Rating Form... if the Government has interim or final ratings in CPARS for the Relevant Experience Project(s) being utilized, the Offeror must provide a copy of this rating(s) report.</blockquote>
+  <div class="ev-explanation">CPARS ratings only exist for federal prime contracts. Vendors whose strongest relevant experience is commercial or subcontract work must rely on the J.P-4 form (a self-reported customer rating form), which carries less evaluative weight. This structurally disadvantages non-incumbents whose best work was not on federal prime contracts, even when that work is highly relevant.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for the Polaris GWAC SDVOSB Pool — a governmentwide indefinite-delivery, indefinite-quantity (IDIQ) master contract vehicle, not a performance-based task order with a defined scope of work. The documents available consist of: (1) the SF33 cover page, (2) the GSA Form 527 financial information form, (3) an FPDS-NG sample reference document, (4) an SF30 amendment primarily updating the SAM.gov notification procedure and a scoring table, and (5) an extensive Q&amp;A document.
+
+Critically, what is NOT present in the provided text is the actual Statement of Work or Performance Work Statement describing IT services to be performed. The solicitation Section C (Description/Specs/Work Statement) content, Section B (Supplies or Services), and the labor category descriptions (Attachment J-2) are referenced but not provided in the extracted text. The Q&amp;A document refers extensively to proposal submission instructions (Section L) and evaluation criteria (Section M), which are scoring and eligibility focused rather than prescriptive process-mandate focused.
+
+The available content is almost entirely about HOW TO PROPOSE — what documents to submit, how to verify relevant experience, how to use the Polaris Submission Portal, teaming requirements, and evaluation scoring mechanics. These are proposal mechanics, not performance requirements. A few elements are worth noting:
+
+- The scoring criteria (relevant experience NAICS codes, cost-reimbursement contract types, OCONUS experience, certifications, cleared facilities) reflect outcome and capability signals rather than process prescriptions.
+- The requirement to submit a Professional Employee Compensation Plan and financial information (GSA 527) are standard responsibility determinations, not prescriptive performance requirements.
+- References to a Contractor Program Manager (G.5.1) and Contractor Contract Manager (G.5.2) suggest some staffing structure requirements exist, but these are management oversight roles standard for GWAC vehicles and the full clause text is not available to assess their prescriptiveness.
+
+Because this is a master IDIQ contract award vehicle — work scope is defined at the task order level by individual ordering agencies, not in the master contract — requirement sprawl at the master contract level would be structurally unusual. The available text shows no evidence of prescriptive step-by-step process mandates, dictated toolsets, or methodology constraints. The solicitation appropriately focuses on evaluating offeror qualifications and capabilities rather than mandating how IT services will be delivered.
+
+Severity is assessed as 1 (Minimal). The available documents do not exhibit requirement sprawl. While the full SOW/PWS text is not provided, the overall structure of a GWAC qualification vehicle is inherently outcome-capability oriented rather than process-prescriptive at the master contract level.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The available solicitation content — the SF33 cover form, SF30 Amendment 0001, the GSA Form 527 (J.P-5), the FPDS-NG sample (J.P-3), and a lengthy Q&amp;A document — does not exhibit the hallmarks of Rule Pools. The regulatory references that appear are standard: FAR clauses cited by section number (52.215-1, 52.222-46, 52.237-10, 52.219-14, 52.207-6, 52.232-8), SBA regulations cited by CFR section in direct response to specific teaming questions (13 CFR 121.103, 13 CFR 125.8, 13 CFR 125.9, 13 CFR 125.18, 13 CFR 126.616, 13 CFR 127.506), and OMB Circular A-129 cited on the GSA 527 financial form. Each regulatory reference in the Q&amp;A document appears in direct response to a specific offeror question and is contextualized — explaining what the regulation requires and why it applies to the situation at hand. The Polaris solicitation is a GWAC vehicle acquisition (a competition for slots on a contract vehicle, not for specific IT services delivery), which means the scope of directly applicable regulations at this stage is inherently narrower than a task-order-level SOW. There is no &#x27;Applicable Documents&#x27; section visible in the provided materials, no bulk list of directives, no irrelevant inclusions (e.g., no energy policy or ID badge requirements in a software context), and no contradictions between cited regulations and the solicitation&#x27;s purpose. The compliance burden described — FPDS reporting, SAM registration, SBA small business program rules, FAR proposal submission requirements — is directly and obviously connected to the work of qualifying for a GWAC vehicle. Critically, the most important caveat here is that 68 pages across 21 attachments were referenced but only a subset was provided. The full RFP text (Section C PWS, Section H Special Requirements, Section I Contract Clauses) was not included in the provided content. Those sections typically contain the most concentrated regulatory citation. However, based on available evidence, there is no indication of Rule Pools at a severity-2 or severity-3 level. The Q&amp;A document — which is 50+ pages of detailed offeror questions — shows vendors engaging substantively with the scoring and eligibility rules, not struggling to parse an impenetrable compliance wall. Severity 1 is appropriate based on the available content.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Per section M.2, Basis for Awards, the Government intends to award contracts without discussions. Proposals must contain the best offer.</blockquote>
+  <div class="ev-explanation">This Q&amp;A response reflects a straightforward procedural point. The solicitation&#x27;s regulatory citations are handled through standard FAR provisions (FAR 52.215-1, FAR 52.222-46, FAR 52.237-10, FAR 52.219-14, FAR 52.232-8) incorporated by reference in normal federal contracting fashion, not an accumulated list of agency-specific policies dumped without context.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Polaris SDVOSB is a governmentwide acquisition contract (GWAC) — an IDIQ vehicle for IT services. At the master contract level, no pricing structure is established; contract type is determined at the task order level by ordering agencies based on their specific requirements. This is the standard, FAR-compliant approach for IT GWACs (see also GSA Alliant, CIO-SP3, etc.). The solicitation explicitly states that cost and pricing information is not considered at the master contract level, and the scoring criteria reward experience with both cost-reimbursement and fixed-price task orders, indicating the vehicle is designed to accommodate multiple contract types as appropriate to each task order&#x27;s requirements. There is no square peg here: the IDIQ structure does not lock ordering agencies into a single pricing approach. The sin of &#x27;square peg&#x27; would apply if this solicitation mandated a specific contract type at the task order level that conflicted with the nature of IT services work — but it does not. Severity is 1 — the contract structure is appropriate for a broad, multi-agency IT services vehicle.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>In accordance with 41 U.S.C. 3306(c) and associated GSA Class Deviation CD-2020-14, cost and pricing information will not be considered at the Master Contract level.</blockquote>
+  <div class="ev-explanation">This confirms that Polaris is a GWAC — an indefinite-delivery, indefinite-quantity (IDIQ) vehicle. Pricing is not established at the master contract level; it is set at the task order level. This is the standard and appropriate structure for a governmentwide IT services acquisition vehicle.</div>
+</div><div class="evidence-item">
+  <blockquote>The contract ordering period for the Master Contract is from the date of the Notice-To-Proceed through five years thereafter, with one, five-year option that may extend the cumulative term of the contract to 10 years.</blockquote>
+  <div class="ev-explanation">The master contract establishes an ordering period, not a fixed scope of work. This is consistent with IDIQ contract structure, where the vehicle itself does not define deliverables or pricing — those are determined at task order award. Assessing pricing structure at the master contract level is therefore not meaningful.</div>
+</div><div class="evidence-item">
+  <blockquote>Reference B.7 for information on utilizing additional labor categories when necessary to provide an IT services-based solution for a specific task order.</blockquote>
+  <div class="ev-explanation">The solicitation references labor categories (LCATs) with fixed hourly rates applicable at the task order level, which is consistent with a T&amp;M/labor-hour task order structure — one of the standard and appropriate pricing approaches for IT services GWACs where scope varies by task order.</div>
+</div><div class="evidence-item">
+  <blockquote>Can Offerors receive points for cost-reimbursement projects even if there is only one cost reimbursable CLIN? Yes, L.5.2.2.4, the Offeror will receive additional points if the Projects (either the contract or a specific CLIN) are United States Federal Government Cost-Reimbursement, specifically any of the cost-reimbursement contract types specified under FAR Subpart 16.3.</blockquote>
+  <div class="ev-explanation">The solicitation awards scoring points to offerors demonstrating experience with cost-reimbursement contract types, signaling that task orders under the GWAC may be issued as cost-reimbursement — alongside T&amp;M or FFP. This multi-type flexibility is appropriate and standard for a broad IT services GWAC serving diverse agency needs.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="47QTCB22R0007 SF30 SDVOSB Amend0001.pdf">47QTCB22R0007 SF30 SDVOSB Amend0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1adfdec8b4e64c03a059f64208029c0f_47QTCB22R0007+SF30+SDVOSB+Amend0001.pdf" download="47QTCB22R0007 SF30 SDVOSB Amend0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="J.P-3 FPDS Sample Polaris SDVOSB.pdf">J.P-3 FPDS Sample Polaris SDVOSB.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1adfdec8b4e64c03a059f64208029c0f_J.P-3+FPDS+Sample+Polaris+SDVOSB.pdf" download="J.P-3 FPDS Sample Polaris SDVOSB.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="J.P-5 GSA527 Polaris SDVOSB.pdf">J.P-5 GSA527 Polaris SDVOSB.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1adfdec8b4e64c03a059f64208029c0f_J.P-5+GSA527+Polaris+SDVOSB.pdf" download="J.P-5 GSA527 Polaris SDVOSB.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Polaris SDVOSB Pool RFP 47QTCB22R0007 SF33.pdf">Polaris SDVOSB Pool RFP 47QTCB22R0007 SF33.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1adfdec8b4e64c03a059f64208029c0f_Polaris+SDVOSB+Pool+RFP+47QTCB22R0007+SF33.pdf" download="Polaris SDVOSB Pool RFP 47QTCB22R0007 SF33.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="QUESTION AND RESPONSE DOCUMENT No. 1.pdf">QUESTION AND RESPONSE DOCUMENT No. 1.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1adfdec8b4e64c03a059f64208029c0f_QUESTION+AND+RESPONSE+DOCUMENT+No.+1.pdf" download="QUESTION AND RESPONSE DOCUMENT No. 1.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

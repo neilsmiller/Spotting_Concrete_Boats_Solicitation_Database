@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDIC&#x27;s Juniper WAN Tech Refresh Requirement — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>FDIC&#x27;s Juniper WAN Tech Refresh Requirement</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 ba085e8ab41f4fd3ab7600572ba1ddb7</span>
+      <a class="sam-link" href="https://sam.gov/opp/ba085e8ab41f4fd3ab7600572ba1ddb7/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-16</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">FEDERAL DEPOSIT INSURANCE CORPORATION › FEDERAL DEPOSIT INSURANCE CORPORATION › _</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-16</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">One year from Award Date</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable</li><li>Technical Acceptability</li><li>Price Completeness</li><li>Price Reasonableness</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial hardware and maintenance procurement — a tech refresh of Juniper WAN equipment consisting of specific, catalog-defined parts. The compliance-over-outcomes sin is fundamentally about service contracts or IT development efforts where process adherence crowds out performance accountability. That dynamic is largely inapplicable here.
+
+The solicitation contains no ongoing reporting requirements, no weekly or monthly status reports, no project management plans, no prescribed meeting cadences, and no QA surveillance plan. There is no work to perform in an ongoing sense — the vendor delivers specific hardware items and maintenance contracts against a price schedule. The inspection and acceptance clause simply requires FDIC to verify delivered goods conform to the order within 15 business days. This is appropriate outcome-focused acceptance for a goods procurement.
+
+The only accountability mechanism is delivery confirmation: &#x27;The goods must be delivered in accordance with the Price Schedule&#x27; and shipment tracking notification within one business day. For a hardware purchase, these are entirely reasonable controls — they verify the right things were received, not that the vendor followed a process.
+
+There are no performance metrics in the traditional sense because none are needed or appropriate. The &#x27;performance&#x27; question is binary: did the vendor deliver the correct Juniper equipment at the contracted price? The maintenance SKUs (Juniper Care Next Day Support, etc.) come with Juniper&#x27;s own service levels embedded in the commercial product, not defined by FDIC reporting requirements.
+
+The solicitation scores a 1 on this dimension. There is no compliance-over-outcomes problem to find because there is no ongoing service performance to measure. The absence of outcome metrics is not a sin here — it reflects the nature of the acquisition.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.6.4-01 - Inspection and Acceptance - July 2008
+(a) All goods and services shall be subject to inspection and test by the FDIC Oversight Manager, to the extent practicable, at all times and places during the term of the award.
+(b) The FDIC shall have 15 business days from the date of Contractor&#x27;s delivery to determine if such goods and services are in compliance with the requirements of the contract.</blockquote>
+  <div class="ev-explanation">This is outcome-oriented acceptance testing for a hardware procurement — the government evaluates whether delivered goods conform to specifications. This is the opposite of compliance theater; it is deliverable acceptance evaluation. Included here only to note it exists and is appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>7.3.1-17 - Lowest Price Technically Acceptable Evaluation Method
+(c) Technical acceptability will be determined by the offer meeting the FDIC&#x27;s minimum technical requirements. Proposals will be evaluated as either &#x27;acceptable&#x27; or &#x27;unacceptable&#x27;.</blockquote>
+  <div class="ev-explanation">The evaluation method is binary pass/fail against defined technical requirements (correct part numbers, authorized reseller status). While this is thin on outcome metrics, it is appropriate for a commercial hardware purchase where the &#x27;outcome&#x27; is receiving the specified equipment at the best price.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful Insider Rewards characteristics. It is a straightforward commercial hardware and maintenance procurement — a tech refresh of specific Juniper WAN equipment with known part numbers. The evaluation method is Lowest Price Technically Acceptable (LPTA), and the technical acceptability threshold is minimal: submit all required documents, price all line items, and be an authorized Juniper reseller or OEM. There are no experience requirements, no past performance evaluation criteria, no dollar thresholds for prior contracts, no federal-specific experience mandates, no lookback windows, and no institutional knowledge requirements. The solicitation does not ask offerors to demonstrate prior work of any kind — it asks only that they can supply specific parts at the best price. The one constraint that could theoretically limit competition — the Juniper authorized reseller requirement — is directly tied to the nature of the procurement. The FDIC is buying named Juniper products with Juniper-branded support contracts; only authorized channel partners can legitimately provide manufacturer-backed warranties and support agreements. This is a supply chain integrity requirement, not an incumbency filter. The Q&amp;A exchange confirms the solicitation was responsive to a vendor identifying serial numbers already under an active contract, and the FDIC removed those items — a sign of reasonable procurement administration rather than incumbent capture. Any qualified Juniper authorized reseller or distributor, whether or not they have previously worked with FDIC, could realistically and competitively respond to this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror must be an Authorized Reseller/Partner of Juniper or be the Original Equipment Manufacturer (OEM). The CO may contact Juniper to confirm the Offeror&#x27;s reseller status.</blockquote>
+  <div class="ev-explanation">This requirement restricts competition to vendors with an existing Juniper partnership or OEM status. However, this is a standard and defensible requirement for a brand-specific hardware procurement — the FDIC is purchasing specific Juniper part numbers and Juniper-branded maintenance services (e.g., &#x27;Juniper Care Next Day Support,&#x27; &#x27;Juniper Government Advanced Care Plus&#x27;). A vendor cannot resell or provide warranty-backed Juniper hardware and Juniper-branded support services unless they are authorized to do so. This is a product-specific supply chain constraint, not an incumbency proxy.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial hardware and maintenance procurement — a technology refresh of Juniper WAN equipment with specific part numbers. It is not a services contract and contains no statement of work describing how tasks should be performed. The entire substantive scope is captured in the price schedule (26 line items listing specific Juniper hardware, cabling, and maintenance SKUs with quantities). There are no process requirements, staffing prescriptions, workflow mandates, or step-by-step task descriptions that would constitute requirement sprawl in the traditional sense.
+
+The solicitation specifies exact Juniper part numbers (e.g., QFX5120-48Y-AFO-T, ACX7348-BASE, ACX7300-RE), which is brand-specific. However, this is a brand-locked hardware refresh — a well-established procurement pattern for replacing end-of-life infrastructure with like-for-like equipment. The agency is not dictating how a vendor should deliver a service; it is ordering specific goods. Specifying part numbers in a hardware purchase is equivalent to specifying a standard in a construction contract: it constrains the product, not the process.
+
+Section C (Description/Specifications/Work Statement) contains no attachments and no full-text clauses — it incorporates only a single clause by reference (7.3.2-34, Duty to Deliver or Perform). The delivery requirements are simple: ship to a distribution center, provide tracking information within one business day of shipment. The contract terms are standard boilerplate (payment, inspection, dispute resolution, supply chain risk management representations).
+
+The one mildly prescriptive element — requiring authorized Juniper reseller status — is a legitimate supply chain integrity requirement for a sole-brand hardware procurement, not a process mandate. Overall, this solicitation exhibits minimal requirement sprawl characteristics. It defines what to deliver (specific equipment) rather than how to perform a service, which is appropriate for a goods procurement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror must be an Authorized Reseller/Partner of Juniper or be the Original Equipment Manufacturer (OEM). The CO may contact Juniper to confirm the Offeror&#x27;s reseller status.</blockquote>
+  <div class="ev-explanation">This locks the procurement to a single vendor&#x27;s product line (Juniper) by requiring offerors to be authorized Juniper partners. However, this is a technology refresh of existing Juniper WAN infrastructure, making brand-specific procurement a reasonable interoperability constraint rather than process sprawl. The requirement defines WHO can sell the equipment, not HOW the vendor should perform work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">No reasoning available.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial hardware and maintenance procurement — specifically identified Juniper network equipment (ACX7348, ACX7300 chassis, line cards, transceivers, cables) and associated vendor support SKUs (Juniper Care Next Day, Government Advanced Care Plus). Every line item has a specific part number, a fixed quantity, and a one-year period of performance. The requirements are fully defined: the FDIC knows exactly what it wants to buy, in what quantities, from a specific OEM ecosystem. FFP is the textbook-appropriate contract type for this scenario. The government bears essentially no risk of scope creep or quantity uncertainty — this is a catalog-style purchase of commercial products. The use of LPTA evaluation further confirms the commodity nature of the procurement. There is no mismatch between the pricing structure and the requirements. The only minor observation is that maintenance service SKUs (items 21–26) are also priced as FFP line items, which is appropriate given that these are catalog-priced vendor support contracts with defined coverage periods, not open-ended labor arrangements. No square peg issue exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.3.2-11 - Pricing Proposal (Firm-Fixed-Price) - February 2025
+(a) Pricing Schedule. Offerors shall complete and submit the Pricing Schedule provided as Attachment B-1 to this solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly requires firm-fixed-price pricing, confirmed by the clause title and the pricing schedule structure.</div>
+</div><div class="evidence-item">
+  <blockquote>Item # | Purchase Category | Purchase Type | Description | Part # ... | Qty | List Price | Discount | Net Price | Extended Price
+1 | HARDWARE | GOODS | 48x25G+8x100G 1U TAA AC port side intake and PSU side exhaust | QFX5120-48Y-AFO-T | N/A | One year from Award Date | 8 ...</blockquote>
+  <div class="ev-explanation">The price schedule consists entirely of discrete hardware goods and named maintenance service SKUs with fixed quantities and specific Juniper part numbers. This is a well-defined, enumerable requirement — exactly the type of procurement where FFP is appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>Requirement Description: Juniper Technical Refresh ... Juniper equipment and maintenance to replace current end of life equipment.</blockquote>
+  <div class="ev-explanation">The requirement is a technology refresh of specific, identified end-of-life WAN equipment. The scope is clear: replace specific equipment with identified Juniper models. There is no ambiguity about what is being purchased.</div>
+</div><div class="evidence-item">
+  <blockquote>7.3.1-17 - Lowest Price Technically Acceptable Evaluation Method ... Technical acceptability will be determined by the offer meeting the FDIC&#x27;s minimum technical requirements. Proposals will be evaluated as either &#x27;acceptable&#x27; or &#x27;unacceptable&#x27;.</blockquote>
+  <div class="ev-explanation">LPTA evaluation reinforces that this is a commodity-style procurement with well-defined, binary acceptability criteria — consistent with FFP pricing where vendors compete on price for a fixed, specified set of goods.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment B.1 - Price Schedule.xlsx">Attachment B.1 - Price Schedule.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/ba085e8ab41f4fd3ab7600572ba1ddb7_Attachment+B.1+-+Price+Schedule.xlsx" download="Attachment B.1 - Price Schedule.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment J.1 - Pre-Award SCRM Info - Example.pdf">Attachment J.1 - Pre-Award SCRM Info - Example.pdf</div></div>
+  <a class="dl-btn" href="../attachments/ba085e8ab41f4fd3ab7600572ba1ddb7_Attachment+J.1+-+Pre-Award+SCRM+Info+-+Example.pdf" download="Attachment J.1 - Pre-Award SCRM Info - Example.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment L1 - Q_A Spreadsheet.pdf">Attachment L1 - Q_A Spreadsheet.pdf</div></div>
+  <a class="dl-btn" href="../attachments/ba085e8ab41f4fd3ab7600572ba1ddb7_Attachment+L1+-+Q_A+Spreadsheet.pdf" download="Attachment L1 - Q_A Spreadsheet.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CORHQ-26-Q-0116.pdf">CORHQ-26-Q-0116.pdf</div></div>
+  <a class="dl-btn" href="../attachments/ba085e8ab41f4fd3ab7600572ba1ddb7_CORHQ-26-Q-0116.pdf" download="CORHQ-26-Q-0116.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

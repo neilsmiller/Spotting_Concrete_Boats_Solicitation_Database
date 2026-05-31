@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robotic Process Automation (RPA) Bot Development and Delivery — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Robotic Process Automation (RPA) Bot Development and Delivery</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 bc86192d2fa1495aa52f69710a352dbb</span>
+      <a class="sam-link" href="https://sam.gov/opp/bc86192d2fa1495aa52f69710a352dbb/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-01-20</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › SPAWAR › SPAWAR PACIFIC › NIWC PACIFIC</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-01-20</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a brief solicitation notice without an attached Statement of Work (SOW), Performance Work Statement (PWS), Quality Assurance Surveillance Plan (QASP), or any other detailed contractual documents. The description is a short summary paragraph describing the general scope (RPA/AI bot development for NIWC Pacific, UiPath and Microsoft environments, incidental training and sustainment) and administrative details (question deadlines, POC emails). There are no reporting requirements, meeting cadences, deliverables lists, QA surveillance language, performance metrics, or acceptance criteria visible in the provided text. With zero attachments noted and no PWS/SOW content, there is insufficient material to assess whether this solicitation prioritizes compliance over outcomes. A meaningful evaluation of Sin #2 would require access to the actual performance requirements, deliverables schedule, QA plan, and reporting sections — none of which are present here.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a brief solicitation notice without attached documents — no Statement of Work (SOW), Performance Work Statement (PWS), evaluation criteria, or personnel qualification requirements are provided. The description is a high-level summary (approximately 150 words) that mentions the contract&#x27;s purpose (RPA/AI bot development for NIWC Pacific, UiPath and Microsoft environments) and administrative details (question deadlines, POC emails), but contains no experience requirements, past performance criteria, evaluation factors, or key personnel qualifications. With zero attachments and no evaluation criteria language, there is no basis to assess whether the solicitation contains insider rewards patterns such as narrow dollar thresholds, federal-specific experience mandates, or incumbency-favoring evaluation criteria. A meaningful analysis of Sin #4 requires access to the full solicitation package, including at minimum the evaluation criteria section and any experience or past performance requirements. The two-day response window (posted 2026-01-20, due 2026-01-22) is itself a potential concern in other sin categories, but does not provide evidence for or against insider rewards without the underlying requirements documents.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is very brief — it is a high-level description rather than a full Statement of Work or Performance Work Statement, and no attachments are noted. Given the thin content, a definitive sprawl assessment is constrained. However, the content that is present shows a moderate pattern: the government has named specific commercial tools (UiPath, Microsoft), enumerated specific contractor activities (design, development, delivery, initial configuration, training, briefings, sustainment), and structured the requirement around what the contractor shall do rather than what operational outcomes are needed (e.g., how many processes automated, what efficiency gains achieved, what acceptance criteria a delivered bot must meet). This reflects the early stages of a prescriptive drafting approach — the government knows what activities it wants to purchase rather than what results it needs. The tool-locking on UiPath and Microsoft is the most significant sprawl element, as it forecloses alternative automation platforms without a clear articulation of why those specific platforms are the only acceptable constraint. The severity is assessed at 2 (Moderate) rather than 3 because the solicitation is too sparse to confirm pervasive sprawl — there is no attached SOW with detailed step-by-step process mandates, and some of the specificity (UiPath integration) is plausibly justified by existing government infrastructure. A full SOW would be needed to confirm whether this moderate pattern escalates to severe.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All solutions must be compatible with the Government&#x27;s existing UiPath and Microsoft automation environments.</blockquote>
+  <div class="ev-explanation">This locks vendors into specific commercial platforms (UiPath and Microsoft) rather than defining the interoperability or automation outcome needed. While some level of platform constraint is legitimate when the government has existing infrastructure, mandating specific named vendor tools — rather than, for example, &#x27;solutions must integrate with existing RPA and office productivity environments currently deployed&#x27; — forecloses vendors who might propose superior or equivalent automation approaches. This is a borderline but real constraint on the solution space.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide expert-level support for the design, development, delivery, and initial configuration of automation solutions.</blockquote>
+  <div class="ev-explanation">Prescribing &#x27;initial configuration&#x27; as a required contractor task begins to dictate the delivery methodology. A performance-based framing would instead define the acceptance criteria for delivered bots (e.g., tested, deployed, and operationally validated), leaving whether and how configuration occurs to the vendor&#x27;s discretion. Mandating this specific step is a mild form of process prescription embedded in what could otherwise be an outcome statement.</div>
+</div><div class="evidence-item">
+  <blockquote>Incidental services — such as training, briefings, and minor sustainment actions — may be required to enable successful delivery and use of automation bots but are not standalone service deliverables.</blockquote>
+  <div class="ev-explanation">While this language attempts to clarify scope boundaries, it implicitly prescribes the support activities the contractor must be prepared to perform (training, briefings, sustainment) without defining success criteria or outcomes for those activities. A vendor cannot propose an alternative enablement model — the list of incidental activities is effectively fixed by the government&#x27;s enumeration.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation text provided is a brief notice-level description of approximately 150 words. It summarizes the general scope (RPA/AI bot development for NIWC Pacific using UiPath and Microsoft environments), provides POC information, and notes a 2-day response window. No Statement of Work (SOW), Performance Work Statement (PWS), or Applicable Documents section is attached or reproduced in the text. There is no regulatory citation list, compliance framework enumeration, or referenced standards section available for analysis. Without an attached SOW/PWS or a dedicated compliance/applicable documents section, it is impossible to assess whether this solicitation exhibits rule pool characteristics. The notice explicitly states &#x27;0 Attachments,&#x27; meaning no supplementary documents were provided for review. A meaningful rule pool analysis requires the full solicitation package — particularly any &#x27;Applicable Documents,&#x27; &#x27;Referenced Standards,&#x27; or Section C/H/I compliance provisions. As written, this posting contains insufficient content to evaluate Sin #3.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation does not explicitly state the contract type, which limits the precision of this analysis. However, the framing of the work — discrete bot development and delivery, a defined technology environment, and explicit treatment of ancillary activities as &#x27;incidental&#x27; — strongly suggests the government views this as a deliverable-based engagement. That profile is most consistent with a firm-fixed-price (FFP) structure. If the government is using a T&amp;M or labor-hour contract (which is common for IT support work of this kind and would be a reasonable inference given the NAICS code 541330 and the open-ended &#x27;incidental services&#x27; language), there is a moderate mismatch: bots are discrete deliverables whose scope can be estimated, especially on a known platform like UiPath, and T&amp;M would give vendors less incentive to deliver efficiently. Conversely, if the government is using FFP (also plausible given the deliverable-centric language), the inclusion of undefined &#x27;incidental&#x27; sustainment activities could create scope creep risk under a fixed-price structure. The 2-day response window suggests this may be a directed or quasi-sole-source action, which would typically favor FFP since cost and schedule should be estimable. Overall, the absence of explicit contract type information and the mixed signals in the solicitation (deliverable language vs. open-ended incidental services) warrant a moderate finding. The requirement is not so clearly mismatched as to be severe, but there is enough ambiguity in how the incidental services are scoped — and enough deliverable clarity in the core bot development work — that the pricing structure deserves scrutiny. Severity is assessed at 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall provide expert-level support for the design, development, delivery, and initial configuration of automation solutions.</blockquote>
+  <div class="ev-explanation">The work described centers on discrete deliverables — designing, developing, and delivering RPA bots — which are tangible outputs with defined endpoints. This language is more consistent with a fixed-price or firm-fixed-price structure, where the government pays for a finished product rather than hours worked.</div>
+</div><div class="evidence-item">
+  <blockquote>All solutions must be compatible with the Government&#x27;s existing UiPath and Microsoft automation environments.</blockquote>
+  <div class="ev-explanation">The constraint to specific, known platforms (UiPath and Microsoft) meaningfully reduces technical uncertainty. When the technology stack is already defined and in use, scope can be bounded more precisely, which strengthens the case for fixed-price rather than T&amp;M pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>Incidental services — such as training, briefings, and minor sustainment actions — may be required to enable successful delivery and use of automation bots but are not standalone service deliverables.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly frames non-bot-development activities as incidental and non-standalone. This suggests the government views the contract as deliverable-driven, not labor-hour-driven. However, the inclusion of open-ended &#x27;incidental&#x27; services with unspecified scope introduces some unpredictability that could justify a T&amp;M component.</div>
+</div><div class="evidence-item">
+  <blockquote>Response Deadline: 2026-01-22 / Response Window: 2 days</blockquote>
+  <div class="ev-explanation">The extremely compressed response window (2 days from posting) is circumstantial but relevant: it suggests the government may be directing work to a known vendor or has pre-negotiated scope. In that context, pricing should be easier to define, which makes a T&amp;M contract less defensible than it would be for a truly open, uncertain engagement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

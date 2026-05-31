@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R--BUNKER HILL 251st EVENT MANAGEMENT SERVICES — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>R--BUNKER HILL 251st EVENT MANAGEMENT SERVICES</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 e0136fa0dc4f4aab8d0e1a3d1ceb9e2c</span>
+      <a class="sam-link" href="https://sam.gov/opp/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">INTERIOR, DEPARTMENT OF THE › NATIONAL PARK SERVICE › NER SERVICES MABO (43000)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561920</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">May 16, 2026 to July 3, 2026</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Expertise</li><li>Experience</li><li>Past performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes pathology. The contract is for a discrete, time-bounded event management and production engagement — two days of public commemoration events in June 2026 — with a clear, fixed deliverable: the events themselves occur successfully, equipment is in place, video is delivered, and the site is restored. The accountability structure is appropriately lean for this scope.
+
+The SOW&#x27;s accountability mechanisms consist of: (1) a single written event execution plan due within one week of award, (2) a mandatory pre-event site visit within 48 hours of award, (3) attendance at coordination meetings as needed, (4) deliverable of video recordings within 15 business days of event conclusion, and (5) a post-event turf walkthrough. None of these constitute overlapping reporting cadences, prescribed report formats covering activities and personnel leave, or plan-adherence tracking of the kind that characterizes this sin.
+
+There are some outcome-adjacent accountability mechanisms: video deliverables have explicit technical specifications (H.264, 1920x1080, .srt captions, audio-described version), the stage manager must submit a program timeline for COR approval at least two weeks prior, and the turf restoration obligation is tied to a physical walkthrough. These are closer to deliverable acceptance criteria than to process compliance.
+
+The solicitation&#x27;s evaluation criteria (technical expertise, experience, past performance, price) are appropriately structured for an RFQ of this nature. There are no QA surveillance plans, no weekly status reports, no tracking of deviations from a project management plan.
+
+The contract is admittedly light on formal performance metrics — there are no SLAs, no attendee satisfaction measures, no uptime targets — but that is appropriate for a one-time outdoor event production contract of short duration. The primary outcome measure is implicit but real: do the events happen successfully on June 16-17, 2026. The government&#x27;s oversight posture (COR approval of site plan, attendance at coordination meetings, day-of radio contact) is calibrated to the nature of the work. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall submit a written event execution plan to the COR within one (1) week of award, detailing proposed layouts, equipment lists, staffing plans, and logistics for all Base CLIN requirements and any exercised optional CLINs.</blockquote>
+  <div class="ev-explanation">This is the primary planning/documentation requirement in the solicitation. It is a single pre-event deliverable, not a recurring reporting cadence. It is outcome-oriented in the sense that it feeds directly into event execution rather than generating oversight paperwork.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall attend all production, logistics, and security coordination meetings as required by the COR from the date of award through June 17, 2026.</blockquote>
+  <div class="ev-explanation">Meeting attendance is required but is not prescribed with a fixed cadence (e.g., &#x27;no less than weekly&#x27;). The frequency is left to COR discretion and tied to actual coordination needs for a short, fixed-scope event. This is normal event production practice rather than compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not present meaningful insider-rewards concerns. The experience requirements — five years in the field, three comparable prior projects within five years — are capability-focused and use commercial-equivalent framing throughout. There is no requirement for prior federal government contracting experience specifically, no dollar thresholds (e.g., &#x27;must have completed contracts exceeding $X&#x27;), and no lookback window so short as to exclude anyone but the incumbent. The NAICS code is 561920 (Convention and Trade Show Organizers), a well-populated commercial market, and the set-aside is total small business, which inherently acknowledges a competitive pool of qualifying vendors. There is no evidence of institutional knowledge requirements — nothing in the solicitation requires familiarity with NPS systems, prior Boston NHP event relationships, or knowledge that could only come from having held this contract previously. Site visits were offered to all interested offerors, which is the normal mechanism for allowing newcomers to assess site-specific conditions. The past performance section contains a clear copy-paste error referencing &#x27;reproducing historic wooden artillery carriages,&#x27; which is a drafting quality problem but not an indicator of insider favoritism. The overall picture is a reasonably written small-business set-aside RFQ for a one-time commemorative event where the experience bar is calibrated to the nature of the work rather than to the incumbent&#x27;s specific history. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors shall provide, as part of their quote, a minimum of three examples of projects similar in size and scope, completed within the last five years. Examples provided must demonstrate technical expertise in event management and production services of events similar in size, scope, and complexity.</blockquote>
+  <div class="ev-explanation">This experience requirement asks for comparable work but does not impose specific dollar thresholds, require federal government contracts, or impose unusually narrow domain requirements. A small event management company with three comparable commercial events in the last five years could satisfy this criterion. The language &#x27;similar in size, scope, and complexity&#x27; is capability-focused rather than incumbency-focused.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors shall provide, as part of their quote, evidence demonstrating a minimum of five years of experience performing event management and production services of projects similar in size and scope.</blockquote>
+  <div class="ev-explanation">A five-year experience floor in event management and production is a reasonable minimum for a contract of this nature — two-day outdoor ceremonial events with ADA requirements, ASL interpretation, broadcast-quality video, sound engineering, security, and permitting. This does not require federal experience specifically, nor does it specify dollar thresholds or narrow the domain to government commemorative events. Any established event production company with five years in the field could compete.</div>
+</div><div class="evidence-item">
+  <blockquote>Past Performance is the factual documentation or narrative of a firm&#x27;s experience, qualifications, and capability. Offerors shall provide three (3) examples of their firm&#x27;s most recent projects within the past five (5) years of similar size and scope (reproducing historic wooden artillery carriages).</blockquote>
+  <div class="ev-explanation">This past performance description contains an apparent copy-paste error — &#x27;reproducing historic wooden artillery carriages&#x27; is plainly irrelevant to event management services and appears to have been copied from a different solicitation. This is a document quality issue rather than an insider-rewards issue, and the operative substance (three examples of similar work in five years) mirrors the technical experience requirement and is not exclusionary by itself.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a mixed picture. It is a well-organized, operationally sensible document for a complex, high-visibility event with genuine constraints: an NPS historic site with strict no-stake rules, a dense urban neighborhood requiring noise management, ADA accessibility requirements, and a tight timeline. Many specifications that might superficially appear as sprawl are legitimate: the no-stakes anchoring requirement protects historic grounds; ADA ramp and stage compliance is legally mandated; technical video specs (H.264, 1920x1080, .srt) are reasonable delivery standards; noise ordinance compliance is a legal obligation. The solicitation also appropriately leaves some scope to the contractor — for example, sound system wattage and speaker count are explicitly left to contractor determination, tent side material is contractor-proposed, and event staffing scope for management services is contractor-proposed and COR-approved.
+
+However, the solicitation exhibits meaningful sprawl in specific areas. The Stage Manager/MC role is specified at a task-by-task level that reads like a job description rather than a capability outcome. Physical infrastructure specifications (chair color and type, exact stage dimensions, specific dBA range for generators, exact media platform dimensions with a maximum distance constraint) collectively over-specify the solution in ways that go beyond what the site constraints require. The 40-foot maximum distance for the media platform is a good example: the outcome needed is quality press capture, not a platform of specific dimensions at a specific maximum distance. A vendor experienced in event production might know that a 60-foot distance with a longer-lens setup achieves equivalent quality — but the solicitation forecloses that judgment.
+
+The pattern is consistent with consensus-driven drafting where NPS program staff, COR, and possibly a previous event vendor contributed specific requirements that reflect how a prior event was executed rather than what outcomes must be achieved. The CLIN structure itself — breaking an event into 23+ line items — also reflects a process-driven rather than outcome-driven procurement structure, though this serves a legitimate pricing flexibility function.
+
+Overall, the sprawl is real and present in identifiable passages, but it does not dominate the solicitation. Most regulatory, safety, and site-protection requirements are legitimate. Severity 2 is appropriate: prescriptive elements constrain vendors in specific areas, particularly around production staffing structure and physical equipment specifications, but a vendor could still propose meaningful variations in logistics, staffing levels, vendor sourcing, and operational approach in other areas.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide a qualified Stage Manager / Master of Ceremonies (MC) who shall: Introduce all speakers from the NPS/COR-approved speaker list • Cue all speakers, singers, bands, military elements, and ceremonial components for appropriate entrances and exits • Coordinate all video operations with living historians and VIP speakers • Develop an overall program timeline for COR approval, incorporating all speakers, music, military ceremonials, and planned media moments, and submit for approval at least 2 weeks prior to event date • Choreograph and cue the ceremonial wreath-laying and any processional elements to ensure optimal media and public capture • Manage all cue sheets in coordination with NPS staff</blockquote>
+  <div class="ev-explanation">This requirement prescribes not just the outcome (a well-run ceremony) but the specific operational tasks the Stage Manager must perform, step by step. A vendor&#x27;s experienced stage manager might organize these responsibilities very differently — for example, using a production director who delegates MC duties, or structuring cue management through a different workflow. The solicitation instead mandates the exact job responsibilities of a specific individual, constraining how the vendor organizes their production team.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall design, provide, and install a dedicated media/press platform measuring 8 ft x 12 ft x 3 ft high, positioned at a COR-approved location to provide an unobstructed sightline for press photography and video capture NO further than 40&#x27; from speakers to ensure high quality.</blockquote>
+  <div class="ev-explanation">While some dimensional specificity for a media riser is reasonable, the compound specification of exact dimensions (8x12x3) combined with a maximum distance constraint (no further than 40&#x27;) prescribes the solution rather than the outcome. The actual outcome needed is quality press coverage. A vendor might achieve the same press coverage goal with a differently configured platform or positioning strategy — but they cannot, because the solicitation has pre-solved the problem for them.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall provide, install, and operate a low-noise (quiet-technology) generator (65–75 dBA) sufficient to power all event equipment. The Contractor shall be solely responsible for obtaining all required permits from the City of Boston and the Commonwealth of Massachusetts for generator use and fuel storage on NPS grounds, including all applicable MA DPU filings. Generator, fuel, and all associated permitting costs are included in the CLIN 00010 price... Generator shall be positioned on Monument Square Street as directed by the COR.</blockquote>
+  <div class="ev-explanation">The dBA range (65–75) combined with the specific placement directive (Monument Square Street) and the bundling of permitting into a single FFP price collectively over-specify the how of generator provision. The outcome needed is adequate power without disturbing the neighborhood. A vendor might propose a different quiet-technology solution (e.g., battery storage, a different generator configuration) that meets the noise and power goals differently, but the solicitation has narrowed the solution space to a diesel generator in a specific location.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide and set up approximately 300 white/ivory folding chairs with flat (non-spike) bottoms to protect landscape... Stage 12&#x27;W x 24&#x27; x 3&#x27;H with Navy blue skirting... Tent open-top structure (top only, no sides), to accommodate approximately 300 people weighted blocking only, no stakes are permitted on NPS property</blockquote>
+  <div class="ev-explanation">Taken individually, each physical specification might be defensible. Taken together across CLIN 00010, the solicitation prescribes not just performance standards but exact product specifications — chair color, chair bottom type, stage dimensions to the foot, stage color, tent configuration. These collectively leave vendors no flexibility to propose functionally equivalent alternatives that might be more cost-effective or operationally superior. This pattern suggests the government has a specific vendor&#x27;s inventory or past event setup in mind rather than defining functional outcomes (e.g., &#x27;seating for 300 that does not damage turf&#x27; or &#x27;stage appropriate for a ceremonial program with monument backdrop&#x27;).</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not rise to a severe rule pool finding (severity 3). There is no dedicated &#x27;Applicable Documents&#x27; section citing 50+ policy documents, no explicit contradictions between cited regulations and the solicitation&#x27;s purpose, and the SOW itself is relatively well-scoped with focused operational requirements for each CLIN. The regulatory framework is largely the standard FAR Part 12 commercial item structure.
+
+However, the solicitation exhibits moderate rule pool characteristics (severity 2) for the following reasons: First, the FAR clause list incorporated by reference runs to approximately 27 clauses with no contextual explanation for any of them — vendors must independently assess applicability. Second, several checked clauses have questionable relevance to outdoor event production: the Buy American-Supplies clause triggers multi-page certification requirements for what is substantially a services contract; the Excess Food Donation clause is checked despite no food service scope; and the SAFETY Act Equitable Adjustment clause applies to anti-terrorism technology vendors, not event tent companies. Third, and most tellingly, the copy-forward drafting error in the past performance evaluation criterion — describing &#x27;reproducing historic wooden artillery carriages&#x27; — is direct evidence that this solicitation was not carefully reviewed and that language was carried forward from other solicitations without scrutiny. This is the same organizational practice that produces uncurated regulatory lists.
+
+The overall compliance burden is elevated beyond what a focused event management procurement would require, but it is not impenetrable, and a sophisticated small business in the event industry could reasonably navigate it. The standard FAR 52.212-5 structure provides familiar scaffolding. Severity 2 is appropriate: noticeable volume of regulatory citations beyond what the scope demands, with some clearly inapplicable inclusions, but no severe contradictions or evidence of a massively accumulated applicable-documents list.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.202-1 Definitions (Jun 2020)
+52.203-5 Covenant Against Contingent Fees (May 2014)
+52.203-6 Restrictions on Subcontractor Sales to the Government (Jun 2020)
+52.203-7 Anti-Kickback Procedures (June 2020)
+52.203-17 Contractor Employee Whistleblower Rights...
+52.204-10 Reporting Executive Compensation...
+52.204-13 System for Award Management Maintenance...
+52.204-18 Commercial and Government Entity Code Maintenance...
+52.204-19 Incorporation by Reference...
+52.204-23 Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab...
+52.204-25 Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment...
+52.211-5 Material Requirements...
+52.212-4 Contract Terms and Conditions-Commercial Items...
+52.232-1 Payments...
+52.232-39 Unenforceability of Unauthorized Obligations...
+52.232-40 Providing Accelerated Payments to Small Business Subcontractors...
+52.233-1 Disputes...
+52.233-3 Protest after Award...
+52.233-4 Applicable Law for Breach of Contract Claim...
+52.242-15 Stop-Work Order...
+52.244-6 Subcontracts for Commercial Items...
+52.245-1 Government Property...
+52.246-20 Warranty of Services...
+52.247-5 Familiarization with Conditions...
+52.247-12 Supervision, Labor, or Materials...
+52.250-5 SAFETY Act Equitable Adjustment...
+52.253-1 Computer Generated Forms</blockquote>
+  <div class="ev-explanation">The solicitation incorporates approximately 27 FAR clauses by reference in a single undifferentiated list with no explanation of how each applies to event management services. While many are standard commercial item clauses, several — such as 52.250-5 SAFETY Act Equitable Adjustment (applicable to anti-terrorism technologies) and 52.211-5 Material Requirements (an older clause oriented toward manufactured supplies) — have questionable relevance to a two-day outdoor commemoration event. No context is provided to help vendors distinguish between clauses that carry operational weight versus those that are pro forma inclusions.</div>
+</div><div class="evidence-item">
+  <blockquote>_x_ (48)
+(i) 52.225-1, Buy American-Supplies (OCT 2022) (41 U.S.C. chapter 83).</blockquote>
+  <div class="ev-explanation">The Buy American-Supplies clause is checked as applicable, which requires offerors to certify domestic content of &#x27;end products.&#x27; This solicitation is overwhelmingly a services contract — tent rental, sound systems, staging, ASL interpretation, security, video production. There are few if any manufactured end products being delivered to the government. Checking this clause triggers multiple pages of Buy American certification tables in the 52.212-3 representations that offerors must complete, creating compliance burden with little apparent relevance to the actual scope of work.</div>
+</div><div class="evidence-item">
+  <blockquote>_x_ (9) 52.226-6, Promoting Excess Food Donation to Nonprofit Organizations (Jun 2020) (42 U.S.C. 1792).</blockquote>
+  <div class="ev-explanation">This clause, which requires contractors to make good-faith efforts to donate excess food to nonprofit organizations, is checked as applicable. The solicitation covers tent, stage, sound, lighting, security, video, and barricade services. The only food-adjacent element is an optional water station (CLIN 00070). There is no catering, concession, or food service scope anywhere in the SOW. Including this clause without explanation suggests a copy-forward inclusion rather than a deliberate applicability determination.</div>
+</div><div class="evidence-item">
+  <blockquote>52.204-23 Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab and Other Covered Entities (Dec 2023)
+52.204-25 Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment (Nov 2021)</blockquote>
+  <div class="ev-explanation">These clauses prohibit use of Kaspersky Lab software and covered Chinese telecommunications equipment (e.g., Huawei, ZTE). Their inclusion is technically standard for commercial acquisitions, but no contextual explanation is provided for why they apply here. For a contractor renting a tent, setting up chairs, and providing a sound engineer, these prohibitions are operationally irrelevant. Their inclusion without any guidance on how they apply to event production equipment creates unnecessary interpretive burden.</div>
+</div><div class="evidence-item">
+  <blockquote>Past Performance is the factual documentation or narrative of a firm&#x27;s experience, qualifications, and capability. Offerors shall provide three (3) examples of their firm&#x27;s most recent projects within the past five (5) years of similar size and scope (reproducing historic wooden artillery carriages).</blockquote>
+  <div class="ev-explanation">While not a regulatory citation per se, this evaluation criterion contains an obvious drafting error — the parenthetical describes &#x27;reproducing historic wooden artillery carriages,&#x27; which has no relationship to event management services. This indicates that evaluation language was copied forward from a different solicitation without review, the same pattern that generates uncurated rule pools. It is direct evidence of the copy-forward drafting dynamic that tends to produce undifferentiated compliance requirements.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The overall contract type — Firm Fixed-Price — is defensible for the core physical infrastructure deliverables: tent rental, chairs, stage, and stage stairs. These are commodity-like event rentals with well-established market rates, and FFP is entirely appropriate for them. The problem is structural: the government has bundled a very large and partially undefined set of labor-intensive services into the same single FFP CLIN (00010), including event management, video production, ASL interpretation, overnight security, lighting design, and noise permitting. Several of these services have explicitly undefined scopes at the time of solicitation (video production scope &#x27;shall be determined by the COR prior to or at time of option exercise&#x27;; event management &#x27;scope and staffing shall be proposed by the Contractor&#x27;). Forcing undefined-scope labor services into a lump-sum FFP creates the classic square peg problem: offerors cannot price accurately, the government cannot compare bids on equal footing, and the risk of post-award disputes or modifications is elevated. That said, this is a severity 2 rather than 3 for several reasons: (1) the event is time-bounded and relatively small in scale, which limits the magnitude of cost overrun risk; (2) the physical infrastructure components that anchor CLIN 00010 are genuinely well-suited to FFP; (3) the government did make a sensible choice to use fixed-unit-price for the barricade CLINs where quantity variability is the primary risk; and (4) the overall contract value is modest enough that experienced event vendors will likely build in contingency rather than require formal modifications. The mismatch is real but partially mitigated by the event&#x27;s fixed dates and defined physical parameters. A better structure would have separated the clearly-defined physical deliverables (tent, stage, chairs) into one FFP CLIN and priced the labor-intensive, scope-uncertain services (event management, video production, security) either as unit-priced CLINs with defined rates or as separate FFP CLINs with fully specified scopes — not bundled into a single omnibus line item alongside undefined deliverables.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This contract is structured with one (1) Firm Fixed-Price (FFP) base line item (CLIN 00010) covering the core physical infrastructure — tent, chairs, stage, and stage stairs with rail — and multiple additional Line Items (Base and Option CLINs) numbered 00020 through 00070 covering all other services and deliverables as follows</blockquote>
+  <div class="ev-explanation">The solicitation establishes FFP as the pricing vehicle for what is, at its core, a time-bound event production and management job. FFP is appropriate here for physical infrastructure items (tent, stage, chairs) where market pricing is well-established. However, the CLIN structure buries a vast array of labor-intensive, variable-scope services into that single FFP line item.</div>
+</div><div class="evidence-item">
+  <blockquote>Included in 00010 - Base: Sound System Setup and Operation; Lighting Design and Operation; Media Platform (8&#x27;x12&#x27;x3&#x27;H); ADA Compliant Stage; ASL Interpretation Services; Portable Restrooms; Tent Audio System; ADA Compliant Access Ramp; Overnight Security Services; Tent Sides Installation; Event Management Services (non-setup/strike); Stage Management Services — MC and Event Operations; Attendee Welcome and Seating Services; Tent Side Removal; Media Platform — Charlestown Navy Yard; Noise Permitting w/ City of Boston — Bunker Hill; Video and Production Services — Bunker Hill; Low-Noise / Quiet Generator; Draping/Piping Services</blockquote>
+  <div class="ev-explanation">An extraordinarily broad array of distinct services — spanning sound engineering, video production, ASL interpretation, event management, permitting, overnight security, and more — are all bundled into a single FFP CLIN (00010). Many of these services involve labor whose quantity and scope are not fully determined at award (e.g., &#x27;scope and staffing shall be proposed by the Contractor and approved by the COR&#x27;). Forcing them into a single FFP line item makes it nearly impossible for offerors to price accurately and creates significant modification risk.</div>
+</div><div class="evidence-item">
+  <blockquote>Full scope, deliverable specifications, and platform requirements shall be determined by the COR prior to or at time of option exercise.</blockquote>
+  <div class="ev-explanation">The video and production services CLIN states that its own scope will be defined at the time of option exercise — yet it is priced as FFP. This is a direct contradiction: a contractor cannot submit a meaningful firm-fixed price for work whose scope is explicitly undefined at solicitation time. This is a classic square peg condition — undefined scope forced into a fixed-price structure.</div>
+</div><div class="evidence-item">
+  <blockquote>Pricing shall be a Fixed-Unit-Price on a per-barricade basis; the total quantity required is to be determined (TBD) by the COR and communicated at time of award.</blockquote>
+  <div class="ev-explanation">CLINs 00020, 00030, 00040, and 00050 all use fixed-unit-price with quantities TBD at award. This is actually a reasonable approach for variable-quantity physical items (barricade rental and setup labor), and is more appropriate than a single lump-sum FFP for those items. However, the government&#x27;s own acknowledgment that quantities are unknown at solicitation time highlights the broader scope uncertainty that pervades the contract — uncertainty that is handled well for barricades but poorly for the bundled CLIN 00010 services.</div>
+</div><div class="evidence-item">
+  <blockquote>Scope and staffing shall be proposed by the Contractor and approved by the COR.</blockquote>
+  <div class="ev-explanation">The Event Management Services requirement explicitly states that scope and staffing are not defined — they will be proposed by the contractor post-award and approved by the COR. Pricing this as FFP (included in CLIN 00010) when the staffing level is unknown at bid time creates either a race to the bottom (vendors underbid and then cannot deliver) or significant overpricing to cover uncertainty. A labor-hour or unit-priced structure tied to staffing levels would be more appropriate for this component.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="B08_Solicitation_Attachment_2_DOL_Wage_Determination.pdf">B08_Solicitation_Attachment_2_DOL_Wage_Determination.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c_B08_Solicitation_Attachment_2_DOL_Wage_Determination.pdf" download="B08_Solicitation_Attachment_2_DOL_Wage_Determination.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="B08_Solicitation_Attachment_3_Statement_of_Work_Amended_5_7_26_0002.docx">B08_Solicitation_Attachment_3_Statement_of_Work_Amended_5_7_26_0002.docx</div></div>
+  <a class="dl-btn" href="../attachments/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c_B08_Solicitation_Attachment_3_Statement_of_Work_Amended_5_7_26_0002.docx" download="B08_Solicitation_Attachment_3_Statement_of_Work_Amended_5_7_26_0002.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140P4326Q0028.pdf">Sol_140P4326Q0028.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c_Sol_140P4326Q0028.pdf" download="Sol_140P4326Q0028.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140P4326Q0028_Amd_0001.pdf">Sol_140P4326Q0028_Amd_0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c_Sol_140P4326Q0028_Amd_0001.pdf" download="Sol_140P4326Q0028_Amd_0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_140P4326Q0028_Amd_0002.pdf">Sol_140P4326Q0028_Amd_0002.pdf</div></div>
+  <a class="dl-btn" href="../attachments/e0136fa0dc4f4aab8d0e1a3d1ceb9e2c_Sol_140P4326Q0028_Amd_0002.pdf" download="Sol_140P4326Q0028_Amd_0002.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

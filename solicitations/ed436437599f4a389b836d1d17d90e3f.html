@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INL Colombia Navy AI Equipment — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>INL Colombia Navy AI Equipment</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 ed436437599f4a389b836d1d17d90e3f</span>
+      <a class="sam-link" href="https://sam.gov/opp/ed436437599f4a389b836d1d17d90e3f/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Sources Sought</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">STATE, DEPARTMENT OF › STATE, DEPARTMENT OF › ACQUISITIONS - INL</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Sources Sought</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">120 days ARO (period of performance: 06/01/2026 - 07/15/2026)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Meets or exceed technical specification</li><li>Delivery Timeline</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a commercial product procurement for AI server hardware and software (Dell PowerEdge XE9680, NVIDIA AI Enterprise subscription) to be delivered to the Colombian Navy. The solicitation&#x27;s accountability structure is almost entirely deliverable-focused: payment follows inspection and acceptance against technical specifications, and the government retains the right to reject non-conforming items. There are no status reports required, no meeting cadences mandated, no process documentation requirements, and no prescribed report formats or sections. The warranty terms define concrete response-time standards (24-hour response to technical requests, 8-day repair turnaround) that are outcome-oriented SLA-type provisions. Evaluation is on Lowest Price, Technically Acceptable basis using compliance with technical specifications, delivery timeline, and warranty period — all of which are deliverable- and outcome-focused criteria. The solicitation is notably sparse on QA surveillance language altogether, which is appropriate for a commercial hardware buy of this nature. The SOW attachment is largely a template with many fields left blank or redacted, but what is present does not introduce compliance-over-outcomes patterns. The sole-source justification document is heavily redacted and provides no additional QA structure to analyze. In summary, this solicitation does not exhibit the compliance-over-outcomes sin. Its accountability mechanisms — sparse as they are — ask &#x27;does the product meet specifications?&#x27; rather than &#x27;did the vendor follow the process?&#x27; Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The payment(s) to the Contractor shall be made following satisfactory inspection and acceptance of products by INL. If the items or some item does not fulfill requested technical specifications, INL shall return the items to vendor with no cost to INL Bogota.</blockquote>
+  <div class="ev-explanation">Acceptance is tied to product conformance with technical specifications — this is outcome/deliverable-focused accountability, not process compliance. Payment is gated on the government&#x27;s evaluation of whether the product meets requirements, not whether the vendor followed a particular process.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government shall have up to fifteen (15) business days, unless specifically denoted below or extended by notification, to review each deliverable product and provide oral and written comments. The Contractor shall review and incorporate comments or implement directed changes, after discussion or clarification with the designated COR, and, if necessary, submit a final version of the product no later than ten (10) business days thereafter.</blockquote>
+  <div class="ev-explanation">This is a standard deliverable review-and-revision cycle. It focuses on whether the product meets government needs, not on process adherence. There is no prescribed format, section structure, or activity-tracking requirement here — this is reasonable outcome-oriented acceptance management.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows no meaningful insider rewards problem. It is a commercial item procurement for specific hardware (Dell PowerEdge XE9680 AI server and NVIDIA AI Enterprise software) evaluated on Lowest Price, Technically Acceptable criteria. The evaluation factors are purely product-compliance oriented: technical specification match, delivery timeline, and warranty period. There are no past performance factors, no experience requirements, no dollar-threshold mandates, no federal-specific experience mandates, and no key personnel qualifications that could function as incumbent filters. The brand-name specification (Dell, NVIDIA) does restrict the competitive pool, but that is a separate concern (sole-source justification / brand-name restriction) rather than an insider rewards issue — it does not advantage any particular reseller over another based on prior contract experience. The JOFOC attachment is substantially redacted and cannot be fully assessed, but the visible solicitation structure contains none of the stacked insider-favoring criteria that characterize this sin. A qualified reseller new to INL work could realistically compete on equal terms with any incumbent by simply offering the specified products at a competitive price within the delivery window.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Evaluation shall be conducted using Lowest Price, Technically Acceptable</blockquote>
+  <div class="ev-explanation">The LPTA evaluation methodology is the least incumbent-favoring approach available. It sets a technical floor (compliance with specifications) and awards to the lowest price meeting that floor. There is no past performance factor, no experience scoring, and no evaluation bonus points for prior contracts of any kind.</div>
+</div><div class="evidence-item">
+  <blockquote>The following are the evaluation factors to be utilized: Compliance with the requested technical specifications, brand name where indicated, delivery timeline, and warranty period as per this Statement of Work.</blockquote>
+  <div class="ev-explanation">The evaluation factors are entirely product-focused: can you supply the specified hardware/software, deliver it on time, and provide the required warranty? These are capability and compliance tests, not experience tests. A vendor who has never previously held this contract — or any government contract — could compete on equal footing if they can supply the specified equipment.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is primarily a commercial item equipment procurement (hardware purchase and delivery), not a services contract. The structural conditions for requirement sprawl — detailed process mandates, prescribed staffing structures, step-by-step workflow instructions — are largely absent because the solicitation is buying a product, not contracting for ongoing labor. The SOW is notable for what it does NOT contain: there are no staffing prescriptions, no workflow procedures, no step-by-step task lists for how the vendor shall perform work. The requirements that exist are either outcome-focused (deliver equipment meeting technical specifications within 120 days, provide 12-month warranty, achieve 24-hour response time for technical requests) or legitimate constraints (tax exemption handling, customs clearance procedures, shipping specifications under FAR clause 652.247-71 which is a standard State Department shipping clause). The brand-name specification for Dell PowerEdge XE9680 is the most substantively prescriptive element, but it is backed by a formal JOFOC, which is the correct FAR mechanism for this situation. The NVIDIA AI Enterprise Essentials subscription as a CLIN item similarly reflects a documented brand-name justification. The SOW body itself is notably sparse — it contains the purpose/background, boilerplate delivery/warranty/customs/inspection language, and references to attached technical specifications. The technical specification table that would reveal the most prescriptive content appears to have been present in the SOW document but was not fully extracted in the text provided. Based on available content, the solicitation reads as a straightforward commercial equipment buy with appropriate procedural boilerplate, not a service contract burdened with process mandates. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Server Model: Dell PowerEdge XE9680
+See attached Statement of Work for full technical specifications and requirements</blockquote>
+  <div class="ev-explanation">The solicitation specifies a brand-name server model (Dell PowerEdge XE9680), which is a prescriptive product choice rather than a performance outcome. However, this is explicitly supported by a filed JOFOC (Justification for Other Than Full and Open Competition) with brand name justification, meaning the government has formally documented why this specific product is required. Brand-name-or-equal specifications backed by a JOFOC are a recognized procurement mechanism, not unwarranted sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>During the warranty period, the contractor must repair the equipment to operational condition in a maximum response time of eight (8) working days, at the Naval Intelligence building.</blockquote>
+  <div class="ev-explanation">Specifying repair must occur &#x27;at the Naval Intelligence building&#x27; dictates where warranty work happens rather than just setting a response time outcome. This is mildly prescriptive about method. That said, it reflects a legitimate security concern — sensitive military intelligence equipment being repaired off-site in Colombia raises obvious counterintelligence concerns — making this a defensible constraint rather than process sprawl.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of rule pools — not severe, but meaningfully above the baseline for a straightforward commercial hardware procurement. The core transaction is simple: buy AI server equipment (Dell PowerEdge XE9680 and associated software), deliver it to Bogotá, and hand it to the Colombian Navy. The compliance framework layered onto this transaction is noticeably heavy relative to that scope.
+
+The primary vehicle for the rule pool is the standard FAR 52.212-5 clause list, which is a normal feature of commercial item contracting — but the contracting officer has checked numerous clauses without apparent curation for this specific acquisition. Checked clauses include requirements on text messaging while driving, contract work hours for laborers, and other provisions with no operational tether to international hardware delivery. The solicitation never explains which checked clauses create real compliance obligations versus which are defensive inclusions.
+
+Importantly, this is NOT a severe case. The solicitation does not have a dedicated &#x27;Applicable Documents&#x27; section with 50+ policy citations. There is no master list of agency directives, standards, or frameworks appended without context. The regulatory citations are primarily standard FAR/SDFAR clauses incorporated through the normal 52.212-5 mechanism, which is legally required and procedurally appropriate. The overseas shipping clauses (652.247-71) are arguably relevant given the international delivery context, even if their prescriptive detail is dated.
+
+The solicitation also includes one genuinely well-targeted new clause: 652.239-801 (Disclosure of AI Use), which is actually appropriate and thoughtfully scoped to the nature of the procurement — the government is buying an AI system and wants disclosure of AI use in contract performance. This is exactly the kind of curated, contextually relevant regulatory requirement that distinguishes good compliance drafting from rule pools.
+
+Severity 2 is appropriate: the compliance burden is elevated beyond what a clean hardware procurement requires, several checked clauses appear to be boilerplate carryovers with no operational relevance to this specific work, but there are no glaring contradictions, no dedicated bulk-list appendix, and the overall regulatory framework is navigable by a competent vendor.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.212-5 - Contract Terms and Conditions Required To Implement Statutes or Executive Orders-Commercial Products and Commercial Services (Mar 2026) ... (a) The Contractor shall comply with the following Federal Acquisition Regulation (FAR) clauses ... (b) The Contractor shall comply with the FAR clauses in this paragraph (b) that the Contracting Officer has indicated as being incorporated in this contract by reference ...</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR 52.212-5, which presents a checklist of approximately 65 regulatory clauses. While this is standard practice for commercial item acquisitions, the sheer volume creates a moderate compliance burden, and several checked clauses are of questionable relevance to a hardware delivery contract for AI server equipment destined for Colombia.</div>
+</div><div class="evidence-item">
+  <blockquote>X (55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024) (E.O. 13513).</blockquote>
+  <div class="ev-explanation">This executive order on banning text messaging while driving is checked as applicable to a contract for delivering server hardware to the Colombian Navy. While technically a standard FAR clause, its applicability to an overseas hardware procurement is purely notional — a vendor shipping AI servers to Bogotá faces no meaningful compliance action under this clause. Its inclusion signals checkbox compliance rather than curated applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>X (39)(i) 52.222-50, Combating Trafficking in Persons (Oct 2025) (22 U.S.C. chapter 78 and E.O. 13627).</blockquote>
+  <div class="ev-explanation">While combating trafficking in persons is a legitimate and important policy requirement for overseas State Department contracts, the solicitation provides no context for how this requirement applies to the specific work — a one-time hardware delivery. The clause is checked without any explanation of what compliance obligations it creates for a vendor delivering servers, making it indistinguishable from boilerplate accumulation.</div>
+</div><div class="evidence-item">
+  <blockquote>652.247-71 - SHIPPING INSTRUCTIONS (FEB 2015) ... Each packing box shall be of solid construction in accordance with best commercial practices ... Dimension of lumber shall be in accordance with the following table ...</blockquote>
+  <div class="ev-explanation">The solicitation incorporates highly detailed overseas shipping and packing specifications (lumber dimensions, steel strap requirements, forklift space measurements) via FAR clause 652.247-71. While some shipping requirements are appropriate given the international delivery context, the level of prescriptive detail — specifying exact millimeter dimensions of box lumber based on weight class — suggests boilerplate clause incorporation without review for applicability to modern commercial packaging practices for AI server hardware.</div>
+</div><div class="evidence-item">
+  <blockquote>(q) Compliance with laws unique to Government contracts. The Contractor agrees to comply with 31 U.S.C. 1352 relating to limitations on the use of appropriated funds to influence certain Federal contracts; 40 U.S.C. chapter 37, Contract Work Hours and Safety Standards; 41 U.S.C. chapter 87, Kickbacks; 49 U.S.C. 40118, Government-financed air transportation; and 41 U.S.C. chapter 21 relating to procurement integrity.</blockquote>
+  <div class="ev-explanation">This clause bundle cites Contract Work Hours and Safety Standards (40 U.S.C. chapter 37), which governs overtime wages for laborers and mechanics on government contracts. For a commercial hardware purchase with no on-site labor component, this citation has no operational relevance. It appears as boilerplate carried forward without curation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm Fixed Price (FFP) for the acquisition of specific commercial hardware (Dell PowerEdge XE9680 AI server) and software (NVIDIA AI Enterprise Essentials Subscription). FFP is the correct contract type here. The requirements are well-defined: the government specifies exact brand-name products, quantities, delivery addresses, a 120-day delivery window, and warranty terms. There is no design uncertainty, no scope ambiguity, and no labor-intensive or unpredictable service component that would call for T&amp;M or cost-reimbursement. The government knows what it wants, the market has established prices for these commercial products, and the contractor&#x27;s risk is limited to sourcing and delivering the specified items. The sole-source JOFOC and brand-name justification further confirm that the requirement is precisely defined. FFP gives the government cost certainty and incentivizes the vendor to deliver on time without the government needing to monitor labor utilization. There are no mismatches between the contract type and the requirements. This is a straightforward commercial product purchase where FFP is the standard and appropriate vehicle. No square peg concern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Type of Contract Pricing: Firm Fixed Price</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates Firm Fixed Price (FFP) as the contract pricing structure for both CLINs, including the Dell PowerEdge XE9680 AI server and the NVIDIA AI Enterprise Essentials Subscription.</div>
+</div><div class="evidence-item">
+  <blockquote>Description: AI-Powered Server Specifications: Server Model: Dell PowerEdge XE9680 / See attached Statement of Work for full technical specifications and requirements</blockquote>
+  <div class="ev-explanation">The requirement is for the purchase and delivery of specific, brand-name commercial hardware and software. Brand-name items with defined specifications are paradigmatic cases where FFP is appropriate — the government knows exactly what it is buying, the price can be reasonably estimated, and the deliverable is unambiguous.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="191NLE26Q0074 Signed.pdf">191NLE26Q0074 Signed.pdf</div></div>
+  <a class="dl-btn" href="../attachments/ed436437599f4a389b836d1d17d90e3f_191NLE26Q0074+Signed.pdf" download="191NLE26Q0074 Signed.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="2026-04-13 signed_PR15400343 Revised SOW_AI Fusion Center FE.docx">2026-04-13 signed_PR15400343 Revised SOW_AI Fusion Center FE.docx</div></div>
+  <a class="dl-btn" href="../attachments/ed436437599f4a389b836d1d17d90e3f_2026-04-13+signed_PR15400343+Revised+SOW_AI+Fusion+Center+FE.docx" download="2026-04-13 signed_PR15400343 Revised SOW_AI Fusion Center FE.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="PR15400343 FAR13 Sole Source Justification_AI Fusion Center FE - R_Redacted.pdf">PR15400343 FAR13 Sole Source Justification_AI Fusion Center FE - R_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/ed436437599f4a389b836d1d17d90e3f_PR15400343+FAR13+Sole+Source+Justification_AI+Fusion+Center+FE+-+R_Redacted.pdf" download="PR15400343 FAR13 Sole Source Justification_AI Fusion Center FE - R_Redacted.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

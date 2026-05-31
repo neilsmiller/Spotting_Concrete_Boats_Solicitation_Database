@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airfield Automated System (AFAS) Technical Support Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Airfield Automated System (AFAS) Technical Support Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c2fdbf4e11c84674b849fbc361e07e88</span>
+      <a class="sam-link" href="https://sam.gov/opp/c2fdbf4e11c84674b849fbc361e07e88/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-24</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR FORCE MATERIEL COMMAND › AIR FORCE SUSTAINMENT CENTER › FA8100  AFSC PZIEC</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DE01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541511</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-24</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (May 23, 2026 – May 22, 2027) plus 4 option years, for a total period of May 23, 2026 through May 22, 2031</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The Service Summary table (Table 2.1) is the primary accountability mechanism, and examining its five performance standards reveals a consistent pattern: each threshold is binary — either the document was delivered on time or the service was provided when requested. The only genuinely outcome-adjacent metric is the Tier 1 two-hour response time in SS-1, but even that measures contact initiation rather than resolution quality or system uptime restoration.
+
+However, the severity is not a full 3 for several mitigating reasons. First, this is a narrow, specialized sole-source support contract for a proprietary COTS system (SAI&#x27;s AFAS/IDS5 suite) where the contractor is essentially the only entity capable of resolving issues. In that context, the most meaningful accountability lever is whether they respond and show up — which is what the metrics capture. Second, the contract is relatively simple in scope: telephone support, configuration management, engineering services on demand, and one image creation task. The absence of complex outcome metrics reflects scope simplicity, not organizational dysfunction. Third, the CLIN structure and the security scanning requirements (SCAP, Nessus, DISA STIGs for the image) provide some implicit quality standards, even if they aren&#x27;t formally structured as performance thresholds.
+
+The genuine gap is that the PWS has no measure of issue resolution quality, no system availability or uptime requirements for AFAS installations, no customer satisfaction mechanism, and no standard for engineering work quality. The CSR monthly report is measured purely by on-time delivery rather than by what it contains or what it reveals about support effectiveness. The QA surveillance plan describes methods of watching without defining what good looks like. This is a meaningful compliance-over-outcomes problem — the government can tell whether the contractor filed paperwork and answered the phone, but has limited contractual tools to enforce that the phone calls actually fixed things. Severity 2 is appropriate: there are real outcome gaps, but the contract&#x27;s narrow scope and the inherent constraints of sole-source proprietary software support prevent this from reaching the severity of a fully accountability-free QA structure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SS-1 | The contractor shall respond to customer support request that is logged within the hours of support coverage within two hours not to exceed twelve hours. | 1.2.1 | 100% Compliance. Response must be no more than 12 hrs.</blockquote>
+  <div class="ev-explanation">This is a response time metric, which is process/activity-focused rather than outcome-focused. It measures whether the contractor replied within a time window — not whether the issue was actually resolved, whether the resolution was correct, or whether the air traffic control system was restored to operational capability. A contractor could respond within two hours with &#x27;we&#x27;re looking into it&#x27; and satisfy this metric while the system remains broken indefinitely.</div>
+</div><div class="evidence-item">
+  <blockquote>SS-2 | The contractor shall provide a Customer Service Request (CSR) report monthly. | 1.2.1 | 100% Compliance. CSR reports are due NLT 5 business days from the end of the month.</blockquote>
+  <div class="ev-explanation">The performance threshold for the monthly CSR report is entirely about delivery of the document on time — not about what the report reveals. There is no threshold for acceptable resolution rates, mean time to resolution, percentage of issues resolved at Tier 1 vs. escalated, or customer satisfaction with resolutions. The government is measuring whether the report arrived, not whether it reflects good support outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>SS-4 | The contractor shall provide engineering services upon request of AFAS Program Manager. | 1.2.3 | 100% Compliance. Engineering services will be provided as needed not to exceed CLIN 001.</blockquote>
+  <div class="ev-explanation">The performance threshold for engineering services is that services are provided when requested, capped at the CLIN ceiling. There is no quality standard for engineering work — no requirement that deficiencies actually be remediated, no measure of whether software patches resolve the underlying issues, no acceptance criteria for engineering outputs. The government can verify the contractor showed up; it cannot verify the work was effective.</div>
+</div><div class="evidence-item">
+  <blockquote>SS-5 | The contractor shall provide a complete/operational AFAS image based on current AF Standard Desktop configuration. | 1.2.4 | 100% Compliance. Image will be designed, created, tested and delivered to AFAS PM within the PoP.</blockquote>
+  <div class="ev-explanation">The threshold is delivery within the period of performance. The word &#x27;tested&#x27; appears in the threshold description but there are no defined test criteria, pass/fail standards, or acceptance test procedures. &#x27;Complete/operational&#x27; is undefined. The government is measuring delivery of the artifact, not whether the image actually functions correctly in an operational air traffic control environment or whether it passes security validation.</div>
+</div><div class="evidence-item">
+  <blockquote>NOTE 2: The AFAS Program Manager will exercise surveillance over the performance thresholds. Surveillance Methods: a. Random sampling of recurring service outputs. b. One hundred percent inspection of the output. c. Periodic inspection of the process or output. d. Customer complaints.</blockquote>
+  <div class="ev-explanation">The surveillance methodology lists &#x27;periodic inspection of the process&#x27; as a surveillance method on equal footing with output inspection. More tellingly, all four methods are listed without any defined criteria for what constitutes acceptable output quality. &#x27;Random sampling&#x27; and &#x27;100% inspection&#x27; are mentioned but there are no acceptance criteria against which samples or outputs would be judged — no error rates, resolution quality standards, or functional performance benchmarks. The structure describes the act of watching, not what success looks like.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents the most extreme form of insider rewards: it is not merely tilted toward an incumbent — it is functionally impossible for any vendor other than Systems Atlanta, Inc. (SAI) to perform. The entire contract is defined around providing support for SAI&#x27;s proprietary IDS5/AFAS software, and the performance requirements use SAI&#x27;s own organizational identity as the standard of performance. Deliverables include SAI-specific email addresses, SAI engineer escalations, patches released at the SAI PM&#x27;s discretion, software version upgrades of SAI&#x27;s proprietary code, and support provided by &#x27;SAI trained&#x27; personnel. These are not experience requirements that an incumbent happens to meet — they are requirements that only the OEM can satisfy by definition.
+
+The solicitation is posted as &#x27;Other Than Full and Open Competition,&#x27; which suggests the contracting office knows this is effectively a sole-source award. The peculiarity here is that the competition notice format was used at all: the solicitation appears to be structured as if it were competitive, with a quote sheet for multiple CLINs and an offer deadline, but the statement of work describes what is essentially an OEM support contract that only SAI could fulfill.
+
+This is not a case where experience requirements are merely tilted toward the incumbent — it is a case where the work is defined in terms that require the awardee to BE the software manufacturer. The severity is 3 (severe). A qualified IT services vendor with no prior relationship with SAI could not realistically compete for any aspect of this contract: they cannot offer SAI&#x27;s email address, cannot release SAI&#x27;s software patches, cannot provide SAI-trained engineers, and cannot deliver SAI software version upgrades. The only mitigating observation is that the agency has acknowledged the non-competitive nature by invoking &#x27;Other Than Full and Open Competition,&#x27; which at least reflects awareness of the market reality — but the solicitation&#x27;s competitive framing does not change the underlying structure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Air Force Flight Standards Agency (AFFSA)/Airfield Automation Directorate requires Information Technology technical support with regards to Airfield Automation System (AFAS), a product of Systems Atlanta, Inc (SAI), software suite.</blockquote>
+  <div class="ev-explanation">The PWS names the specific proprietary software product and its manufacturer (Systems Atlanta, Inc / SAI) as the subject of the entire contract. All tasks — telephone support, site configuration, engineering services, image creation — are defined entirely around SAI&#x27;s IDS5 product. This means any vendor performing this contract must effectively BE Systems Atlanta, Inc., or hold a formal support relationship with them, since third parties cannot realistically provide engineering-level support, software patches, license reconfiguration, and core software upgrades for a proprietary system without the OEM&#x27;s involvement or authorization.</div>
+</div><div class="evidence-item">
+  <blockquote>SAI Abbreviated Life Cycle Support (A-LCS) Program
+To include:
+1. Telephonic Support Services
+...i. USAF only email address direct to SAI Help Desk (AFAS.support@sysatl.com).</blockquote>
+  <div class="ev-explanation">The CLIN description across all base and option years explicitly names a SAI-specific email address (AFAS.support@sysatl.com) as a contract deliverable. This is not a performance requirement — it is a description of SAI&#x27;s own proprietary support infrastructure. No competitor could offer this email address; only SAI can. The quote sheet is essentially describing SAI&#x27;s own product brochure, making SAI the only possible awardee.</div>
+</div><div class="evidence-item">
+  <blockquote>CSR issue escalation to an SAI Engineer for IDS5 functionality or technical problem resolution. May include services for S/W patches and scripts at the discretion of SAI PM.</blockquote>
+  <div class="ev-explanation">The contract requires escalation to &#x27;an SAI Engineer&#x27; by name, and software patches and scripts issued &#x27;at the discretion of SAI PM.&#x27; This language presupposes the awardee IS SAI or has contractually delegated authority from SAI to act on SAI&#x27;s behalf. No independent third-party vendor could commit to escalating issues to SAI engineers or releasing SAI patches, since those resources are controlled by SAI, not by a hypothetical competitor.</div>
+</div><div class="evidence-item">
+  <blockquote>Tier 2 Support - (unlimited during SAI business hours) – Normally remedied by working with the local site database administrator; however, these issues typically include more technically challenging concerns. This level of support requires a higher degree of skill and more extensive system knowledge - provided by SAI trained Technicians and Engineers.</blockquote>
+  <div class="ev-explanation">The requirement explicitly specifies that Tier 2 support must be &#x27;provided by SAI trained Technicians and Engineers.&#x27; Only Systems Atlanta, Inc. can certify that its technicians and engineers are &#x27;SAI trained.&#x27; This requirement is not written as a capability standard a third party could meet — it is written as an organizational identity requirement that only the OEM can satisfy.</div>
+</div><div class="evidence-item">
+  <blockquote>One (1) IDS5 software version upgrade [included in Option Year 1 CLIN 1001]</blockquote>
+  <div class="ev-explanation">Delivering an IDS5 software version upgrade requires control over the IDS5 source code and release pipeline, which is proprietary to Systems Atlanta, Inc. No third-party vendor could contractually commit to delivering a version upgrade of a proprietary software product they do not own. This requirement, combined with the others, makes the contract effectively sole-source to SAI in substance even though it is nominally posted as a competitive solicitation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The most significant pattern is that the PWS was clearly written from the perspective of the incumbent contractor&#x27;s (SAI&#x27;s) existing service delivery model — the CLINs in the quote sheet closely mirror SAI&#x27;s own commercial product structure (&#x27;SAI Abbreviated Life Cycle Support (A-LCS) Program&#x27;), and the service descriptions in the PWS map directly onto SAI&#x27;s internal tier structure (Tier 1/2/3 support, specific SAI engineers, SAI business hours, even the SAI-specific help desk email address &#x27;AFAS.support@sysatl.com&#x27;). This is a classic &#x27;incumbent capture&#x27; pattern where the current contractor&#x27;s operating model has been transcribed into requirements, making it difficult for any other vendor to propose a meaningfully different approach.
+
+That said, the sprawl is not pervasive enough to warrant a severity-3 rating. Several factors mitigate the finding: (1) The performance objectives in the Service Summary table (SS-1 through SS-5) are mostly outcome-oriented — response times, delivery of configuration files, operational images — and provide measurable thresholds. (2) The underlying mission need is narrow and technically constrained: this is proprietary software support for a specific COTS product (SAI/AFAS IDS5), which inherently limits how differently any vendor could approach the work. When the software is proprietary to one vendor, prescribing that vendor&#x27;s support tiers and processes is less problematic than it would be for generic IT services. (3) The contract is a straightforward sole-source/other-than-full-and-open-competition acquisition (no set-aside, one responsible source expected), so the prescriptiveness functions more as a scope definition for SAI than as a barrier to competition — competition is already effectively excluded by the proprietary nature of the product.
+
+The sprawl that exists — mandated telephone support channels, specific staffing layer descriptions, Blu-ray disc delivery, named scanning tools — represents real but secondary constraints. A severity-2 rating reflects that sprawl is clearly present and rooted in incumbent-model transcription, but is partially justified by the proprietary single-vendor nature of the work and is balanced by outcome-focused performance thresholds.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor Help Desk personnel shall receive and log calls, fill out a Customer Service Request (CSR) form, and forward the CSR to the appropriate SAI resource for resolution.</blockquote>
+  <div class="ev-explanation">This prescribes a specific step-by-step workflow — receive, log, fill out a form, forward — rather than stating the outcome (support requests are tracked and routed to resolution). A vendor with a more automated ticketing system or integrated platform could achieve the same result differently, but this language mandates a specific process sequence.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall be available to provide telephone support for 8-continuous hours (eg., 0800-1600, 0900-1700, Eastern Time), Monday through Friday, except contractor observed holidays.</blockquote>
+  <div class="ev-explanation">Specifying the support channel as &#x27;telephone&#x27; and prescribing exact continuous hours constrains how support is delivered. The outcome need is &#x27;AFAS users can get help during business hours.&#x27; A vendor might achieve this more effectively through a chat portal, email ticketing, or hybrid system, but the solicitation forecloses those approaches by mandating telephone delivery in a specific format.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor Help Desk personnel shall diagnose and resolve system and maintenance issues related to AFAS software configuration, SAI database building, AFAS network infrastructure, SAI software and associated AFAS support tools. Engineering support shall be provided by the contractor&#x27;s engineering staff to resolve AFAS software issues...Product technical support shall be provided by the contractor&#x27;s training staff to resolve issues involving utilization of AFAS...</blockquote>
+  <div class="ev-explanation">This language dictates a specific internal staffing structure — separate &#x27;Help Desk personnel,&#x27; &#x27;engineering staff,&#x27; and &#x27;training staff&#x27; as distinct organizational layers — rather than defining capability requirements. A vendor might staff this differently (e.g., cross-trained engineers who handle all tiers) while still meeting the same service level outcomes, but the language implies a prescribed organizational model.</div>
+</div><div class="evidence-item">
+  <blockquote>Image delivery via Blu-ray Disc; Two (2) copies delivered to HQ AFFSA.</blockquote>
+  <div class="ev-explanation">Mandating delivery via Blu-ray Disc specifies an exact physical medium rather than defining the outcome (a deployable, verified system image delivered to the government). Secure digital transfer, encrypted USB, or other methods may be equally or more reliable, but the solicitation forecloses them by prescribing the medium.</div>
+</div><div class="evidence-item">
+  <blockquote>Perform security scanning such as the SCAP Compliance Checker, the Nessus Security Scanner, and manual DISA Security Technical Implementation Guide (STIG) checks.</blockquote>
+  <div class="ev-explanation">While DISA STIG compliance is a legitimate security requirement, naming specific commercial tools (SCAP Compliance Checker, Nessus) goes beyond mandating the security outcome and begins prescribing the toolchain. A vendor using equivalent validated scanning tools could meet the same security standard, but the language creates an expectation of specific product use. This is a mild but real example of tool prescription embedded within an otherwise legitimate security requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem that stems from two distinct but related issues. First, the PWS affirmatively declares &#x27;Applicable Documents: None&#x27; — abdicating the agency&#x27;s responsibility to curate and explain the regulatory framework that actually governs the work (AF network security policies, DISA STIGs for the image creation task, applicable ATC system standards). Second, the solicitation portion compensates with an overloaded clause list that includes provisions clearly inapplicable to a software telephone support and image creation contract: a multi-page hardware marking clause (252.211-7003) requiring physical data matrix barcodes on serialized items; a sea transportation clause (252.247-7023) for a landlocked delivery; and telecommunications facilities ordering clauses (252.239-7002/7004/7007) designed for physical circuit procurement. These are not curated — they are boilerplate copy-forwards. The combination of &#x27;no applicable documents&#x27; in the PWS and an undifferentiated FAR/DFARS clause dump in the solicitation means vendors get no guidance on what actually governs the work and must parse approximately 50 clauses and provisions — many clearly misfired — to understand their obligations. This does not rise to severity 3 because (a) there is no contradictory prohibition analogous to the VA SMS example, (b) the FAR clauses that do apply (WAWF, CMR reporting, service contract labor standards) are genuinely relevant to this type of service contract, and (c) an experienced government contractor can identify the inapplicable clauses with moderate effort. The severest individual inclusions (IUID marking, sea transport) are boilerplate errors rather than evidence of systematic accumulation across dozens of domain-specific policies. Severity 2 is appropriate: elevated compliance burden, visible boilerplate carryovers, but not an impenetrable or contradictory regulatory wall.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.0 APPLICABLE DOCUMENTS
+None</blockquote>
+  <div class="ev-explanation">The PWS explicitly declares no applicable documents — meaning the agency made no attempt to enumerate the regulatory framework governing this software support work. While this avoids a bulk list, it is its own form of passive management: the absence of any curated guidance leaves contractors with no interpretive framework for which standards actually govern the work (DISA STIGs, AF network policies, etc.).</div>
+</div><div class="evidence-item">
+  <blockquote>RFO Clauses Incorporated by Reference
+[Table listing: 52.203-3, 52.203-6, 52.203-6 Alt I, 52.203-19, 52.204-13, 52.209-6, 52.209-9, 52.209-10, 52.212-4, 52.219-8, 52.222-3, 52.222-19, 52.222-40, 52.222-41, 52.222-43, 52.222-50, 52.222-62, 52.222-23, 52.229-12, 52.232-33, 52.232-40, 52.233-3, 52.233-4, 52.240-91, 52.244-6, 52.203-11, 52.240-90, 52.203-18, 52.204-7, 52.212-1]</blockquote>
+  <div class="ev-explanation">Approximately 30 FAR clauses are incorporated by reference. While standard FAR clauses are a normal part of federal contracting and not per se a rule pool, the sheer density here relative to the simplicity of the work (telephone support and image creation for a legacy COTS software suite) is notable. No explanatory context is provided for any clause, and their undifferentiated presentation creates an elevated compliance interpretation burden.</div>
+</div><div class="evidence-item">
+  <blockquote>252.211-7003 Item Unique Identification and Valuation. (Jan 2023)
+[Full text included — multiple pages defining data matrix symbology, concatenated unique item identifiers, enterprise identifiers, serialization within part/lot/batch numbers, MIL-STD-130 marking requirements, etc.]</blockquote>
+  <div class="ev-explanation">This clause — which governs physical hardware marking with machine-readable data matrix barcodes for DoD asset tracking — is reproduced in full text and occupies several pages of the solicitation. The contract is for software telephone support services and one Windows 11 image delivered on Blu-ray disc. There are no physical items being manufactured, no hardware being delivered to DoD inventory, and no assets requiring serialization. Including this clause in full text with no explanation of applicability is a clear misfire — it creates a compliance obligation that appears entirely inapplicable to the actual work.</div>
+</div><div class="evidence-item">
+  <blockquote>252.239-7002 Access. Dec 1991
+252.239-7004 Orders for Facilities and Services. Sep 2019
+252.239-7007 Cancellation or Termination of Orders. Sep 2019
+252.239-7010 Cloud Computing Services. Jan 2023</blockquote>
+  <div class="ev-explanation">Several DFARS 239 telecommunications facilities clauses are incorporated by reference. DFARS 252.239-7002 through 252.239-7007 govern the ordering of physical telecommunications circuits and facilities — not relevant to a software support help desk contract. Their inclusion alongside 252.239-7010 (Cloud Computing) with no differentiation or context leaves vendors unable to determine which of these actually applies to a remote telephone support and image delivery arrangement.</div>
+</div><div class="evidence-item">
+  <blockquote>252.247-7023 Transportation of Supplies by Sea. Oct 2024</blockquote>
+  <div class="ev-explanation">The Transportation of Supplies by Sea clause requires contractors to notify the government when supplies are transported by sea and to use U.S.-flag vessels. The deliverables under this contract are (1) telephone support services and (2) a Windows 11 image on two Blu-ray discs shipped to Tinker AFB, Oklahoma — a landlocked location. There is no plausible sea transportation component. This inclusion is textbook boilerplate carryover with no relevance to the actual work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate square peg concern. The overall FFP structure is not unreasonable for the dominant portion of the requirement: routine telephonic help desk support is essentially a subscription service with predictable staffing and relatively stable demand, making FFP defensible. The contractor knows it must staff a help desk for 8 hours a day, Monday through Friday, and the monthly reporting obligation is similarly predictable. For that core support function, FFP is appropriate and competition can keep prices honest.
+
+However, the solicitation bundles materially different work types into a single FFP CLIN structure without differentiation. Task 3 (Engineering Services) is explicitly event-driven — triggered by &#x27;catastrophic system failure,&#x27; OS/security changes, and software defect remediation — all of which are inherently unpredictable in frequency and effort. Folding this work into a monthly FFP rate means the contractor must estimate the average annual engineering burden across the contract period and price accordingly. If the system has a stable year, the government overpays; if it has a bad year, the contractor absorbs losses or seeks modifications. Neither outcome is optimal.
+
+The image creation task (Task 4) is the opposite problem: it is a well-defined, one-time deliverable (one Win11 image, delivered on Blu-ray, within the PoP) that is entirely appropriate for FFP. But it is priced as part of the monthly CLIN rather than as a discrete deliverable CLIN, obscuring its cost and making performance measurement harder.
+
+The severity is 2 rather than 3 because: (1) the predominant work — telephonic support — is genuinely suitable for FFP; (2) the contract cap on engineering services (&#x27;not to exceed CLIN 001&#x27;) provides some budget discipline even if the pricing mechanism is imperfect; (3) the contractor (Systems Atlanta, Inc.) is the sole-source OEM for the software, meaning there is no competitive market to arbitrate pricing, which actually makes FFP somewhat more appropriate since the government cannot compare bids — a T&amp;M structure might not provide better cost control in a sole-source environment. The mismatch is real and will likely result in either a padded contingency in the contractor&#x27;s pricing or future modification pressure around engineering services, but it does not rise to the level of a severe structural failure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Air Force Sustainment Center&#x27;s Enterprise/Specialized Contracting Branch (AFSC/PZIEC) at Tinker Air Force Base, Oklahoma intends to award a Firm Fixed Price (FFP) contract for the AFAS Technical Support Services.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm Fixed Price (FFP) contract type. FFP places cost risk on the contractor and works best when scope is well-defined and predictable. The question is whether this requirement fits that profile.</div>
+</div><div class="evidence-item">
+  <blockquote>Engineering services will not be provided until approved by AFAS Program Manager... These services may include activities such as: Technical Interchange Meetings (TIMs), Catastrophic System Failure that exceed telephone support Technicians, IDS data page template designs, Remediation of system deficiencies of the core software, Software maintenance patching services, On-site technical support when needed.</blockquote>
+  <div class="ev-explanation">The engineering services task (Task 3) is explicitly demand-driven and unpredictable in scope. &#x27;Catastrophic system failure&#x27; events and on-site technical support are by definition unforeseeable. Bundling variable, event-driven engineering work into an FFP structure creates risk: either the contractor prices in a large contingency buffer, or they underbid and resist performing when demand spikes. A T&amp;M component for this task would be more appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>SS-4 | The contractor shall provide engineering services upon request of AFAS Program Manager. | 1.2.3 | 100% Compliance. Engineering services will be provided as needed not to exceed CLIN 001.</blockquote>
+  <div class="ev-explanation">The performance threshold for engineering services is capped at &#x27;not to exceed CLIN 001,&#x27; which is the same CLIN as routine telephonic support. This signals that the government has collapsed variable engineering labor into a single fixed monthly price, with no mechanism to compensate the contractor for high-demand periods or to hold funds back in low-demand periods. A T&amp;M CLIN with a ceiling would better match unpredictable demand.</div>
+</div><div class="evidence-item">
+  <blockquote>1.2.3 Task 3: Engineering Services... Remediation of system deficiencies of the core software, Software maintenance patching services, On-site technical support when needed</blockquote>
+  <div class="ev-explanation">Software defect remediation and on-site technical support are classic T&amp;M use cases: the quantity of labor cannot be predicted in advance because it depends on what defects are discovered and what failures occur. Under FFP, the contractor either overbids to cover worst-case scenarios or risks being underwater when the system has a bad year, neither of which serves the government&#x27;s interests.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001: SAI Abbreviated Life Cycle Support (A-LCS) Program... 12 MO... [single fixed price for all support tiers plus engineering services plus image creation]</blockquote>
+  <div class="ev-explanation">All services — routine help desk support, variable-demand engineering services, and a discrete image creation deliverable — are bundled into a single monthly FFP CLIN with a 12-month quantity. This prevents any meaningful cost transparency between the predictable (telephonic support, monthly reporting) and unpredictable (engineering, on-site visits, catastrophic failure response) components. Separating the discrete deliverable (image creation) and variable engineering into distinct CLINs with appropriate pricing structures would reduce risk for both parties.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Combined Synopsis Solicitation_FA810026QB001 %28AFAS%29.pdf">Combined Synopsis Solicitation_FA810026QB001 %28AFAS%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c2fdbf4e11c84674b849fbc361e07e88_Combined+Synopsis+Solicitation_FA810026QB001+%28AFAS%29.pdf" download="Combined Synopsis Solicitation_FA810026QB001 %28AFAS%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="PWS AFAS Apr 2026 Rev. 01.pdf">PWS AFAS Apr 2026 Rev. 01.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c2fdbf4e11c84674b849fbc361e07e88_PWS+AFAS+Apr+2026+Rev.+01.pdf" download="PWS AFAS Apr 2026 Rev. 01.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

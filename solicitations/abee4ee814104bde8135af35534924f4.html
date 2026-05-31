@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Combat Development Systems Engineering and Technical Assistance (SETA) Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Combat Development Systems Engineering and Technical Assistance (SETA) Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 abee4ee814104bde8135af35534924f4</span>
+      <a class="sam-link" href="https://sam.gov/opp/abee4ee814104bde8135af35534924f4/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › US SPECIAL OPERATIONS COMMAND (USSOCOM) › MARSOC H92257</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R408</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541690</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year (2026-2027) + 4 Option Years (2027-2031) + 6-Month Extension (FAR 52.217-8)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Best Value</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The QASP provided in Attachment 4 is the primary accountability document for this contract, and it exhibits a clear compliance-over-outcomes orientation — though not at the most severe level. All four QA categories measure process inputs and staffing mechanics: personnel presence on Day 1, credential possession, complaint response timeliness, and vacancy fill rates. None of the four categories define a performance target related to the actual purpose of the contract: supporting MARSOC&#x27;s Combat Development capability development mission. There is no metric for the quality of technical analysis produced, no measure of whether capability development programs advanced, no user satisfaction assessment of the SETA support, and no outcome tied to the specific functional areas (C5ISR, Targeting, ISR, SA&amp;Effects, Lethality, Requirements).
+
+The reporting structure — weekly transition reports, monthly reports across all categories — generates a steady flow of documentation that tracks whether the contractor is following the plan (staffing levels, complaint resolution timelines) rather than whether the plan is producing mission value. The only financial remedy (1% LCAT price reduction) is reserved exclusively for a process metric (vacancy fill rate), which signals clearly where the government&#x27;s accountability priorities lie.
+
+However, this is assessed as severity 2 rather than 3 for several mitigating reasons. First, this is a SETA/staff augmentation contract, where input-and-process metrics are more defensible than in a deliverable-heavy IT or systems development contract — measuring whether qualified personnel are present and responsive is genuinely relevant to this type of work. Second, the SOW itself (access-restricted) may contain outcome-oriented acceptance criteria for specific analytical deliverables that are not visible in the excerpts provided; the QASP is not the only place outcomes could be defined. Third, the reporting cadence, while not trivial, does not exhibit the extreme overlapping multi-tier structure (weekly + monthly + quarterly + daily meetings) that characterizes severity 3 cases. The QASP is compliance-focused, but the solicitation as a whole does not appear to have displaced outcome accountability entirely — it may simply have failed to build it in robustly.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Category of Service: Transition | Objective: 100% of qualified personnel are in place on day one of performance | Performance Standard: Personnel are in place on day one of performance | Acceptable Quality Level: 100% of personnel are in place on Day 1 of performance | Method of Evaluation: Weekly transition update by Contractor to GOVT | Deliverable: Weekly Transition Reports, Monthly Reports</blockquote>
+  <div class="ev-explanation">This QA metric measures staffing presence — a process input — not whether the transition produced any useful work output. Success is defined as bodies in seats on Day 1, not whether the contractor team began delivering value or was capable of doing so. The evaluation method is a weekly status report, which is surveillance of process compliance rather than an outcome measure.</div>
+</div><div class="evidence-item">
+  <blockquote>Category of Service: Qualified Personnel | Method of Evaluation: Inspections by COR; Formal Customer Complaints; Review of Monthly Reports | Remedy: Immediate replacement of any individual that does not meet the required skills and qualifications within 14 days | Deliverable: Monthly Reports</blockquote>
+  <div class="ev-explanation">This metric measures whether personnel hold the right credentials (a process/input measure), not whether their work produces quality analysis or advances MARSOC capability development. The evaluation mechanism relies on COR inspections and monthly reports — surveillance of person-attributes rather than work product quality or mission outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Category of Service: Management of Issues | Acceptable Quality Level: Performance issues are corrected within one week of receipt; Customer complaints are resolved within 2 working days of receipt of complaint | Method of Evaluation: Inspections by COR; Formal Customer Complaints; Review of Monthly Reports | Remedy: Retraining or replacement of personnel that received complaint</blockquote>
+  <div class="ev-explanation">This measures responsiveness to complaints — a process timeliness metric — not whether the underlying analytical support work is effective. Resolving a complaint within 2 days says nothing about whether SETA support is actually improving MARSOC&#x27;s capability development outcomes. The accountability structure rewards process speed, not technical quality.</div>
+</div><div class="evidence-item">
+  <blockquote>Category of Service: Management of Positions Shortfalls (Retention/Fill Rates) | Acceptable Quality Level: Vacancies* are filled within 21 days [or] within 7 days | Method of Evaluation: Inspections by COR; Formal Customer Complaints; Review of Monthly Reports | Remedy: **1% reduction in gross price of vacant LCAT for not meeting the acceptable fill level</blockquote>
+  <div class="ev-explanation">The most financially consequential QA remedy in the entire QASP — a price reduction — is triggered solely by vacancy duration, a staffing process metric. There is no equivalent financial remedy tied to poor analytical quality, failed capability development support, or any mission outcome. The incentive structure rewards seat-filling speed over work quality.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics, primarily driven by structural features rather than explicit exclusionary language visible in the available documents. The most significant factor is the Day 1 100% staffing requirement combined with the highly specialized, clearance-dependent labor categories that map directly to MARSOC G-8 internal functional areas. An incumbent contractor&#x27;s staff are already cleared, already embedded, and already performing — allowing the incumbent to simply retain personnel and meet Day 1 requirements trivially. A new entrant must identify, recruit, and position seven cleared specialists in niche SOCOM domains before contract start, which is operationally very difficult. The financial penalty for Day 1 vacancies reinforces this asymmetry. However, the solicitation is a Total Small Business Set-Aside, which does broaden competition beyond the largest defense contractors, and the contract is relatively small (7 FTEs, ~$675K total travel plus labor). The SOW — which would contain the explicit personnel qualification requirements and evaluation criteria most likely to reveal specific experience thresholds, lookback windows, or federal-specific mandates — is not publicly available, preventing full assessment. Given the specialized domain, clearance requirements, Day 1 staffing mandate, and access-controlled SOW, the playing field is tilted toward the incumbent but not conclusively closed. A well-networked small business with cleared SOCOM-experienced staff could conceivably compete. Severity is assessed at 2 — moderate — with the caveat that the hidden SOW may contain additional insider-favoring criteria that would warrant upgrading to severity 3 if revealed.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Personnel are in place on day one of performance | 100% of personnel are in place on Day 1 of performance</blockquote>
+  <div class="ev-explanation">The QASP requires 100% of qualified personnel on Day 1 of performance. For a non-incumbent, staffing seven specialized SETA roles (C5ISR Analyst, Targeting Analyst, ISS Analyst, SA &amp; Effects Analyst, Lethality Analyst, CDD General Analyst, Requirements Analyst) with active clearances on Day 1 is nearly impossible without pre-existing relationships with cleared personnel already familiar with MARSOC operations. The incumbent&#x27;s staff are already in place and cleared; a new awardee must recruit, vet, and position equivalent personnel before contract start — a structural disadvantage.</div>
+</div><div class="evidence-item">
+  <blockquote>Transition | 100% of qualified personnel are in place on day one of performance | **1% reduction in gross price of vacant LCAT for not meeting the acceptable fill level</blockquote>
+  <div class="ev-explanation">The financial penalty for failing to meet Day 1 staffing is imposed immediately from contract start. While 1% per LCAT is modest, the combination of an instant-on staffing requirement with a financial remedy creates asymmetric risk for a new entrant who cannot guarantee Day 1 fill rates without pre-positioned cleared staff — something only the incumbent can realistically provide.</div>
+</div><div class="evidence-item">
+  <blockquote>Labor Categories: C5ISR Analyst, Targeting Analyst, ISS Analyst, SA &amp; Effects Analyst, Lethality Analyst, CDD General Analyst, Requirements Analyst — all referencing specific SOW paragraphs (3.0.2 through 3.0.8)</blockquote>
+  <div class="ev-explanation">The solicitation defines seven highly specialized labor categories tied to specific MARSOC G-8 Combat Development functional areas. These are niche USSOCOM/MARSOC-specific roles that require active security clearances and specialized domain knowledge. The pool of qualified cleared candidates with direct MARSOC Combat Development experience is extremely small, and the incumbent contractor controls the current workforce performing these functions — giving them a decisive incumbency advantage in recruiting and retaining those personnel.</div>
+</div><div class="evidence-item">
+  <blockquote>Access to the SOW may be granted upon request.</blockquote>
+  <div class="ev-explanation">The full Statement of Work — which would contain the detailed personnel qualifications, experience requirements, and evaluation criteria most relevant to assessing insider rewards — is access-controlled and not publicly posted. This opacity itself functions as a soft incumbency advantage: the incumbent already knows the requirements in detail, while new entrants must request access and work from a document they may receive late. The evaluation criteria referenced in the solicitation (&#x27;factors and subfactors as outlined in the attached solicitation&#x27;) cannot be fully assessed without the SOW.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl, primarily centered on its rigid staffing and labor prescriptions rather than outcome definition. The most significant manifestation is the pricing template&#x27;s mandatory labor category structure — seven named roles, each at exactly 1 FTE and 1,920 hours, with an explicit prohibition on modifying those parameters. This is the structural signature of a staffing augmentation contract that has been written around an incumbent&#x27;s current workforce rather than around a capability need. The government has pre-solved the resourcing question, leaving vendors to compete only on price per labor hour rather than on their approach to delivering technical outcomes.
+
+The QASP provides some countervailing evidence: it does articulate measurable performance standards (fill rates, issue resolution timelines, qualification verification), which are legitimate outcome-oriented tools. The QASP structure is reasonable and not itself sprawl. However, the QASP&#x27;s extreme specificity on fill timelines (including a 1-day standard) reinforces rather than mitigates the staffing-structure prescriptivism of the pricing template.
+
+The solicitation&#x27;s overall character is that of a personnel services contract lightly dressed as a performance-based acquisition. The SOW itself is not fully available in the provided text (access requires a request), so the full extent of any task-level process prescription in SOW paragraphs 3.0.2 through 3.0.8 cannot be assessed. If those SOW sections contain step-by-step task lists (which is common in SETA contracts of this type), severity could rise to 3. Based on available evidence, severity 2 is appropriate: sprawl is clearly present and consequential, but the QASP does preserve some outcome orientation, and the contract scope (SETA manpower augmentation) does inherently involve some degree of personnel-level specification.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>C5ISR Analyst | 3.0.2 | 1 | 1920 ... Targeting Analyst | 3.0.3 | 1 | 1920 ... ISS Analyst | 3.0.4 | 1 | 1920 ... SA &amp; Effects Analyst | 3.0.5 | 1 | 1920 ... Lethality Analyst | 3.0.6 | 1 | 1920 ... CDD General Analyst | 3.0.7 | 1 | 1920 ... Requirements Analyst | 3.0.8 | 1 | 1920</blockquote>
+  <div class="ev-explanation">The solicitation prescribes exactly seven named labor categories, each at exactly 1 FTE and exactly 1,920 hours per year, with a note explicitly stating &#x27;DO NOT change the number of hours per FTE or Total Annual Hours.&#x27; This locks the vendor into a specific staffing structure and headcount rather than allowing them to propose how best to allocate labor to achieve the mission. A vendor who could deliver equivalent technical outcomes with, say, a senior generalist supported by part-time specialists, or through automation of certain analytical workflows, is precluded from proposing that approach. This is a textbook example of prescribing the solution rather than defining the need.</div>
+</div><div class="evidence-item">
+  <blockquote>*Hours: The hours provided are the required hours for this task; DO NOT change the number of hours per FTE or Total Annual Hours</blockquote>
+  <div class="ev-explanation">This explicit instruction removes any vendor flexibility on labor allocation. Performance-based acquisition would instead define required outputs or deliverables and allow vendors to propose staffing levels to meet them. By mandating exact hours per category, the government has effectively pre-solved the resourcing question, eliminating the competitive value of having vendors propose different, potentially more efficient approaches.</div>
+</div><div class="evidence-item">
+  <blockquote>Vacancies* are filled within 14 days of personnel departures when notice is not given ... Vacancies* are filled within 1 day of personnel departures when at least two-week notice is given ... Vacancies* are filled within 7 days</blockquote>
+  <div class="ev-explanation">The QASP mandates specific fill timelines down to single-day precision for certain scenarios. While QASP standards are generally appropriate performance management tools, the extreme specificity here (1-day fill when two-week notice is given) is operationally prescriptive rather than outcome-oriented. The underlying outcome need — continuity of technical support — could be expressed as a minimum staffing level or capability availability threshold rather than a time-to-fill mandate that implicitly requires the contractor to maintain a ready bench of cleared, qualified personnel at all times.</div>
+</div><div class="evidence-item">
+  <blockquote>100% of personnel are in place on day one of performance ... 100% of all personnel meet required skills and qualifications</blockquote>
+  <div class="ev-explanation">The QASP establishes a 100% fill rate on Day 1 of performance as the performance standard, which when combined with the rigidly prescribed seven-category staffing structure effectively mandates a specific organizational model for the contractor. There is no flexibility to phase in personnel, use part-time or surge support, or staff differently across periods of performance. This reinforces the staffing structure prescriptivism in the pricing template.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool behavior. The available documentation — the pricing template, QASP, OCI disclosure form, and solicitation header — contains very few regulatory citations, and those that do appear are narrowly targeted and contextually explained. The FAC/DFARS references are standard boilerplate for any federal acquisition. The FAR 9.505 citations in the OCI form are directly germane to SETA work and are individually labeled with their applicability. The QASP is structured around performance outcomes rather than regulatory compliance lists. Notably, the full Statement of Work was not available in the provided attachments (the DD254 failed to render, and the SOW itself was listed as access-controlled). The available content suggests a lean, focused solicitation for a small-business SETA effort with seven labor categories — not the type of acquisition where sprawling applicable-documents lists typically appear. There is no evidence of bulk, undifferentiated regulatory citation, no irrelevant policies, and no contradictions between cited regulations and the solicitation&#x27;s purpose. Severity is assessed at 1. If the SOW&#x27;s applicable documents section were available, that assessment could be revisited, but based on the content provided, this solicitation does not demonstrate rule pool characteristics.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The solicitation document and incorporated provisions and clauses are those in effect through Federal Acquisition Circular (FAC) 2026-01, (effective March 13, 2026) and the DFARS Publication Notice (DPN) 20260507.</blockquote>
+  <div class="ev-explanation">The solicitation references its regulatory basis concisely — FAC 2026-01 and a specific DFARS publication notice. This is a standard, focused citation of the governing acquisition framework rather than a bulk list of regulations.</div>
+</div><div class="evidence-item">
+  <blockquote>OCI Disclosure Form references: FAR 9.505-1 (Systems Engineering and Technical Direction), FAR 9.505-2 (Preparing Specifications or Work Statements), FAR 9.505-3 (Providing Technical Evaluation), FAR 9.505-4 (Obtaining Access to Proprietary Information)</blockquote>
+  <div class="ev-explanation">The OCI disclosure form cites four specific FAR subparts, each directly and logically tied to the conflict-of-interest categories relevant to a SETA contract. This is curated, contextual citation — each regulatory reference comes with a descriptive label explaining its applicability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate square peg concern. The contract is labeled FFP, but the underlying structure — fixed FTE counts, fixed annual hours per FTE, and payment computed as hours × fully burdened labor rate — is functionally a labor-hour or FFP level-of-effort term contract (FAR 16.207). The requirement itself is advisory manpower augmentation (SETA support), which is a canonical use case for labor-hour or T&amp;M contracting: the government is buying expertise and presence, not a defined deliverable or outcome.
+
+The severity is assessed as 2 (moderate) rather than 3 (severe) for several reasons. First, FAR 16.207 does explicitly authorize FFP level-of-effort term contracts for situations where the government wants a fixed number of hours of effort over a term, which is essentially what this pricing template describes. Second, SETA support contracts are commonly structured this way across DoD, and the approach is not without precedent or justification. Third, the QASP imposes meaningful remedies — including financial deductions and mandatory replacement — that partially compensate for the absence of true output-based accountability. Fourth, the fixed FTE/hour structure does give the government predictable cost ceilings, which is a legitimate objective even if it doesn&#x27;t fully leverage FFP incentive mechanisms.
+
+The concern that prevents a severity 1 rating is the mismatch between the FFP label and the absence of defined deliverables or outcomes tied to payment. The QASP measures inputs and process compliance (personnel fill rates, complaint resolution timelines) rather than mission outcomes. Advisory and analytical SETA work — supporting capability development teams across C5ISR, targeting, lethality, and requirements — is inherently reactive to evolving operational needs, making it difficult to define the scope with the precision FFP ideally requires. A labor-hour contract with the same rate structure would be a more transparent and technically accurate vehicle, and would still allow the government to cap costs while being more honest about the nature of the work being purchased. The government&#x27;s choice to call this FFP without invoking FAR 16.207 or providing a written justification for the pricing approach is a moderate concern but not a disqualifying flaw.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award a single Firm Fixed Price (FFP) type contract to the responsible offeror whose proposal represents the Best Value to the Government.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates this as an FFP contract. FFP places cost risk on the contractor and assumes requirements are well-defined and costs are estimable. For labor augmentation SETA support — where the government is purchasing bodies with expertise rather than defined deliverables — this warrants scrutiny.</div>
+</div><div class="evidence-item">
+  <blockquote>The Marine Forces Special Operations Command (MARFORSOC) G-8 Division, Combat Development Systems Engineering and Technical Assistance (SETA) program, requires manpower augmentation to provide technical support and subject matter expertise to capability development teams.</blockquote>
+  <div class="ev-explanation">The stated purpose is &#x27;manpower augmentation&#x27; — personnel filling advisory and analytical roles embedded in government teams. SETA work is inherently advisory and reactive to government direction, with the workload driven by evolving operational priorities rather than a fixed scope. This is a classic profile for T&amp;M or labor-hour contracting, not FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>Labor Categories FFP | C5ISR Analyst | 1 | 1920 hrs | Targeting Analyst | 1 | 1920 hrs | ISS Analyst | 1 | 1920 hrs | SA &amp; Effects Analyst | 1 | 1920 hrs | Lethality Analyst | 1 | 1920 hrs | CDD General Analyst | 1 | 1920 hrs | Requirements Analyst | 1 | 1920 hrs</blockquote>
+  <div class="ev-explanation">The pricing structure is built around fixed FTE counts and fixed annual hours (1,920 per FTE) at fully burdened labor rates. This is structurally identical to a labor-hour contract — the government is buying a fixed number of hours per labor category — yet it is labeled FFP. The distinction matters: FFP implies a defined deliverable or outcome, whereas locking in hours per FTE without tying payment to outputs is closer to a level-of-effort arrangement. FAR 16.207 covers FFP level-of-effort term contracts, which are a legitimate vehicle for this structure, but the solicitation does not invoke that authority or acknowledge the tension.</div>
+</div><div class="evidence-item">
+  <blockquote>Firm Fixed Price: The quantity of hours for each labor category will be multiplied by the fully burdened labor rate. The amount negotiated for ODCs will be added to the total labor amount to arrive at the task order FFP.</blockquote>
+  <div class="ev-explanation">The pricing mechanics — hours × rate = price — are functionally equivalent to a labor-hour contract. However, under a true FFP label, the contractor is theoretically at risk for cost overruns, yet there are no deliverables specified that would drive a cost overrun. If personnel show up and log hours, the contractor is made whole. This structure provides limited incentive for efficiency or output quality beyond the QASP remedies.</div>
+</div><div class="evidence-item">
+  <blockquote>*Hours: The hours provided are the required hours for this task; DO NOT change the number of hours per FTE or Total Annual Hours</blockquote>
+  <div class="ev-explanation">By fixing both the number of FTEs and the hours per FTE rigidly, the government has eliminated the primary mechanism by which FFP incentivizes efficiency. In a true FFP outcome-based contract, the vendor controls inputs (hours, staffing mix) to deliver the defined output. Here, inputs are prescribed, but outputs are not clearly defined as deliverables — the work is advisory and ongoing. The result is that FFP provides the government no more cost control than a labor-hour contract would, while potentially obscuring the true contract structure.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="2_Pricing Template_8May26.xlsx">2_Pricing Template_8May26.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/abee4ee814104bde8135af35534924f4_2_Pricing+Template_8May26.xlsx" download="2_Pricing Template_8May26.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3_Draft DD254_8May26.pdf">3_Draft DD254_8May26.pdf</div></div>
+  <a class="dl-btn" href="../attachments/abee4ee814104bde8135af35534924f4_3_Draft+DD254_8May26.pdf" download="3_Draft DD254_8May26.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="4_QASP_8May26.xlsx">4_QASP_8May26.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/abee4ee814104bde8135af35534924f4_4_QASP_8May26.xlsx" download="4_QASP_8May26.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="7_OCI Disclosure Form_8May26.docx">7_OCI Disclosure Form_8May26.docx</div></div>
+  <a class="dl-btn" href="../attachments/abee4ee814104bde8135af35534924f4_7_OCI+Disclosure+Form_8May26.docx" download="7_OCI Disclosure Form_8May26.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="H9225726RE010.pdf">H9225726RE010.pdf</div></div>
+  <a class="dl-btn" href="../attachments/abee4ee814104bde8135af35534924f4_H9225726RE010.pdf" download="H9225726RE010.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

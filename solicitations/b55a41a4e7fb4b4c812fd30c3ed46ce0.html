@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>R425--Stationary Engineer Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>R425--Stationary Engineer Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b55a41a4e7fb4b4c812fd30c3ed46ce0</span>
+      <a class="sam-link" href="https://sam.gov/opp/b55a41a4e7fb4b4c812fd30c3ed46ce0/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-21</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">VETERANS AFFAIRS, DEPARTMENT OF › VETERANS AFFAIRS, DEPARTMENT OF › 252-NETWORK CONTRACT OFFICE 12 (36C252)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-21</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base period 08/01/2026 through 07/31/2027, with four (4) one-year renewal options (plus up to 6 months extension under FAR 52.217-8); total duration not to exceed five (5) years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price</li><li>Technical Capability</li><li>Experience</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, meriting a severity 2. The accountability structure is built primarily around documentation: daily check-in/check-out logs with prescribed content, weekly timecard submissions, bi-weekly assessment reports, and payment conditioned on complete paperwork. These mechanisms verify that workers were present and activities were performed — they do not measure whether the boiler plant delivered steam reliably, maintained safe operating pressures, or kept hospital buildings within environmental design conditions.
+
+Mitigating factors prevent a severity 3 rating. First, this is a facilities operations contract for physical plant equipment at a VA medical campus, not an IT development contract — in this context, activity logging and inspection checklists serve legitimate safety and regulatory purposes. Boiler plant operations are governed by VHA Directive 1810 and the Safety Device Testing Manual, and documentation of safety device checks is a genuine safety requirement, not pure compliance theater. Second, the contract does include some outcome-oriented language: the overarching requirement is to &#x27;deliver steam to the various campus buildings, maintain and repair the equipment, start and stop HVAC, and other equipment as necessary to maintain indoor environmental conditions.&#x27; Third, the bi-weekly assessment is tied to professional credentials (PE license required for the assessor) suggesting substantive evaluation intent, not just form-filling.
+
+However, nowhere does the solicitation define measurable performance standards — there are no steam uptime targets, no acceptable downtime thresholds, no response time requirements for emergency situations beyond &#x27;immediately contact the VA list of contacts.&#x27; The performance standards section describes surveillance methodology (random monitoring, COR documentation of deficiencies) without any quantified benchmarks. The practical effect is that the government will know whether paperwork was submitted but will have limited contractual basis to distinguish adequate from excellent plant operations. This is a real but not severe manifestation of compliance-over-outcomes.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Payment for work under this contract is subject to the completion of daily timecards that the contractor shall compile and email every week to the Operations Supervisor and COR with a request for approval.</blockquote>
+  <div class="ev-explanation">Weekly timecard submission is a process-compliance mechanism — it verifies that workers showed up and logged hours, not whether the boiler plant was operated effectively or safely. Approval of timecards is the primary payment gating mechanism, making process documentation the core accountability tool.</div>
+</div><div class="evidence-item">
+  <blockquote>Daily check in/check out is mandatory for services performed on site. This includes all operations, repair labor, inspections, testing and/or maintenance services. This detailed written report shall be signed by the contractor describing the specific tasks(s) performed, preventive maintenance performed, including the exact location of the system or device serviced, an itemized nomenclature list of all parts replaced (if any), including equipment identification (i.e., serial number), a description of all items requiring further attention, and the name(s) of the technician(s) performing the work.</blockquote>
+  <div class="ev-explanation">Daily written reports with prescribed content covering tasks performed, parts replaced, and equipment IDs measure activity logging, not outcomes. The report documents what was done, not whether the plant operated within safe parameters, delivered steam reliably, or maintained environmental conditions — the actual mission objectives.</div>
+</div><div class="evidence-item">
+  <blockquote>Every two (2) weeks a written report of the boiler plant and supporting equipment, as detailed in the &#x27;Two Week Assessment Criteria&#x27; (Attachment 4), shall be provided to the COR.</blockquote>
+  <div class="ev-explanation">The bi-weekly assessment report (Attachment 4) is a prescribed-format inspection checklist covering equipment status, safety devices, burners, fuel systems, and control panels. While this has operational value, it measures whether inspections were completed on schedule rather than against any quantified performance target — e.g., system uptime percentage, steam delivery reliability, or safety device test pass rates.</div>
+</div><div class="evidence-item">
+  <blockquote>To receive approval on any invoicing by the contractor, the COR/CO shall be provided with complete documentation of daily worker logs and any reports generated by the work.</blockquote>
+  <div class="ev-explanation">Invoice approval is explicitly conditioned on documentation completeness — &#x27;complete documentation of daily worker logs and any reports generated.&#x27; This means payment is gated on paperwork compliance, not on whether the plant performed well. A contractor could submit impeccable documentation while the plant ran poorly and still receive full payment.</div>
+</div><div class="evidence-item">
+  <blockquote>The primary methods of surveillance are random monitoring, which shall be performed by the Boiler Plant Supervisor or designated representative. Acceptance Testing on each repair shall be performed in the presence of the Boiler Plant Supervisor or designated representative.</blockquote>
+  <div class="ev-explanation">The surveillance methodology is presence-based (random monitoring by a supervisor) and repair-specific (acceptance testing). There are no defined performance standards against which surveillance measures outcomes — no uptime thresholds, no steam delivery metrics, no response-time SLAs for emergency situations. The QA section identifies who watches, not what good performance looks like.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards problem, not a severe one. The core technical requirements — City of Chicago stationary engineer license, three years of high-pressure boiler experience, PE license for the assessment function — are reasonable and defensible for a high-pressure boiler plant serving a large hospital campus. The set-aside for SDVOSBs, best-value evaluation, and explicit acceptance of commercial medical facility experience (not just VA experience) are mitigating factors that keep the door open for non-incumbents.
+
+However, two elements tilt the field meaningfully. First, the assessor qualification requiring &#x27;three years of VA stationary engineer operations&#x27; is a federal-agency-specific experience mandate that has no obvious technical justification — the assessment is a plant inspection function, and a qualified PE with hospital or industrial boiler experience could perform it without prior VA exposure. This is the clearest instance of institutional knowledge as a requirement. Second, the combination of (a) government unilateral personnel rejection authority, (b) a 2-week replacement window, (c) PIV processing delays, and (d) 40-hour site-specific training requirements creates a staffing risk structure that systematically advantages a vendor with pre-positioned, pre-approved personnel — i.e., the incumbent. A new entrant must simultaneously hire, credential, badge, and train an entire team under tight timelines and uncertainty about whether the government will accept their candidates. The solicitation also requires demonstrable prior experience at a &#x27;medical facility of similar size,&#x27; which while not exclusively VA-specific, narrows the eligible pool and gives evaluators broad discretion to favor candidates from facilities most similar to Hines.
+
+These factors together tilt but do not close the competitive field. A well-resourced SDVOSB with prior large-facility stationary engineer staffing experience and access to licensed engineers could realistically compete. The severity is therefore 2 — moderate — rather than 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror shall provide a narrative that describes experience, how offeror will ensure qualified staff is in place within thirty (30) days of contract award, and proof that offeror has been providing stationary engineer support staff as described in the Statement of Work at a medical facility of the similar size as procuring facility.</blockquote>
+  <div class="ev-explanation">The requirement for prior experience at a &#x27;medical facility of the similar size as procuring facility&#x27; narrows the eligible pool to vendors who have staffed stationary engineer operations at comparably large VA or hospital campuses. Hines is a large, full-service VA medical campus with industrial-scale boiler and chiller infrastructure. Vendors with equivalent experience at commercial industrial facilities (power plants, large universities, major manufacturing) are implicitly disadvantaged by the medical facility specificity requirement, even if their technical capability is identical.</div>
+</div><div class="evidence-item">
+  <blockquote>Prior to any work, each contractor shall submit a resume, formatted as a pdf, to prove a minimum of three (3) years&#x27; experience with high pressure boilers and industrial/commercial Heating, Ventilation, and Air Conditioning (HVAC) operation experience of similar or greater size and complexity to Hines campus.</blockquote>
+  <div class="ev-explanation">Requiring experience with systems &#x27;of similar or greater size and complexity to Hines campus&#x27; is a capability requirement that is defensible on its face — Hines has 35,000 lb/hr water tube boilers and 1,200-ton chillers. However, the phrase &#x27;similar or greater size&#x27; anchors the benchmark to a specific facility, giving COR/CO broad discretion to reject candidates from vendors who have never worked at Hines or a comparably sized VA campus. The government also retains the right to reject any individual &#x27;at any time with no additional cost,&#x27; which compounds the risk for new entrants who cannot predict whether their staff will pass muster.</div>
+</div><div class="evidence-item">
+  <blockquote>Specific to the assessment report requirement (SOW section 2.0 – General Requirements), offeror shall submit the following: Professional engineers license. Three (3) years&#x27; experience in VA stationary engineer operations.</blockquote>
+  <div class="ev-explanation">The biweekly assessment report requires the assigned assessor to have &#x27;three (3) years&#x27; experience in VA stationary engineer operations&#x27; — not simply three years of stationary engineering or industrial plant experience, but experience specifically within VA operations. This is a federal-specific and agency-specific experience mandate. A highly qualified PE with a decade of hospital or industrial boiler experience who has not worked in VA facilities would not satisfy this criterion. This requirement functions as an institutional knowledge test for a role that is fundamentally a technical inspection function.</div>
+</div><div class="evidence-item">
+  <blockquote>The COR and Contracting Officer (CO) shall retain the right to determine who is qualified and can request the removal of a contracted operator at any time with no additional cost to the government. Contractor shall find a suitable replacement within two (2) weeks of any unplanned removals.</blockquote>
+  <div class="ev-explanation">The government&#x27;s unilateral and unrestricted authority to reject personnel — combined with the two-week replacement obligation — creates significant staffing risk that incumbent vendors can absorb more easily than new entrants. An incumbent already has a bench of pre-approved personnel familiar with the Hines plant. A new entrant must build that bench from scratch, with each hire subject to government approval, PIV processing, and 40-hour site-specific training. This structural asymmetry rewards the incumbent without explicitly requiring incumbency.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl (Severity 2). The core mission — provide qualified stationary engineers to safely operate a high-pressure boiler plant and campus mechanical systems 24/7 — is legitimate and well-defined. The government has real safety, regulatory, and continuity interests that justify meaningful specificity: VHA Directive 1810 compliance, NFPA and ASME code adherence, Chicago SE license requirements, and physical qualification standards are all legitimate constraints, not sprawl.
+
+However, several sections cross from outcome definition into process prescription. The most significant pattern is that the SOW repeatedly specifies not just what must be achieved but exactly how the contractor must operate: a mandated 40-hour shadowing protocol (rather than a competency demonstration standard), a detailed task list that reads like an incumbent&#x27;s job description, a rigid reporting chain for scheduling and leave management that gives a VA supervisor discretionary control over contractor workforce deployment, and an administrative paperwork requirement tied directly to invoicing that encodes a specific workflow rather than a service standard.
+
+The biweekly assessment requirement with Attachment 4&#x27;s itemized checklist is the clearest example: it specifies the instrument, the cadence, and a specific credential combination for the assessor, rather than specifying the safety assurance outcome and allowing the contractor to propose how to achieve it.
+
+The sprawl here is not severe enough to be a dominant problem. Large portions of the SOW — particularly the regulatory compliance requirements, safety standards, physical qualifications, and performance monitoring provisions — are appropriately framed. The prescriptive elements are concentrated in the training methodology, reporting structure, and scheduling provisions, and appear to stem from the government&#x27;s deep familiarity with how this plant currently operates (likely reflecting the incumbent&#x27;s practices) rather than a wholesale inability to define outcomes. A competent vendor would feel constrained in staffing methodology and administrative workflow but would retain meaningful discretion in workforce composition, equipment approach, and operational decisions within each shift.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Each contracted operator shall work with a Qualified VA operator for forty (40) hours prior to standing a shift alone. This cost can be billed as normal time against the entirety of this contract up to eight (8) times (eight (8) different Operators).</blockquote>
+  <div class="ev-explanation">The SOW dictates a specific training methodology (side-by-side shadowing with a VA operator for exactly 40 hours) rather than defining a competency outcome. A contractor might reasonably propose an alternative qualification path — skills assessment, simulator training, or accelerated mentorship — but the solicitation locks in a single process. The billable-training cap further encodes this process into the financial structure.</div>
+</div><div class="evidence-item">
+  <blockquote>The operator shall perform the minimum duties listed in the table below as part of their daily activities. Additionally, the operator shall be capable of and shall perform the following duties at a minimum as necessary during a shift: [12-item bulleted list including &#x27;Lighting off, warming up, placing in service, and shutting down the boilers,&#x27; &#x27;Collecting and organizing the equipment and plant performance records,&#x27; &#x27;Equipment repairs such as replace valves up to 12 inches, broken flares, repair and replace copper, steel, iron and other pipe up to 6 inches in diameter...&#x27;]</blockquote>
+  <div class="ev-explanation">This list prescribes specific tasks and their execution rather than defining operational outcomes (e.g., &#x27;maintain safe, continuous steam delivery and facility environmental conditions&#x27;). While some task specification is appropriate for a skilled-trades contract, the granular enumeration — down to valve sizes and pipe materials — reads like an incumbent&#x27;s job description rather than a performance standard. It constrains the contractor from organizing work differently or deploying personnel with different skill distributions.</div>
+</div><div class="evidence-item">
+  <blockquote>Payment for work under this contract is subject to the completion of daily timecards that the contractor shall compile and email every week to the Operations Supervisor and COR with a request for approval. Daily check in/check out is mandatory for services performed on site. This detailed written report shall be signed by the contractor describing the specific tasks(s) performed, preventive maintenance performed, including the exact location of the system or device serviced, an itemized nomenclature list of all parts replaced (if any), including equipment identification (i.e., serial number), a description of all items requiring further attention, and the name(s) of the technician(s) performing the work.</blockquote>
+  <div class="ev-explanation">The reporting regime prescribes a specific administrative workflow (weekly timecard emails, daily sign-in/sign-out, itemized written reports with serial numbers and exact locations) tied directly to payment authorization. While some documentation is legitimate for a contract of this type, conditioning all invoicing on this particular paper process — rather than on demonstrated service delivery — is process prescription rather than outcome accountability.</div>
+</div><div class="evidence-item">
+  <blockquote>Every two (2) weeks a written report of the boiler plant and supporting equipment, as detailed in the &#x27;Two Week Assessment Criteria&#x27; (Attachment 4), shall be provided to the COR. The assessment shall be performed every two (2) weeks from the start of the contract until the ultimate completion date of the contract. The person assessing the plant shall have the following credentials: Expertise in VA stationary engineer operations as evidenced by minimum 3 years&#x27; experience. Professional Engineering license...</blockquote>
+  <div class="ev-explanation">The biweekly assessment requirement specifies not only a fixed cadence and a detailed checklist format (Attachment 4 itemizes every subsystem to inspect), but also requires a specific credential combination (PE license plus VA stationary engineer experience) for the assessor. This forecloses the possibility of a contractor proposing an equivalent assurance mechanism — continuous monitoring technology, third-party inspection, or a different reporting structure — that might achieve the same safety oversight goal more efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>The shift shall be established two (2) weeks in advance but is subject to change based on the needs of the plant and the discretion of the VA Boiler Plant Supervisor... The contractor shall manage the provided operators in coordination with the VA Boiler Plant Supervisor. Planned or unplanned leave from shift needs to immediately be brought to the attention of the VA Plant supervisor and the Operator on duty at the time.</blockquote>
+  <div class="ev-explanation">The solicitation places scheduling authority with the VA Boiler Plant Supervisor rather than with the contractor. This is a meaningful process constraint: a contractor cannot optimize shift structure, rotation patterns, or staffing efficiency — the government supervisor retains discretionary control over how personnel are deployed. This is a hybrid arrangement that encodes the government&#x27;s current supervisory approach rather than holding the contractor accountable for an outcome (continuous qualified coverage) and letting them manage staffing to achieve it.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate Rule Pools problem, but not a severe one. The SOW&#x27;s technical standards section is notably well-curated: the five or six directly applicable boiler plant codes and directives are named with specific editions and attachment references, giving vendors a clear picture of the operational compliance landscape. This is good practice and distinguishes this solicitation from a true bulk-list offender.
+
+However, Section C incorporates approximately 65 FAR and VAAR clauses by reference in the standard 52.212-5 checkbox format, many of which have at best marginal relevance to a labor services contract for on-site stationary engineers — including UAS procurement prohibitions, biobased product reporting, and foreign tax provisions. These are standard FAR boilerplate checkboxes, and their presence is common in commercial services contracts; alone they would not constitute a finding. The issue is that none are contextualized, and several (particularly the subcontracting plan requirements alongside SDVOSB set-aside obligations) create genuine compliance interpretation questions that the solicitation does not resolve.
+
+The overall document is relatively short (3 pages of PDF) and well-structured for what it is — a facilities labor services contract. The regulation volume is elevated but not impenetrable. A vendor experienced in VA contracting would recognize most of the clause list as standard boilerplate. A vendor new to VA would face more confusion but could work through it. There are no clear contradictions between cited regulations and the solicitation&#x27;s purpose (unlike the archetypal SMS example). Severity 2 is appropriate: the regulatory citation volume is higher than necessary for this scope, some inclusions are boilerplate carryovers with no evident applicability, but the core compliance picture for the actual work is clear.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.223-2 REPORTING OF BIOBASED PRODUCTS UNDER SERVICE AND CONSTRUCTION CONTRACTS (MAY 2024)
+52.223-5 POLLUTION PREVENTION AND RIGHT-TO-KNOW INFORMATION (MAY 2024)
+52.223-10 WASTE REDUCTION PROGRAM (MAY 2024)</blockquote>
+  <div class="ev-explanation">These environmental clauses are incorporated by reference with no explanation of how they apply to stationary engineer labor services at a boiler plant. While a boiler plant does involve fuels and some chemicals, these reporting and program requirements are oriented toward product procurement and manufacturing operations, not a labor services contract for plant operators. No context is provided explaining what biobased products would be purchased, what pollution prevention plans are expected, or how waste reduction programs are to be administered.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 ENCOURAGING CONTRACTOR POLICIES TO BAN TEXT MESSAGING WHILE DRIVING (MAY 2024)
+52.229-12 TAX ON CERTAIN FOREIGN PROCUREMENTS (FEB 2021)
+52.240-1 PROHIBITION ON UNMANNED AIRCRAFT SYSTEMS MANUFACTURED OR ASSEMBLED BY AMERICAN SECURITY DRONE ACT-COVERED FOREIGN ENTITIES (NOV 2024)</blockquote>
+  <div class="ev-explanation">These clauses are standard FAR checkboxes that have marginal or no operational relevance to on-site stationary engineer services at a VA medical campus boiler plant. The UAS prohibition clause is particularly disconnected — there is no plausible role for unmanned aircraft systems in this scope. The tax on foreign procurements clause similarly has no obvious application to a domestic labor services contract. No explanatory context is provided for any of these.</div>
+</div><div class="evidence-item">
+  <blockquote>X (21) (i) 52.219-9, Small Business Subcontracting Plan (Jan 2025) (15 U.S.C. 637(d)(4))... X (24) 52.219-16, Liquidated Damages—Subcontracting Plan (Sep 2021)... X (29) 52.219-32, Orders Issued Directly Under Small Business Reserves (Mar 2020)</blockquote>
+  <div class="ev-explanation">The solicitation is set aside 100% for SDVOSBs with a 50% limitations on subcontracting requirement, which creates internal tension with the inclusion of subcontracting plan requirements (52.219-9) and associated liquidated damages (52.219-16). These clauses are typically applied to large businesses or contracts not fully set aside. Their inclusion without explanation of how they coexist with the SDVOSB set-aside and LOS restrictions adds compliance ambiguity for small business offerors trying to understand their obligations.</div>
+</div><div class="evidence-item">
+  <blockquote>All work shall be in conformance with VA Policy and Procedures, safety standards, manufacturer&#x27;s/industry standards to include:
+American Society of Mechanical Engineers (ASME) Boiler and Pressure Vessel Code, latest edition;
+NFPA 85 Boiler and Combustion Systems Hazards Code, latest edition;
+NFPA 70E Standard for electrical safety in the workplace, latest edition.
+VHA Directive 1810 (1), as transmitted Jan 4, 2023...
+VHA Boiler and Associated Plant Safety Device Testing Manual 8th Edition</blockquote>
+  <div class="ev-explanation">This set of technical standards in the SOW is actually well-curated and directly relevant to the work — these are all legitimate standards for high-pressure boiler plant operations. This mitigates the overall Rule Pools severity: the SOW&#x27;s own standards section is appropriately focused and contextualized, distinguishing it from a true bulk-list solicitation.</div>
+</div><div class="evidence-item">
+  <blockquote>X (55) 52.226-8, Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024)
+X (46) 52.223-23, Sustainable Products and Services (May 2024)(DEVIATION FEB 2025)
+X (63) 52.240-1, Prohibition on Unmanned Aircraft Systems...</blockquote>
+  <div class="ev-explanation">The Section C clause list runs to approximately 65 checked or listed FAR/VAAR provisions incorporated by reference, with no prioritization or guidance on which carry operational weight versus which are boilerplate. While many are standard for any commercial services contract, the undifferentiated presentation — all at the same level with no context — creates a compliance interpretation burden for vendors unfamiliar with VA contracting norms.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation appropriately uses a Firm-Fixed-Price contract structure for what is fundamentally a well-defined, recurring labor services requirement. The government needs six stationary engineers to operate a boiler and chiller plant on a continuous 24/7 basis at a specific VA campus. The scope is stable: fixed number of personnel, fixed weekly hours (40 hours/week per operator), defined shift structure, known location, and clearly articulated technical qualifications. The Service Contract Act wage determination (Cook County WD 2015-5017) and the informational rate reference ($38.41/hour + 30% fringe) further anchor the labor cost baseline, making cost estimation feasible for offerors. The &#x27;billing based on actual hours worked&#x27; language might superficially suggest T&amp;M, but this is a standard feature of FFP staffing contracts — it simply means the government pays for hours delivered rather than a lump sum, while the per-hour rate itself is fixed at award and not subject to adjustment based on contractor cost experience. The overtime provision introduces minor variability but is appropriately controlled through COR/CO approval. There is no ambiguity in requirements that would make FFP inappropriate or that would demand cost-reimbursement or T&amp;M. A T&amp;M structure here would remove the contractor&#x27;s incentive to efficiently staff and manage absences, since they would be paid regardless of productivity. FFP, by contrast, places appropriate risk on the contractor to field six qualified operators and absorb the cost of turnover, leave coverage, and training beyond the capped government allowance. This is a textbook appropriate use of FFP for a defined labor services contract.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>From this RFP, the Government intends to award a firm-fixed-price contract where the Contractor provides a price that is not subject to any adjustment on the basis of the Contractor&#x27;s cost experience in performing the contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates a Firm-Fixed-Price (FFP) contract type. This is the primary evidence for the pricing structure evaluation.</div>
+</div><div class="evidence-item">
+  <blockquote>Billing shall be based on the number of actual hours worked. If the contractor does not provide the hours of service, they cannot invoice for that work.</blockquote>
+  <div class="ev-explanation">Although the contract is labeled FFP, billing is based on actual hours worked per operator — a characteristic that introduces some T&amp;M-like flexibility. However, this is consistent with how service contracts for staffing arrangements often work under FFP: the contractor prices per operator-hour and the government pays for delivered hours. The wage rates are set in the price schedule and fixed, which preserves the FFP character.</div>
+</div><div class="evidence-item">
+  <blockquote>Unless an exception is requested and approved by the COR, the requirement is to provide forty (40) hours per week for the fifty-two (52) week period of performance per operator. In the event overtime hours are required, the contractor shall notify the COR prior to working and obtain approval/authorization. Upon receiving this approval/authorization, the contractor will be allowed to invoice at time and a half the hourly unit rate established in the price schedule for this contract.</blockquote>
+  <div class="ev-explanation">The scope is well-defined: six operators, 40 hours/week, 52 weeks per year, at fixed hourly rates set at award. The overtime provision is controlled and requires prior approval, which caps cost variability. This predictability supports FFP as the appropriate contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor shall provide six (6) fully qualified staff to begin working shifts full-time, within the first thirty (30) days from time of award... Contractor shall provide six (6) fully qualified personnel for various shifts throughout the entirety of this contract.</blockquote>
+  <div class="ev-explanation">The requirement is stable and well-defined: a fixed number of personnel (6), performing a known category of work (stationary engineer operations), at a known location, over a predictable period. This is precisely the scenario where FFP is appropriate — the government knows what it needs and can reasonably estimate cost.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C25226R0008 0001.docx">36C25226R0008 0001.docx</div></div>
+  <a class="dl-btn" href="../attachments/b55a41a4e7fb4b4c812fd30c3ed46ce0_36C25226R0008+0001.docx" download="36C25226R0008 0001.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C25226R0008 0002.docx">36C25226R0008 0002.docx</div></div>
+  <a class="dl-btn" href="../attachments/b55a41a4e7fb4b4c812fd30c3ed46ce0_36C25226R0008+0002.docx" download="36C25226R0008 0002.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="36C25226R0008_2.docx">36C25226R0008_2.docx</div></div>
+  <a class="dl-btn" href="../attachments/b55a41a4e7fb4b4c812fd30c3ed46ce0_36C25226R0008_2.docx" download="36C25226R0008_2.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 Hines VA Campus Site Plan.pdf">Attachment 1 Hines VA Campus Site Plan.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b55a41a4e7fb4b4c812fd30c3ed46ce0_Attachment+1+Hines+VA+Campus+Site+Plan.pdf" download="Attachment 1 Hines VA Campus Site Plan.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 Two Week Onsite Assessment.pdf">Attachment 4 Two Week Onsite Assessment.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b55a41a4e7fb4b4c812fd30c3ed46ce0_Attachment+4+Two+Week+Onsite+Assessment.pdf" download="Attachment 4 Two Week Onsite Assessment.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

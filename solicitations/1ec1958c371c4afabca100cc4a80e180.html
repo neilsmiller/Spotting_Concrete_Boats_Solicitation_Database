@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DoWEA Pacific South District, On-Board Video Surveillance System (OBVSS) Service — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DoWEA Pacific South District, On-Board Video Surveillance System (OBVSS) Services For School Transportation Vehicles Okinawa, Japan</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 1ec1958c371c4afabca100cc4a80e180</span>
+      <a class="sam-link" href="https://sam.gov/opp/1ec1958c371c4afabca100cc4a80e180/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-29</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF DEFENSE EDUCATION ACTIVITY (DODEA) › DOD EDUCATION ACTIVITY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">485410</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-29</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">Base Year (8/1/2026 - 7/31/2027) + 4 Option Years (8/1/2027 - 7/31/2031) + FAR 52.217-8 Option (8/1/2031 - 1/31/2032)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation sits at moderate severity (2) rather than severe (3). On one hand, it has genuine outcome-oriented elements that prevent it from being pure compliance theater: the five-day response time for repairs is a performance SLA, the camera technical specifications (1080p, zero blind spots, 15 days storage, facial recognition capability) define measurable deliverable quality, and the monthly system performance report at least gestures toward uptime and data transfer as metrics. These features indicate the government understands what good looks like.
+
+On the other hand, the accountability structure is noticeably weighted toward process documentation over measured outcomes. There are two parallel maintenance report types (preventive and corrective) with essentially identical prescribed content — activity logs rather than outcome assessments. The monthly diagnostic report requires &#x27;any changes&#x27; in uptime and data transfer rates but sets no thresholds, so a contractor could report 60% uptime and technically comply. The PRS table references a QASP as a &#x27;living document&#x27; but the QASP itself is not provided in the solicitation text, meaning the primary quality assurance mechanism is opaque. The CDR process as the enforcement backstop is procedural rather than consequential.
+
+The core gap: nowhere does the PWS define what percentage of vehicles must have fully operational OBVSS systems at any given time, what constitutes an unacceptable camera coverage failure rate, or how student safety outcomes are measured against the system&#x27;s stated purpose. The solicitation knows what it wants the system to do (safe transport, behavior monitoring, evidence-quality recording) but measures the contractor on whether reports were filed and technicians showed up within five days — not whether the fleet of 83 vehicles is actually providing reliable surveillance coverage. This is a moderate rather than severe case because the technical specifications are substantive and the service-level response time provides real accountability, but the QA structure as a whole leans toward process compliance.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Task 2 – Preventive Maintenance Report: the Contractor shall provide a Maintenance Report to the COR within five (5) working days after each preventative maintenance visit via electronic mail. The report, at a minimum, shall include the following: Vehicle Identification Number, Date/Time Inspection Started/Work Completed (start time to finish), Description of maintenance performed, Any identified issues and resolutions, Incomplete repairs that require additional replacement of OBVSS parts, and estimated completion date.</blockquote>
+  <div class="ev-explanation">This reporting requirement focuses entirely on documenting activities performed — what was inspected, when work started and stopped, what was done. There is no outcome metric attached: no minimum acceptable camera operability rate, no target percentage of vehicles fully functional after a visit, no measure of whether the surveillance system is actually protecting students.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 3 – Monthly System Performance monitoring: the Contractor shall provide the COR a systems diagnostic report, showing any changes in: System Uptime Statistics, Data Transfer Success rates</blockquote>
+  <div class="ev-explanation">This is the closest the PWS comes to an outcome metric, but it is framed as reporting &#x27;any changes&#x27; rather than holding the contractor to a defined performance threshold. There is no stated minimum acceptable uptime (e.g., 99% uptime required), no acceptable data transfer success rate, and no consequence structure tied to these statistics. The report documents system status rather than enforcing a performance standard.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 2 – Corrective Maintenance Report - The Contractor shall provide a Maintenance Report to the COR within five (5) working days after each corrective maintenance/repair visit via electronic mail. The report, at a minimum, shall include the following: Vehicle Identification Number, Date/Time Inspection Started/Work Completed (start time to finish), Description of maintenance performed, Incomplete repairs that require additional replacement of OBVSS parts, and estimated completion date.</blockquote>
+  <div class="ev-explanation">A second maintenance report type with nearly identical prescribed content to the preventive maintenance report. This creates overlapping documentation of the same activity types across different visit categories. Neither report type ties back to a measurable outcome — the government learns what the contractor did, not whether the OBVSS fleet is performing acceptably.</div>
+</div><div class="evidence-item">
+  <blockquote>All requirements and objectives identified above must be fulfilled 100% of the time to meet the needs of a safe and efficient student transportation program. In the event of non-performance or failure to meet an objective, the KO will issue a Contract Discrepancy Report (CDR) with instructions on further steps necessary for corrective action.</blockquote>
+  <div class="ev-explanation">The PRS section states that all requirements must be met &#x27;100% of the time&#x27; but then defines non-performance as triggering a CDR — a process compliance response. The accountability mechanism is procedural (issue a CDR) rather than outcome-based (measure degradation in student safety coverage, camera availability, or incident documentation completeness). This is the hallmark of compliance-over-outcomes: the enforcement mechanism measures adherence to process, not achievement of results.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 3 – Site Contractor lists: The Contractor shall provide a list of all contractor personnel that will be performing on each school or job prior to start of work.</blockquote>
+  <div class="ev-explanation">While a legitimate security requirement given controlled-access installations, this requirement — combined with the training memorandum, wiring diagrams, written CM appointment notifications, and multiple maintenance reports — contributes to a pattern where the primary touchpoints between contractor and government are documentation submissions rather than evaluation of whether cameras are functioning and recording usable footage.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards characteristics. The past performance requirements are permissive: up to three references, spanning prime and subcontractor work, within a standard three-year window, with no specified dollar floor. The relevancy standard (&#x27;bus transportation services of similar scope&#x27;) is broad enough to admit commercial, international, or adjacent-domain experience. There are no stacked criteria combining dollar thresholds, federal-specific mandates, and narrow domain requirements. The manufacturer authorization requirement is a genuine operational constraint for work in Japan, not an incumbency filter. The allowance for teaming partners to supply past performance further opens competition. A qualified OBVSS integrator or vehicle electronics firm without prior DoWEA contract history could realistically compete on technical approach, price, and teaming arrangements. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>To be considered recent, efforts must be ongoing or completed within the last three (3) years preceding the issuance date of the initial solicitation. To be relevant, the Offeror must demonstrate experience with bus transportation services of similar scope, magnitude of effort and complexities that this solicitation requires.</blockquote>
+  <div class="ev-explanation">The relevancy requirement references &#x27;bus transportation services&#x27; broadly and does not impose a specific dollar threshold or require prior federal government contracts. A vendor with commercial or international school bus surveillance/maintenance experience could plausibly meet this standard. The three-year lookback is standard practice and not unusually restrictive for a contract of this scale.</div>
+</div><div class="evidence-item">
+  <blockquote>The Offeror shall submit Volume II Past Performance (Attachment 3), listing no more than three (3) recent contract(s) performed by the prime, subcontractors, or teaming partners acting as prime.</blockquote>
+  <div class="ev-explanation">The solicitation allows subcontractors and teaming partners to contribute past performance references, which meaningfully broadens the eligible pool beyond just vendors with direct prior contracts. A new entrant could team with an experienced subcontractor to meet the past performance standard.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor is required to be authorized, in writing, by the applicable equipment manufacturer to import, repair and maintain their company&#x27;s hardware and DVR viewing software applications and accessories.</blockquote>
+  <div class="ev-explanation">This is a technical constraint tied to manufacturer authorization for operating in Japan, not an incumbency proxy. It reflects a legitimate operational requirement (import authorization, warranty compliance) rather than a filter favoring a prior contract holder. Any qualified integrator could seek such authorization from a relevant manufacturer.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl (Severity 2). The PWS contains meaningful outcome-oriented elements — it specifies what the OBVSS system must achieve (camera coverage zones, recording quality, storage duration, system uptime), defines measurable service levels (5 business day response times, bi-annual maintenance schedules), and uses performance standards with a QASP structure. These are legitimate requirements that define the problem space rather than the solution space.
+
+However, several sections cross into prescribing the HOW. The installation methodology (conduit routing, color-coded wiring), the organizational structure of the contractor&#x27;s management (50-mile rule, 8-hour pre-notification, face-to-face meeting requirements), the layered reporting cadence (monthly diagnostic + bi-annual maintenance report + corrective maintenance report), and personal appearance rules at unusual specificity (4cm heel rule) all dictate implementation choices rather than outcomes. These elements appear to reflect a prior contract&#x27;s operational procedures copied forward rather than a fresh articulation of what the government needs.
+
+The sprawl is real but not dominant. A competent vendor could still propose their own OBVSS hardware solution, their own software architecture, and their own maintenance approach — the technical specification in Exhibit 2 mostly defines functional minimums rather than mandating a specific product. The sprawl is concentrated in the administrative and installation method sections rather than pervading the entire document. This places the solicitation at Severity 2: constrained in some meaningful areas, but not so thoroughly prescriptive that vendors are reduced to staffing a predetermined operating manual.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Wiring should be uniformly color-coded and tagged. Diagram: the Contractor shall provide to the COR a wiring and cabling diagram upon completion of installation.</blockquote>
+  <div class="ev-explanation">Color-coding wiring and tagging are installation method prescriptions, not outcome requirements. The outcome needed is a reliable, maintainable installation. How the contractor organizes wiring is a professional judgment call that should be left to the installer. Requiring a specific color-coding scheme forecloses alternative professional installation practices without a safety or interoperability justification.</div>
+</div><div class="evidence-item">
+  <blockquote>Cables shall be professionally installed in small conduits (cables shall not be visible). Contractor shall provide all required cables/mounting hardware required for the re-installation.</blockquote>
+  <div class="ev-explanation">Specifying that cables must be routed through &#x27;small conduits&#x27; dictates a specific installation method rather than a functional outcome (e.g., &#x27;cables shall be protected from physical damage and not create a hazard&#x27;). A vendor with a different but equally valid cable management approach — adhesive raceways, loom wrap, or integrated vehicle channels — would be forced to use conduit regardless of whether it is optimal for the specific vehicle type.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contract Manager shall be located within 50 miles of the installation and must be able to attend face-to-face meetings as required. The Contract Manager shall have full authority to act and make immediate decisions for the contractor on all matters relating to the daily operations of this contract. The Contract Manager shall speak, read, and write the English language when communicating with the COR, Contract Specialist, and Contracting Officer. The COR must be able to contact the Contract Manager any time issues arise regarding the OBVSS. The contract manager must be able to respond to any emergency requirements within 24 hours. Upon initial call, the Contract Manager must give the COR the maintenance plan and technician&#x27;s name eight (8) hours prior to arrival at the location.</blockquote>
+  <div class="ev-explanation">This passage prescribes a specific internal staffing structure and management model in granular detail. The 50-mile proximity requirement, 24-hour emergency response, and 8-hour pre-notification of technician name all dictate how the contractor must organize its operations rather than defining the outcome (e.g., &#x27;the contractor shall be capable of on-site response within X hours&#x27;). A small firm with remote management capability backed by locally-stationed technicians could meet the functional need but would be disqualified by these prescriptive organizational mandates.</div>
+</div><div class="evidence-item">
+  <blockquote>Task 3 – Monthly System Performance monitoring: the Contractor shall provide the COR a systems diagnostic report, showing any changes in: System Uptime Statistics, Data Transfer Success rates</blockquote>
+  <div class="ev-explanation">Monthly diagnostic reporting on specific metrics is a reporting cadence and format prescription layered on top of the bi-annual maintenance visits and corrective maintenance reports already required. While some reporting is a legitimate deliverable, mandating a specific monthly report format and content on top of multiple other reporting requirements reflects process compliance orientation rather than outcome focus. The government&#x27;s actual need — knowing the system is working — could be served by a single consolidated reporting mechanism rather than multiple separately prescribed deliverables.</div>
+</div><div class="evidence-item">
+  <blockquote>Contractor personnel shall not wear shoes with open toes and/or shoes with heels higher than 4 centimeters while performing under this contract</blockquote>
+  <div class="ev-explanation">Prescribing a maximum heel height in centimeters goes beyond a legitimate safety or professional appearance standard and into micromanagement of contractor personnel conduct. A performance-based approach would state that contractor personnel shall dress in a manner appropriate for a school environment and consistent with safety requirements. Specifying 4-centimeter heels is the kind of copied-from-incumbency detail that signals the solicitation reflects the last contractor&#x27;s operating procedures rather than a defined outcome.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit rule pool characteristics. There is no &#x27;Applicable Documents&#x27; section, no bulk regulatory citation list, and no accumulation of irrelevant directives. The compliance requirements that do appear — manufacturer authorization in writing, Windows 11 compatibility, DoWEA IT approval for software, base access protocols, personnel conduct standards — are each directly tied to operational realities of the contract: working on military installations in Japan, installing software on government networks, and ensuring personnel interacting with schoolchildren meet conduct standards. The PWS is structured around concrete tasks and objectives rather than regulatory compliance frameworks. Standard FAR clauses (FAR 52.217-8 is referenced in the pricing structure) are incorporated by reference in the normal manner. The security and conduct requirements, while detailed, are appropriate given that contractor personnel will be working in proximity to schoolchildren on military installations. There is no evidence of copy-forward accumulation, irrelevant citations, or contradictory regulatory mandates. A prospective vendor reading this solicitation can readily understand the compliance landscape without interpretive burden.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor is required to be authorized, in writing, by the applicable equipment manufacturer to import, repair and maintain their company&#x27;s hardware and DVR viewing software applications and accessories.</blockquote>
+  <div class="ev-explanation">This is a focused, contextually explained requirement directly tied to the specific work — importing and maintaining surveillance hardware in Japan. It tells vendors exactly what authorization they need and why.</div>
+</div><div class="evidence-item">
+  <blockquote>Software must be approved prior to operating on the DoWEA computer network. Must be compatible with IT requirements.</blockquote>
+  <div class="ev-explanation">This is a brief IT compliance reference, but it is directly relevant to the requirement that video playback software be installed on government computers. It does not cite a list of policies — just the underlying operational constraint.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation uses firm-fixed-price unit pricing across all CLINs, with the sole exception of a materials NTE CLIN for unexpected repair parts. This pricing structure is well-matched to the requirements. The core work — installing, maintaining, and removing OBVSS equipment on a known, stable fleet of 83 vehicles — is highly predictable in scope. Fleet size is enumerated, vehicle types are specified, camera counts per vehicle type are defined, maintenance schedules are fixed (bi-annual), and the installation is a discrete, repeatable task. The contractor owns the equipment and is responsible for warranty, which further reduces scope uncertainty. FFP per-unit pricing correctly places performance risk on the contractor while giving the government cost certainty. The NTE materials CLIN is a sensible carve-out for the genuinely unpredictable element (physical damage requiring replacement parts) and is appropriately capped. Option-period installation CLINs showing quantity of 1 per vehicle type suggest the government anticipates minimal new installations in subsequent years, which is consistent with the fleet being largely equipped in the base year. No meaningful mismatch between contract pricing structure and requirement characteristics exists here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SLIN 0001AA | Installation on Buses | each | 68 | [Unit Price] | 0
+SLIN 0001AB | Installation on Microbuses | each | 13 | [Unit Price] | 0
+SLIN 0001AC | Installation on Vans | each | 2 | [Unit Price] | 0</blockquote>
+  <div class="ev-explanation">Installation CLINs are priced on a per-vehicle, firm-fixed-price basis. Installation of surveillance hardware on a known, enumerated fleet of vehicles (83 total) is a well-defined task with predictable scope and labor. FFP is appropriate here.</div>
+</div><div class="evidence-item">
+  <blockquote>SLIN 0002AA | Bi-annual preventative maintenance per vehicle | each | 83 | [Unit Price] | 0</blockquote>
+  <div class="ev-explanation">Preventive maintenance is priced per vehicle at a fixed unit rate. The PWS specifies a defined schedule (twice per year per vehicle), a defined fleet size (83 vehicles), and defined inspection tasks. The quantity and nature of work is predictable, making per-unit FFP appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>SLIN 0002AB | Unscheduled corrective maintenance per vehicle | each | 21 | [Unit Price] | 0</blockquote>
+  <div class="ev-explanation">Unscheduled corrective maintenance is priced per-vehicle at a fixed unit price with an estimated quantity of 21 incidents per year. This is a reasonable approach: the government estimated a historical or anticipated frequency, and the vendor prices a fixed rate per incident. This is a common and defensible approach for variable but bounded maintenance work.</div>
+</div><div class="evidence-item">
+  <blockquote>SLIN 0002AC | Materials - Not To Exceed (NTE) $5,000. | each | 5000 | 1 | 5000</blockquote>
+  <div class="ev-explanation">Materials are handled via a Not-to-Exceed CLIN rather than a pure fixed-price or pure cost-reimbursement line. This is appropriate for unpredictable physical repair parts — the NTE cap controls cost exposure while allowing reimbursement for actual unexpected material costs. The PWS confirms: &#x27;in the event of unexpected physical damages, the Contractor may request COR approval to purchase all repair parts and/or materials and be reimbursed under the contracts&#x27; subline item titled Materials.&#x27;</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="26QE047_Attachment 1_PWS.docx">26QE047_Attachment 1_PWS.docx</div></div>
+  <a class="dl-btn" href="../attachments/1ec1958c371c4afabca100cc4a80e180_26QE047_Attachment+1_PWS.docx" download="26QE047_Attachment 1_PWS.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="26QE047_Attachment 3_Volume II_Past Perf Proposal.docx">26QE047_Attachment 3_Volume II_Past Perf Proposal.docx</div></div>
+  <a class="dl-btn" href="../attachments/1ec1958c371c4afabca100cc4a80e180_26QE047_Attachment+3_Volume+II_Past+Perf+Proposal.docx" download="26QE047_Attachment 3_Volume II_Past Perf Proposal.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="26QE047_Attachment 4_PPQ.docx">26QE047_Attachment 4_PPQ.docx</div></div>
+  <a class="dl-btn" href="../attachments/1ec1958c371c4afabca100cc4a80e180_26QE047_Attachment+4_PPQ.docx" download="26QE047_Attachment 4_PPQ.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="26QE047_Attachment 5_Volume III_Price.xlsx">26QE047_Attachment 5_Volume III_Price.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/1ec1958c371c4afabca100cc4a80e180_26QE047_Attachment+5_Volume+III_Price.xlsx" download="26QE047_Attachment 5_Volume III_Price.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="26QE047_Attachment 6_252.239-7009.pdf">26QE047_Attachment 6_252.239-7009.pdf</div></div>
+  <a class="dl-btn" href="../attachments/1ec1958c371c4afabca100cc4a80e180_26QE047_Attachment+6_252.239-7009.pdf" download="26QE047_Attachment 6_252.239-7009.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

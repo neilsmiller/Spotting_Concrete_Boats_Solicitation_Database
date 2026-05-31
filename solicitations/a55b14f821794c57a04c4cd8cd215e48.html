@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DCSA MPP Broad Agency Announcement (BAA) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DCSA MPP Broad Agency Announcement (BAA)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 a55b14f821794c57a04c4cd8cd215e48</span>
+      <a class="sam-link" href="https://sam.gov/opp/a55b14f821794c57a04c4cd8cd215e48/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-03-31</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › ACC-CTRS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541611</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-31</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12-month base period with option for two additional 12-month periods, not to exceed 36 months total</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Alignment with National Security and DOW priorities</li><li>Alignment with DCSA strategic plan and mission</li><li>Technical approach and developmental assistance</li><li>Cost reasonableness</li><li>Letters of Endorsement from CEOs (Pass/Fail)</li><li>FOCI Questionnaire (Pass/Fail)</li><li>Statement of Mentor and Protégé eligibility</li><li>Engineering and Technical Assistance is 50% or more of the overall proposed costs (Pass/Fail)</li><li>HBCU/MSI/APEX/SBDC/WBC/MEP Involvement (Pass/Fail)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a Mentor-Protégé Program BAA — a fundamentally different instrument from a performance-based services contract. Its primary purpose is to structure a developmental relationship between firms, not to procure a system or ongoing service with measurable performance targets. The nature of the instrument inherently limits outcome-measurement opportunities: DFARS Appendix I governs what is allowable, and the program&#x27;s statutory framework defines success largely in terms of small business development over a 1-3 year horizon rather than discrete, measurable deliverables.
+
+The solicitation does exhibit some compliance-orientation in its evaluation criteria — particularly the cluster of pass/fail checks (CEO letters, FOCI questionnaires, eligibility statements, cost ratio thresholds) and the cost proposal review framed exclusively around FAR cost principles. There is no mention of performance benchmarks for protégé capability growth, no baseline-vs.-endpoint assessment framework, and no user or mission outcome metrics.
+
+However, the solicitation is thin on QA and reporting requirements altogether — it lacks the dense, overlapping reporting cadences, prescribed report formats, and surveillance plan language that characterize severe compliance-over-outcomes problems. There is no weekly status report requirement, no meeting frequency mandate, no waterfall-style schedule tracking. The accountability structure is light rather than compliance-heavy. The Phase II proposal requires a Statement of Work and technical approach, and Section R of the white paper template asks proposers to identify TRL/MRL baselines and anticipated endpoints — which at least gestures toward outcome measurement.
+
+The absence of robust outcome metrics is a real gap, but in the context of an MPP BAA where the statutory framework and DFARS Appendix I govern the relationship, this is more characteristic of the program type than a drafting sin. The solicitation is not crowded with process-compliance mechanisms; it simply lacks strong outcome accountability. This warrants a low severity finding — the compliance orientation is present but does not dominate the accountability structure, and there is insufficient QA/reporting machinery to constitute a severe case of this sin.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Letters of Endorsement from CEOs (Pass/Fail)
+FOCI Questionnaire (Pass/Fail)
+Statement of Mentor and Protégé eligibility
+Engineering and Technical Assistance is 50% or more of the overall proposed costs (Pass/Fail)
+HBCU/MSI/APEX/SBDC/WBC/MEP Involvement (Pass/Fail)</blockquote>
+  <div class="ev-explanation">Several evaluation criteria are structured as binary pass/fail compliance checks — letters on file, eligibility statements, cost ratio thresholds — rather than as measures of whether the developmental assistance will actually produce capable protégé firms. These criteria verify that the right boxes are checked, not that the proposed program will succeed.</div>
+</div><div class="evidence-item">
+  <blockquote>The proposal will be reviewed for allowability, allocability, and reasonableness.</blockquote>
+  <div class="ev-explanation">The Phase II cost proposal review is framed entirely in terms of cost accounting compliance standards (FAR allowability, allocability, reasonableness) with no mention of whether the proposed costs correspond to outcomes likely to improve protégé capabilities. This is an accounting compliance check, not a value-for-money or outcome assessment.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards characteristics. The DCSA MPP BAA is a Mentor-Protégé program BAA, which is structurally different from a competitive service contract. The program is explicitly designed to bring in new small business entrants (Protégés) who have not previously held DCSA work — indeed, one eligibility criterion bars firms that have already participated as Protégés, which actively prevents incumbent capture on the Protégé side. The Mentor eligibility requirement of $25M in DoW contracts reflects the program&#x27;s design logic: large primes must have demonstrated DoD relevance to credibly mentor small businesses into the defense industrial base. This is not a narrow, stacked, or lookback-window-bounded requirement of the type that creates insider rewards — it is a categorical floor based on firm size and current DoD engagement. The evaluation criteria (alignment with national security priorities, technical approach, cost reasonableness, pass/fail letter and eligibility requirements) are capability- and alignment-focused, not contract-history-specific. There are no requirements for specific numbers of prior completed contracts at specific dollar thresholds, no federal-specific experience mandates for Protégés, and no scoring bonuses for having previously held this specific contract. A qualified large prime with a relevant small business partner could realistically compete without any prior relationship with DCSA. The BAA&#x27;s rolling submission structure and open call format further reduce barriers to new entrants. There are document quality issues (references to &#x27;Department of War,&#x27; a response deadline predating the posting date) and some administrative irregularities worth noting in other analytical dimensions, but none of these constitute insider rewards. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Prime contractors with $25M or more in DOW contracts in the last fiscal year.</blockquote>
+  <div class="ev-explanation">This is a Mentor eligibility threshold — not an evaluation criterion that favors incumbents in a traditional sense. It establishes that Mentors must be substantial DoD prime contractors, which is a reasonable baseline for a program designed to transfer capability from large primes to small businesses. It does not require prior participation in this specific BAA or any specific contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>Has not had another Mentor Protégé agreement under the DoW Mentor-Protégé Program authority, 10 U.S.C. 2302 note</blockquote>
+  <div class="ev-explanation">This criterion actually works against incumbency for Protégés — it explicitly excludes firms that have previously held an agreement, preventing repeat participation and opening slots to new entrants. This is the opposite of an insider reward.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a Broad Agency Announcement for a Mentor-Protégé Program, and by its nature it is deliberately light on process prescription. The document is structured primarily around eligibility criteria, evaluation criteria, and administrative process — not detailed task-level requirements. The scope of work (Section 6.0) lists types of allowable developmental assistance but explicitly uses &#x27;include, but are not limited to&#x27; framing, which is the opposite of prescriptive sprawl. The white paper and proposal templates (Attachment 1) ask vendors to describe their own developmental assistance approach, timeline, and methodology — the government has not pre-specified how mentoring must be delivered. The technical priorities in Section 5.0 identify outcome areas (cloud migration, AI/ML, zero trust, workforce development) without mandating specific tools or platforms. The pass/fail criteria (Letters of Endorsement, FOCI questionnaire, 50% engineering/technical threshold, HBCU/MSI involvement) are structural eligibility filters consistent with the statutory framework governing Mentor-Protégé programs under DFARS Appendix I, not process mandates. The 50% engineering/technical assistance threshold has a statutory/regulatory basis and is not an arbitrary process prescription. There is one note-worthy constraint — the BAA specifies reimbursable agreements only, excluding credit or hybrid — but this is a financial structure choice within statutory authority, not a performance process mandate. Overall, this solicitation is appropriately outcome- and eligibility-focused for its instrument type. Requirement sprawl is not a meaningful concern here. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Types of developmental assistance include, but are not limited to: Technical/Engineering Assistance: Technology transfer, certifications, quality processes, manufacturing improvements. Business Development Assistance: HR, accounting, marketing, safety, and company policies. Facility Clearance (FCL) Sponsorship &amp; Guidance: Establish a formal process to assist the protégé in obtaining and maintaining a facility clearance...</blockquote>
+  <div class="ev-explanation">This list describes categories of permissible assistance rather than mandating a specific sequence of steps or implementation method. The &#x27;include, but are not limited to&#x27; language explicitly preserves flexibility. Vendors remain free to design their own approach within these broad categories.</div>
+</div><div class="evidence-item">
+  <blockquote>Identify and describe the anticipated developmental assistance approach for the Protégé Firm specifying the type of assistance plann. Provide how this approach will address the Protégé Firm&#x27;s nes to enhance their ability to perform successfully under contracts or subcontracts within DoW and other Federal agencies.</blockquote>
+  <div class="ev-explanation">Section P of the white paper template asks offerors to describe their own approach rather than prescribing one. This is outcome-oriented solicitation design — the government is asking what the vendor proposes, not dictating the method.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin in any meaningful way. The regulatory footprint is notably lean for a DoD acquisition. The primary governing framework cited — DFARS Appendix I — is the correct and only necessary reference for a Mentor-Protégé Program BAA; its relevance requires no explanation. Beyond that, the solicitation cites a public law establishing the PPI (Pub. L. 117-63), references standard SBA size standards and 10 U.S.C. statutory authorities in the white paper template&#x27;s eligibility section, and mentions FAR/DFARS compliance as a type of developmental assistance the Mentor can provide to the Protégé — not as a compliance obligation imposed on offerors. The white paper template does reproduce statutory eligibility criteria in full (Section I), but this is a disclosure requirement for the Protégé to self-certify eligibility under the program&#x27;s authorizing statute, not a bulk regulatory dump. There is no &#x27;Applicable Documents&#x27; section, no master list of directives, no energy-efficiency executive orders, no ID badge policies, and no contradictions between cited regulations and the solicitation&#x27;s purpose. The compliance landscape is readily understandable to a vendor new to the agency. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Refer to DFARS Appendix I, paragraph I-106 for specific guidelines regarding allowable developmental assistance.</blockquote>
+  <div class="ev-explanation">Rather than dumping a list of regulations, the solicitation makes a single, contextually appropriate reference to the relevant DFARS appendix governing the Mentor-Protégé Program. This is a curated, purposeful citation — DFARS Appendix I is the primary regulatory framework for DoD MPP agreements and its relevance is self-evident.</div>
+</div><div class="evidence-item">
+  <blockquote>Note: Cybersecurity compliance (NIST SP 800 / CMMC Level I) is not reimbursable. However, DOW OSBP encourages companies to seek the services of Project Spectrum (https://www.projectspectrum.io) for CMMC Level 1 at no cost.</blockquote>
+  <div class="ev-explanation">This is actually an example of good regulatory curation: the solicitation explicitly carves out a compliance area, explains its non-reimbursable status, and directs firms to an alternative resource. This is the opposite of a rule pool — the agency is providing interpretive guidance rather than dumping compliance obligations on vendors.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a Broad Agency Announcement for the DCSA Mentor-Protégé Program, structured as a cooperative agreement administered through an intermediary (Move America, Inc.) with subawards to participating firms. The instrument is reimbursable (cost-reimbursement), which is the statutory and regulatory norm for DoD Mentor-Protégé agreements under DFARS Appendix I. Cost-reimbursement is appropriate here for several reasons: (1) The scope of developmental assistance is inherently variable — each Mentor-Protégé pair will propose customized technical and business development activities tailored to the Protégé&#x27;s specific gaps and needs; (2) The work involves capacity-building, training, technology transfer, and organizational development — activities whose precise extent and cost cannot be predicted in advance; (3) The program is explicitly not purchasing a defined deliverable but rather incentivizing a developmental relationship, which is precisely the use case for cost-reimbursement; (4) DFARS Appendix I, which governs this program DoD-wide, presupposes reimbursable agreements. The solicitation&#x27;s restriction to reimbursable agreements (explicitly excluding credit and hybrid agreements) is consistent with DoD policy and appropriate for the requirements. There is no mismatch between the pricing structure and the nature of the work. The BAA format itself is appropriate for this type of broad, open-ended developmental program. No square peg is present here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Note: This BAA is soliciting Reimbursable agreements only, no Credit or Hybrid agreements will be accepted.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly restricts participation to reimbursable (cost-reimbursement) agreements. For a Mentor-Protégé Program, this is the standard and appropriate pricing structure — the government reimburses documented developmental assistance costs incurred by the Mentor on behalf of the Protégé. This is not a contract for a deliverable product or well-scoped service; it is a structured developmental relationship where the type and volume of assistance will vary based on the Protégé&#x27;s evolving needs.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="DCSA MPP BAA.docx">DCSA MPP BAA.docx</div></div>
+  <a class="dl-btn" href="../attachments/a55b14f821794c57a04c4cd8cd215e48_DCSA+MPP+BAA.docx" download="DCSA MPP BAA.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="MPP White Paper_Updated Template.docx">MPP White Paper_Updated Template.docx</div></div>
+  <a class="dl-btn" href="../attachments/a55b14f821794c57a04c4cd8cd215e48_MPP+White+Paper_Updated+Template.docx" download="MPP White Paper_Updated Template.docx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

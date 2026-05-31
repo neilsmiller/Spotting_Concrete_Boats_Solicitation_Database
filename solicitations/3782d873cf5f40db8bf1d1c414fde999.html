@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNAL Force Travel Logistics Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>CNAL Force Travel Logistics Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 3782d873cf5f40db8bf1d1c414fde999</span>
+      <a class="sam-link" href="https://sam.gov/opp/3782d873cf5f40db8bf1d1c414fde999/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R699</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541611</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation text provided is primarily composed of the wage determination document (SCA Wage Determination No. 2015-4341, Rev. 33), amendment forms (SF30), and the DD254 security classification document. The wage determination constitutes the vast majority of the readable text and contains no performance, reporting, or QA provisions whatsoever — it is purely a labor standards document required by the Service Contract Act.
+
+The core performance work statement, QA surveillance plan, evaluation criteria, and reporting requirements are referenced as being in the SF 1449 and attached PWS/SOW, but those documents — while listed as attachments — are not readable in the provided text (the SF 1449 content appears encoded or corrupted in the PDF extraction). The Q&amp;A document is listed but its content is not provided.
+
+Without access to the actual PWS/SOW, reporting requirements, QASP, or deliverables list, it is impossible to make a confident finding of compliance-over-outcomes. The solicitation is marked &#x27;sufficient_content: true&#x27; because there is technically enough framing to know what kind of contract this is (FFP, SDVOSB set-aside, management consulting NAICS 541611, Navy force travel logistics support), but the key documents needed to assess this sin are not readable. The FFP contract type provides a mild structural incentive toward outcome accountability. No reporting cadences, prescribed report formats, meeting mandates, or QA surveillance language is visible in the provided text. Given the absence of evidence of the sin — and the inability to find it even searching carefully through the available pages — severity is set to 1 (minimal/no detectable problem in available text).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Questions and Answers</blockquote>
+  <div class="ev-explanation">The solicitation attachments include a Q&amp;A document, suggesting some level of contractor engagement, but no specific reporting or QA surveillance language is extractable from the provided text to evaluate outcome vs. compliance orientation.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government intends firm-fixed-price (FFP) contract for services.</blockquote>
+  <div class="ev-explanation">A firm-fixed-price structure is generally outcome-oriented by design — the contractor is paid for results, not activities. This is a mild mitigating factor against compliance-over-outcomes patterns.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation documents available for review consist primarily of a wage determination (a standard SCA document listing occupation codes and pay rates for the Virginia/North Carolina region), an amendment extending the response deadline by five days, and a DD254 (security classification form with no legible substantive text). The core solicitation documents — the SF 1449, the Statement of Work or Performance Work Statement, the evaluation criteria, and the past performance/experience requirements — are referenced as attachments but their substantive text is not reproduced in the provided content in a readable form. The pages rendered from the main solicitation body appear to be corrupted or encoded in a format that renders as unreadable character sequences (CID-encoded text). As a result, I cannot assess the experience requirements, evaluation criteria, or past performance factors in any meaningful way. What I can observe is that this is an SDVOSB set-aside for travel logistics support services at CNAL (Commander, Naval Air Force, Atlantic), under NAICS 541611 (Management Consulting), with a $24.5M size standard. The wage determination shows a mix of administrative and support occupations, consistent with a travel coordination/logistics service contract. None of the readable content reveals experience requirements, past performance thresholds, dollar-denominated contract size requirements, or evaluation criteria that could be assessed for insider rewards. Without access to the SOW, evaluation criteria, and experience requirements, I cannot find evidence of insider rewards. Given that the substantive evaluation and experience content is inaccessible, I am treating this as borderline insufficient content, but because enough structural information exists to confirm the nature of the acquisition, I have marked sufficient_content as true and assigned severity 1 — the baseline — reflecting an absence of detected insider reward indicators rather than a confirmed clean solicitation.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The document set provided consists primarily of a wage determination (SCA Wage Determination No. 2015-4341 Rev 33) and a brief solicitation amendment (Amendment 0002/SF30) that extends the response deadline from May 7 to May 12, 2026. The wage determination occupies the bulk of the readable content across pages 1-11 and lists occupation codes and wage rates for the Virginia/North Carolina area — it contains no performance work statement, statement of work, or task descriptions. The amendment document (SF30) contains only administrative change language (the date extension) with no substantive requirements. While the solicitation references an attached SF 1449 and a Performance of Work Statement as attachments, those documents were not included in the provided text. The solicitation description mentions &#x27;Details on the requirement in reference to the period of performance, performance of work statement, submission and evaluation criteria are provided in the attached SF 1449,&#x27; but the SF 1449&#x27;s substantive pages are not legible — the PDF extraction renders them as corrupted character sequences (CID font encoding artifacts) that cannot be meaningfully parsed. Without access to the actual SOW/PWS describing what the contractor is expected to do, it is not possible to assess whether the requirements dictate HOW work should be done versus WHAT outcomes are needed. The NAICS code 541611 (Administrative Management and General Management Consulting Services) and the title &#x27;CNAL Force Travel Logistics Support&#x27; suggest this is a support services contract, but no task-level detail is accessible. Insufficient content to render a meaningful Requirement Sprawl assessment.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of rule pools (severity 2), primarily manifested through the incorporation of an exhaustively broad SCA wage determination (Rev. 33 of WD 2015-4341) covering well over 100 occupational classifications, the vast majority of which are irrelevant to a force travel logistics support contract. The wage determination includes occupations like aerospace structural welders, well drillers, radiator repair specialists, electricians, and air traffic controllers — none of which bear any obvious relationship to travel coordination and logistics support services under NAICS 541611. This is a textbook bulk-inclusion pattern: a master-list compliance document incorporated without curation or filtering to the actual scope. The presence of a Draft DD254 as an attachment also raises questions, as classified contract security specifications are not standard for management consulting/travel logistics work, suggesting possible boilerplate carryover. However, several mitigating factors prevent a severity 3 rating. First, the core compliance framework (SCA wage determination, FAC clauses, SF 1449) is standard federal contracting practice and not an agency-specific accumulation. Second, the solicitation is relatively streamlined in its surface structure — it does not present a dedicated &#x27;Applicable Documents&#x27; section with dozens of agency directives cited without context. Third, the wage determination breadth, while excessive, is a known feature of SCA compliance rather than an agency-specific rule-accumulation problem. The PDF content of the solicitation&#x27;s substantive attachments (SF 1449, PWS) is not fully legible due to encoding issues, which limits the depth of analysis possible for the actual performance requirements. If the PWS contains a dedicated &#x27;Applicable Documents&#x27; or &#x27;Referenced Regulations&#x27; section with additional agency-specific policy citations, the severity could warrant upgrading to 3. Based on available evidence, severity 2 — noticeable but not impenetrable compliance burden, with some clearly irrelevant inclusions that appear to be boilerplate carryovers — is the appropriate rating.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Wage Determination No. 2015-4341 Rev. 33 — pages 1 through 11 of extracted content showing occupation codes and wage rates for dozens of job classifications including Accounting Clerks I/II/III, Administrative Assistants, Court Reporters, Customer Service Representatives I/II/III, Data Entry Operators I/II/III, Dispatchers, Document Preparation Clerks, Duplicating Machine Operators, General Clerks I/II/III, Housing Referral Assistants, Messenger Couriers, Order Clerks I/II, Personnel Assistants (Employment) I/II/III, Production Control Clerks, Secretaries I/II/III, Word Processors I/II/III, Medical Assistants, Accounting Technicians, Automotive Servicers, Electricians, Furniture Handlers, and many others</blockquote>
+  <div class="ev-explanation">The wage determination incorporated into this solicitation for &#x27;Force Travel Logistics Support&#x27; (NAICS 541611 — Management Consulting) covers an extraordinarily wide range of occupational categories, many of which have no plausible connection to travel logistics support services. Categories like Court Reporters, Housing Referral Assistants, Messenger Couriers, Automotive Servicers, Electricians, Furniture Handlers, and Production Control Clerks appear to be included wholesale from a master SCA wage determination rather than filtered to the occupations actually relevant to the scope of work. This is a classic rule-pool pattern: a bulk compliance document incorporated without curation.</div>
+</div><div class="evidence-item">
+  <blockquote>Draft DD254 (Contract Security Classification Specification) attached as Attachment 2 alongside the performance work statement for CNAL Force Travel Logistics Support</blockquote>
+  <div class="ev-explanation">A DD254 is a security classification specification typically required for classified work or work involving access to classified information. Its presence as a draft attachment to a travel logistics support contract (NAICS 541611) raises a question of relevance — travel coordination and logistics support does not obviously require a classified contract security specification. Without the actual DD254 content being legible, this may represent a boilerplate carryover from a predecessor contract rather than a genuinely tailored compliance requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>The solicitation document and incorporated provisions and clauses are those in effect through Federal Acquisition Circular 2026-01... Details on the requirement in reference to the period of performance, performance of work statement, submission and evaluation criteria are provided in the attached SF 1449.</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s summary provides no context for which of the incorporated provisions and clauses are operationally significant for this specific scope of work. The compliance landscape is presented as a monolithic block — FAC 2026-01, all attached documents — with no guidance to vendors about which elements carry the greatest compliance weight or how they interact with the travel logistics support mission.</div>
+</div><div class="evidence-item">
+  <blockquote>Wage Determination occupations listed include: Electrician, Furniture Handler, Furniture Refinisher, Furniture Repairer Minor, Automotive Servicer, Aircraft Log/Maintenance Clerk, Air Traffic Control Specialist (Center/Station/Terminal), Aerospace Structural Welder, Aerospace Technical Library Aide/Clerk, Radiator Repair Specialist, Well Driller, Small Engine Repairman</blockquote>
+  <div class="ev-explanation">These specific SCA occupational categories — aerospace structural welders, well drillers, radiator repair specialists, air traffic controllers, and automotive servicers — are included in the compliance document governing wage rates for a management consulting/travel logistics support contract. While the SCA requires wage determinations to cover all potentially employed classifications, the failure to identify and limit the applicable categories to those relevant to force travel logistics work means vendors must navigate an enormous undifferentiated compliance document. This is a moderate rule-pool pattern: bulk regulatory content incorporated without scope-filtering.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation explicitly states a firm-fixed-price contract type for CNAL Force Travel Logistics Support services. The requirement involves recurring administrative and travel logistics support work for a Navy command, classified under NAICS 541611. The wage determination lists numerous clerical and administrative job categories (accounting clerks, administrative assistants, customer service representatives, data entry operators, etc.), indicating the work consists of well-understood, recurring support functions with predictable staffing levels and labor quantities. These characteristics — defined scope, recurring nature, predictable labor categories, commercial-like service delivery — align well with FFP pricing. The government can define the service requirements, the contractor can price them with reasonable certainty, and performance is objectively measurable (e.g., travel orders processed, logistics coordination completed). There is no indication of undefined or highly variable scope that would make FFP inappropriate. A T&amp;M contract would be inappropriate here because labor quantity and task duration are sufficiently predictable for this type of recurring administrative support. The FFP structure is the standard and appropriate choice for Service Contract Act-covered, recurring administrative services of this type. Severity is assessed as 1 — Minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends firm-fixed-price (FFP) contract for services.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states FFP as the contract pricing structure.</div>
+</div><div class="evidence-item">
+  <blockquote>CNAL Force Travel Logistics Support ... NAICS Code: 541611</blockquote>
+  <div class="ev-explanation">NAICS 541611 is Management Consulting Services. The title &#x27;Force Travel Logistics Support&#x27; combined with a management/administrative consulting code suggests the work involves defined, recurring support services such as travel coordination and logistics management for the Commander, Naval Air Force Atlantic (CNAL). These are well-understood, recurring service tasks with predictable labor inputs.</div>
+</div><div class="evidence-item">
+  <blockquote>Wage Determination No 2015-4341 Rev 33 ... Accounting Clerk I/II/III, Administrative Assistant, Customer Service Representative I/II/III, Data Entry Operator I/II, Dispatcher Motor Vehicle, Document Preparation Clerk, General Clerk I/II/III, Housing Referral Assistant, Messenger Courier, Order Clerk I/II, Personnel Assistant (Employment) I/II/III, Production Control Clerk</blockquote>
+  <div class="ev-explanation">The wage determination covers a broad set of clerical and administrative occupational categories. These are commodity-like service roles with predictable hourly duties, and their scope can be reasonably estimated in advance, supporting FFP as an appropriate contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="1.09 Solicit DD254.pdf">1.09 Solicit DD254.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3782d873cf5f40db8bf1d1c414fde999_1.09+Solicit+DD254.pdf" download="1.09 Solicit DD254.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926QL078.pdf">Solicitation - N0018926QL078.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3782d873cf5f40db8bf1d1c414fde999_Solicitation+-+N0018926QL078.pdf" download="Solicitation - N0018926QL078.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment - N0018926QL0780001.pdf">Solicitation Amendment - N0018926QL0780001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3782d873cf5f40db8bf1d1c414fde999_Solicitation+Amendment+-+N0018926QL0780001.pdf" download="Solicitation Amendment - N0018926QL0780001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation Amendment N0018926QL0780002 SF 30.pdf">Solicitation Amendment N0018926QL0780002 SF 30.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3782d873cf5f40db8bf1d1c414fde999_Solicitation+Amendment+N0018926QL0780002+SF+30.pdf" download="Solicitation Amendment N0018926QL0780002 SF 30.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Wage Determination No 2015-4341 Rev 33.pdf">Wage Determination No 2015-4341 Rev 33.pdf</div></div>
+  <a class="dl-btn" href="../attachments/3782d873cf5f40db8bf1d1c414fde999_Wage+Determination+No+2015-4341+Rev+33.pdf" download="Wage Determination No 2015-4341 Rev 33.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

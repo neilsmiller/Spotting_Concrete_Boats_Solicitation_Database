@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPE ST3 Professional Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>CPE ST3 Professional Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 24a39686ca11478aa06280a675a4f042</span>
+      <a class="sam-link" href="https://sam.gov/opp/24a39686ca11478aa06280a675a4f042/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › AMC › ACC › ACC-CTRS</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation occupies a genuine middle ground for this sin. On one hand, the drafters have made a sincere and visible effort to frame the contract around Agile outcomes: the stated objective is &#x27;task-based, outcome-focused, capability-centric,&#x27; there are explicit references to &#x27;specific measurable results,&#x27; and the Agile framework does introduce sprint-level acceptance criteria and definitions of done that are at least nominally outcome-oriented at the micro level. The solicitation is not a waterfall-era reporting machine — it does not require weekly written status reports, monthly progress reports in prescribed formats, and twice-daily teleconferences.
+
+On the other hand, the accountability structure has a significant gap: it defines how the work will be done (Agile ceremonies, sprint cadences, implementation plans, dashboards, retrospectives) without defining what the work is supposed to achieve at the program or mission level. The Agile metrics required — velocity, burndown, cycle time, impediment tracking — are all process health indicators, not mission outcome indicators. There are no contract-level performance standards: no acquisition timeline benchmarks, no program milestone success rates, no measures of warfighter readiness impact, no quality thresholds for acquisition documents produced.
+
+The result is that the government will be able to assess whether the contractor is running a compliant Agile process, but not whether that process is producing better acquisition outcomes than the previous non-Agile approach. The PWS&#x27;s own stated purpose — &#x27;this is a mindset shift&#x27; from staffing to outcomes — is not matched by an accountability structure that actually measures outcomes. The compliance-over-outcomes pattern exists, but it is the absence of outcome metrics layered on top of a reasonable process framework, rather than a fully metastasized reporting burden. Severity 2 is appropriate: the sin is present and notable, but the solicitation does include some outcome-oriented language and the reporting burden is not extreme.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Implement velocity tracking and burndown/burnup charts for the tasks prioritized by the Government
+• Measure cycle time and lead time for work products and deliverables
+• Track and report on task completion rates and quality metrics in human readable reporting venues and dashboards in real-time
+• Provide visualization of work in progress and impediments (blockers)
+• Deliver traditional Contract Data Requirements List (CDRL) information using Agile tools and dashboards for continuous monitoring (DI-MISC-80711A, Knowledge Management Portal and Dashboard)</blockquote>
+  <div class="ev-explanation">The Agile Metrics and Reporting section (3.2.3) is entirely focused on process and activity tracking — velocity, cycle time, task completion rates, work-in-progress visualization, and impediment tracking. These are all inputs and throughput measures. There are no outcome metrics: no measures of acquisition timeline improvement, no training system readiness rates, no warfighter capability milestones achieved, no quality of deliverables as evaluated by end users. The dashboard tracks whether the Agile process is being run, not whether the Agile process is producing mission value.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall propose and manage this contract using an Agile Implementation Plan detailing the following information:
+• Framework selection and customization
+• Team structure and roles
+• Tools and technology approach
+• Implementation timeline
+• Provide this Plan at award through the Knowledge Management Portal and update as required through the life of the task order</blockquote>
+  <div class="ev-explanation">The Agile Implementation Plan — the primary contractual management document — is defined entirely in terms of process setup: framework chosen, team structure, tools, and a timeline. There is no requirement that the plan define success criteria, performance baselines, or measurable outcomes. The government will receive a document describing how the contractor intends to work, but not what results that work is expected to achieve. This is a plan to comply with the plan, not a performance accountability mechanism.</div>
+</div><div class="evidence-item">
+  <blockquote>Sprint Planning and Review Documentation
+• Sprint goals and objectives
+• Committed user stories
+• Acceptance criteria
+• Definition of Done
+• Demo materials
+• Agile Performance Dashboard
+• Velocity metrics
+• Quality metrics
+• Impediment tracking
+• Task burndown</blockquote>
+  <div class="ev-explanation">The sprint documentation requirements are extensive and process-prescriptive, listing nine specific artifact types that must be produced. While &#x27;acceptance criteria&#x27; and &#x27;definition of done&#x27; gesture toward outcomes, they are defined at the sprint level — i.e., did this specific user story get completed — rather than at the mission or program level. There is no requirement to demonstrate that sprint completions translated into acquisition outcomes, improved program execution, or warfighter benefit. The documentation requirement measures process fidelity to Agile methodology, not program results.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide during monthly Sprint retrospective reviews and dashboard:
+• Improvement recommendations
+• Success metrics
+• Updated implementation roadmap</blockquote>
+  <div class="ev-explanation">The Agile Maturity Assessment (3.2.7) requires monthly retrospectives with &#x27;success metrics&#x27; — but these metrics are undefined. In context, they are clearly process improvement metrics (is the Agile implementation maturing?), not mission outcome metrics (are acquisition timelines improving? are training devices fielded faster? are warfighters better supported?). The &#x27;updated implementation roadmap&#x27; further confirms this is self-referential: the Agile process assessing the Agile process, with no external mission performance anchor.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall manage other contract Quality Assurance Surveillance Plans (QASPs), coordinate TADSS relocations, and track upgrade schedules for all devices. The contractor shall monitor contractor performance and report feedback to appropriate USG representatives to ensure compliance with quality standards... The contractor shall provide direct input regarding the following criteria on other vendor&#x27;s contracts:
+• Timeliness of deliverables
+• Accuracy and quality of documentation
+• Effectiveness of recommendations and solutions
+• Compliance with applicable regulations and standards</blockquote>
+  <div class="ev-explanation">Section 4.4.1 (PL TSO Quality Assurance) defines quality surveillance criteria for other contractors. Three of the four criteria — timeliness, documentation accuracy, and regulatory compliance — are compliance-oriented process checks. Only &#x27;effectiveness of recommendations and solutions&#x27; approaches an outcome measure, and it is not defined with any standard or threshold. This is the closest the PWS comes to a formal QA surveillance framework, and it is predominantly compliance-focused.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of insider rewards. The government has made a genuine attempt to move away from pure incumbent capture — the explicit note disqualifying prior STRI SETA contracts from counting toward Agile experience is a deliberate effort to prevent the incumbent from simply claiming existing work as qualifying experience. The outcome-focused, task-based Agile framing also signals an intent to evaluate capability rather than incumbency.
+
+However, several structural features still tilt the playing field toward established defense contractors with prior Army training and simulation experience. The key personnel requirements for the Agile PM, while not requiring specific dollar thresholds or federal-only experience, do stack multiple qualifications that favor vendors already in the defense Agile space. The TS FCL requirement combined with TS/SCI individual requirements creates a meaningful barrier for new market entrants. The platform-specific aviation experience requirement for Flight School support is genuinely narrow. And the broad OCI exclusion, while legally appropriate, has the perverse effect of further limiting the competitive pool.
+
+Critically, the solicitation does not impose the most severe insider reward patterns — there are no explicit dollar thresholds for prior contracts, no &#x27;must have held a similar federal contract within X years&#x27; requirements, and the evaluation criteria (not fully visible in this pre-solicitation) have not been revealed in a way that shows explicit scoring bonuses for incumbency. The draft PWS is also explicitly framed as subject to change based on RFI responses. These are mitigating factors that keep this from reaching severity 3.
+
+The overall picture is a solicitation that is better than average in its awareness of incumbency risks, but still contains structural features that would give experienced Army training and simulation vendors — particularly the current SETA/CASTT incumbents or close analogues — a material competitive advantage over fully new entrants. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Minimum of 5 years of experience in Agile project management. ***Note, the previous CPE STRI SETA contracts are not considered Agile requirements.</blockquote>
+  <div class="ev-explanation">This footnote explicitly disqualifies experience from the most directly relevant prior contracts — the CPE STRI SETA contracts — while simultaneously requiring 5 years of Agile PM experience. The effect is paradoxical: it excludes incumbent-specific experience while still requiring a narrow credential that may be easier to demonstrate through commercial or non-STRI government work. However, the 5-year minimum with specific project type requirements (at least 3 Agile projects from inception to completion) does narrow the pool somewhat, particularly for smaller businesses. The note itself suggests awareness of incumbency concerns, which is a mitigating factor.</div>
+</div><div class="evidence-item">
+  <blockquote>Proven experience leading at least 3 Agile projects from inception to completion. Experience in managing projects that involve cross-functional teams and multiple stakeholders. Demonstrated success in projects that required rapid iteration and feedback loops, such as software development or product management. Familiarity with Agile transformations within organizations, showcasing the ability to implement Agile practices at scale.</blockquote>
+  <div class="ev-explanation">This stacked set of requirements for the Agile PM key personnel position combines quantity of prior projects, specific project characteristics, and organizational transformation experience. While individually these are reasonable capability signals, together they form a fairly narrow gate — especially in a DoD context where true Agile adoption is recent. A vendor with strong program management experience in non-software domains (e.g., traditional defense acquisition support) would be disadvantaged even if capable of performing the work.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall possess a Top Secret facility clearance (FCL) with No storage requirements... The appropriate clearance level will range from HSPD-12 (Tier-1) to Top Secret (Tier-5), depending on the sensitivity of the information being accessed. Specific tasks and duties may require personnel to be indoctrinated into Sensitive Compartmented Information (SCI).</blockquote>
+  <div class="ev-explanation">While clearance requirements are generally legitimate (noted in the sin definition), the combination of a required Top Secret FCL at the firm level plus individual personnel clearances up to TS/SCI is a meaningful barrier to new entrants. Obtaining a corporate FCL for a company that doesn&#x27;t already have one takes months to years. This requirement, stacked with the other domain-specific experience requirements, contributes to an environment where established incumbents or large defense contractors with existing clearance infrastructure have a structural advantage over smaller or newer competitors.</div>
+</div><div class="evidence-item">
+  <blockquote>These tasks require specific experience with US Army rotary wing aviation training methods, tasks, doctrine, tactics, techniques, and procedures; familiarity with US Army Aviation regulations, aircraft specific technical publications, ancillary aircraft specific weapons and survivability equipment, communications systems, and mission planning... These tasks are directly supported by the experience as noted in category Aviation Training Analysis and Support.</blockquote>
+  <div class="ev-explanation">For the Flight School Support task area, the PWS mandates experience specifically with US Army rotary wing platforms (UH-60M/CH-47F/AH-64E/LUH-72A). This is platform-specific institutional knowledge that is predominantly held by vendors already embedded in Army aviation training programs. While operationally defensible given the unique nature of Army aviation systems, it narrows competition to a small set of vendors with prior Army aviation training contracts.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor and its partners are ineligible to perform as a supplier, a subcontract supplier, or a consultant to a supplier for any other requirement within CPE STRI for the life of the Commercial Acquisition of Services for Testing and Training contract plus one year.</blockquote>
+  <div class="ev-explanation">The broad OCI exclusion covering the entire CPE STRI portfolio for the contract life plus one year creates a significant competitive dynamic. Vendors who are currently performing other CPE STRI work may be unable to compete for this contract (or vice versa), effectively reducing the competitive pool. Large established defense contractors with existing CPE STRI work would be excluded, potentially leaving only the current CASTT/SETA incumbent and vendors with no CPE STRI footprint as viable competitors — a paradox that cuts against both incumbent advantage and new entrant participation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This PWS exhibits moderate-to-significant requirement sprawl concentrated in specific sections, though it is not pervasively prescriptive throughout. The government has made a genuine effort to frame the contract as outcome-focused — repeatedly stating that the &#x27;focus will be on task completion rather than staffing specific positions&#x27; and emphasizing a &#x27;task-based, outcome-focused, capability-centric, Agile Program Management approach.&#x27; This framing is commendable and genuine in the introductory sections. However, the sprawl emerges when the document moves from aspirational framing into the actual task area requirements, where the accumulated specificity of multiple contributing program offices has layered in process prescriptions that undercut the stated philosophy.
+
+The most significant sprawl occurs in: (1) the Agile Program Management section, which mandates a specific methodology framework and specific artifacts rather than management outcomes; (2) the G4 Facilities task area, which reads as a physical labor job description rather than a capability statement; (3) the G2 security task area, which prescribes exact on-site headcounts rather than security outcomes; and (4) numerous technical task areas in Volume I that blend legitimate technical constraints with prescriptive process steps.
+
+Mitigating factors that hold this to severity 2 rather than 3: the majority of the technical task areas (Sections 5.1-5.23 in Volume I) are written primarily as capability descriptions — they identify what expertise is needed and what domains the contractor must address, not step-by-step operating procedures. The security and compliance requirements (AT training, CUI handling, NIST 800-171, FAR/DFARS clauses) are legitimate regulatory mandates, not sprawl. The extensive appendices listing example documents and tools are appropriately labeled as &#x27;examples,&#x27; preserving some flexibility. The document is notably large (103 pages covering a very broad portfolio), and sprawl is uneven — concentrated in certain sections rather than universal.
+
+The root cause pattern here appears to be consensus-driven drafting: each directorate and program office contributed its requirements, and the resulting document accumulated prescriptive language from multiple contributing authors without a centralizing editor pruning process mandates in favor of outcomes. The stated &#x27;mindset shift&#x27; in the introduction was not fully carried through into the body of the document. The overall severity is 2 — sprawl is present and meaningful, constraining vendors in specific areas, but outcome-oriented language is still dominant enough that capable offerors would have room to propose differentiated approaches in most areas.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Establish and maintain a Scaled Agile Framework (SAFe) or equivalent methodology for managing all tasks and present it to the Government within 30 days
+• Implement Sprints to prioritize tasks and efforts across the CPE with the Government at least monthly
+• Create and manage backlogs with prioritized tasks within Sprints
+• Implement continuous process improvement
+• Track and utilize Agile artifacts and documentation such as backlogs, user-stories, burndown charts, feature definitions-of-done, sprint reviews, and sprint demonstration outcomes.</blockquote>
+  <div class="ev-explanation">This section prescribes a specific management methodology (SAFe or equivalent) and mandates exact Agile ceremonies, artifacts, and cadences. While &#x27;or equivalent&#x27; provides some flexibility, the detailed enumeration of specific artifacts (burndown charts, user-stories, sprint reviews, etc.) and the 30-day stand-up requirement dictate HOW the contractor organizes its own management approach rather than what management outcomes the government needs. A contractor using a different but effective delivery framework — say, a Kanban-based continuous flow model appropriate for support services — is effectively excluded.</div>
+</div><div class="evidence-item">
+  <blockquote>Technical Publication Streamlining, with vast knowledge of military writing, Standard Operating Procedures, technical manuals, technical publications, and military standards to outline, prioritize and complete technical writing tasks in a manner that coincides with overall program cost, performance, schedule and integrated product support (IPS) elements. The contractor shall have working knowledge of MIL-STD 40051, MIL-HDBK 1222, and eXtensible Markup Language. Oversee the technical manual development process including validation and verification with appropriate target audience users.</blockquote>
+  <div class="ev-explanation">This requirement prescribes not just an outcome (technically accurate publications) but specific knowledge of named standards and a specific markup language. While MIL-STD compliance has a legitimate regulatory basis, mandating working knowledge of specific standards as a personnel qualification rather than as a compliance outcome blurs the line between prescribing who must do the work and what the work must achieve.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall provide two employees on-site at Building 4497 Sensitive Compartmented Information Facility (SCIF) twenty-four hours a day, seven days a week. The contractor shall provide two additional employees on-site during core hours for a total of four employees during core hours with a total of three employees covering standard operating hours outside core hours.</blockquote>
+  <div class="ev-explanation">This is a direct staffing prescription — the solicitation specifies exact headcounts (two employees 24/7, four during core hours, three during standard hours) for a specific location. This eliminates any contractor flexibility to staff differently, use rotational arrangements, or apply technology solutions (e.g., remote monitoring) to meet the security outcome. The government is defining the solution (specific bodies in seats) rather than the outcome (facility security maintained to defined standards).</div>
+</div><div class="evidence-item">
+  <blockquote>Coordinate and execute the relocation of personnel, equipment, and furnishings.
+• Reconfigure office spaces and cubicles as required.
+• Set up and reconfigure large multi-purpose conference rooms.
+• Move equipment into and out of storage spaces using manual methods, pallet jacks, dollies, and GSA vehicles.
+• Perform tasks requiring lifting up to 45 pounds and repetitive motion.
+• Track, review, and ensure the completeness and accuracy of facility work requests.
+• Initiate follow-up actions on overdue requests and provide status updates.
+• Offer expertise to customers to resolve facility-related issues.
+• Participate in property accountability and asset visibility inventories.
+• Operate at least five types of Government-owned vehicles, including a box truck, 4-door sedan, 15-passenger van, 7-passenger van, and economy van, using a Standard Florida Driver&#x27;s License.</blockquote>
+  <div class="ev-explanation">This block of bullets from the G4 Facilities task area reads as an operational procedure manual rather than a capability requirement. It specifies manual methods (&#x27;manual methods, pallet jacks, dollies&#x27;), exact vehicle types, lifting weight limits, and step-by-step actions. The outcome (facilities support enabling organizational operations) is buried under a list of prescribed actions. A contractor cannot propose a more efficient approach — they are effectively required to replicate the incumbent&#x27;s physical task list.</div>
+</div><div class="evidence-item">
+  <blockquote>Implement velocity tracking and burndown/burnup charts for the tasks prioritized by the Government
+• Measure cycle time and lead time for work products and deliverables
+• Track and report on task completion rates and quality metrics in human readable reporting venues and dashboards in real-time
+• Provide visualization of work in progress and impediments (blockers)
+• Deliver traditional Contract Data Requirements List (CDRL) information using Agile tools and dashboards for continuous monitoring (DI-MISC-80711A, Knowledge Management Portal and Dashboard)</blockquote>
+  <div class="ev-explanation">This section mandates specific Agile measurement artifacts (velocity tracking, burndown/burnup charts, cycle time, lead time) and specifies they must be delivered in real-time dashboards. While reporting requirements are legitimate, prescribing specific metrics and visualization types constrains vendors who may use different but equally valid measurement approaches. The government is effectively specifying the measurement system rather than the performance standards it wants to monitor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. The most significant manifestation is in Volume II&#x27;s Appendix A, which lists approximately 40 regulations covering the full breadth of Army policy — logistics, security, acquisition, records management, property accountability, demilitarization, emergency management, spectrum management, and more — with no applicability context provided for any individual citation. The phrase &#x27;to the extent specified herein&#x27; is the only scoping language, but the PWS body does not consistently reference these documents in ways that would help vendors understand which actually govern performance.
+
+Several citations are at best tangentially related to professional acquisition support services — notably AR 700-131 (loan/lease/donation of materiel), AR 700-144 (demilitarization), and AR 770-3 (type classification). While the solicitation does cover some logistics and fielding tasks, these specific regulations are not explained or contextualized in the performance requirements.
+
+Mitigating factors prevent a severity-3 rating. First, unlike the worst examples of rule pools, there are no clearly contradictory or absurd inclusions — no policy that prohibits the very activity being solicited. Second, the overall scope of this contract is genuinely broad (supporting 7 directorates, 6+ program offices, across the full acquisition lifecycle including logistics, security, IT, and international programs), which means a longer regulatory list is more defensible than it would be for a narrowly scoped IT services contract. Many of the listed ARs do have some legitimate connection to the work somewhere in the 103-page PWS. Third, the inline requirements sections (3.1.1 through 3.1.22 in both volumes) do provide reasonably specific compliance obligations for security, travel, training, and incident reporting, citing specific clauses like FAR 52.204-2 and DFARS 252.204-7012 with meaningful context.
+
+The core problem is the disconnect between the inline requirements (which are reasonably contextualized) and the Appendix A bulk list (which is not). A vendor can understand what cybersecurity compliance requires from reading Section 3.1.14, but cannot readily determine what AR 710-3 or AR 700-144 actually demands in practice. The &#x27;not all inclusive&#x27; disclaimer amplifies rather than resolves this uncertainty. This is a moderate but real compliance interpretation burden — severity 2.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>APPENDIX A – APPLICABLE DOCUMENTS
+
+UNITED STATES CODE (USC)
+• Title 48 Federal Acquisition Regulations Systems
+• Title 40 Subtitle III Clinger-Cohen Act (CCA) of 1996
+• Title 44 Chapter 35 Subchapter II Federal Information Security Modernization Act of 2014 (FISMA)
+
+DEPARTMENT OF THE ARMY DOCUMENTS
+• AR 1-1 Planning, Programming, Budgeting, and Execution
+• AR 11-2 Risk Management and Internal Control Program
+• AR 5-11 Management of Army Modeling and Simulation
+• AR 5-12 Army Use of the Electromagnetic Spectrum
+• AR 25-1 Army Information Technology
+• AR 25-2 Army Cyber Security
+• AR 25-13 Army Telecommunications and Unified Capabilities
+• AR 25-30 Army Publishing Program
+• AR 25-400-2 Army Records Management Program
+• AR 70-1 Army Operation of the Adaptive Acquisition Framework
+• AR 73-1 Test and Evaluation Policy
+• AR 190-13 The Army Physical Security Program
+• AR 350-1 Army Training and Leader Development
+• AR 380-5 Army Information Security Program
+• AR 380-10 Foreign Disclosure and Contacts with Foreign Representatives
+• AR 380-28 Army Sensitive Compartmented Information Security Program
+• AR 380-49 Industrial Security Program
+• AR 380-67 Personnel Security Program
+• AR 381-12 Threat Awareness and Reporting Program
+• AR 500-3 U.S. Army Continuity of Operations Program
+• AR 525-13 Antiterrorism/Force Protection Programs
+• AR 525-27 Army Emergency Management Program
+• AR 530-1 Operations Security Program
+• AR 700-18 Provisioning of U.S. Army Equipment
+• AR 700-131 Loan, Lease, and Donation of Army Materiel
+• AR 700-144 Demilitarization and Trade Security Controls
+• AR 700-145 Item Unique Identification
+• AR 700-127 Integrated Product Support
+• AR 702-11 Army Quality Program
+• AR 708-1 Logistics Management Data and Cataloging Policy
+• AR 710-2 Secondary Item Policy and Retail Level Management
+• AR 710-3 Inventory Management Asset and Transaction Reporting System
+• AR 710-4 Property Accountability
+• AR 715-30 Secure Environment Contracting
+• AR 735-5 Relief of Responsibility and Accountability
+• AR 770-2 Materiel Fielding
+• AR 770-3 Type Classification and Materiel Release
+• DA PAM 73-1 Test and Evaluation in Support of Systems Acquisition
+• OMB Circular A-130 Managing Information as a Strategic Resource
+• NIST SP 800-53 Rev 5 Security and Privacy Controls
+• NTIA Manual</blockquote>
+  <div class="ev-explanation">Volume II&#x27;s Appendix A contains approximately 40 regulatory citations presented as a flat, undifferentiated list with no explanation of how each applies to the specific scope of HQ staff support work. No prioritization or applicability context is provided. A vendor cannot determine which of these actually carry compliance weight versus which are boilerplate carryovers from prior iterations.</div>
+</div><div class="evidence-item">
+  <blockquote>AR 700-131 Loan, Lease, and Donation of Army Materiel
+• AR 700-144 Demilitarization and Trade Security Controls
+• AR 770-3 Type Classification and Materiel Release</blockquote>
+  <div class="ev-explanation">These regulations govern materiel disposal, demilitarization, and type classification — activities that are at best peripheral to professional acquisition support services. The Volume II PWS is for HQ Staff Support (program management, acquisition support, enterprise operations, event planning, administrative support). Demilitarization and type classification policy would not normally govern the day-to-day work of an acquisition support contractor, yet these are listed at the same level as genuinely applicable documents like FAR and DFARS.</div>
+</div><div class="evidence-item">
+  <blockquote>AR 500-3 U.S. Army Continuity of Operations Program
+• AR 525-27 Army Emergency Management Program</blockquote>
+  <div class="ev-explanation">While the solicitation does mention continuity-related deliverables (COOP plans, Emergency Action Plans) in Appendix B, these regulations are listed in the Applicable Documents without any context explaining whether the contractor is expected to implement or just support COOP functions. For a professional services contract, citing full COOP and emergency management regulations at the enterprise level — without scoping their applicability — creates ambiguity about what compliance actually demands of the vendor.</div>
+</div><div class="evidence-item">
+  <blockquote>The following documents form a part of this PWS to the extent specified herein. These are not all inclusive and the references are subject to change throughout the period of the contract. In the event of a conflict between documents referenced herein and the contents of this PWS, the contents of the PWS shall be the governing requirement.</blockquote>
+  <div class="ev-explanation">The hedge phrase &#x27;These are not all inclusive&#x27; explicitly signals that this list is already acknowledged as incomplete — meaning vendors may face additional regulatory obligations not named anywhere in the solicitation. Rather than curating a definitive applicable set, the PWS formally disclaims completeness, compounding the compliance uncertainty created by the already long list.</div>
+</div><div class="evidence-item">
+  <blockquote>Volume I Section 2 – APPLICABLE DOCUMENTS [table listing]: DoDD 5240.06, AR 525-13, AR 530-1, Army Directive 2014-05, CFR Title 32 Part 117, DFARS, DoDI 5200.48, DoDI 3020.41, FAR</blockquote>
+  <div class="ev-explanation">Volume I presents its own separate applicable documents table with 9 citations at the front of the document, while Volume II&#x27;s Appendix A contains ~40 citations — the two volumes share substantial compliance scope but use entirely different regulatory reference structures with no cross-referencing or harmonization. This suggests the two volumes were drafted by different teams with no deliberate review of combined compliance burden, which is characteristic of copy-forward accumulation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a pre-solicitation RFI with a draft PWS attached, so the final contract type has not been determined. The Government is explicitly soliciting industry input on CLIN structure and pricing approach, which is a positive sign of self-awareness. However, the draft PWS creates enough context to assess the risk of pricing misalignment.
+
+The core tension is this: the solicitation simultaneously says it wants to move away from &#x27;staffing specific positions&#x27; toward outcome-based task completion (implying FFP deliverable CLINs), while also describing work that is inherently unpredictable in volume and scope (surge support, dynamic mission priorities, evolving threat environments). The two volumes of the PWS bundle radically different types of work — from 24/7 physical security guard duty with defined schedules (highly predictable, suitable for FFP) to open-ended acquisition advisory support across a 370-product portfolio (highly variable, suitable for T&amp;M or labor-hour) to specialized technical engineering on demand (suitable for labor-hour with defined LCATs).
+
+The Government&#x27;s suggestion of a &#x27;hybrid FFP-LOE for Agile teams + FFP deliverable CLINs for defined artifacts&#x27; is directionally sound but incomplete. FFP Level-of-Effort (LOE) is a legitimate structure for professional services where the output is effort rather than a specific deliverable, but it still requires defining the number of hours or staff-months in advance, which may be difficult given the stated need for surge flexibility. Without a clear CLIN structure that separates predictable recurring work (like access control) from unpredictable surge advisory work, there is meaningful risk of either over-paying under a labor-hour structure or requiring frequent modifications under FFP when scope shifts.
+
+This is assessed as severity 2 rather than 3 because: (1) no final contract type has been selected — this is still market research; (2) the Government is demonstrably aware of the tension and seeking input; (3) a hybrid approach with appropriately structured CLINs could resolve the misalignment; and (4) the IDIQ task order structure provides some inherent flexibility. The risk is real but not yet locked in, and the Government&#x27;s process suggests it may arrive at a reasonable structure before award.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This requirement reflects CPE STRI&#x27;s commitment to transformation by adopting a task-based, outcome-focused, capability-centric, Agile Program Management approach that enables flexibility, responsiveness, and scalability... Focus will be on task completion rather than staffing specific positions.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly frames the requirement as outcome/task-focused rather than labor-hour driven, which is an argument for fixed-price deliverable CLINs. However, the actual work described throughout the PWS is highly variable in volume and nature — making pure FFP problematic and potentially indicating a hybrid approach is needed.</div>
+</div><div class="evidence-item">
+  <blockquote>Support shall encompass a wide range of contract types and vehicles, including but not limited to firm-fixed-price, cost-reimbursement, indefinite delivery/indefinite quantity (IDIQ), and other hybrid arrangements.</blockquote>
+  <div class="ev-explanation">The solicitation describes the contract types that the contractor will support as part of the acquisition support work, but does not clearly state the pricing structure for the professional services contract itself. This ambiguity makes it difficult to assess alignment. The mention of multiple types suggests the Government is aware of the need for flexibility but has not committed to a specific pricing structure for this vehicle.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will need to provide flexibility to surge unique and critical expertise. The intent of this effort is to provide the Government with highly specialized skills not easily sourced or cost effective within organic formations. The contractor will provide flexibility in execution as threats and priorities change.</blockquote>
+  <div class="ev-explanation">The surge/flexibility language strongly implies a labor-hour or T&amp;M structure, since the quantity of work is inherently unpredictable. A firm-fixed-price contract would struggle to accommodate surges, as the scope is undefined at contract award and will change based on mission priorities.</div>
+</div><div class="evidence-item">
+  <blockquote>Contracting &amp; Pricing Feedback: Recommended vehicle(s); CLIN structure; risk management approaches; handling of ODCs/travel; data rights/licensing considerations... Recommend a contract/CLIN approach that balances iterative delivery with traceable outcomes (e.g., hybrid FFP-LOE for Agile teams + FFP deliverable CLINs for defined artifacts).</blockquote>
+  <div class="ev-explanation">The RFI is actively soliciting industry feedback on what contract/CLIN structure to use, including a hybrid FFP-LOE plus FFP deliverable approach. This indicates the Government has not yet settled on a pricing structure and is aware that the requirements present a tension between fixed-price and level-of-effort approaches. While this is appropriate market research, it signals uncertainty about the right fit.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall implement Agile program management methodologies across all task areas... Create and manage backlogs with prioritized tasks within Sprints... The contractor shall manage and execute tasks within the following functional buckets [including 23 distinct technical and acquisition task areas spanning cloud administration, cybersecurity, systems architecting, software engineering, FMS case development, facility operations, security access control, and administrative office support].</blockquote>
+  <div class="ev-explanation">The breadth of task areas — ranging from 24/7 physical security guard duty at Redstone Arsenal to cloud architecture to FMS case development — makes a single uniform contract pricing type almost certainly misaligned with the requirement. Physical access control (section 4.1.2, requiring two employees on-site 24/7) is a predictable, schedulable service appropriate for FFP, whereas surge technical advisory work is appropriate for T&amp;M or labor-hour. Bundling these under a single pricing scheme without differentiated CLIN structures creates misalignment.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="PWS-2025-032_Vol 1 CASTT and Vol 2 HQ _Distribution A.pdf">PWS-2025-032_Vol 1 CASTT and Vol 2 HQ _Distribution A.pdf</div></div>
+  <a class="dl-btn" href="../attachments/24a39686ca11478aa06280a675a4f042_PWS-2025-032_Vol+1+CASTT+and+Vol+2+HQ+_Distribution+A.pdf" download="PWS-2025-032_Vol 1 CASTT and Vol 2 HQ _Distribution A.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

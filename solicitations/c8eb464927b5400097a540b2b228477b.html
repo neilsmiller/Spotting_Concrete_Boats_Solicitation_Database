@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFORMATION RESOURCE CENTER SERVICES — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>INFORMATION RESOURCE CENTER SERVICES</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c8eb464927b5400097a540b2b228477b</span>
+      <a class="sam-link" href="https://sam.gov/opp/c8eb464927b5400097a540b2b228477b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">UNITED STATES TRADE AND DEVELOPMENT AGENCY › UNITED STATES TRADE AND DEVELOPMENT AGENCY › US TRADE AND DEVELOPMENT AGENCY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R699</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">561110</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12 months base period with four 12-month option periods (Sep 29, 2026 through Sep 28, 2031 if all options exercised), plus a 6-month extension option under FAR 52.217-8</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>FACTOR 1: TECHNICAL APPROACH</li><li>SUB-FACTOR 1: STAFFING AND MANAGEMENT</li><li>SUB-FACTOR 2: IMPLEMENTATION</li><li>FACTOR 2: PAST PERFORMANCE</li><li>FACTOR 3: PRICE</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The PWS generates a meaningful reporting burden — weekly status reports, biannual document flow process maps, biannual library holdings reports, annual records management deliverables, an IRC manual, an annual calendar, and ad hoc PIMS reports — all centered on documenting activities and maintaining process artifacts. The QA section requires only that the contractor submit a Quality Control Plan describing procedures for identifying and resolving problems; it imposes no performance standards against which quality is measured.
+
+However, the severity is moderated to 2 rather than 3 for several reasons. First, this is a primarily administrative support contract (records management, receptionist services, mail room, conference room support) where many deliverables are inherently process-oriented by the nature of the work. A &#x27;Document Flow Process Map&#x27; is a reasonable artifact for an information management function. Second, there is no evidence of overlapping reporting cadences (e.g., weekly AND monthly AND quarterly reports covering the same content) — the reporting structure, while procedural, is not excessively redundant. Third, the solicitation references CPARS assessment in D.1.12.2, which introduces at least a downstream outcome-oriented accountability mechanism, even if performance criteria are not defined in the contract itself. Fourth, for some task areas (FOIA processing, records management), the absence of defined SLAs or accuracy metrics is a genuine gap — FOIA has statutory response deadlines that could have been incorporated as performance targets but were not. The solicitation never specifies what &#x27;success&#x27; looks like for records management accuracy, FOIA timeliness, or visitor processing quality. The accountability structure asks &#x27;did you deliver the weekly status report and update the process map?&#x27; rather than &#x27;did FOIA requests go out on time and were records retrieved accurately?&#x27; This is a real problem, but it is not as severe as cases where reporting requirements completely crowd out any outcome focus.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Weekly Status Report: The Contractor shall deliver a weekly written status report to the CO and COR on problems, accomplishments, and status of all tasks. The report for the previous week is due by the close of business, the first working day of each week.</blockquote>
+  <div class="ev-explanation">The weekly status report focuses on &#x27;problems, accomplishments, and status of all tasks&#x27; — language centered on activity reporting and schedule adherence. There are no outcome metrics specified (e.g., FOIA response times, records retrieval accuracy rates, visitor satisfaction) against which accomplishments are measured. The report confirms the contractor is doing things, not whether those things are achieving results.</div>
+</div><div class="evidence-item">
+  <blockquote>Quality Assurance Plan: The Contract must ensure the effectiveness of the workflow and quality assurance of the work products submitted to the Agency.</blockquote>
+  <div class="ev-explanation">This is the entirety of the QA language for the contract. It requires a Quality Control Plan be submitted within 20 days of award, specifying &#x27;procedures for identifying potential problems, reporting of issues, resolutions, and ensuring they do not recur.&#x27; The QA mechanism is entirely process-oriented — submit a plan, follow the plan, document deviations. There are no defined performance standards against which quality is measured, no service level agreements, no user satisfaction criteria.</div>
+</div><div class="evidence-item">
+  <blockquote>PIMS Reports: The Contractor shall deliver reports from PIMS both on an ad hoc and on a regularly scheduled basis to the COR. The Contractor must review the reports being produced on a routine basis and shall make recommendations to the COR on amendments to reporting practices and formats that promote efficiency or improve record keeping.</blockquote>
+  <div class="ev-explanation">The PIMS reporting requirement focuses on generating and reviewing data outputs and recommending process improvements — not on measuring whether the information management function is achieving mission outcomes. The deliverable is the report and the recommendations, not demonstrated improvement in agency records quality or accessibility.</div>
+</div><div class="evidence-item">
+  <blockquote>Document Flow Process Map: The Contractor shall review and update the Agency&#x27;s Document Flow Process Map to keep current with changing business requirements for the dissemination of information. An updated copy of the Agency&#x27;s Document Flow Process Map shall be delivered to the COR twice each year.</blockquote>
+  <div class="ev-explanation">Delivering an updated process map twice per year is a compliance-oriented deliverable — it confirms the contractor documented the process, not that the process is working well. There is no corresponding requirement to measure whether document flow is actually efficient or error-free.</div>
+</div><div class="evidence-item">
+  <blockquote>D.1.10.2. Performance Standards. The Contractor shall meet the requirements of this contract in a highly professional manner, and performance must conform to professional standards of integrity and quality. Work shall be conducted in a timely manner and be responsive to USTDA needs.</blockquote>
+  <div class="ev-explanation">The PWS&#x27;s only explicit &#x27;performance standards&#x27; language is entirely aspirational and process-descriptive (&#x27;professional manner,&#x27; &#x27;timely manner,&#x27; &#x27;responsive&#x27;). No quantitative thresholds are defined — no FOIA response time targets, no records retrieval accuracy rates, no conference room readiness scores, no mail processing turnaround standards. This confirms that the accountability structure relies on subjective compliance assessment rather than measurable outcomes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics. The most significant factor is the mandatory Secret Facility Clearance requirement on the proposal due date, with no sponsorship available and a 40-day performance assumption timeline. For a $4.39M administrative support services contract — predominantly SCA-covered clerical and administrative roles — this clearance requirement functions as an incumbency filter. It is not disqualifying on its own (clearances are a legitimate government need), but combined with the other factors, it significantly narrows the field.
+
+The proposal requirement explicitly favoring incumbent staff (no references needed) is a textbook insider rewards element that directly reduces the evidentiary burden for the incumbent&#x27;s team while penalizing challengers.
+
+The FOIA-specific records management experience requirement adds a government-specific dimension that disadvantages purely commercial vendors. The 15-year Project Manager requirement is aggressive for a contract of this size and nature.
+
+Mitigating factors prevent a severity-3 rating: the solicitation does not impose specific dollar thresholds for prior contracts, does not require a specific number of prior federal contracts of a defined size, and the past performance evaluation framework is relatively standard (1-4 surveys, CPARS accepted). The work itself — administrative support, records management, receptionist services — is common enough that multiple small businesses could plausibly compete if they hold the necessary clearances. The experience requirements are stated in functional terms rather than as narrow contract-history requirements.
+
+Overall, the combination of the clearance threshold requirement, the explicit two-tier proposal burden for incumbent versus non-incumbent staff, and FOIA-specific experience requirements tilts the playing field meaningfully toward the incumbent (IT Shows, Inc.) without completely closing competition. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Project Manager
+ At least 15 years of relevant work experience
+ Experience with administrative services like office management, records, human resources support, or procurement
+ Experience analyzing and implementing business processes
+ Experience leading projects, including creating project plans and process maps
+ College degree required, business, management, or related degree preferred</blockquote>
+  <div class="ev-explanation">The Project Manager position requires 15 years of experience, which is a high bar for what is fundamentally an administrative support contract valued at $4.39M over five years. However, the experience requirements are described in general terms (administrative services, business processes) rather than demanding prior federal government contracts at specific dollar thresholds. This is elevated but not narrowly exclusionary on its own.</div>
+</div><div class="evidence-item">
+  <blockquote>Senior Admin Support to include Records Management/Custodian Duties (Non-Exempt)
+ At least 10 total years of related work experience
+ At least 5 years of records management experience, including Freedom of Information Act information management
+ Experience in creating and implementing records management policies, procedures, and retention schedules
+ College degree required in business or information management and/or related certifications</blockquote>
+  <div class="ev-explanation">Requiring 5 years of records management experience specifically including FOIA information management is a moderately narrow requirement. FOIA program support is specific to government contexts, meaning this effectively requires prior federal or state government experience for the senior records management position. A vendor deploying commercial-sector records managers would be disadvantaged, tilting the field toward incumbents or those with prior government work.</div>
+</div><div class="evidence-item">
+  <blockquote>D.1.5.2. A Secret Facility Clearance is required for contract performance. The Contractor shall be prepared to assume full responsibility for all areas of operation under the contract, within 40 calendar days after contract award. USTDA will not serve as a facility clearance sponsor for this contract.</blockquote>
+  <div class="ev-explanation">The requirement to hold a Secret Facility Clearance on the RFP closing date, combined with USTDA&#x27;s refusal to sponsor facility clearances and a 40-day assumption-of-responsibility timeline, effectively limits competition to vendors who already hold facility clearances. Obtaining a facility clearance from scratch takes months. This requirement does not test capability — it tests whether the vendor has already navigated the clearance process, which the incumbent has by definition. The solicitation acknowledges this is a re-solicitation of an existing contract held by IT Shows, Inc.</div>
+</div><div class="evidence-item">
+  <blockquote>E.1.4. FACILITY CLEARANCE REQUIREMENT: The Prime Contractor must be cleared (possesses appropriate facility clearance level) on the due date for proposals to be considered for award. The contractor shall hold, at a minimum, an interim Secret facility clearance as granted by DCSA on the RFP closing date.</blockquote>
+  <div class="ev-explanation">Requiring an active facility clearance as a threshold eligibility requirement on the proposal due date, with no path to obtain one during the award period, is a hard gate that excludes most small businesses. Combined with the total small business set-aside and the nature of the work (primarily administrative and records management), this requirement is disproportionate. The incumbent (IT Shows, Inc.) already holds this clearance by virtue of performing under the existing contract.</div>
+</div><div class="evidence-item">
+  <blockquote>Names and resumes for ALL proposed individuals must be submitted as part of the proposal. Resumes for any proposed individual using &#x27;experience&#x27; in lieu of a &#x27;college degree&#x27; to qualify, must clearly document the relevant successful work history. The resume must also include points of contact (names, phone numbers, and emails) for the relevant projects who can address the individual&#x27;s performance (Offeror or Offeror personnel cannot be submitted as point of contact). If incumbent staff are proposed, no point of contact information is required.</blockquote>
+  <div class="ev-explanation">The proposal requirement explicitly creates a two-tier system: incumbent staff can be proposed without providing reference contact information, while non-incumbent staff must provide verifiable references. This directly advantages the incumbent by reducing the burden of proof for its existing workforce and creating an administrative advantage. It signals that the evaluation structure rewards continuity with the current contractor&#x27;s team.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits severe requirement sprawl (Severity 3). The PWS reads primarily as an operating manual documenting how the incumbent contractor currently performs each function, rather than a statement of what outcomes USTDA needs. This is a classic pattern of incumbent-capture sprawl: the government has copy-pasted the current contractor&#x27;s operational procedures into the requirements, effectively mandating that the next vendor replicate the existing approach rather than propose improvements.
+
+The sprawl is pervasive across multiple sections. The records management section (D.1.3.1.1) contains multi-paragraph descriptions of sequential steps — receive, create, scan, label, organize, circulate, file, inventory, control, quality-check — that prescribe the workflow in granular detail. The conference room and training center section (D.1.3.3) specifies how often to walk through rooms, who to notify before calling repair vendors, and which tasks must happen in what sequence. The mail room section specifies where staff must pick up mail and what vendors they must use for delivery.
+
+The staffing specification in D.1.4 is particularly illustrative of severe sprawl. Eight named labor categories are prescribed, each with 10-20 specific qualifications. Hours are fixed at 1,912 per non-exempt position. GS-grade equivalents are specified for each role. And then the solicitation explicitly prohibits hybrid staffing models. This leaves vendors with essentially no discretion over how to structure their delivery team — they can only bid the exact configuration USTDA has specified.
+
+Some legitimate constraints exist and should not be counted as sprawl: the security clearance requirements (Secret clearance) are genuine operational constraints driven by the nature of classified information access; the NARA compliance requirements are legal mandates; the FOIA processing requirements are statutory obligations; the dress code reference is a minor workplace standard. These elements do not reduce the overall severity of the sprawl pattern.
+
+A vendor reading this PWS would correctly conclude that innovation, automation, or process improvement is not welcome — only compliance with the prescribed approach. The solicitation does not articulate what outcomes it needs (e.g., &#x27;records accessible within X minutes,&#x27; &#x27;FOIA requests processed within statutory deadlines,&#x27; &#x27;conference rooms ready for events with zero AV failures per quarter&#x27;). Instead, it describes what people must do and how they must do it. This is the defining characteristic of Severity 3 requirement sprawl.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Serve as primary Point of Contact (POC) for records management, to include receiving official Agency documents (administrative or programmatic) from the USTDA staff to initiate creation of new files, develop the file structure (content), scan, label, organize the material, circulate files, establish filing procedures, take inventory, control access, ensure quality control, and that proper file retention policies are followed.</blockquote>
+  <div class="ev-explanation">This passage specifies a detailed, sequential workflow — receive, create files, develop structure, scan, label, organize, circulate, file, inventory, control access, QC, and retention — rather than specifying the outcome (e.g., &#x27;Agency records shall be accessible, accurately indexed, and retained in compliance with NARA schedules&#x27;). A vendor cannot propose automation tools, centralized digital-first processes, or reorganized workflows without deviating from these prescribed steps.</div>
+</div><div class="evidence-item">
+  <blockquote>Staff and operate two (2) USTDA reception areas, one on the 11th floor (Primary Receptionist Area) and the other on the 10th floor (Secondary Receptionist Area) of USTDA&#x27;s Offices. Both reception areas must be staffed at all times during normal business hours, including backup coverage during breaks or scheduled/unscheduled leave.</blockquote>
+  <div class="ev-explanation">This prescribes a specific staffing configuration — two physical reception desks, both staffed at all times with backup coverage — rather than defining the outcome (e.g., &#x27;visitors and callers shall be greeted and assisted within X minutes during business hours&#x27;). It forecloses any approach the vendor might propose, such as cross-trained staff covering both desks during quiet periods or other efficient staffing models.</div>
+</div><div class="evidence-item">
+  <blockquote>Conduct walk-through of conference room spaces and training center twice a week to check the system and equipment function and elevate issues to the COR for Agency support. ... Coordinate audiovisual issues through the COR before setting up technical repair visits.</blockquote>
+  <div class="ev-explanation">These requirements dictate specific operational procedures — twice-weekly walkthroughs, routing all AV issues through the COR before scheduling repairs — rather than specifying the outcome (conference rooms are functional and ready for events). Vendors cannot propose monitoring technology, automated status checks, or direct vendor relationships that might resolve issues faster and more efficiently.</div>
+</div><div class="evidence-item">
+  <blockquote>Maintain and update IRC Document Flow Process Map, detailing IRC&#x27;s points of intersection and document management processes within the Agency document flow, and the efficiency of both the IRC&#x27;s and the Agency&#x27;s business processes for the establishing and maintaining official records and documents.</blockquote>
+  <div class="ev-explanation">Rather than specifying that business processes be documented and kept current (outcome), this prescribes a specific deliverable format and its content (&#x27;IRC&#x27;s points of intersection,&#x27; &#x27;efficiency of both the IRC&#x27;s and the Agency&#x27;s business processes&#x27;). Combined with the requirement to update this twice yearly, it mandates the vendor mirror the incumbent&#x27;s existing process documentation structure rather than propose improved approaches.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall supply qualified personnel necessary to perform the specific and generic tasks as outlined in the following... Project Manager [lists 20+ qualifications] ... Senior Admin Support/Records Mgmt. [lists 15+ qualifications] ... Senior Admin Support/Project IS [lists 15+ qualifications] ... Admin Support/Project IS [lists 15+ qualifications]...</blockquote>
+  <div class="ev-explanation">The solicitation prescribes eight specific labor categories with exhaustive qualification requirements (education, years of experience, specific skill types), maps them to specific GS-grade equivalents, specifies exactly 1,912 hours per non-PM position per year, and then instructs vendors that &#x27;no proposed hybrid staffing model (onsite and telework) will be considered.&#x27; This is the paradigmatic form of requirement sprawl: the government has pre-determined the solution (specific people, specific roles, specific hours) rather than defining what outcomes the workforce must achieve. Vendors have no meaningful ability to propose alternative staffing structures, skill combinations, or delivery models.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the rule pool pattern. The regulatory compliance section is structured through the standard FAR commercial services framework (SF 1449, FAR 52.212-4, FAR 52.212-5 with selective checkbox activation), which is the intended mechanism for this type of acquisition rather than an agency-specific accumulation of uncurated policies. The directly incorporated FAR clauses in Section C are limited to six clauses, each clearly relevant to the contract scope. The 52.212-5 omnibus clause uses the standard checkbox mechanism, with many boxes deliberately left unchecked, indicating active curation rather than passive accumulation. The security requirements cited in the DD Form 254 (NISPOM, 12 FAM) are directly tied to the SECRET clearance and DoS building access requirements, which are genuine operational constraints for a contractor working in a DoS-serviced SCIF-adjacent environment. The Department of Labor Wage Determination (Attachment 2) is a mandatory SCA requirement for a covered service contract, not a discretionary regulatory addition. There is no &#x27;Applicable Documents&#x27; bulk list, no contradictory regulatory citations, and no evidence of copy-forward accumulation of obsolete policies. The solicitation&#x27;s regulatory citations are proportionate to and contextually grounded in the actual work requirements. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>a. FAR CLAUSES INCORPORATED BY REFERENCE
+52.202-1 Definitions JUN 2020
+52.204-2 Security Requirements MAR 2021
+52.204-9 Personal Identity Verification of Contractor Personnel JAN 2011
+52.212-4 Contract Terms and Conditions--Commercial Items NOV 2023
+52.232-39 Unenforceability of Unauthorized Obligations JUN 2013
+52.245-1 Government Property SEP 2021</blockquote>
+  <div class="ev-explanation">The directly incorporated FAR clauses are a short, focused list of six clauses, each plausibly relevant to this service contract: security requirements, PIV credentials, commercial items terms, government property (GFE is provided), and obligations. This is a compact, well-curated set for this type of contract.</div>
+</div><div class="evidence-item">
+  <blockquote>b. FAR CLAUSES INCORPORATED BY FULL TEXT
+52.212-5 Contract Terms and Conditions Required to Implement Statutes or Executive Orders...</blockquote>
+  <div class="ev-explanation">Section C uses the standard FAR 52.212-5 commercial services omnibus clause with checkboxes, which is the normal FAR mechanism for incorporating statutory/EO requirements into commercial service contracts. The contracting officer has checked only the applicable boxes (labor standards, small business, payment, etc.), leaving many unchecked. This is the designed FAR structure, not an uncurated rule pile.</div>
+</div><div class="evidence-item">
+  <blockquote>While at USTDA location which is serviced by DoS, the contractor shall comply with applicable DoS regulations relative to the protection of classified and/or sensitive information, including the National Industrial Security Program Operating Manual (NISPOM) and 12 Foreign Affairs Manual (FAM) 500 and 600 as applicable.</blockquote>
+  <div class="ev-explanation">The DD Form 254 cites NISPOM and 12 FAM sections for security at a DoS-serviced facility. These are directly relevant given the SECRET facility clearance requirement and the DoS building access requirement. The &#x27;as applicable&#x27; qualifier provides some interpretive guidance. This is a narrow, contextually appropriate citation rather than a bulk list.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a Firm-Fixed-Price contract structure with fixed labor hour quantities per labor category per year. The requirements are well-defined recurring administrative support services: records management, FOIA support, reception, mailroom operations, conference room support, and document management. The scope is stable and largely unchanged from the incumbent contract (re-solicitation of contract 1131PL20CSA41021), with known staffing levels (seven non-exempt SCA-covered positions plus a Project Manager) and predictable workloads. The government specifies fixed annual hours (1,912 per year per position), which gives offerors a clear basis to estimate costs. This is precisely the type of work for which FFP is appropriate: defined requirements, known staffing, competitive market (small business set-aside with multiple expected offerors), and SCA wage determinations that reduce wage uncertainty. The pricing structure — fixed hourly rates times fixed hours — gives the government cost certainty while appropriately transferring performance risk to the contractor. There is no meaningful mismatch between the contract type and the requirements here. This is a textbook appropriate use of FFP for routine, repetitive administrative services.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>D.1.13. TYPE OF CONTRACT: This contract includes the Fixed Rates for required labor categories, to provide non-personal services to complete the requirements identified herein in accordance with the contract.</blockquote>
+  <div class="ev-explanation">The solicitation identifies fixed labor category rates. Combined with the pricing schedule structure showing specific hourly rates per LCAT and a monthly rate for the Project Manager, this is consistent with a firm-fixed-price or labor-hour contract with fixed hourly rates.</div>
+</div><div class="evidence-item">
+  <blockquote>Project Manager | 12 | MO ... Senior Admin Support/Records Mgmt. | 1912 | HR ... Senior Admin Support/Project IS | 1912 | HR ... Admin Support/Project IS | 1912 | HR ... Admin Support/Facility &amp; Audio-Visual Mgmt. | 1912 | HR ... Admin Support/Information Specialist | 1912 | HR ... Admin Support/Mail &amp; File Mgmt. | 1912 | HR ... Admin Support/Receptionist | 1912 | HR</blockquote>
+  <div class="ev-explanation">The pricing schedule specifies fixed quantities per period (1,912 hours per year per position, 12 months for the PM) at unit prices to be proposed. This structure — fixed hours per labor category — is characteristic of a fixed-price level-of-effort contract, which is appropriate for recurring, defined-scope administrative support services with predictable staffing requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>USTDA is issuing this small business set-aside Request for Proposal (RFP) to solicit offerors for the purpose of entering into a single award Firm-Fixed-Price contract.</blockquote>
+  <div class="ev-explanation">Section E.1.1 explicitly confirms a Firm-Fixed-Price (FFP) contract. For well-defined, recurring administrative support services with stable staffing levels and predictable annual workloads, FFP is a standard and appropriate contract type.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="1131PL26R0031 - RFP.pdf">1131PL26R0031 - RFP.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c8eb464927b5400097a540b2b228477b_1131PL26R0031+-+RFP.pdf" download="1131PL26R0031 - RFP.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATTCH 1 - DD254.pdf">ATTCH 1 - DD254.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c8eb464927b5400097a540b2b228477b_ATTCH+1+-+DD254.pdf" download="ATTCH 1 - DD254.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATTCH 2 - WD 2015-4281 Revision No. 36.pdf">ATTCH 2 - WD 2015-4281 Revision No. 36.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c8eb464927b5400097a540b2b228477b_ATTCH+2+-+WD+2015-4281+Revision+No.+36.pdf" download="ATTCH 2 - WD 2015-4281 Revision No. 36.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="ATTCH 3 - Past Performance Survey.doc">ATTCH 3 - Past Performance Survey.doc</div></div>
+  <a class="dl-btn" href="../attachments/c8eb464927b5400097a540b2b228477b_ATTCH+3+-+Past+Performance+Survey.doc" download="ATTCH 3 - Past Performance Survey.doc" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

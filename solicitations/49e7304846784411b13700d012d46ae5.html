@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sole Source: NHHCDB Crane Repairs — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Sole Source: NHHCDB Crane Repairs</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 49e7304846784411b13700d012d46ae5</span>
+      <a class="sam-link" href="https://sam.gov/opp/49e7304846784411b13700d012d46ae5/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333923</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation content available for analysis is extremely limited. The primary document (Redacted+Sole+Source_Redacted.pdf) appears to have been fully redacted — all pages show as blank. The second attachment (Wage Determination) is a standard Davis-Bacon wage determination document with no QA, reporting, or performance accountability provisions. The solicitation description in the notice itself is a brief combined synopsis/solicitation posting that identifies the requirement (rebuild a nonoperational crane hydraulic swivel on a LINKBELT RTC80130), names the intended sole source (Wood&#x27;s CRW Corp.), and provides administrative details. It references a Statement of Work (SOW) but the SOW content is not visible in the provided text. Without access to the SOW or any performance work statement, QA surveillance plan, deliverables list, or reporting requirements, there is no basis to evaluate whether the accountability structure emphasizes compliance over outcomes. The nature of the work — a discrete mechanical repair/rebuild of a crane hydraulic swivel — suggests this is likely a fixed-price, outcome-oriented engagement (crane either works or it doesn&#x27;t), which would tend toward low severity on this dimension. However, this inference cannot substitute for actual solicitation content. Sufficient content is not present to make a meaningful assessment.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a sole-source acquisition under FAR 12.102(a) directed at Wood&#x27;s CRW Corp. for a highly specific, narrowly scoped mechanical repair task: rebuilding the hydraulic swivel on a LINKBELT RTC80130 crane at Naval History and Heritage Command, Detachment Boston. The solicitation documents are largely redacted or blank (the main PDF renders as only two pages of content, the wage determination pages are empty, and no SOW text is visible), which limits deep analysis. However, based on the available content, there is no evidence of Insider Rewards as defined — no stacked experience requirements, no dollar-threshold past-performance mandates, no federal-specific experience requirements, and no evaluation criteria awarding bonus points for incumbency proxies. The sole-source justification itself is the mechanism of exclusion here, not constructed experience barriers. Sole-source acquisitions under FAR 13 simplified acquisition procedures for specialized equipment repairs (a specific crane model requiring specialized hydraulic swivel expertise) are a categorically different phenomenon from insider rewards: the agency is not building exclusionary criteria into a competitive solicitation, it is openly bypassing competition with a stated rationale. The notice explicitly invites all responsible sources to submit quotes and states the Small Business Office concurs. The NAICS code (333923 — overhead traveling cranes) and the technical specificity of the repair (a single identified crane model) suggest the narrow vendor pool reflects genuine market conditions for specialized OEM or certified repair capability, not artificial solicitation design. No experience requirements, evaluation criteria, or institutional knowledge mandates are visible in the available text that would constitute insider rewards. Severity is rated 1 — minimal.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation text provided is largely a notice shell — a combined synopsis/solicitation for a sole-source crane hydraulic swivel repair on a LINKBELT RTC80130. While the posting references an attached Statement of Work (SOW), the actual SOW content was not rendered in the document text. The PDF attachment (&#x27;Redacted+Sole+Source_Redacted.pdf&#x27;) appears to have been redacted or is otherwise blank in the extracted text (Pages 1-2 show no content). The second attachment is a Wage Determination document, which contains no technical requirements. Without the SOW or any substantive technical requirements text, there is insufficient content to assess whether the solicitation dictates HOW work should be done versus WHAT outcome is needed. The description in the notice itself is appropriately high-level — it describes the need as &#x27;rebuilding/repairing a nonoperational crane hydraulic swivel&#x27; — which is outcome-oriented language, but this is too brief to draw conclusions about the full requirements structure. A meaningful assessment of Requirement Sprawl requires the actual SOW, which is not available in the provided text.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward simplified acquisition solicitation for a narrow, physical repair task — rebuilding the hydraulic swivel on a specific crane model (LinkBelt RTC80130) at a Navy facility in Boston. The solicitation is brief and the attachments consist of a redacted solicitation document and a wage determination. The regulatory framework cited is minimal and appropriate: standard FAR Part 12 commercial item procedures, FAC 2026-01, and the relevant DFARS publication notice, all incorporated by reference in the conventional manner. There is no &#x27;Applicable Documents&#x27; bulk list, no enumeration of directives or executive orders, and no indication of accumulated copy-forward regulatory citations. The wage determination attachment (WD 2015-4341 REV 33) is a Service Contract Act determination — directly applicable to a repair services contract and entirely appropriate to include. The PDF pages for the redacted solicitation appear to be very limited in content (only 2 pages extracted), which constrains full analysis, but there is no evidence of regulatory overloading in what is available. For a crane hydraulic swivel repair — a discrete, physical maintenance task — the compliance landscape is inherently narrow: FAR/DFARS clauses, applicable safety standards for crane work, and the wage determination. Nothing in the solicitation suggests a larger regulatory dump exists. Severity is 1 (minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This solicitation documents and incorporates provisions and clauses in effect through FAC 2026-01 (effective 13 March 2026) and DFARS Publication Notice 20251110 (effective 10 November 2025). It is the responsibility of the contractor to be familiar with the applicable clauses and provisions. The clauses may be accessed in full text at these addresses: https://www.acquisition.gov/far/ and http://www.acq.osd.mil/dpap/dars/dfarspgi/current/index.html.</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR and DFARS clauses by reference in the standard manner for a simplified acquisition. This is normal federal contracting practice, not a rule pool. No expanded list of agency-specific regulations, directives, or policies is appended beyond what would be expected for a commercial item simplified acquisition.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation uses a Firm Fixed Price contract for a discrete crane hydraulic swivel rebuild on a specific, known piece of equipment (LINKBELT RTC80130). This is an appropriate contract type choice. The requirement is a bounded repair task with a defined deliverable (a rebuilt, operational hydraulic swivel), performed on a known piece of equipment by a vendor (Wood&#x27;s CRW Corp.) presumably familiar with this type of work. The scope is not open-ended: the government is not buying variable hours of labor across unpredictable work categories, nor is it commissioning complex R&amp;D. Rather, it is purchasing a specific repair outcome. FFP is well-suited here because the deliverable is concrete, the work type is well understood in the market (crane hydraulic swivel rebuilds), and the risk of scope creep is relatively low for a mechanical rebuild of a defined component. There is a mild caveat: sole-source repair work sometimes reveals unexpected damage that can complicate scope estimation, which in theory could favor T&amp;M. However, crane hydraulic swivel rebuilds are a mature, commercially available service with reasonably predictable labor and parts costs, and the solicitation references the Statement of Work for specifications. This is not a severe or even moderate mismatch — FFP is the standard and appropriate contract type for this category of maintenance and repair work. No square peg issue is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>the Government intends to solicit and negotiate a Firm, Fixed Price contract with only one source, Wood&#x27;s CRW Corp.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states that a Firm Fixed Price contract will be used for this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>contractor support services to rebuild the nonoperational crane hydraulic swivel on Naval History and Heritage Command, Detachment Boston&#x27;s (NHHCDB) LINKBELT Crane Model RTC80130</blockquote>
+  <div class="ev-explanation">The requirement is a discrete, well-defined repair/rebuild task on a specific crane component. The scope is bounded — rebuild a hydraulic swivel on a known crane model — making it amenable to fixed-price contracting.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Redacted Sole Source_Redacted.pdf">Redacted Sole Source_Redacted.pdf</div></div>
+  <a class="dl-btn" href="../attachments/49e7304846784411b13700d012d46ae5_Redacted+Sole+Source_Redacted.pdf" download="Redacted Sole Source_Redacted.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926QL139.pdf">Solicitation - N0018926QL139.pdf</div></div>
+  <a class="dl-btn" href="../attachments/49e7304846784411b13700d012d46ae5_Solicitation+-+N0018926QL139.pdf" download="Solicitation - N0018926QL139.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Wage Determination WD 2015-4341 REV 33.pdf">Wage Determination WD 2015-4341 REV 33.pdf</div></div>
+  <a class="dl-btn" href="../attachments/49e7304846784411b13700d012d46ae5_Wage+Determination+WD+2015-4341+REV+33.pdf" download="Wage Determination WD 2015-4341 REV 33.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

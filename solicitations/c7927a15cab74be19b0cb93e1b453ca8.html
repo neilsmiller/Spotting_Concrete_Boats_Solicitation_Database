@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intermediate Medical Acquisition Course (IMAC) — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Intermediate Medical Acquisition Course (IMAC)</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c7927a15cab74be19b0cb93e1b453ca8</span>
+      <a class="sam-link" href="https://sam.gov/opp/c7927a15cab74be19b0cb93e1b453ca8/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-31</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE HEALTH AGENCY (DHA) › DEFENSE HEALTH AGENCY</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R408</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">611430</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-31</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP (firm-fixed-price) for course delivery CLINs; Cost reimbursable for ODC CLINs</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months) + 4 option years (12 months each)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Go, No Go Factor</li><li>Technical Approach Factor</li><li>Past Performance Factor</li><li>Price (evaluated separately for fairness and reasonableness)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The accountability structure centers on process deliverables: attendance rosters, surveys transmitted (not acted upon), certificates issued, course materials delivered 15 days prior, and a QASP framed entirely around presentation accuracy, format compliance, and timeliness. The primary QA instrument is deferred to post-award with no binding outcome commitments. Critically, for a training contract, the obvious outcome measures — trainee pass rates, pre/post knowledge assessments, minimum satisfaction scores, instructor qualification standards with measurable criteria, or demonstrable alignment to DAU PM Level II learning objectives — are absent from the performance standards. The solicitation does require a final exam and course evaluations, which represent nascent outcome-orientation, and the DAU certification Go/No-Go requirement is a legitimate quality gate. These features prevent a severity-3 rating. However, the QASP quality measures are entirely input/process/format focused, and the deliverable structure treats surveys and certificates as compliance artifacts rather than accountability instruments. The result is a moderate compliance-over-outcomes pattern: some outcome proxies exist (exam, surveys, DAU certification), but the QA surveillance apparatus as written measures process adherence rather than whether the training achieved its stated purpose of equipping acquisition personnel with advanced medical acquisition knowledge.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall maintain attendance through a class roster (Deliverable 4) and administer a course evaluation/survey to attendees at each course completion date (Deliverable 5). The Contractor shall email the class roster and evaluations/surveys to the designated Government POC within 10 business days after course completion (Deliverables 4 and 5).</blockquote>
+  <div class="ev-explanation">The course evaluation/survey is collected and transmitted as a deliverable, but the PWS specifies no performance thresholds or standards for what constitutes satisfactory results. There is no minimum satisfaction score, no required pass rate on the final exam, no benchmark for instructor quality, and no consequence if surveys reveal poor outcomes. The deliverable is the act of collecting and emailing the surveys — not achieving any particular level of trainee satisfaction or learning.</div>
+</div><div class="evidence-item">
+  <blockquote>Accuracy – Work performed shall be accurate in presentation, technical content, and adherence to accepted elements of style. Clarity - Work performed shall be clear and concise. Consistency to Requirements - All work must satisfy the requirements of this statement of work. Timeliness - Work Products shall be submitted on or before the due date specified by DHA/OPMED.</blockquote>
+  <div class="ev-explanation">The QASP quality measures are entirely process- and format-oriented: accuracy of presentation, clarity, consistency to requirements, file editability, format compliance, and timeliness. None of these measures assess whether training actually improved participant knowledge, whether DAU learning objectives were met at a measurable level, or whether IPT members performed better after attending. The surveillance plan monitors whether the contractor delivered on time and in the right format, not whether the training worked.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government intends to utilize a Quality Assurance Surveillance Plan (QASP) to monitor the quality of the Contractor&#x27;s performance... The QASP will be finalized immediately following award, and a copy provided to the Contractor after award. The QASP is a living document and may be updated by the Government as necessary.</blockquote>
+  <div class="ev-explanation">The QASP — the primary accountability instrument — is deferred entirely to post-award. This means offerors cannot evaluate how their performance will be judged, and the government has not committed to any outcome-based standards in the solicitation itself. Deferring the QASP while populating deliverables with process-focused measures (rosters, surveys as transmittals, format compliance) signals that process compliance will dominate even if outcome measures are theoretically added later.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall also issue and email a Certificate of Training (Deliverable 6) to each attendee within 15 business days after students have completed the final exam.</blockquote>
+  <div class="ev-explanation">Certificate issuance is tied to completing the final exam, but no passing score, competency threshold, or learning outcome standard is defined. The deliverable is the certificate itself — a compliance artifact — not demonstrated learner proficiency. There is no language specifying what level of performance on the final exam constitutes successful completion, making the exam a process step rather than an outcome gate.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a textbook case of severe insider rewards, driven primarily by the hard Go/No-Go requirement that the proposed course already be DAU-certified at the time of proposal submission. DAU certification of a specialized medical acquisition course is not a commodity credential that a capable training firm can acquire on demand — it requires prior engagement with DAU&#x27;s curriculum review and approval process for this specific course content. Combined with a 30-day response window, this requirement functionally restricts competition to the entity that currently holds or previously developed this course. No new entrant, regardless of instructional capability, subject matter expertise, or organizational sophistication, could realistically develop a new curriculum, submit it to DAU, obtain certification, and submit a compliant proposal in 30 days. The severity is further reinforced by several compounding factors: (1) the course has been in operational use since at least 2009, indicating a long-standing incumbent relationship; (2) experience evaluation explicitly rewards &#x27;identical&#x27; prior work, creating an evaluation scoring gradient that advantages the incumbent even among proposals that clear the Go/No-Go gate; (3) the PWS embeds coordination relationships with the requiring activity (OPAA) that presuppose familiarity with the agency&#x27;s internal processes. Taken individually, a DAU certification requirement is not inherently problematic — this is a specialized, regulated training domain. But the requirement that certification exist prior to proposal submission, within a 30-day window, for a course that has demonstrably existed for over a decade, transforms a defensible quality standard into an effective incumbent filter. A legitimately competitive solicitation would either allow DAU certification to be obtained post-award, or would provide a substantially longer response window. The solicitation is full and open with no set-aside, which creates the appearance of competition without the substance of it.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Go, No-go #1: Ability to propose a fully DAU certified course. Proposed course shall be DAU certified prior to proposal submission (Proof required with proposal). Failure to provide an approach which clearly demonstrates this &#x27;Go-No-go&#x27; capability will render the proposal as deficient and un-awardable.</blockquote>
+  <div class="ev-explanation">This is the most exclusionary requirement in the solicitation. A vendor must already possess DAU certification for this specific course before they can even submit a proposal. DAU certification for a specialized medical acquisition course (IMAC) is not a general credential — it requires prior engagement with DAU&#x27;s certification process for this particular curriculum. Any qualified training vendor that has not already navigated that specific bureaucratic relationship with DAU is immediately and categorically excluded, regardless of their instructional capability, subject matter expertise, or course content quality. This functions as a hard incumbent filter at the gate-clearing stage, before any capability evaluation occurs.</div>
+</div><div class="evidence-item">
+  <blockquote>The Offeror&#x27;s proposal shall demonstrate that their proposed solution(s) meets the mandatory &#x27;go, no-go&#x27; subfactor at time of proposal submission. Failure to demonstrate compliance with this go, no-go subfactor will result in a non-responsive proposal, will be deemed deficient, and will be excluded from further evaluation and therefore not considered for award.</blockquote>
+  <div class="ev-explanation">The binary, eliminatory nature of this requirement — applied before any technical or price evaluation — ensures that no amount of superior capability, lower price, or better curriculum design can compensate for not already having obtained DAU certification. This is the structural signature of an incumbent filter: the threshold is defined in a way that is specific to prior relationship with a certifying body, not to the ability to deliver the required training outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>In the past the OPAA, the USAMRDC, and the entire U.S. Army Medical Department as well as other services has needed medically focused Defense Acquisition University (DAU)-certified course on program management since the establishment of the medical research, development, and acquisition (RDA) process within the USAMRDC known as Decision Gate in 2009.</blockquote>
+  <div class="ev-explanation">The background section reveals that this course has been in continuous use since 2009, strongly implying a long-running incumbent relationship. The requirement that the course be &#x27;DAU certified prior to proposal submission&#x27; effectively means only the vendor(s) who have previously held or developed this course — and already obtained that certification — can compete. A new entrant would need to develop an equivalent curriculum, submit it to DAU for certification review, and obtain approval, all before the proposal deadline. The 30-day response window makes this practically impossible for any non-incumbent.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall administer the course... The contractor liaises with the OPAA for student selection... The OPAA will review and approve the objectives to be presented in the truncated senior-leader course. The course material will be selections from the DAU-course developed by the contractor and approved by the OPAA.</blockquote>
+  <div class="ev-explanation">Multiple operational touchpoints — coordination with OPAA on student selection, approval of course objectives, and development of course material for the truncated version — assume a pre-existing working relationship with the requiring activity. A vendor new to this contract would need to build these relationships and processes from scratch, while the incumbent already operates within them. These are not explicit scored criteria, but they reflect institutional knowledge dependencies that advantage whoever currently holds the relationship.</div>
+</div><div class="evidence-item">
+  <blockquote>The Offeror shall submit written information which effectively demonstrates the Offeror&#x27;s relevant experience (for this purpose, experience refers to what an Offeror has done, not how well it was accomplished) identical to, similar to or related to the tasks performed within the PWS.</blockquote>
+  <div class="ev-explanation">The experience factor explicitly rewards &#x27;identical&#x27; experience first, then similar, then related. Given that the PWS describes a highly specialized, niche product — a DAU-certified, medically focused acquisition course for DoD personnel integrating FDA regulatory pathways — &#x27;identical&#x27; experience is essentially definitional to having held this or an immediately predecessor contract. While the language includes &#x27;similar&#x27; and &#x27;related,&#x27; the evaluative gradient still privileges exact prior performance, which benefits the incumbent over new entrants who may have equivalent capability in adjacent domains.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl — severity 2 — not severe, but meaningfully constraining. The PWS is relatively short (21 total pages across all attachments) and the core mission is well-articulated: deliver a DAU-certified, medically focused acquisition course to DHA personnel. The outcome is clear and the DAU certification requirement is a legitimate external standard, not sprawl. However, several sections cross from outcome definition into process prescription. The most significant examples are the platform mandate (MS Teams specifically), the physical CD deliverable, the fixed daily schedule (0800-1630), the requirement for instructor physical presence even during VILT, and the step-by-step post-course administrative workflow. These don&#x27;t collectively dominate the document — a vendor could still propose meaningful variation in instructional design, staffing composition, and curriculum approach — but they do constrain delivery logistics and technology choices in ways that serve no obvious legal, safety, or interoperability purpose. The CD requirement in particular is a classic copy-paste artifact from an older contract era. The management approach requirements in Section L (chain of command, communications, crosschecks) are more typical proposal boilerplate than operational sprawl. Overall, the solicitation is competently structured with a clear performance basis, but a moderate layer of prescriptive process requirements limits vendor flexibility in areas where innovation could improve value.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The class hours shall be from 0800-1630. Any changes shall be coordinated between the contractor and designated Government POC.</blockquote>
+  <div class="ev-explanation">This prescribes the exact daily schedule rather than defining an outcome (e.g., &#x27;deliver 40 hours of instruction over five consecutive business days&#x27;). A contractor cannot propose an alternative schedule structure — such as extended days to compress the course or a different daily rhythm — that might better serve learner retention or logistics.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor would deliver via MS Teams. The COR would make available Government Furnished Equipment (computers), system access, and a Teams profile so they can manage the course. [NOTE: for DAU VILT for ACQ2030 virtual classes are conducted via MS Teams.]</blockquote>
+  <div class="ev-explanation">This mandates a specific commercial platform (MS Teams) for virtual delivery rather than specifying a functional requirement such as &#x27;deliver via a Government-approved virtual platform capable of supporting interactive instructor-led training.&#x27; A vendor with superior capabilities on another platform (e.g., Adobe Connect, Zoom for Government, or a proprietary LMS) cannot propose it.</div>
+</div><div class="evidence-item">
+  <blockquote>The instructors should still travel to Fort Detrick to conduct the VILT course at an on-site location if required.</blockquote>
+  <div class="ev-explanation">This requires physical instructor presence even for virtual course delivery, combining in-person and VILT in a way that eliminates a hybrid or fully remote model. This prescribes a staffing/logistics approach rather than an outcome, constraining a vendor who might deliver equally effective VILT without requiring instructor travel to the site.</div>
+</div><div class="evidence-item">
+  <blockquote>All materials generated will be provided to the COR/Government in both print and digital format. In addition, all materials will be compiled into a single CD and folder to be presented to the COR at the end of the base and all option years.</blockquote>
+  <div class="ev-explanation">Mandating physical CD delivery is a prescriptive process requirement tied to a legacy format. The outcome — ensuring the Government retains all course materials — could be achieved through a shared drive, secure portal, or other digital repository. Requiring a CD specifies the method without a legitimate technical or legal basis for that particular medium.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall maintain attendance through a class roster (Deliverable 4) and administer a course evaluation/survey to attendees at each course completion date (Deliverable 5). The Contractor shall email the class roster and evaluations/surveys to the designated Government POC within 10 business days after course completion... The Contractor shall also issue and email a Certificate of Training (Deliverable 6) to each attendee within 15 business days after students have completed the final exam.</blockquote>
+  <div class="ev-explanation">While deliverables are generally legitimate, this passage prescribes the specific mechanism (email to a named POC), the specific tracking method (roster), and a cascading sequential process that constrains how the contractor manages post-course administration. A vendor using an LMS or automated certification system could fulfill the outcome (Government receives documentation of attendance and completion) more efficiently, but the solicitation locks in a manual, email-based workflow.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit the Rule Pools sin in any meaningful way. Reviewing the full document — including the Section L/M instructions, the PWS, the NDA attachment, and the pricing sheets — the solicitation cites only a handful of regulatory references, and each is cited in context with an explanation of its applicability. FAR Part 31 is referenced twice, both times specifically to govern cost reimbursement for travel and ODCs. There is no &#x27;Applicable Documents&#x27; section, no bulk list of directives, no executive orders of questionable relevance, and no accumulation of agency-specific policies layered on top of standard FAR clauses. The compliance landscape is straightforward: a training services contract with standard non-personal services provisions, a DAU certification requirement (which is the core go/no-go criterion and clearly explained), and an NDA requirement. The NDA itself references USAMRDC in ways that are slightly incongruous with a DHA contract, suggesting some copy-forward from an earlier version, but this is a minor drafting artifact — not a regulatory pool. A vendor reading this solicitation can readily understand the full compliance environment without needing to parse dozens of ambiguously applicable policies. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Travel costs shall be incurred and billed in accordance with FAR Part 31. Costs for these expenses will be reviewed, certified and approved by the COR. All travel and transportation shall utilize commercial sources and carriers provided the method used for the appropriate geographical area results in reasonable charges to the government.</blockquote>
+  <div class="ev-explanation">FAR Part 31 is cited in context — specifically to govern travel cost reimbursement. This is a focused, purposeful citation with a clear explanation of why and how it applies, not a bulk listing.</div>
+</div><div class="evidence-item">
+  <blockquote>All ODCs shall be fully supported in compliance with all competition requirements of FAR PART 31.</blockquote>
+  <div class="ev-explanation">Again, FAR Part 31 is cited specifically for ODC cost allowability. The citation is narrow and contextual, not part of an undifferentiated regulatory dump.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a well-matched contract pricing structure for its requirements. The core course delivery CLINs (0001/1001/2001/3001/4001 for the DAU-certified course; 0002/1002/etc. for the truncated senior leader course) are all Firm-Fixed-Price priced per class (each). This is appropriate because the requirement is a well-defined, repeating training deliverable: a 40-hour course with a fixed curriculum, a defined audience size (25-30 students), fixed class hours (0800-1630), and a DAU-certified syllabus. The scope is stable — the contractor must hold a DAU certification prior to proposal submission, so the course content is already established. The number of course offerings per period is fixed (6 DAU-certified offerings, 2 mandatory truncated offerings, with options for up to 2 additional truncated offerings). Deliverables, timelines, and acceptance criteria are all specified. This is exactly the scenario where FFP is appropriate: predictable scope, predictable quantity, competitive market, and measurable outputs. ODCs (travel, materials) are separately priced on a cost-reimbursable basis, which is the correct approach for genuinely variable cost elements that depend on delivery modality and location. The hybrid FFP-plus-cost-reimbursable-ODC structure is standard and sensible for training contracts of this type. There is no indication of scope uncertainty that would warrant T&amp;M or full cost-reimbursement on the labor side. The government is buying a known product — a certified course — not expertise or advisory services of indeterminate scope. The pricing structure is well-aligned with the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>0001 | BASE PERIOD Medical Focus PM Training: Medical Focus PM Training (DAU Certified) (PWS Section 2.01) | FFP | 6 | Ea</blockquote>
+  <div class="ev-explanation">The primary course delivery CLINs are priced as Firm-Fixed-Price on a per-class (each) basis. This is appropriate: the course is a well-defined, discrete deliverable — a 40-hour, DAU-certified, 5-day course delivered to 25-30 attendees. Scope, duration, and content are stable and predictable, making FFP a natural fit.</div>
+</div><div class="evidence-item">
+  <blockquote>0004 | BASE PERIOD OTHER DIRECT COSTS (ODCS) (PWS Section 2.1.4) | COST | 1 | Job</blockquote>
+  <div class="ev-explanation">ODCs — including travel, materials, printing, and shipping — are priced on a cost-reimbursement basis. This is standard and appropriate: actual travel and material costs genuinely cannot be predicted with precision and depend on whether courses are held in-person or virtually, at Fort Detrick or other CONUS sites. Cost reimbursement for ODCs alongside FFP for labor/course delivery is a well-established hybrid structure.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="A02. Attachment 1. RFP IMAC Additional Instructions  Evaluation Criteria.docx">A02. Attachment 1. RFP IMAC Additional Instructions  Evaluation Criteria.docx</div></div>
+  <a class="dl-btn" href="../attachments/c7927a15cab74be19b0cb93e1b453ca8_A02.+Attachment+1.+RFP+IMAC+Additional+Instructions++Evaluation+Criteria.docx" download="A02. Attachment 1. RFP IMAC Additional Instructions  Evaluation Criteria.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📝</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2. PWS IMAC Courses.docx">Attachment 2. PWS IMAC Courses.docx</div></div>
+  <a class="dl-btn" href="../attachments/c7927a15cab74be19b0cb93e1b453ca8_Attachment+2.+PWS+IMAC+Courses.docx" download="Attachment 2. PWS IMAC Courses.docx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="B08 Attachment 3 - Pricing Sheet IMAC %28Rev%29.xlsx">B08 Attachment 3 - Pricing Sheet IMAC %28Rev%29.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/c7927a15cab74be19b0cb93e1b453ca8_B08+Attachment+3+-+Pricing+Sheet+IMAC+%28Rev%29.xlsx" download="B08 Attachment 3 - Pricing Sheet IMAC %28Rev%29.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - HT942626RE011.pdf">Solicitation - HT942626RE011.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c7927a15cab74be19b0cb93e1b453ca8_Solicitation+-+HT942626RE011.pdf" download="Solicitation - HT942626RE011.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

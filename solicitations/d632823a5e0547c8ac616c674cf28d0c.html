@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REPAIR of NRP,SERVER,REAR IO — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>REPAIR of NRP,SERVER,REAR IO</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d632823a5e0547c8ac616c674cf28d0c</span>
+      <a class="sam-link" href="https://sam.gov/opp/d632823a5e0547c8ac616c674cf28d0c/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-20</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7K20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-20</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">90 days delivery; Repair Turnaround Time (RTAT) of 60 days after receipt of asset; Induction Expiration Date: 365 days after contract award</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Past Performance</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard Navy depot-repair solicitation for a single hardware item (NRP,SERVER,REAR IO). Its accountability structure is lean and largely outcome-oriented. The primary QA requirement is that the repaired item must pass inspection against the original manufacturer&#x27;s specifications and drawings — a straightforward functional test. The solicitation imposes a clear performance metric (60-day RTAT) with real financial consequences for failure. CAV RP reporting exists to track asset transactions, but it directly supports the RTAT metric rather than functioning as standalone compliance documentation. There is no evidence of overlapping report cadences, prescribed format requirements for status reports, meeting mandates, or plan-adherence tracking. The solicitation does not require weekly status reports, monthly progress reports, or QA surveillance plans focused on process compliance. The absence of a SOW/PWS with elaborate reporting deliverables is itself significant — the entire work statement fits on a few pages and is structured around functional outcomes (repair to OEM spec, deliver within RTAT) rather than process compliance. The packaging and marking requirements (MIL-STD-2073, MIL-STD-129) and IUID requirements are standard regulatory mandates for Navy supply-chain management, not compliance theater substituting for outcome accountability. Overall, this solicitation exhibits minimal compliance-over-outcomes characteristics. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.4 Inspection/Testing Repaired Items - The Contractor shall perform all inspection and testing requirements as specified in the original manufacturer&#x27;s specifications and drawings.</blockquote>
+  <div class="ev-explanation">This is outcome-oriented: the inspection standard is whether the repaired item meets the original manufacturer&#x27;s specifications — i.e., does it work correctly — not whether the contractor followed a prescribed process. This is the primary QA mechanism in the solicitation.</div>
+</div><div class="evidence-item">
+  <blockquote>Repair Turnaround Time (RTAT) definition: The resultant contract actual delivery requirement is measured from asset Return to the date of asset acceptance under the terms of the contract... contractor is required to accurately report all transactions by the fifth regular business day after receipt and the Action Date entered in CAV must be dated to reflect the actual date of physical receipt.</blockquote>
+  <div class="ev-explanation">The RTAT is a concrete, measurable performance metric with a financial consequence structure (price reductions for failure). This is outcome-focused accountability, not process compliance. The CAV reporting requirement supports this metric rather than existing as standalone compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>H. IMPORTANT NOTE: Reconciliation Price Reduction: Any asset(s) for which the contractor does not meet the required RTATs, the contractor is late. However, any delay determined to be excusable (e.g. Government Delay) will not result in a price reduction.</blockquote>
+  <div class="ev-explanation">The price reduction mechanism ties financial consequences directly to a performance outcome (delivery within RTAT), which is the hallmark of outcome-based accountability rather than compliance monitoring.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a severe case of insider rewards, structured not through traditional experience point thresholds or lookback windows, but through an OEM authorization gate that categorically excludes any vendor without a pre-existing commercial relationship with the original manufacturer (CAGE 3Z3Z4). The mechanism is the &#x27;authorized distributor&#x27; requirement in Section 6.2 and Attachment 1, which explicitly states that award consideration will only be given to authorized distributors of the original manufacturer. This is not a capability test — it is a gatekeeping requirement enforced by the OEM, not the government. The OEM decides who is authorized; the government then awards only to those the OEM has blessed. This creates a structural monopoly or near-monopoly: the OEM itself and whatever small channel it has chosen to authorize. The stacking effect is significant: the &#x27;authorized distributor only&#x27; requirement combines with the obligation to perform all repair work per OEM-controlled documents (drawings, tech orders, manufacturing procedures), the approval of only a single part number (TI14-S406), and the inspection requirement tied to OEM specifications. Together these provisions make it functionally impossible for any repair vendor without explicit OEM authorization to compete, regardless of their actual repair capability. A qualified independent repair shop with demonstrated electronic server repair expertise, military packaging compliance, and IUID capability could not clear the first gate. This is a severity 3 finding. The one mitigating consideration is that this is a specialized Navy repair item (NRP — Network Rack Panel, Server, Rear I/O) where OEM repair authorization may have genuine technical justification, particularly for proprietary firmware or safety-critical configurations. However, the solicitation makes no attempt to articulate a performance-based alternative or to explain why OEM authorization specifically is necessary rather than, say, demonstrated repair capability verified by government inspection. The requirement reads as a bright-line exclusion, not a considered judgment about minimum capability thresholds.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement explicitly limits award consideration to authorized distributors of the original manufacturer. The original manufacturer (CAGE 3Z3Z4, part number TI14-S406) controls which companies are &#x27;authorized distributors.&#x27; Any repair vendor not already holding an authorized distributor relationship with that specific manufacturer — including independent repair shops, alternative service providers, or new entrants who may be fully capable of repairing this hardware — is categorically excluded. This is a structural gating requirement that has nothing to do with demonstrated repair capability and everything to do with a pre-existing commercial relationship with the OEM.</div>
+</div><div class="evidence-item">
+  <blockquote>All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures. CAGE___Ref. No. &lt;3Z3Z4 TI14-S406&gt;</blockquote>
+  <div class="ev-explanation">The SOW ties all repair procedures to documents and standards associated with a single CAGE code (3Z3Z4). Access to OEM drawings, technical orders, and manufacturing operations for a proprietary defense item is typically restricted. A vendor that is not the OEM or an OEM-authorized entity would likely lack access to these controlled technical documents, making it practically impossible for them to comply with the work statement — regardless of their general repair competence.</div>
+</div><div class="evidence-item">
+  <blockquote>The NRP,SERVER,REAR IO furnished under this contract/purchase order shall meet the material and physical requirements as specified &lt;Approved item of supply is PART NUMBER TI14-S406 with all additional requirements as defined on drawing 8546495.&gt;</blockquote>
+  <div class="ev-explanation">The specification locks the approved item of supply to a single proprietary part number and a single drawing. This means a vendor cannot propose an alternate repair approach, use compatible parts from a different supplier, or demonstrate capability through alternative means. The requirement is not performance-based (e.g., &#x27;must meet these functional specifications&#x27;) — it is part-number specific, which operationally restricts competition to those with OEM-level access to that specific item&#x27;s design data.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall perform all inspection and testing requirements as specified in the original manufacturer&#x27;s specifications and drawings.</blockquote>
+  <div class="ev-explanation">This inspection and acceptance clause requires compliance with the original manufacturer&#x27;s (OEM&#x27;s) specifications and drawings — documents that are proprietary and typically only available to the OEM and its authorized channel partners. An independent repair vendor without an authorized distributor or repair license from CAGE 3Z3Z4 would be unable to meet this requirement, since they would not have lawful access to the manufacturer&#x27;s proprietary test specifications. This effectively converts a quality requirement into an OEM-exclusivity requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward depot-level repair solicitation for a single NSN item (NRP,SERVER,REAR IO). The statement of work is short and outcome-oriented: the contractor must repair the item to meet material, physical, and operational requirements as defined by existing drawings and standards, and must pass inspection against the original manufacturer&#x27;s specifications. The solicitation does not dictate step-by-step repair procedures, specific tooling choices, staffing structures, or workflow sequences. The most directive language in Section 3.2 explicitly defers to &#x27;the contractors repair/overhaul standard practices, manuals and directives,&#x27; which is the opposite of requirement sprawl — it grants the contractor latitude to apply its own expertise. The packaging, marking, IUID, and CAV reporting requirements throughout the solicitation are regulatory compliance mandates and administrative standards (MIL-STD-2073, MIL-STD-130, DFARS 252.211-7003, FAR 52.245-1), not prescriptions of how to perform the core repair work. The RTAT, throughput constraint, and price-reduction provisions define measurable performance outcomes and accountability mechanisms, consistent with performance-based principles. There is no evidence of copy-paste from an incumbent operating manual, no bullet lists of procedural steps, and no mandated tooling or staffing structures. The solicitation is competently scoped for the type of acquisition it represents.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures.</blockquote>
+  <div class="ev-explanation">This language defers to the contractor&#x27;s own standard practices and approved documents rather than prescribing a specific step-by-step repair process. It is permissive, not prescriptive — the contractor chooses how to repair as long as it conforms to applicable standards. This is the opposite of requirement sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>The NRP,SERVER,REAR IO furnished under this contract/purchase order shall meet the material and physical requirements as specified &lt;Approved item of supply is PART NUMBER TI14-S406 with all additional requirements as defined on drawing 8546495.&gt;</blockquote>
+  <div class="ev-explanation">Specifying an approved part number and a drawing reference constrains the acceptable output (the repaired item must match a specific part configuration), which is a legitimate technical interoperability and configuration-control constraint rather than a prescription of repair methodology. This defines WHAT the end item must be, not HOW to achieve it.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. It is not a severe case — there is no &#x27;Applicable Documents&#x27; section with 20+ individually numbered regulations, and most of the regulatory citations are at least plausibly connected to a DoD hardware repair contract. The FAR and DFARS clauses in Section I, while numerous, are largely standard DoD contract clauses that appear by reference and represent normal federal contracting practice rather than an agency-specific rule pile.
+
+However, several features elevate this above severity 1. First, the packaging section (WSSTERMDZ03) presents over ten standards and specifications as a dense block with minimal conditional guidance, requiring contractors to parse complex applicability rules independently. Second, the document ordering instructions in Section 6.3 and Attachment 1 include categories (Nuclear Reactor Publications, Ordnance Standards) that have no conceivable relevance to server rear I/O board repair — a clear sign of boilerplate copy-forward without review. Third, six cybersecurity clauses are included without any explanation of what covered defense information the repair contractor will actually handle, leaving bidders to assess their own CMMC certification needs blindly. Fourth, seven country-of-origin and trade restriction clauses appear without context for which are driven by known supply chain risks versus which are default template inclusions.
+
+Critically, the SOW&#x27;s own technical requirements section cites no specific applicable documents at all — deferring entirely to &#x27;the contractor&#x27;s repair/overhaul standard practices&#x27; and &#x27;any other contractor or government approved documents.&#x27; The regulatory burden thus falls entirely on the administrative sections, creating an imbalance: the technical work is underspecified while the compliance apparatus is overspecified.
+
+This is a classic moderate rule pool: enough volume and boilerplate carry-forward to elevate the compliance interpretation burden meaningfully beyond what the scope of work (repair one electronic hardware item) would seem to require, but not so severe as to present glaring contradictions or a completely impenetrable regulatory wall. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All repair work shall be performed in accordance with the contractors repair/overhaul standard practices, manuals and directives including but not limited to drawings, technical orders, manufacturing operations, tooling instructions, approved repair standards and any other contractor or government approved documents developed to provide technical repair procedures.</blockquote>
+  <div class="ev-explanation">The SOW&#x27;s primary technical compliance anchor is a broad catch-all phrase — &#x27;including but not limited to&#x27; — that does not identify any specific applicable documents by name. The contractor must independently determine which of their own documents satisfy this requirement, creating an undefined compliance universe rather than a curated list.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-STD-130, REV N, 16 NOV 2012 ... MIL-STD 2073 PACKAGING APPLIES AS FOUND ELSEWHERE IN THE SCHEDULE ... MIL-STD-129 ... MIL-PRF-131, MIL-PRF-81705, MIL-PRF-22191, MIL-PRF-3420 and MIL-PRF-22019 ... MIL-STD-147 ... ANSI/ESD S20.20-2021 ... ASTM D3951-18 (2023) ... MIL-STD-1330 ... MIL-PRF-61002 ... ISPM 15 ... ANSI MH1-2016</blockquote>
+  <div class="ev-explanation">The packaging section alone (Section D, WSSTERMDZ03) cites over ten separate military standards, commercial standards, and specifications governing preservation, packaging, packing, and marking. While these are at least grouped thematically around packaging, they are presented as a bulk list with minimal explanation of which apply conditionally versus universally, creating an elevated compliance burden for a single-item repair solicitation.</div>
+</div><div class="evidence-item">
+  <blockquote>6.3 Ordering Information for Document References - The Department of Defense Single Stock Point (DODSSP)... [followed by subsections A through H covering DODSSP products, cancelled documents, commercial specifications, Ordnance Standards, NOFORN documents, NOFORN Military Specs, Nuclear Reactor Publications, NAVSEA Technical Manuals, and Interim Changes]</blockquote>
+  <div class="ev-explanation">Section 6.3 (replicated in full in Attachment 1) provides an eight-subsection ordering guide for document categories — including Nuclear Reactor Publications and Ordnance Standards — that have no evident connection to repairing a server rear I/O module. This appears to be a boilerplate block copied from a master template without review for applicability to the specific item being repaired.</div>
+</div><div class="evidence-item">
+  <blockquote>252.204-7012 SAFEGUARDING COVERED DEFENSE INFORMATION AND CYBER INCIDENT REPORTING (MAY 2024)... 252.204-7025 NOTICE OF CYBERSECURITY MATURITY MODEL CERTIFICATION LEVEL REQUIREMENTS (NOV 2025)... 252.204-7021 CONTRACTOR COMPLIANCE WITH THE CYBERSECURITY MATURITY MODEL CERTIFICATION LEVEL REQUIREMENTS (NOV 2025)... 252.240-91 SECURITY PROHIBITIONS AND EXCLUSIONS... 52.240-92 SECURITY REQUIREMENTS... 252.240-7997 NIST SP 800-171 DOD ASSESSMENT REQUIREMENTS</blockquote>
+  <div class="ev-explanation">Six separate cybersecurity and information security clauses are incorporated into a contract for physical repair of a hardware item (a server rear I/O board). While DFARS 252.204-7012 is broadly required for DoD contracts, the simultaneous inclusion of CMMC certification requirements, NIST SP 800-171 assessment requirements, and multiple security prohibition clauses — all without any explanation of which covered defense information the repair contractor will process — represents an undifferentiated compliance burden that may not be calibrated to the actual cyber risk of a depot-level hardware repair.</div>
+</div><div class="evidence-item">
+  <blockquote>252.225-7016 RESTRICTION ON ACQUISITION OF BALL AND ROLLER BEARINGS (JAN 2023)... 252.225-7012 PREFERENCE FOR CERTAIN DOMESTIC COMMODITIES (APR 2022)... 252.225-7002 QUALIFYING COUNTRY SOURCES AS SUBCONTRACTORS (MAR 2022)... 252.225-7013 DUTY-FREE ENTRY (AUG 2025)... 252.225-7048 EXPORT CONTROLLED ITEMS (JUNE 2013)... 252.225-7056 PROHIBITION REGARDING BUSINESS OPERATIONS WITH THE MADURO REGIME (JAN 2023)... 252.225-7060 PROHIBITION ON CERTAIN PROCUREMENTS FROM THE XINJIANG UYGHUR AUTONOMOUS REGION</blockquote>
+  <div class="ev-explanation">Seven separate country-of-origin, domestic preference, and foreign trade clauses are incorporated with no guidance on which are operationally relevant to this repair. The ball and roller bearings restriction is plausibly applicable if the item contains bearings, but this is not stated. The Maduro regime prohibition and Xinjiang procurement prohibition are almost certainly boilerplate inclusions from a standard clause library rather than tailored requirements reflecting identified supply chain risks for this specific server component.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a repair contract for a single, identified military part (NRP,SERVER,REAR IO) with a defined part number (TI14-S406), a specific NSN, a 60-day RTAT, and a clear return-to-stock objective. The solicitation explicitly requires firm-fixed-price (FFP) and rejects T&amp;E-only quotes. FFP is the appropriate contract type here: the deliverable is concrete (a repaired unit returned in &#x27;A&#x27; condition), the performance standard is defined (original manufacturer specifications and drawings per Section C/E), and the repair methodology is established (contractor&#x27;s repair/overhaul standard practices, manuals, drawings per Section 3.2). The government has also incorporated a reconciliation price reduction mechanism for missed RTATs, which provides additional incentive for timely performance under FFP. The solicitation does acknowledge that assets may arrive in incomplete, damaged, or worn condition, which introduces some scope variability — but this is a standard feature of Navy depot-level repair contracts, and the government has addressed it by instructing offerors to include all anticipated repair costs (including handling damage, missing parts, wear) in their fixed price. The T&amp;E fee provision for BR/BER determinations further handles edge cases where an asset cannot be repaired, capping the government&#x27;s exposure. There is no evidence of misalignment: the requirement is bounded, the output is measurable, and FFP appropriately transfers performance risk to the contractor. No square peg concern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Only a firm-fixed price (FFP) for the REPAIR of the subject item(s) will be accepted. Quotes limited to test and evaluation (T&amp;E) will NOT be accepted. The quoted price MUST be for the REPAIR of the item(s).</blockquote>
+  <div class="ev-explanation">The solicitation explicitly mandates FFP pricing for this repair contract. This is the correct pricing structure for a discrete repair action on a specific, identified military part (NRP,SERVER,REAR IO, NSN 7025-01-660-0558) where the scope — receive a broken asset, repair it to specification, return it in serviceable condition — is well-defined and repeatable.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="3.01_RFQ_N0010426QUB37_25337-0034.PDF">3.01_RFQ_N0010426QUB37_25337-0034.PDF</div></div>
+  <a class="dl-btn" href="../attachments/d632823a5e0547c8ac616c674cf28d0c_3.01_RFQ_N0010426QUB37_25337-0034.PDF" download="3.01_RFQ_N0010426QUB37_25337-0034.PDF" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

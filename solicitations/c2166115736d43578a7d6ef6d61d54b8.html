@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maize DNA Extraction and Sequencing — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Maize DNA Extraction and Sequencing</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c2166115736d43578a7d6ef6d61d54b8</span>
+      <a class="sam-link" href="https://sam.gov/opp/c2166115736d43578a7d6ef6d61d54b8/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">AGRICULTURE, DEPARTMENT OF › AGRICULTURAL RESEARCH SERVICE › USDA ARS AFM APD</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R499</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541380</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">06/15/2026 to 09/30/2026 (approximately 15 weeks)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Approach</li><li>Price</li><li>Past Performance</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is notably outcome-focused rather than compliance-focused. The SOW specifies concrete, measurable performance targets: 90% of samples must meet DNA quality standards for genotyping; each genotyped sample must achieve a call rate of at least 95%; a minimum of 15,000 SNP markers must be produced; sequencing must reach a minimum depth of 25× per sample; all data must align to the B73 RefGen_v5 reference genome assembly; and the full job must be completed within 15 weeks of sample receipt. These are genuine outcome metrics — they define success in terms of what was produced and whether it meets scientific utility thresholds, not whether the vendor followed a process.
+
+The reporting burden is essentially nonexistent. The only reporting requirement is &#x27;provide regular status updates to the Government throughout the performance period&#x27; — no prescribed format, no required sections, no overlapping cadences, no plan-deviation tracking. The deliverable acceptance criteria are technical and quantitative (call rates, SNP marker counts, sequencing depth, QC documentation), meaning the government evaluates whether the work is good, not whether the vendor checked procedural boxes.
+
+The QC documentation requirement (&#x27;All DNA quality-control (QC) metrics must be documented and provided to the Government. Samples that fail QC must be identified and reported&#x27;) is tied directly to outcome assessment — it exists to tell the government whether samples met quality thresholds, not to confirm that a process was followed. This is the right kind of documentation: it serves outcome evaluation rather than replacing it.
+
+Overall, this is a well-structured, outcome-oriented SOW for a technical laboratory services acquisition. The accountability structure asks &#x27;is the work good?&#x27; rather than &#x27;did you follow the process?&#x27; Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide regular status updates to the Government throughout the performance period.</blockquote>
+  <div class="ev-explanation">This is the SOW&#x27;s only reporting requirement. It is vague and minimal — no prescribed format, no required sections, no frequency mandate, and no plan-adherence focus. While &#x27;status updates&#x27; could theoretically become compliance theater, the absence of prescribed cadences or format requirements means it does not constitute a meaningful reporting burden.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation for maize DNA extraction and next-generation genotyping services does not exhibit meaningful insider rewards patterns. The evaluation criteria assess technical approach (ability to meet schedule and SOW requirements), price, and past performance — none of which impose specific dollar thresholds, federal-specific experience mandates, or narrow lookback windows that would exclude non-incumbents.
+
+The SOW specifies technical performance standards (90% QC pass rate, 95% call rate, 15,000 SNP markers, Illumina NovaSeq X 10B or similar platform, ApeKI restriction enzyme, B73 RefGen_v5 reference genome, VCF format output), but these are industry-standard methods in commercial genomics services. Any qualified commercial genomics laboratory — university core facility, private sequencing company, or biotech firm — routinely performs GBS library preparation with ApeKI, runs Illumina NovaSeq instruments, and delivers VCF files aligned to reference genomes. These are not esoteric federal-government-specific requirements; they are standard commercial service specifications.
+
+The past performance evaluation uses an acceptable/neutral/unacceptable framework that explicitly allows neutral ratings for vendors with no prior record, meaning a vendor with no federal contracting history can still compete on equal terms. There are no dollar thresholds required for prior contracts, no requirements for prior federal (as opposed to commercial) experience, no short lookback windows, and no institutional knowledge requirements that could only be satisfied by a prior incumbent.
+
+The technical approach evaluation focuses on demonstrated capability to meet the SOW — a legitimate capability test, not an incumbency test. A commercial genomics lab that has never held a USDA contract could straightforwardly demonstrate it can perform DNA extraction, GBS library prep, Illumina sequencing, and SNP calling, and would be evaluated on that basis.
+
+The solicitation is a small, well-scoped commercial services procurement for a well-defined set of laboratory services. The requirements are outcome-focused and technically specific without being exclusionary. A qualified vendor who has never worked this specific contract could realistically and competitively respond.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl, concentrated in the SOW&#x27;s performance requirements section. The document shows a split character: several requirements are well-framed as outcomes (90% of samples must meet DNA quality standards; ≥95% call rate; ≥15,000 SNPs distributed across all chromosomes; delivery within 15 weeks), which is appropriate outcome-based specification. However, the SOW also layers specific process mandates on top of those outcomes — naming a particular restriction enzyme, a specific sequencing instrument model, a particular flow cell configuration, specific control types, and a single-batch processing requirement. These process prescriptions are not legally mandated, not interoperability constraints, and not safety or security baselines. They reflect the agency&#x27;s (or an incumbent&#x27;s) preferred method of achieving the outcome, rather than the outcome itself. A vendor with a superior genotyping workflow using a different enzyme or sequencing chemistry is effectively excluded even if they could meet or exceed the stated data quality thresholds. The sprawl is real but bounded — it does not dominate the entire solicitation, and the outcome metrics (call rate, SNP count, coverage depth) are clearly defined. This is a solicitation that mostly knows what it wants but over-specifies how to get there in several key technical areas, consistent with a Severity 2 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Prepare genotyping by sequencing, or next-generation genotyping libraries using approved, commercially available methods employing the ApeKI restriction enzyme. A PCR-free preparation method must be used to construct a specialized library.</blockquote>
+  <div class="ev-explanation">This requirement dictates a specific enzymatic method (ApeKI restriction enzyme) and a specific library construction approach (PCR-free). While ApeKI-based GBS is a well-established and common method for maize genotyping, mandating this specific enzyme and preparation method forecloses vendors from proposing alternative genotyping approaches (e.g., different restriction enzymes, array-based genotyping, or other library prep chemistries) that could meet the downstream outcome — 15,000 SNPs distributed across maize chromosomes at ≥95% call rate. The outcome requirement is defined elsewhere; this requirement prescribes the process to achieve it.</div>
+</div><div class="evidence-item">
+  <blockquote>Next Generation Sequencing must be completed using the Illumina NovaSeq X 10B (300 cycles shared flow cell) or similar platform with a read length of 2 x 150 (Paired End)</blockquote>
+  <div class="ev-explanation">Naming a specific sequencing instrument model (Illumina NovaSeq X 10B) and a specific flow cell configuration constrains vendors to platforms functionally equivalent to this system. While the &#x27;or similar platform&#x27; hedge provides some flexibility, the read length specification (2 x 150 paired end) further narrows the approach. The actual mission need — generating sufficient high-quality sequence data to call SNPs at the required depth and coverage — could potentially be met by other configurations. This is process prescription rather than outcome definition.</div>
+</div><div class="evidence-item">
+  <blockquote>All samples must be run together in a single batch to maintain consistency and ensure optimal data quality</blockquote>
+  <div class="ev-explanation">Requiring all 384 samples to be run in a single batch is an operational process mandate. The stated rationale (&#x27;to maintain consistency&#x27;) reflects a preference for one technical approach over others. A vendor with different quality control methods, blocking strategies, or batch correction bioinformatics pipelines might achieve equivalent or superior data quality using multiple runs. The outcome — high-quality, consistent genotype calls across all samples — is already defined elsewhere (≥95% call rate, ≥15,000 SNPs). This requirement layers a process constraint on top of an already-defined outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor must include both positive and negative controls during library preparation. Negative controls consist of water used during library preparation, and positive controls consist of water used during library preparation, and positive controls consist of DNA from known reference samples.</blockquote>
+  <div class="ev-explanation">While the use of controls in library preparation is a sound scientific practice, specifying exactly what those controls must consist of (water for negative, known reference DNA for positive) goes beyond requiring quality assurance to prescribing the specific QC implementation method. A vendor&#x27;s established QC protocols might use different control types that achieve equivalent or superior quality assurance. This is a mild example of process prescription over outcome specification.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not rise to the level of a severe rule pool. The SOW itself is admirably concise and technically focused — clearly specifying performance standards (90% QC pass rate, 95% call rate, 15,000 SNPs, specific sequencing platform and parameters). The regulatory citations are concentrated in the standard commercial acquisition framework appropriate for a FAR Part 12 acquisition, and the total clause count is not extreme by federal contracting standards.
+
+However, the solicitation earns a moderate severity (2) finding for two reasons. First, AGAR 452.203-72 — a sprawling, 21-item supplier terms clause clearly drafted for complex software or IT service contracts — occupies roughly a third of the solicitation text and is applied wholesale to a simple fixed-price lab services purchase order. The AI/ML provisions, geographic data storage restrictions, and automated decision-making prohibitions have zero relevance to maize genomics work and represent copy-forward accumulation from an agency master template. Second, no regulatory citations include any context explaining applicability, leaving small business vendors to conduct their own compliance interpretation. The combination of disproportionate clause length relative to scope, inclusion of clearly inapplicable technology-governance provisions, and absence of any curating language constitutes a moderate but not severe rule pool pattern. A vendor with prior federal lab services experience would recognize most of this as standard boilerplate; a vendor new to federal contracting faces a meaningfully elevated compliance parsing burden before they can price the actual work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>52.203-17 Contractor Employee Whistleblower Rights (Nov 2023)
+52.203-19 Prohibition on Requiring Certain Internal Confidentiality Agreements or Statements (Jan 2017)
+52.222-50 Combating Trafficking in Persons (Nov 2025)
+52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024)
+52.232-39 Unenforceability of Unauthorized Obligations (Jun 2013)
+52.232-40 Providing Accelerated Payments to Small Business Subcontractors (Mar 2023)
+52.233-3 Protest After Award (Sep 2025)
+52.233-4 Applicable Law for Breach of Contract Claim (Sep 2025)
+52.240-91 Security Prohibitions and Exclusions (Nov 2025)
+52.244-6 Subcontracts for Commercial Products and Commercial Services (Nov 2025)</blockquote>
+  <div class="ev-explanation">The solicitation incorporates approximately 10 clauses by reference without any explanation of how they apply to a straightforward laboratory services contract for DNA extraction and sequencing. While individually these are standard FAR clauses that commonly appear in commercial acquisitions, no context is provided to help a small business vendor understand which are operationally relevant versus purely boilerplate. For a simple 15-week lab services job, clauses like 52.244-6 (Subcontracts for Commercial Products) and 52.233-3 (Protest After Award) add to a compliance reading burden with no guidance on their significance.</div>
+</div><div class="evidence-item">
+  <blockquote>52.226-8 Encouraging Contractor Policies to Ban Text Messaging While Driving (May 2024)</blockquote>
+  <div class="ev-explanation">This clause governs contractor employee behavior behind the wheel. For a laboratory services contract where work is performed at the contractor&#x27;s own facilities — extracting DNA from maize leaf samples and conducting sequencing runs — this requirement has no meaningful operational connection to the work. It is boilerplate inclusion, not a curated requirement. Its presence without any context illustrates passive regulatory accumulation.</div>
+</div><div class="evidence-item">
+  <blockquote>AGAR 452.203-71 Anti-Discrimination and Diversity, Equity, and Inclusion (DEI) Compliance (Dec 2025)... AGAR 452.203-72 Unenforceable Supplier Terms... 452.204–70 Modification for Contract Closeout (Apr 2026)</blockquote>
+  <div class="ev-explanation">Three AGAR-specific clauses are included in full text, running across approximately six pages of an 11-page solicitation document. The AGAR 452.203-72 clause alone spans over four pages listing 21 enumerated categories of unenforceable supplier terms — the bulk of which (e.g., restrictions on AI training data use, geographic data storage requirements, automated decision-making) have no conceivable application to a fixed-price purchase order for maize DNA extraction. This significantly inflates the regulatory reading burden relative to the actual scope of work.</div>
+</div><div class="evidence-item">
+  <blockquote>AGAR 452.203-72 Unenforceable Supplier Terms... (d) Unenforceable Terms. Any supplier terms that impose obligations or restrictions inconsistent with applicable Federal law are unenforceable... 18. Uses Government data, usage data, metadata, prompts, content, or interactions to train, fine-tune, improve, or derive any artificial intelligence, machine learning, or automated decision-making model. 19. Subjects the Government to automated decision-making, automated risk scoring... 20. Utilizes artificial intelligence or algorithmic tools that produce decisions, recommendations, or outputs affecting contract performance...</blockquote>
+  <div class="ev-explanation">Items 18–21 of the unenforceable supplier terms clause address AI and machine learning risks that are plainly inapplicable to a laboratory services contract for genomic DNA extraction. The contractor is being asked to acknowledge restrictions on AI training data use and algorithmic decision-making in a context where the deliverables are physical sequencing data files on a hard disk. This is a textbook instance of a clause being copy-forwarded from an agency master template without review for relevance to the specific acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>The clauses and provisions contained herein are applicable to any order awarded as a result of this solicitation. The terms and conditions set forth herein supersede all other terms and conditions.</blockquote>
+  <div class="ev-explanation">The solicitation provides no prioritization, categorization, or guidance on which clauses carry operational weight versus which are standard legal boilerplate. All cited regulations are presented at the same level of importance. A small business vendor new to USDA contracting must parse the full clause library — including multi-page AGAR provisions — to determine what actually governs the work of extracting DNA from 384 maize leaf samples.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward fit for Firm-Fixed Price. The requirement is a commercial laboratory service — DNA extraction and genotyping-by-sequencing for a fixed, known quantity of samples (384) using a standard method (ApeKI-based GBS on Illumina NovaSeq X). The scope is discrete and fully defined: a specific number of samples, specific chemistry, a specific sequencing platform, specific output formats (VCF, hard disk delivery), and specific quality thresholds (≥90% QC pass rate, ≥95% call rate, ≥15,000 SNPs). These are exactly the conditions under which FFP is appropriate — the requirements are well-defined, the quantity is fixed, multiple vendors compete in this market, and performance criteria are measurable and objective. A laboratory service provider can estimate costs for this type of work with reasonable accuracy because the input quantity, methods, and deliverables are all known in advance. There is no meaningful risk of scope creep, evolving requirements, or unpredictable labor quantities that would argue for T&amp;M. There is no technical uncertainty of the kind that would argue for cost-reimbursement — GBS is a mature, commercially available service. The 15-week period of performance is consistent with industry norms for this volume of work. FFP is the correct contract type here, and the solicitation uses it appropriately. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>It is anticipated that a Firm-Fixed price purchase order with a Period of Performance (POP) of 15 weeks will be awarded as a result of this synopsis/solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a Firm-Fixed Price (FFP) contract type will be used.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001: Maize DNA Extraction and Sequencing for 384 leaf samples | 1 | Job</blockquote>
+  <div class="ev-explanation">The single CLIN is priced as one &#x27;Job&#x27; — a lump-sum deliverable-based structure that aligns with FFP. The scope is discrete and fully enumerable: exactly 384 samples, specific methods, and defined outputs.</div>
+</div><div class="evidence-item">
+  <blockquote>Complete all processing activities within 15 weeks of sample receipt.</blockquote>
+  <div class="ev-explanation">The schedule is well-defined and predictable, which is consistent with FFP. A laboratory service provider can estimate with reasonable confidence how long 384 samples will take to process.</div>
+</div><div class="evidence-item">
+  <blockquote>Extract high‑quality genomic DNA from freeze‑dried maize leaf tissue... A minimum of 90 percent of all samples must meet the required DNA quality standards... Each successfully genotyped sample must achieve a call rate of at least 95 percent... A minimum of 15,000 SNP markers with known chromosomal positions... must be produced.</blockquote>
+  <div class="ev-explanation">The performance requirements are specific, measurable, and objective — hallmarks of a well-defined scope suitable for FFP. Quality thresholds, output formats, sequencing depth, and delivery media are all specified, reducing ambiguity about what the contractor must deliver.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="A04_SOW- Maize DNA_1232SA26Q0568.pdf">A04_SOW- Maize DNA_1232SA26Q0568.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c2166115736d43578a7d6ef6d61d54b8_A04_SOW-+Maize+DNA_1232SA26Q0568.pdf" download="A04_SOW- Maize DNA_1232SA26Q0568.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_1232SA26Q0568.pdf">Sol_1232SA26Q0568.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c2166115736d43578a7d6ef6d61d54b8_Sol_1232SA26Q0568.pdf" download="Sol_1232SA26Q0568.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

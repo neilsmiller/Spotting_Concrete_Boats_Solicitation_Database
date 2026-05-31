@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HARD DRIVE — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>HARD DRIVE</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 77dbaa1468954b67bdfc8451d4f149af</span>
+      <a class="sam-link" href="https://sam.gov/opp/77dbaa1468954b67bdfc8451d4f149af/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-12</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP WEAPON SYSTEMS SUPPORT › NAVSUP WSS MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7E20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">333998</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-12</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward firm-fixed-price purchase order for a hard drive (NSN-based supply item), not a services or IT development contract. The QA provisions (Sections 4.1–4.3) are minimal and standard: the contractor is responsible for inspections, must keep records for 365 days, and the government reserves the right to inspect. There are no overlapping reporting cadences, no prescribed report formats, no weekly status reports, no progress report requirements, and no plan-adherence tracking mechanisms. The accountability structure for this type of procurement is appropriately outcome-oriented in the sense that matters for supply contracts: the government will inspect and accept or reject the physical item based on whether it conforms to specification (Government Source Inspection is required, per Section B). The reference to DFARS 252.211-7003 (IUID) and MIL-STD-2073 packaging are compliance requirements, but they are product-conformance standards — not process surveillance substituting for outcome measurement. Compliance-over-outcomes as a sin is most damaging in services and IT contracts where process tracking crowds out performance metrics. For a discrete hardware buy, the light inspection and record-keeping framework is proportionate and appropriate. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">This is a standard record-keeping requirement for a supply contract. It is not a compliance-over-outcomes problem — it supports traceability and post-delivery accountability for a physical product, which is appropriate for a hardware procurement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider rewards characteristics, primarily through its authorized source and authorized distributor requirements. The combination of (1) restricting award to pre-approved government sources, (2) refusing to delay award for new source approval, (3) limiting competition to OEM-authorized distributors only, and (4) requiring OEM confirmation letters creates a system that structurally favors incumbent suppliers and established supply chain participants.
+
+However, important mitigating factors reduce severity from 3 to 2. First, the solicitation does acknowledge a pathway for new sources (Section 3.5 lists categories of data that could support authorization — prior approval proof, production data, test data, etc.) and invites unsolicted vendors to submit qualifications for future procurements. Second, for a military-specification hard drive identified by specific NSN and CAGE/part number (52088 B722), the authorized-source restriction reflects a legitimate and common DoD practice for source-controlled, safety-critical, or configuration-controlled items — not purely incumbent capture. The government genuinely cannot substitute arbitrary components in fielded weapon systems without configuration control review. Third, the solicitation lacks complex evaluation criteria that would stack additional insider-favoring factors like dollar thresholds, lookback windows, or scored past performance subcriteria.
+
+The insider rewards concern here is structural — the source control designation itself limits competition by design — but it stems from legitimate supply chain integrity concerns rather than from solicitation drafting choices intended to favor an incumbent service provider. The playing field is tilted toward approved sources but the rationale is defensible, placing this at severity 2 rather than 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The ultimate awardee of the proposed contract action must be an authorized source. Award of the proposed contract action will not be delayed while an unauthorized source seeks to obtain authorization.</blockquote>
+  <div class="ev-explanation">This requirement restricts award to pre-approved &#x27;authorized sources&#x27; only. Any vendor not already on the government&#x27;s approved source list — regardless of their capability to manufacture or supply a compliant hard drive — is effectively excluded. The government explicitly states it will not delay award to allow new sources to seek authorization, meaning a qualified new entrant has no practical path to compete on this solicitation.</div>
+</div><div class="evidence-item">
+  <blockquote>3.5 Source Control Item - Previous delivery of the specified National Stock Number or similar item manufactured to technical procurement specifications and/or drawings supplied by a Government activity or Price Contractor does not in itself qualify a supplier as a Government approved source. Only those sources for this item previously approved by the Government have been solicited.</blockquote>
+  <div class="ev-explanation">This passage codifies the insider dynamic: only previously approved sources were solicited. A vendor that has not previously manufactured or supplied this specific NSN — even one with equivalent technical capability — has not been solicited and faces structural exclusion. The requirement for prior government approval creates a closed loop that inherently rewards incumbent or historically approved vendors.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2 Notice To Distributors/Offerors - Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This restricts competition to authorized distributors of the specific OEM — a status that takes time to obtain and depends on the OEM&#x27;s willingness to authorize new distributors. A capable distributor not currently on the OEM&#x27;s authorized list cannot compete, regardless of technical or price competitiveness. Combined with the &#x27;will not be delayed&#x27; language, this further narrows the effective vendor pool to those already embedded in the supply chain.</div>
+</div><div class="evidence-item">
+  <blockquote>If you are not the manufacturer of the material you are offering, you must provide an official letter and/or email from the OEM confirming that your company is an authorized distributor of their items.</blockquote>
+  <div class="ev-explanation">This traceability notice reinforces the authorized-source and authorized-distributor requirements. While supply chain integrity is a legitimate concern for military hardware, layering OEM authorization on top of the government-approved source requirement creates stacked barriers that collectively exclude any vendor not already embedded in the existing supply relationship.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward Navy supply/procurement solicitation for a hard drive (NSN-based, source-controlled item). The document is a standard commercial/military purchase order template for a physical good — not a services contract. The requirements focus almost entirely on WHAT must be delivered: the specific part (identified by CAGE code and reference number), packaging standards (MIL-STD-2073), marking (MIL-STD-130), quality inspection records, and authorized source restrictions. None of these dictate HOW the vendor manufactures or procures the hard drive internally. The administrative requirements (change notification codes, waiver/deviation procedures, ESD compliance) are standard configuration control and quality assurance clauses for Navy supply contracts, not operational process mandates. There is no SOW or PWS describing step-by-step service delivery processes, no staffing prescriptions, no workflow mandates. Requirement sprawl as defined — solicitations that dictate how work is performed rather than what outcome is needed — is essentially inapplicable to a product supply solicitation of this type. The solicitation is appropriately outcome-focused for its purpose: deliver the approved hard drive, properly packaged, from an authorized source. Severity is 1 (minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.3 Changes in Design, Material Servicing, or Part Number - Except for a Code 1 change, which shall be processed as provided in the code statement shown below, no substitution of items shall be made until the NAVICP-MECH Contracting Officer has notified and approval has been given by issuance of a written change order. When any change in design, material, servicing or part number is made to replace or substitute any item to be furnished on this contract/purchase order, the Contractor shall furnish, for the substituting/replacement item, a drawing and an explanation of the reason for the change...</blockquote>
+  <div class="ev-explanation">This section prescribes a specific administrative process (codes 1-6, drawing submissions, written notifications) for managing part changes. However, this is a standard supply chain traceability and configuration control requirement common to Navy repair parts procurement — not an operational &#x27;how to do the work&#x27; mandate. It constrains substitution to protect the government&#x27;s interest in receiving the correct, approved component. This is a legitimate constraint, not sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>3.6 Electrostatic Discharge Control - The Contractor shall comply with the electrostatic discharge control requirements established in ANSI/ESD S20.20...</blockquote>
+  <div class="ev-explanation">This specifies a particular industry standard (ANSI/ESD S20.20) for ESD protection. While it names a specific standard, ESD control for electronic components is a safety/quality baseline requirement, not a process mandate that forecloses innovation. Naming the applicable standard is appropriate in a supply contract for sensitive electronic hardware.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard NAVSUP Weapon Systems Support parts procurement solicitation for a hard drive (NSN-based, source-controlled item). The regulatory landscape is lean and appropriate for the scope. The FAR/DFARS clauses incorporated by reference — IUID (DFARS 252.211-7003), inspection of supplies, WAWF payment instructions, Buy American/FTA, AbilityOne, small business subcontracting, ESD control, and MIL-STD packaging — are all standard, recognizable clauses for a DoD supply procurement of this type. None appear irrelevant or contradictory to the actual work. The two technical standards cited in the requirements body (MIL-STD-130 for marking, ANSI/ESD S20.20 for electrostatic discharge) are directly germane to procuring an electronic component. The &#x27;Applicable Documents&#x27; section (2.1) references documents as an attachment, but no attachment was provided in the posting; this is a data gap rather than evidence of a rule pool. There is no bulk undifferentiated list of policies, no obvious copy-forward accumulation of irrelevant regulations, and no contradictions between cited policies and the solicitation&#x27;s purpose. The compliance burden for a vendor bidding on this item is straightforward and well within normal expectations for a DoD parts buy. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.1 Applicable Documents - The document(s) listed below form a part of this contract/purchase order including modifications or exclusions. 2.1.1 &quot;Document References&quot; listed below must be obtained by the Contractor.</blockquote>
+  <div class="ev-explanation">The solicitation references an &#x27;Applicable Documents&#x27; section but notably does not actually enumerate a long list of documents inline. The section is essentially a placeholder referencing that document references are included as an attachment — which is not provided. This is minimal, not a rule pool.</div>
+</div><div class="evidence-item">
+  <blockquote>3.2 Marking - This item shall be physically identified in accordance with ;MIL-STD-130, REV N, 16 NOV 2012; ... 3.6 Electrostatic Discharge Control - The Contractor shall comply with the electrostatic discharge control requirements established in ANSI/ESD S20.20</blockquote>
+  <div class="ev-explanation">The two technical standards cited in the body of the solicitation — MIL-STD-130 for marking and ANSI/ESD S20.20 for ESD control — are directly applicable to the physical procurement of a hard drive. Each is cited in context with a clear explanation of why it applies. This is curated, not pooled.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward supply procurement for a specific hard drive identified by part number and NSN. The requirement is a discrete, tangible, commercially-identifiable item with a defined specification. FFP is the textbook-appropriate contract type for such a purchase: the deliverable is unambiguous (a specific hard drive), the quantity and nature of the item are known, and competition among authorized distributors can keep prices honest. There is no labor-hour uncertainty, no evolving scope, and no technical development risk that would argue for cost-reimbursement or T&amp;M. The FAR&#x27;s guidance that FFP is appropriate when &#x27;risk involved is minimal or can be predicted with an acceptable degree of certainty&#x27; applies squarely here. The pricing structure and the requirements are well-aligned; this is not a square peg situation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Only a Firm-Fixed Price (FFP) will be accepted.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly mandates FFP pricing for this procurement.</div>
+</div><div class="evidence-item">
+  <blockquote>1. SCOPE 1.1 This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the HARD DRIVE.</blockquote>
+  <div class="ev-explanation">The requirement is for a discrete, physical commercial-type item — a hard drive — with a specific part number (52088 B722) and NSN. This is a well-defined, tangible deliverable with no ambiguity in scope.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1 Cage Code/Reference Number Items - The HARD DRIVE furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. ;52088 B722;</blockquote>
+  <div class="ev-explanation">The item is defined by a specific manufacturer cage code and part number, meaning the technical specification is fixed and known in advance. There is no scope uncertainty.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PCI DSS Compliance Technical Support — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>PCI DSS Compliance Technical Support</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 0cd8775a75f341f2823f3703a952ae1b</span>
+      <a class="sam-link" href="https://sam.gov/opp/0cd8775a75f341f2823f3703a952ae1b/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-23</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR EDUCATION AND TRAINING COMMAND › JOINT BASE SAN ANTONIO › FA9000  AF NAF PO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541512</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-23</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year + 4 one-year option periods (total potential performance period of 5 years)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li><li>Factor 1: Contractor Statement of Work (CSOW) / Technical Acceptability</li><li>Factor 3: Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows moderate compliance-over-outcomes characteristics, but not the severe pattern seen in the worst cases. On the positive side, the solicitation is genuinely outcome-oriented in its framing: it explicitly states the goal is &#x27;full PCI DSS compliance,&#x27; &#x27;self-sufficient operation,&#x27; and &#x27;long-term verifiable PCI DSS compliance,&#x27; and it does make an attempt at outcome metrics (training effectiveness measurement, ROC completion by September 2026). The phased structure — gap analysis feeding into implementation feeding into sustainment — reflects a logical results chain rather than pure process compliance. However, several structural weaknesses push this to a moderate severity. First, the acceptance criteria are opaque: the Q&amp;A deflects the specific question about how deliverables are evaluated beyond COR approval, suggesting process gates dominate over outcome standards. Second, the primary performance SLAs are withheld from offerors (&#x27;available upon contract award&#x27;), which means the competition cannot be structured around binding outcome commitments — a hallmark of compliance-over-outcomes contracting. Third, the training effectiveness metric (question volume) is a weak proxy that conflates activity with results. Fourth, Phase 1&#x27;s primary deliverable is documentation (gap analysis, implementation strategy) rather than a measurable security improvement, with &#x27;August 2026&#x27; as the success criterion. The solicitation does not exhibit the severe multi-layered reporting cadences (weekly + monthly + quarterly reports with prescribed sections) that characterize severity 3. The Q&amp;A also reveals thoughtful engagement with technical requirements. But the combination of deferred SLAs, COR-centric acceptance, and documentation-as-deliverable patterns is sufficient to flag moderate compliance-over-outcomes concern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SOO Section 5.3 outlines a regular meeting schedule, including Weekly Status Meetings.</blockquote>
+  <div class="ev-explanation">Weekly status meetings are required as a baseline cadence. When combined with formal reporting deliverables, this adds a recurring process-compliance touchpoint. However, without seeing the full SOO Section 5.3 text, the meeting cadence alone is not definitive evidence of the sin — it depends on whether the meetings have outcome-focused agendas or are purely status-review sessions.</div>
+</div><div class="evidence-item">
+  <blockquote>How will deliverable acceptance be evaluated beyond COR approval? See SOO, para. 4.3 and ATCH 07, para. 2.</blockquote>
+  <div class="ev-explanation">The Q&amp;A deflects the question about acceptance evaluation back to referenced documents rather than articulating outcome-based criteria. The reference to &#x27;COR approval&#x27; as a baseline suggests acceptance is primarily a process gate (did a human sign off?) rather than tied to measurable performance outcomes. This is a structural indicator that compliance mechanisms may dominate over outcome assessment.</div>
+</div><div class="evidence-item">
+  <blockquote>Training effectiveness will be measured by the number of Tools related questions (implementation, management, alerts, etc) coming from the field to the AFSVC central PCI team tracked in the PCI repository.</blockquote>
+  <div class="ev-explanation">This is an attempt at an outcome metric for training, but it is a proxy activity measure (question volume) rather than a genuine outcome measure (e.g., reduction in compliance gaps attributable to trained staff, or percentage of installations achieving self-sufficient operation). A declining question count could mean staff are well-trained — or that they gave up seeking help. This conflates process activity with outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>The SOO requires the contractor to conduct a &#x27;Gap Analysis&#x27; and deliver a &#x27;Solution Implementation Strategy&#x27; for a &#x27;complete enterprise tool suite&#x27; (SOO 4.1.1.1, 4.1.1.4)... a high-level implementation plan that defines the necessary steps, resource requirements, and a project timeline with a target initial completion date of August 2026.</blockquote>
+  <div class="ev-explanation">The primary Phase 1 deliverable is a plan and strategy document, not a measurable security outcome. Success is defined as producing the document and meeting the August 2026 date. There is no articulated metric for what a &#x27;good&#x27; gap analysis looks like in terms of PCI compliance improvement — deliverable completion substitutes for outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>For 24x7 support services covering all CDE operational security functions, what are the exact SLA response/resolution times for Critical, High, Medium, Low incidents? Response times are required in accordance with the latest PCI DSS version (currently 4.0.1) and outlined in our PCI Security policy available upon contract award.</blockquote>
+  <div class="ev-explanation">This is a notable missed opportunity. When asked directly for SLA metrics — the clearest form of outcome-focused accountability — the government defers entirely to a policy document not available to offerors at solicitation time. This means offerors cannot price or plan against defined performance targets, and the government has not publicly committed to measurable performance standards that would bind the evaluation and contract administration process.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents moderate insider-rewards characteristics — a tilted playing field, but not a closed one. The core experience requirements (five years of cybersecurity experience, PCI DSS expertise) are legitimate capability tests that a broad market of vendors could satisfy. The solicitation explicitly acknowledges that commercial PCI DSS experience is relevant, that teaming is permitted, and that subcontractor past performance counts — all meaningful mitigants.
+
+However, several factors create structural advantages for vendors with prior DoD/federal PCI experience. First, &#x27;highly desirable&#x27; federal government experience and &#x27;preferred&#x27; DAF/DoW familiarity will translate into scoring advantages in an LPTA evaluation where technical acceptability is the threshold — vendors on the margin of acceptability who also have federal experience will be favored. Second, the scale and specificity of the requirement (104 worldwide locations, 938 PCI network sites, 13M+ transactions annually, integration with Telos Xacta.360 and specific incumbent tools like QRadar and Trellix) means that credibly relevant past performance is naturally rare — vendors who have done PCI compliance work for large, decentralized DoD or federal organizations are a narrow population. Third, the integration requirements with AFSVC-specific systems (Xacta.360, QRadar, Aloha POS, Ingenico terminals) and the collaboration requirement with an already-engaged QSA firm (F41999-26-Q-0007 awardee) create institutional knowledge advantages that are difficult to overcome without prior exposure.
+
+Critically, the solicitation does not impose specific dollar thresholds for prior contracts, does not require a defined number of completed contracts, and does not have explicit lookback windows — the hallmarks of severe insider rewards. The LPTA structure also means price matters, which can compensate for scoring disadvantages in past performance. A well-qualified commercial PCI firm with strong references and competitive pricing could realistically compete. The severity is therefore 2: the playing field is tilted toward vendors with federal/DoD PCI experience, but it is not closed to competent newcomers.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The SOO (Section 3.2) requires a minimum of five years of hands-on cybersecurity experience. Experience with Federal Government or DoW is highly desirable and experience with DAF/DoW IT Environments is a preferred, not required, qualification (SOO 3.2.2). Strong commercial PCI DSS experience will be considered relevant.</blockquote>
+  <div class="ev-explanation">The SOO establishes a five-year cybersecurity experience floor, but critically, federal/DoD experience is listed as &#x27;highly desirable&#x27; rather than merely acceptable. While commercial PCI DSS experience is acknowledged as relevant, the language creates a scoring advantage for vendors with federal government experience over those with equivalent or superior commercial credentials. This is a moderate insider-favoring criterion — not a hard exclusion, but a tilt in evaluation.</div>
+</div><div class="evidence-item">
+  <blockquote>The SOO (Section 3.2.2) states that experience with DAF/DoW IT Environments...including familiarity with their unique security policies, procedures, and infrastructure is a preferred qualification.</blockquote>
+  <div class="ev-explanation">Familiarity with DAF/DoW-specific IT environments is listed as a preferred qualification. While framed as a preference rather than a requirement, this criterion rewards vendors who have already operated within Air Force or DoD environments — knowledge that is difficult to demonstrate without prior contract performance in those specific ecosystems. A commercially focused PCI/cybersecurity firm would be structurally disadvantaged in demonstrating this familiarity.</div>
+</div><div class="evidence-item">
+  <blockquote>ATCH 06, Section 4.2 states that subcontractors completing at least 10% of the work require separate past performance evaluation... The NAFI will assess the quality of recent performance, with an emphasis on efforts that are relevant to the requirements outlined in the SOO.</blockquote>
+  <div class="ev-explanation">Past performance is evaluated with an emphasis on relevance to the SOO&#x27;s specific requirements — a large-scale, multi-installation, DoD-context PCI DSS compliance program supporting 104+ locations and 13M+ annual card transactions. The combination of scale, domain specificity (PCI DSS in a DoD/NAF environment), and the &#x27;relevant&#x27; emphasis means that vendors without prior experience in comparably complex federal or military PCI programs will struggle to present competitive past performance, even if their commercial track record is strong.</div>
+</div><div class="evidence-item">
+  <blockquote>Yes. The Government evaluates the past performance of the offeror as a whole, which includes the prime contractor and any major subcontractors or teaming partners... with an emphasis on efforts that are relevant to the requirements outlined in the SOO. See ATCH 06, para. 4.2.</blockquote>
+  <div class="ev-explanation">The mitigating factor here — that teaming partner and subcontractor past performance counts — is genuine and meaningfully reduces insider exclusion. A firm without direct incumbent history can assemble a team whose collective experience covers the relevant domain. This is the primary reason severity does not rise to a 3.</div>
+</div><div class="evidence-item">
+  <blockquote>AFSVC has a robust vulnerability management program featuring automated scanning and regular penetration testing in collaboration with Mid-Atlantic Broadband (MABB) and Fortra... Installation specific decentralized Tools will be identified during the phase 1 gap analysis.</blockquote>
+  <div class="ev-explanation">The solicitation reveals that AFSVC already has named incumbent relationships (MABB and Fortra for vulnerability management). While these are not the same contract being solicited, this signals an existing vendor ecosystem within AFSVC&#x27;s CDE environment. A new vendor would need to integrate with and around these incumbent relationships, creating implicit institutional knowledge advantages for vendors already familiar with AFSVC&#x27;s operational environment.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The core tension is that AFSVC has written a Statement of Objectives (SOO) — which by design should focus on outcomes — but several key provisions cross the line into prescribing the how. Most notably, the government has pre-decided the solution architecture (enterprise tool suite with SIEM, DLP, MFA, centralized repository integration) before the gap analysis Phase 1 is complete, which structurally forecloses vendor proposals that would achieve PCI DSS compliance through alternative means such as aggressive scope reduction. The Q&amp;A exchanges reveal this directly: multiple vendors questioned whether a scope-reduction strategy could be evaluated as an alternative, and the government consistently deflected, confirming the tool suite is the predetermined answer. The Tier 2/3 staffing model and 24/7 support posture are prescribed structurally rather than through outcome-based SLAs. However, several mitigating factors prevent a severity 3 rating. The SOO is genuinely outcomes-oriented in important respects: it uses a phased structure, defers significant technical scoping to the Phase 1 gap analysis, explicitly declines to prescribe staffing levels (Q&amp;A #20: &#x27;AF SVC is seeking industry to provide this answer&#x27;), and leaves tool selection open to contractor recommendation. The &#x27;complete enterprise tool suite&#x27; language may also reflect genuine security baseline requirements given the Level 1 merchant status and DoD security framework obligations. The solicitation reads as a hybrid: a legitimate outcome-based SOO in structure, with prescriptive overlays added during drafting as the government couldn&#x27;t fully resist defining the solution they envisioned. Sprawl is present and would constrain some vendors meaningfully, but it does not dominate the document.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Contractor will Install, configure, and ensure proper integration of all approved security tools. However, for privileged actions, the contractor&#x27;s role is to provide expert, hands-on guidance while government personnel execute the actions (SOO 4.1.2.2).</blockquote>
+  <div class="ev-explanation">This prescribes a specific division of labor and implementation method for tool deployment rather than defining the outcome (tools are correctly deployed and integrated). A vendor who could achieve the same result through a different privileged-access arrangement — such as a dedicated contractor admin account with scoped permissions — is effectively precluded by this process mandate.</div>
+</div><div class="evidence-item">
+  <blockquote>The SOO requires &#x27;Ongoing Technical Support&#x27; (SOO 4.1.3), including &#x27;24/7 Support Services&#x27; (SOO 4.1.3.1.3), &#x27;Tier 2/3 Sustainment Support&#x27; for escalations (SOO 2.2.5), incident response assistance (SOO 4.1.3.4.2.4), and &#x27;PCI DSS Assessment Preparation Support&#x27; (SOO 4.1.3.2).&#x27; The contractor must plan for both [steady-state and surge support].</blockquote>
+  <div class="ev-explanation">The solicitation prescribes a specific support tier architecture (Tier 2/3 escalation model) and a 24/7 staffing posture rather than defining outcome-based SLAs. A vendor who could meet the same compliance and response objectives through a different operational model — such as automated alerting with on-call escalation — would still be forced to conform to the prescribed structural model.</div>
+</div><div class="evidence-item">
+  <blockquote>SOO Section 4.1.1 requires the contractor to perform a Technical Tool Gap Analysis and Solution Strategy and deliver recommendations for a complete Tool Suite and a Solution Implementation Strategy document. The contractor leads the technical effort by performing the gap analysis, designing the target architecture, and recommending a comprehensive security tool suite.</blockquote>
+  <div class="ev-explanation">While a gap analysis is a reasonable deliverable, the SOO pre-specifies the output — a &#x27;complete enterprise tool suite&#x27; including SIEM, DLP, and MFA — before the gap analysis has been performed. This is circular: the assessment is required to justify a solution the government has already decided to procure. A vendor who concluded after assessment that scope reduction (e.g., P2PE-based descoping) would achieve compliance more cost-effectively cannot propose that outcome; the solicitation has already defined the answer.</div>
+</div><div class="evidence-item">
+  <blockquote>A suspected security incident must be reported to AFSVC within one hour of the Contractor&#x27;s initial awareness, regardless of the detection source or confirmation status... The &#x27;one-hour clock begins the moment there is awareness of a potential incident.&#x27;</blockquote>
+  <div class="ev-explanation">This is a borderline case — incident reporting timelines can be legitimate SLAs — but the requirement that the clock starts at &#x27;awareness of a potential incident&#x27; (not a confirmed incident or a defined alert threshold) with no tiering by severity prescribes a specific operational workflow. It effectively mandates continuous human monitoring or automated pipeline design in a particular way, constraining how vendors staff and architect their detection capability.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. The compliance framework citations are not presented as a single bulk &#x27;Applicable Documents&#x27; list — which would indicate severity 3 — but they accumulate throughout the Q&amp;A responses and SOO references in a way that creates meaningful interpretive burden without curating context. The core tension is structural: this is a NAF solicitation explicitly operating outside FAR and on commercial networks rather than NIPRNet, yet the solicitation imports DoD information assurance frameworks (DoD RMF, DoD 8500 series, DoDM 8140.03) that were designed for DoD information systems on government networks. The agency&#x27;s own Q&amp;A acknowledges the commercial network context (&#x27;DAF NAFIs process payment card transactions over locally managed commercial networks rather than the NIPRNet&#x27;) but does not reconcile this with the simultaneous requirement to comply with DoD RMF and DoD 8500 series. That tension is the hallmark of uncurated compliance accumulation: frameworks are added without reviewing whether they actually apply to this particular operating environment. That said, many of the cited frameworks — PCI DSS 4.0.1, NIST SP 800-53, CISA directives — are legitimately relevant to a payment card security compliance program, and the solicitation does provide some contextual explanation through the Q&amp;A mechanism. The compliance list has not grown to absurd length with clearly irrelevant entries (no energy efficiency standby power directives here). The severity is 2: elevated compliance burden from stacking multiple DoD-specific frameworks onto a NAF commercial network context without differentiation or applicability explanation, but not the severe undifferentiated bulk citation that would characterize a severity 3 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The solution must align with DoD standards, including NIST SP 800-53, CISA directives, and the DoD RMF (SOO 6.9.2) while closing PCI control gaps and avoiding redundancy.</blockquote>
+  <div class="ev-explanation">This Q&amp;A response references NIST SP 800-53, CISA directives, and the DoD RMF as compliance requirements, but provides no context for how each specifically applies to a NAF merchant payment card compliance effort operating on commercial networks rather than NIPRNet. The solicitation itself notes that &#x27;DAF NAFIs process payment card transactions over locally managed commercial networks rather than the NIPRNet,&#x27; which raises legitimate questions about whether DoD RMF — a framework designed for federal information systems on government networks — actually applies to this environment in the way being implied.</div>
+</div><div class="evidence-item">
+  <blockquote>SOO Section 6.7.1 requires contractor personnel to have certifications that align with DoDM 8140.03. While not explicitly stated that the training materials for local staff must align, it would be a best practice to ensure the content is consistent with DoD cybersecurity workforce requirements.</blockquote>
+  <div class="ev-explanation">DoDM 8140.03 is the DoD Cyberspace Workforce Qualification and Management Program directive, designed for government employees occupying cyberspace work roles on DoD information systems. Its application to contractor personnel supporting a NAF merchant PCI compliance program — operating on commercial networks rather than DoD systems — is not explained. The agency&#x27;s own Q&amp;A answer hedges (&#x27;not explicitly stated&#x27;) but still imports the framework without articulating how it connects to the actual work scope.</div>
+</div><div class="evidence-item">
+  <blockquote>Section 6.9.2 also requires compliance with NIST SP 800-53, CISA directives, DoD 8500 series, and the DoD Risk Management Framework (RMF).</blockquote>
+  <div class="ev-explanation">This response stacks four distinct compliance frameworks (NIST SP 800-53, CISA directives, DoD 8500 series, and DoD RMF) alongside PCI DSS without differentiating their applicability or explaining how they interact with each other for this specific environment. DoD 8500 series documents (now largely superseded by DoDI 8500.01) govern information assurance for DoD information systems — but AFSVC NAF systems process commercial payment card data on commercial networks, creating genuine ambiguity about whether these DoD-specific information assurance mandates apply at all, or apply only in part.</div>
+</div><div class="evidence-item">
+  <blockquote>Should training materials align with DoD-specific frameworks (e.g., DoDM 8140.03)? SOO Section 6.7.1 requires contractor personnel to have certifications that align with DoDM 8140.03.</blockquote>
+  <div class="ev-explanation">The solicitation imports DoD workforce certification standards without explaining which specific work roles require which certification levels, or how DoDM 8140.03 — a framework for DoD civilian and military cyberspace positions — maps to contractor roles in a NAF PCI compliance support context. Vendors must interpret which roles require which certifications under a framework not designed for commercial contractor support of NAF merchant operations.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will handle CUI and require training per SOO 6.6.3... Tier 1 is sufficient, most of the work is unclassified (SOO 6.6.1). Refer to SOO 6.7.2.2...</blockquote>
+  <div class="ev-explanation">The solicitation invokes CUI handling requirements and Tier 1/3 personnel security standards without explaining the regulatory basis or which specific CUI categories apply to NAF payment card data environments. PCI DSS cardholder data is not inherently CUI under the federal CUI framework, yet the solicitation treats it as such without explanation. This creates compliance ambiguity: vendors must determine whether they are subject to NARA CUI requirements, DoD CUI implementation guidance, or some NAF-specific interpretation — a non-trivial interpretive burden with no curating guidance provided.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate square-peg concern. The FFP structure is understandable for a PCI compliance support engagement where deliverables are defined in principle (gap analysis report, tool deployment, sustainment support) and the government wants cost certainty. FFP is not inherently wrong here. However, several compounding factors weaken the fit. First, Phase 1 is essentially a discovery exercise — its outputs define the scope of Phases 2–4. Pricing all phases as FFP before Phase 1 is complete forces vendors to price work they cannot reliably scope, which drives either risk-padding or future modifications. Second, the government&#x27;s own Q&amp;A openly questions whether FFP is appropriate and invites industry input, which is an unusual concession that signals the contracting office has not resolved this question. Third, the combination of a firm August 2026 deadline with an uncertain contract start date and undefined Phase 2 scope creates the classic FFP failure condition: fixed price, fixed deadline, undefined scope. Fourth, the sustainment phase (Phase 3) involves 24/7 support services with flexible surge capacity for incidents and assessments — a labor-intensive, variable-demand service that is typically better priced as T&amp;M or labor-hour to avoid the government either overpaying for unused surge capacity built into a fixed price or underpaying and then needing modifications. The severity is 2 rather than 3 because: the government is breaking the work into phases and CLINs, which provides some scope granularity; Phase 1 is a relatively bounded gap analysis deliverable that can be priced as FFP; the government&#x27;s openness to suggestions indicates awareness of the issue; and the overall framework of a defined compliance program with known industry benchmarks does provide some basis for estimation. A more precise structure — FFP for Phase 1, with T&amp;M or labor-hour for Phase 3 sustainment and conditional pricing mechanisms for Phases 2 and 4 contingent on Phase 1 results — would better match this requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The NAFI will award one (1) Firm Fixed Price (if applicable) contract.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly designates a Firm-Fixed Price (FFP) contract structure. The parenthetical &#x27;if applicable&#x27; is unexplained and does not change the stated intent.</div>
+</div><div class="evidence-item">
+  <blockquote>This is a competitive Lowest Price Technically Acceptable (LPTA) Request for Quote (RFQ) in which price is considered the most important factor for Contractors deemed technically acceptable. This is a Firm-Fixed Price Contract, however, if there are areas of this requirement where FFP is not beneficial to the Government we are open to any suggestions from the industry.</blockquote>
+  <div class="ev-explanation">The government itself acknowledges uncertainty about whether FFP is the right vehicle, inviting offerors to suggest alternatives. This is a telling admission: when the contracting office is unsure whether FFP is appropriate at the solicitation stage, that is a signal the contract type has not been adequately matched to the requirements.</div>
+</div><div class="evidence-item">
+  <blockquote>The quantity information is expected to be determined during the Phase 1 Gap Analysis. There are 938 PCI network sites scanned... Phase 1 gap analysis will be required to conduct a thorough gap analysis, which could include up to 5 site visits dependent upon solutioning ability via central data.</blockquote>
+  <div class="ev-explanation">Key scope parameters — number of sites requiring hands-on support, exact tool requirements, and the full architecture — are not known at time of award. Under FFP, vendors must price an unknown scope, which typically results in either inflated bids to cover risk or underbids that lead to disputes and modifications.</div>
+</div><div class="evidence-item">
+  <blockquote>Phases 2 and 4 are at the AFSVC&#x27;s discretion based on Phase 1 results... provide pricing estimate based on industry expertise.</blockquote>
+  <div class="ev-explanation">Two of the four phases are contingent on Phase 1 findings that do not yet exist. Asking offerors to price contingent phases under FFP — based solely on &#x27;industry expertise&#x27; without defined scope — is structurally incompatible with FFP, which requires well-defined requirements. These phases are better suited to T&amp;M or cost-reimbursable pricing until Phase 1 produces a defined scope.</div>
+</div><div class="evidence-item">
+  <blockquote>It is a firm date regardless of when award is made in order to attain a successful PCI Report on Compliance (ROC) in September 2026, unless the QSA deems a remediation plan is acceptable for a ROC with conditions... The Government cannot guarantee a specific start date but within 90 days of RFQ closing.</blockquote>
+  <div class="ev-explanation">The government imposes a firm August 2026 completion milestone for Phase 2 but cannot guarantee a contract start date. Combined with an undefined scope from Phase 1, a fixed-price vendor facing a hard deadline and unknown scope is likely to encounter cost overruns or scope disputes, precisely the failure mode FFP is supposed to prevent but instead creates when scope is uncertain.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATCH 03 Special Provisions 8 Apr 2026.pdf">ATCH 03 Special Provisions 8 Apr 2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0cd8775a75f341f2823f3703a952ae1b_ATCH+03+Special+Provisions+8+Apr+2026.pdf" download="ATCH 03 Special Provisions 8 Apr 2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATCH 09 Reps and Certs 8 Apr 2026.pdf">ATCH 09 Reps and Certs 8 Apr 2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0cd8775a75f341f2823f3703a952ae1b_ATCH+09+Reps+and+Certs+8+Apr+2026.pdf" download="ATCH 09 Reps and Certs 8 Apr 2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATCH 13 RFI Q_A 17 Mar 2026.pdf">ATCH 13 RFI Q_A 17 Mar 2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0cd8775a75f341f2823f3703a952ae1b_ATCH+13+RFI+Q_A+17+Mar+2026.pdf" download="ATCH 13 RFI Q_A 17 Mar 2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="ATCH 14 Pre-Solicitation Notification Q_A 19 Mar 2026.pdf">ATCH 14 Pre-Solicitation Notification Q_A 19 Mar 2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0cd8775a75f341f2823f3703a952ae1b_ATCH+14+Pre-Solicitation+Notification+Q_A+19+Mar+2026.pdf" download="ATCH 14 Pre-Solicitation Notification Q_A 19 Mar 2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="RFQ Q_A 20 Apr 2026.pdf">RFQ Q_A 20 Apr 2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/0cd8775a75f341f2823f3703a952ae1b_RFQ+Q_A+20+Apr+2026.pdf" download="RFQ Q_A 20 Apr 2026.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

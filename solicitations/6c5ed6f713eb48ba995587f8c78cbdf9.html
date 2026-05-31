@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microsoft Academic M365 A5 Software — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Microsoft Academic M365 A5 Software</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 6c5ed6f713eb48ba995587f8c78cbdf9</span>
+      <a class="sam-link" href="https://sam.gov/opp/6c5ed6f713eb48ba995587f8c78cbdf9/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-07</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-07</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward commercial supply acquisition for Microsoft 365 A5 software licenses — a commodity purchase, not a complex services contract. The document is essentially a purchase order wrapper with standard FAR commercial-item clauses. There is virtually no QA or accountability structure to analyze for this sin: no status reports, no meeting cadences, no surveillance plans, no prescribed deliverable formats, and no process compliance requirements. The single inspection clause delegates responsibility to the supplier without imposing procedural burdens. The one performance-adjacent requirement — delivery and operational status by May 30, 2026 — is a simple outcome milestone rather than a compliance mechanism. Because this is a software license procurement rather than a services contract, the absence of elaborate QA machinery is entirely appropriate. The sin of compliance-over-outcomes typically manifests in complex IT services solicitations with waterfall-era reporting requirements; it simply does not apply in a meaningful way to a commodity license buy of this type. Severity is 1 — minimal — because there is no compliance-theater structure present. The solicitation lacks outcome metrics beyond the delivery date, but that absence is appropriate given the nature of the acquisition rather than a structural failure.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>FOB Destination applies. Responsibility and Inspection: unless otherwise specified in the order, the supplier is responsible for the performance of all inspection requirements and quality control.</blockquote>
+  <div class="ev-explanation">This is the entirety of the QA language in the solicitation. It delegates inspection responsibility to the supplier but imposes no process compliance burden — no required reports, no prescribed formats, no surveillance cadence. It is minimal but outcome-neutral rather than compliance-theater.</div>
+</div><div class="evidence-item">
+  <blockquote>The software licenses shall be delivered and operational by 30 May 2026.</blockquote>
+  <div class="ev-explanation">This is a simple delivery milestone — a binary outcome measure. It does not create a reporting or process compliance structure, and it focuses on the end state (operational licenses) rather than adherence to a process.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal evidence of insider rewards in the technical sense defined by Sin #4. The requirement is for a commercial software product — Microsoft 365 A5 Academic licenses — which is a commodity item available through multiple authorized resellers. The solicitation imposes no experience thresholds, no dollar-value past performance requirements, no federal-specific contract history mandates, and no institutional knowledge criteria. There are no evaluation criteria documents or key personnel qualifications that could function as incumbency filters. The FAR 52.212-2 evaluation framework referenced is standard for commercial items and does not appear to contain stacked insider-favoring criteria based on the available text.
+
+The solicitation does reference the current contract holder and frames the requirement as a renewal, which signals incumbency awareness. The five-day response window (posted May 7, deadline May 12) is extremely compressed and could practically favor the incumbent reseller who already knows the exact license counts and pricing — but that pattern is better analyzed under a different sin (e.g., artificial urgency or restricted competition) rather than as a structural experience requirement.
+
+The brand restriction to Microsoft Academic licenses is a product specification, not an experience requirement — any authorized Microsoft reseller can compete regardless of whether they have previously held this specific contract. The Total Small Business Set-Aside designation further signals an intent to open competition within the reseller market. There are no meaningful insider rewards mechanisms present in the solicitation text.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>only Microsoft Academic licenses meeting NDU&#x27;s requirements will be considered for award</blockquote>
+  <div class="ev-explanation">This language restricts award to Microsoft-branded Academic licenses specifically, but this reflects a brand/product requirement rather than an experience-based barrier to competition. Resellers and authorized Microsoft channel partners — including small businesses — can offer these exact licenses without having previously held this contract.</div>
+</div><div class="evidence-item">
+  <blockquote>NDU is currently utilizing Microsoft applications via the Enrollment for Educational Solutions Campus agreement. This agreement provides NDU with a managed capability via the service offerings from the current contract holder. As such, NDU is seeking to renew M365 A5 licenses that are already integrated with the student benefit capability...</blockquote>
+  <div class="ev-explanation">The description explicitly frames this as a renewal and references the &#x27;current contract holder,&#x27; signaling awareness of incumbency. However, the solicitation is set aside for small businesses and does not impose experience thresholds, federal contract history requirements, or past performance criteria that would structurally exclude a new reseller. Any authorized Microsoft reseller with SAM registration could theoretically respond.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward COTS software license procurement for renewal of Microsoft 365 A5 Academic licenses. The document is brief — a combined synopsis/solicitation with minimal technical requirements — and it does not exhibit the hallmarks of requirement sprawl. There are no bullet lists prescribing step-by-step vendor processes, no staffing structure mandates, no detailed workflow procedures, and no copy-pasted operational procedures from an incumbent contract. The solicitation defines WHAT is needed (a specific quantity of M365 A5 licenses, delivered and operational by a date certain) rather than HOW vendors must deliver it. The one potentially prescriptive element — naming Microsoft specifically — is justified by the legitimate interoperability context: NDU is renewing an existing campus agreement with an already-integrated ecosystem, making Microsoft Academic licenses a genuine technical constraint rather than arbitrary product preference. The solicitation is appropriately scoped for a commercial item procurement of this nature. Severity is assessed at 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>only Microsoft Academic licenses meeting NDU&#x27;s requirements will be considered for award</blockquote>
+  <div class="ev-explanation">This language specifies the brand/product by name, which could be construed as prescribing a specific tool. However, in context this is a COTS software renewal — NDU is already integrated into the Microsoft ecosystem via an Enrollment for Educational Solutions Campus agreement, making this a legitimate interoperability and continuity constraint rather than arbitrary sprawl. The government has a documented existing investment and integration dependency that justifies the brand specification.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a brief combined synopsis/solicitation for commercial software licenses (Microsoft 365 A5 Academic) issued under FAR Part 12 commercial items procedures. The regulatory citation landscape is exceptionally lean: four named FAR provisions (52.212-1 through 52.212-4), a reference to incorporating FAR/DFARS by reference, and SAM registration. There is no &#x27;Applicable Documents&#x27; section, no agency-specific policy list, no security compliance framework enumeration, and no bulk regulatory appendix. The solicitation explicitly notes it is for commercial supplies, which by design limits the regulatory apparatus. Even accounting for the two attachments referenced (only the combined synopsis text was available for analysis), the visible structure of this short-form solicitation shows no sign of rule pool accumulation. The compliance burden on a vendor reading this document is entirely legible: standard commercial item terms, SAM registration, and delivery by a fixed date. This is severity 1 — a well-contained regulatory footprint appropriate to the acquisition type and scope.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>This solicitation documents and incorporates provisions and clauses in effect through Federal Acquisition Circular, effective 03/16/2026. Defense Federal Acquisition Regulation Public Notice, effective 04/24/2026. It is the responsibility of the contractor to be familiar with the applicable clauses and provisions. The clauses may be accessed in full text at these addresses: https://www.acquisition.gov/browse/index/far &amp; https://www.acquisition.gov/dfars.</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR/DFARS by reference in the standard manner for commercial item acquisitions. This is normal federal contracting practice, not a rule pool. No agency-specific policy list is appended on top of these standard clauses.</div>
+</div><div class="evidence-item">
+  <blockquote>The provision at FAR 52.212-1 ... FAR 52.212-2 ... FAR 52.212-3 ... The clause at FAR 52.212-4 ... All clauses shall be incorporated by reference into the resultant purchase order to the maximum extent practicable.</blockquote>
+  <div class="ev-explanation">The solicitation cites exactly four FAR provisions by name, all of which are the standard commercial-items acquisition clauses. This is a minimal, focused set directly applicable to the acquisition type — the opposite of a rule pool.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a textbook appropriate use of firm-fixed-price contracting. The government is procuring a known quantity of commercial software licenses — Microsoft 365 A5 Academic — for a defined user population (NDU faculty, staff, and students). The scope is stable and well-defined: a renewal of existing licenses under a known agreement structure, for a commercial product with a publicly available pricing structure. There is no uncertainty about what is being purchased, no evolving requirements, no labor component with unpredictable hours, and no complex technical unknowns. FFP is exactly the right contract type here. The FAR explicitly contemplates FFP for commercial supplies, and this solicitation is structured under FAR Part 12 (commercial items acquisition), which is consistent with that approach. There is no indication that a different contract type would be preferable. Severity is 1 — the pricing structure is well-matched to the requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award a single firm-fixed-price contract and the subject synopsis solicitation posting for software licenses (required supplies described below).</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states a firm-fixed-price (FFP) contract type will be used for the procurement of Microsoft 365 A5 software licenses.</div>
+</div><div class="evidence-item">
+  <blockquote>National Defense University (NDU) located in Washington, D.C. requires the procurement of Microsoft 365 A5 software licenses currently utilized throughout National Defense University by faculty, staff and students.</blockquote>
+  <div class="ev-explanation">The requirement is for a known, commercially available software product with a defined quantity of licenses. This is precisely the kind of purchase for which FFP is appropriate — the scope is stable, the product is commercial and well-understood, and the cost can be estimated with confidence.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Microsoft M365 Combined Synopsis-Solicitation.pdf">Microsoft M365 Combined Synopsis-Solicitation.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6c5ed6f713eb48ba995587f8c78cbdf9_Microsoft+M365+Combined+Synopsis-Solicitation.pdf" download="Microsoft M365 Combined Synopsis-Solicitation.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0018926QD086.pdf">Solicitation - N0018926QD086.pdf</div></div>
+  <a class="dl-btn" href="../attachments/6c5ed6f713eb48ba995587f8c78cbdf9_Solicitation+-+N0018926QD086.pdf" download="Solicitation - N0018926QD086.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

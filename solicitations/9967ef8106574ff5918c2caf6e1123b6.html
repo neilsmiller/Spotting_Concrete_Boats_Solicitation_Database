@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDIC - Pure Storage Software Subscription -SUB — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>FDIC - Pure Storage Software Subscription -SUB</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 9967ef8106574ff5918c2caf6e1123b6</span>
+      <a class="sam-link" href="https://sam.gov/opp/9967ef8106574ff5918c2caf6e1123b6/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-04-27</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">FEDERAL DEPOSIT INSURANCE CORPORATION › FEDERAL DEPOSIT INSURANCE CORPORATION › _</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7A21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541519</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-27</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">3 years (June 11, 2026 - June 10, 2029), billed annually</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li><li>Technical Acceptability (pass/fail): Offeror must provide ALL items with matching Part Numbers in Section B - Price Schedule; Offeror must provide ALL required documents listed in FDIC Provision 7.3.2-09 General Proposal Instructions; Offeror must provide proof of being an Authorized Reseller/Partner of Pure Storage or be the Original Equipment Manufacturer (OEM)</li><li>Price (completeness and reasonableness)</li><li>Financial Capability (pass/fail)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a commercial product procurement — a renewal of Pure Storage Evergreen Gold subscriptions and associated hardware maintenance — not a services contract. The nature of the acquisition fundamentally limits the applicability of Sin #2. There is no Statement of Work or Performance Work Statement (Section C explicitly states &#x27;No attachments were added for this section&#x27;). The accountability structure consists of a standard 15-business-day acceptance window after delivery, an annual billing trigger, and a straightforward invoice content checklist. There are no reporting cadences, no required status reports, no mandated meetings, no process documentation requirements, and no QA surveillance plan. The LPTA evaluation criteria (Attachment M-1) measure technical acceptability purely through pass/fail verification that the vendor can supply the specific part numbers listed — this is appropriate for a defined-SKU commercial purchase. The one area that could theoretically raise concern is the invoice content clause (7.5.13-13), which requires detailed invoice elements including a signed certification statement — but this is standard financial accountability for payment processing, not compliance theater substituting for outcome measurement. For a software subscription renewal where &#x27;success&#x27; is simply that the licenses are active and support is available for the specified serial numbers, the absence of elaborate QA machinery is a feature, not a deficiency. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.6.4-01 - Inspection and Acceptance - July 2008
+(a) All goods and services shall be subject to inspection and test by the FDIC Oversight Manager, to the extent practicable, at all times and places during the term of the award.
+(b) The FDIC shall have 15 business days from the date of Contractor&#x27;s delivery to determine if such goods and services are in compliance with the requirements of the contract.</blockquote>
+  <div class="ev-explanation">The acceptance clause focuses on delivery conformance — whether the goods and services match contract requirements — which is reasonable deliverable-acceptance testing for a subscription/maintenance procurement. There is no prescribed reporting cadence embedded here, and the 15-day window is a standard acceptance mechanism, not compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>7.3.2-01 - Description of Goods or Services - July 2008
+The FDIC is requesting proposals from offerors to perform the following activities: The purchase of Pure Storage software and related hardware maintenance.</blockquote>
+  <div class="ev-explanation">Section C, which would normally contain a Statement of Work or Performance Work Statement defining ongoing reporting and QA obligations, contains no attachments and only a single reference clause. The absence of any SOW means there are no prescribed reporting cadences, meeting frequencies, or process-compliance mandates — which is appropriate for a pure COTS subscription/maintenance renewal.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards problem rooted primarily in the brand-specific authorization requirement rather than experience thresholds or past performance criteria in the traditional sense. The acquisition is for a software subscription and maintenance renewal on an existing Pure Storage infrastructure with identified serial numbers — which structurally limits the universe of qualified bidders to Pure Storage authorized resellers. The LPTA evaluation method and the absence of past performance evaluation factors mean there are no stacked experience-threshold or lookback-window problems of the kind that would drive a severity-3 rating. The requirement that offerors prove Pure Storage partnership status is a necessary constraint for a branded product renewal, but it does concentrate the eligible vendor pool significantly. Any reseller currently holding Pure Storage authorization can compete on price, so this is not a completely closed competition — the FDIC is not requiring years of FDIC-specific experience or minimum contract dollar thresholds. However, the combination of brand authorization requirement, specific serial number familiarity, and the practical reality that Pure Storage&#x27;s partner ecosystem for a customer of this size is limited means the playing field is tilted toward whoever currently holds the maintenance relationship. This warrants a severity 2: competition is narrowed but not foreclosed, and the brand-authorization requirement has a reasonable justification (ensuring the vendor can actually deliver authorized support and software entitlements from Pure Storage directly). A qualified reseller new to this account could realistically obtain Pure Storage partner status and compete, though the practical barriers to doing so within a 10-day response window are meaningful.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offeror must provide proof of being an Authorized Reseller/Partner of Pure Storage or be the Original Equipment Manufacturer (OEM). Proof of status must be provided with the Offeror&#x27;s Quote. The CO may contact the manufacturer to confirm the Offeror&#x27;s reseller status.</blockquote>
+  <div class="ev-explanation">This requirement limits competition to vendors who have an established, formal partnership relationship with Pure Storage — a single, named manufacturer. A vendor cannot simply demonstrate capability to supply and support the products; they must hold an existing authorization credential from Pure Storage. While Pure Storage&#x27;s partner program is open to application, onboarding takes time, and established incumbents with existing authorizations have a structural advantage. More importantly, this requirement is product-brand-specific, not capability-specific. It does not test the vendor&#x27;s ability to deliver the service; it tests whether the vendor already has a relationship with one particular OEM.</div>
+</div><div class="evidence-item">
+  <blockquote>Offeror must provide ALL items with matching Part Numbers in Section B - Price Schedule.</blockquote>
+  <div class="ev-explanation">The pricing schedule lists dozens of line items tied to specific serial numbers of hardware already installed at FDIC facilities. These are not generic product types — they are specific units currently under a support contract. A vendor who has previously supported these units would have immediate familiarity with the installed base, the serial numbers, and the associated subscription tiers. A new vendor must independently research and confirm coverage for each identified unit. While the serial numbers are provided in the solicitation, this intimate knowledge of the existing infrastructure marginally advantages the incumbent or an authorized reseller currently servicing this account.</div>
+</div><div class="evidence-item">
+  <blockquote>Proof of active registration in SAM.gov (REQUIRED) ... Proof of partnership with Pure Storage (REQUIRED)</blockquote>
+  <div class="ev-explanation">The solicitation bundles SAM.gov registration (a standard administrative requirement) with proof of Pure Storage partnership as co-equal mandatory submission requirements. Vendors who are not current Pure Storage partners — even if technically qualified to resell and support the products — are disqualified at the threshold. This functions as an incumbency filter because the vendor most likely to hold current Pure Storage partnership credentials for this specific customer account is the incumbent support provider or their authorized channel partner.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a commercial item procurement for Pure Storage software subscriptions and hardware maintenance renewals — effectively a reseller/OEM price competition for known, pre-identified equipment with serial numbers already specified. The nature of the acquisition makes requirement sprawl largely inapplicable in the traditional sense: there is no services-delivery approach to prescribe, no workflow to mandate, and no staffing structure to dictate.
+
+The Section C statement of work is a single sentence. The pricing schedule (Section B) is a detailed list of specific part numbers, serial numbers, and quantities tied to existing FDIC infrastructure — this specificity is necessary and appropriate for a subscription renewal, not evidence of prescribing how a vendor should work. The LPTA evaluation criteria contain only two technical gates: matching part numbers and authorized reseller status, both of which are reasonable constraints for procuring OEM software subscriptions.
+
+The contract clauses (insurance, invoicing, data security, EULA terms) are standard administrative and legal requirements, not operational process mandates on the vendor.
+
+There is simply no Statement of Work or Performance Work Statement here that could exhibit the step-by-step process prescription that characterizes genuine requirement sprawl. The severity is 1 — minimal — not because the solicitation is particularly well-crafted, but because the acquisition type (commercial product renewal) does not generate the conditions where this sin typically manifests. The document is appropriately scoped for what it is procuring.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The purchase of Pure Storage software and related hardware maintenance.</blockquote>
+  <div class="ev-explanation">Section C&#x27;s entire statement of work is this single sentence. The solicitation defines WHAT is being purchased (specific Pure Storage subscription SKUs tied to identified serial numbers) without prescribing HOW the vendor must deliver or support the product. There is no process dictation here — only a product acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>Offeror must provide ALL items with matching Part Numbers in Section B - Price Schedule... Offeror must provide proof of being an Authorized Reseller/Partner of Pure Storage or be the Original Equipment Manufacturer (OEM).</blockquote>
+  <div class="ev-explanation">These are the two substantive technical requirements in the LPTA evaluation criteria. Requiring matching part numbers and authorized reseller status are legitimate constraints for a commercial item procurement of a sole-source product ecosystem — not sprawl. They define who can supply the specific goods, not how the vendor must perform work.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics, driven primarily by two structural factors. First, Section C — the Work Statement — is entirely empty, meaning the entire regulatory apparatus of the contract exists without any anchoring to described work. This makes it impossible for a vendor to assess which compliance requirements are operationally relevant versus boilerplate. Second, the contract clause list in Section I runs to approximately 35+ referenced provisions incorporating FDIC&#x27;s full standard contract library, applied wholesale to a commercial software subscription renewal covering named Pure Storage hardware at specific FDIC facilities. Some inclusions are plainly appropriate: information security clauses (7.4.2-02, 7.4.2-05), SAM registration, EFT payment, and data rights provisions all make sense for an IT procurement. But the library also carries along boilerplate with questionable fit: $5M bodily injury insurance, the Presidential $1 Coin Act, automobile liability coverage, and detailed Section 889 telecommunications representations that require vendor effort to parse for a storage array subscription. Critically, no clause is introduced with any explanation of its applicability to this specific work. The solicitation does not rise to severity 3 because: (a) there are no direct contradictions between cited policies and the solicitation&#x27;s stated purpose; (b) the regulatory list, while long, is drawn from a coherent FDIC contract template rather than an ad hoc accumulation; (c) the core commercial supplier agreement terms clause (7.3.2-78) is thoughtfully written and provides substantive guidance; and (d) the evaluation criteria section (Section M) is unusually clear and focused. The rule pool here is a symptom of template application rather than deliberate regulatory dumping, which is characteristic of moderate rather than severe findings.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>7.3.2-32 | Compliance with Presidential $1 Coin Act of 2005 | July 2008
+7.3.2-35 | Calendar Days | July 2008
+7.3.2-40 | Change in Physical Location | July 2008
+7.3.2-42 | Contractor Personnel | July 2008</blockquote>
+  <div class="ev-explanation">These clauses, incorporated by reference in Section I, are standard FDIC boilerplate carryovers with marginal relevance to a straightforward commercial software subscription and hardware maintenance renewal. The Presidential $1 Coin Act compliance clause in particular has no discernible connection to purchasing Pure Storage storage array subscriptions.</div>
+</div><div class="evidence-item">
+  <blockquote>7.5.8-01 - Liability Insurance... (a) Worker&#x27;s Compensation and Employer&#x27;s Liability Insurance... (b) Comprehensive Bodily Injury and Property Damage Liability Insurance... with Bodily Injury (including death) and Property Damage limits of not less than Five Million Dollars ($5,000,000) per occurrence combined single limit... (c) Automobile Public Liability and Property Damage Insurance...</blockquote>
+  <div class="ev-explanation">Full commercial general liability and automobile insurance requirements at $5M per occurrence are cited for what is fundamentally a software subscription renewal with serial-numbered existing hardware. The contractor will not be performing on-site physical construction or operations at scale that would justify bodily injury and automobile liability insurance at these limits. These appear to be standard contract templates applied without review of whether they are proportionate to the scope.</div>
+</div><div class="evidence-item">
+  <blockquote>7.1.2-01 | Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab and Other Covered Entities | September 2020
+7.1.2-02 | Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment | April 2021</blockquote>
+  <div class="ev-explanation">While the Kaspersky prohibition is defensible for any IT acquisition, the telecommunications and video surveillance equipment prohibition (Section 889 / NDAA FY2019) is incorporated in full text and requires detailed representation and disclosure procedures for a Pure Storage storage array subscription. There is no indication that Pure Storage products implicate covered telecommunications equipment, making this a boilerplate addition that requires vendor effort to parse and certify without apparent applicability.</div>
+</div><div class="evidence-item">
+  <blockquote>Section C - Description/Specifications/Work Statement PAGE 19 OF 60
+Section C - Description/Specifications/Work Statement
+No attachments were added for this section.
+Clauses Incorporated By Reference
+Full Text Clauses
+No full text clauses were found for this section.</blockquote>
+  <div class="ev-explanation">The entire work statement section is empty — there are no specifications, no statement of work, and no attached PWS or SOW. This means all the regulatory and contractual clauses in Sections H, I, K, and L exist without any corresponding explanation of how they apply to the specific work. The absence of a work statement amplifies the rule pool problem: vendors cannot map any of the cited clauses to actual performance requirements because the performance requirements are not articulated.</div>
+</div><div class="evidence-item">
+  <blockquote>Section I lists approximately 35+ clauses by reference including: 7.3.2-58 Limitation on Payments to Influence Certain Federal Transactions, 7.3.2-60 Anti-Kickback Procedures, 7.3.2-63 Affirmative Action for Workers with Disabilities, 7.3.2-64 Affirmative Action for Special Disabled Veterans and Vietnam Era Veterans, 7.3.2-65 Employment Reports on Special Disabled Veterans and Vietnam Era Veterans, 7.5.4-05 Patent Rights, 7.5.4-06 FDIC Rights in Data - General, 7.5.4-09 Commercial Computer Software - Restricted Rights</blockquote>
+  <div class="ev-explanation">A cluster of employment-related affirmative action reporting requirements and patent/data rights clauses are applied to a commercial software subscription from a named OEM reseller. Patent rights acquisition clauses and employment reporting requirements for disabled veterans are standard FAR-analog carryovers that appear to be applied wholesale without review of whether they are substantively triggered by this procurement type. The cumulative effect is a list of 35+ referenced clauses presented without any prioritization or explanation of which ones carry actual compliance weight for this specific subscription purchase.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a renewal of Pure Storage Evergreen Gold software subscriptions and associated hardware maintenance fees for a fleet of identified appliances (with serial numbers listed). The requirements are fully defined: specific manufacturer part numbers, specific hardware units, specific quantities, and a fixed 3-year period of performance billed annually. There is no ambiguity in scope, no variable labor content, no research or development component, and no uncertainty in what will be delivered. Firm-Fixed-Price is the correct and standard contract type for commercial software subscription and maintenance renewals of this kind. The vendor knows exactly what they are quoting — a reseller authorization letter is even required to confirm they can sell these specific Pure Storage products. There is no mismatch between the FFP structure and the nature of the requirement. A T&amp;M or cost-reimbursement approach would be inappropriate here. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>For Firm-Fixed-Price, Contractor must submit invoice upon completion of the service or delivery of the goods. Billing shall occur no earlier than the start of year (annual billing) for the goods/services listed in Section B.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly identifies the contract type as Firm-Fixed-Price. This is consistent with the nature of the requirement: a commercial software subscription and maintenance renewal for existing Pure Storage hardware.</div>
+</div><div class="evidence-item">
+  <blockquote>Pure Storage Evergreen Gold Subscription - extended service agreement - 1M ... FA-m50R2-40TB,1MO,ADV,GOLD ... Qty: 12 ... 6/11/2026 - 6/10/2027</blockquote>
+  <div class="ev-explanation">The line items are defined subscription products with known part numbers, specific hardware serial numbers, fixed quantities, and defined periods of performance. The scope is fully determined — there is no ambiguity about what is being purchased or how much it will cost to deliver.</div>
+</div><div class="evidence-item">
+  <blockquote>Offeror must provide ALL items with matching Part Numbers in Section B - Price Schedule. Offeror must provide proof of being an Authorized Reseller/Partner of Pure Storage or be the Original Equipment Manufacturer (OEM).</blockquote>
+  <div class="ev-explanation">The evaluation criteria confirm this is a straightforward commercial product procurement. Part numbers are pre-specified, the manufacturer is identified, and reseller authorization is a pass/fail gate. This is a textbook scenario for FFP: commercial off-the-shelf subscriptions with known pricing.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CORHQ-26-Q-0132-P00001 %28FINAL%29.pdf">CORHQ-26-Q-0132-P00001 %28FINAL%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9967ef8106574ff5918c2caf6e1123b6_CORHQ-26-Q-0132-P00001+%28FINAL%29.pdf" download="CORHQ-26-Q-0132-P00001 %28FINAL%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CORHQ-26-Q-0132_FDIC PURE STORAGE RFQ_v41626.pdf">CORHQ-26-Q-0132_FDIC PURE STORAGE RFQ_v41626.pdf</div></div>
+  <a class="dl-btn" href="../attachments/9967ef8106574ff5918c2caf6e1123b6_CORHQ-26-Q-0132_FDIC+PURE+STORAGE+RFQ_v41626.pdf" download="CORHQ-26-Q-0132_FDIC PURE STORAGE RFQ_v41626.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="REVISED SECTION B _AMENDMENT 1_PRICING WORKSHEET %28FINAL Amend 1%29.xls">REVISED SECTION B _AMENDMENT 1_PRICING WORKSHEET %28FINAL Amend 1%29.xls</div></div>
+  <a class="dl-btn" href="../attachments/9967ef8106574ff5918c2caf6e1123b6_REVISED+SECTION+B+_AMENDMENT+1_PRICING+WORKSHEET+%28FINAL+Amend+1%29.xls" download="REVISED SECTION B _AMENDMENT 1_PRICING WORKSHEET %28FINAL Amend 1%29.xls" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="SECTION B_PRICING WORKSHEET_OFFERORS SHALL USE_FINAL.xls">SECTION B_PRICING WORKSHEET_OFFERORS SHALL USE_FINAL.xls</div></div>
+  <a class="dl-btn" href="../attachments/9967ef8106574ff5918c2caf6e1123b6_SECTION+B_PRICING+WORKSHEET_OFFERORS+SHALL+USE_FINAL.xls" download="SECTION B_PRICING WORKSHEET_OFFERORS SHALL USE_FINAL.xls" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

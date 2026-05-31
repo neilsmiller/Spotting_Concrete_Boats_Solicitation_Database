@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commercial Data Pilot (CDP) Program – Wildfire Imagery Pilot Study — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Commercial Data Pilot (CDP) Program – Wildfire Imagery Pilot Study</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 82be4526da0a42398a7f8a7113c554c3</span>
+      <a class="sam-link" href="https://sam.gov/opp/82be4526da0a42398a7f8a7113c554c3/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-24</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">COMMERCE, DEPARTMENT OF › NATIONAL OCEANIC AND ATMOSPHERIC ADMINISTRATION › DEPT OF COMMERCE NOAA</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DF10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">518210</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-24</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm-Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">June 1, 2026 through April 1, 2027 (1 month preparation + 6 months data delivery + 3 months evaluation)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Technical Capability</li><li>Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes dysfunction. The accountability structure is dominated by quantitative performance metrics: spatial resolution thresholds (200m/50m), geolocation accuracy tied to resolution, latency thresholds (3 hours/60 minutes), and an 80% availability floor. These are measurable outcome standards that directly test whether the data is operationally useful for wildfire detection — not whether the contractor followed a plan.
+
+The solicitation&#x27;s reporting requirements are notably light. There are no weekly status reports, no prescribed report formats with enumerated sections, no meeting cadences (aside from a single post-award kickoff), and no plan-adherence tracking. The documentation requirements (ATBDs, calibration reports, user guides) are substantively functional — they enable NOAA to validate data quality and conduct independent calibration/validation — rather than bureaucratic compliance artifacts.
+
+The three-phase structure (Preparation, Data Delivery, Evaluation) creates natural milestones, but the evaluation criteria are science-driven: NOAA will compare commercial data performance against ABI and VIIRS instruments, assess fire detection capability, and evaluate radiometric quality. This is outcome measurement.
+
+The one area that touches on process compliance is the requirement to document configuration changes within 24 hours and deliver files per NESDIS ICD protocols — but these are narrow, operationally justified requirements (configuration changes can corrupt data quality; ICD compliance enables secure ingest), not a pervasive compliance surveillance apparatus.
+
+Overall severity is 1. This is a well-constructed pilot solicitation that defines success in terms of data quality and operational utility, not paperwork compliance.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall provide all necessary technical documentation to support data understanding, usage, and validation. At a minimum, this shall include: Algorithm Theoretical Basis Documents (ATBDs)... Documentation and data files to support characterization, quality control, and calibration/validation activities... Pre-launch and on-orbit calibration reports. Documentation of quality control flags and calibration/validation indicators. User guides and detailed data specification documents.</blockquote>
+  <div class="ev-explanation">This is a documentation requirement, but it is substantively tied to enabling the Government to validate and use the data — it supports outcome evaluation (calibration/validation), not mere process compliance. These documents are functional prerequisites for NOAA to assess whether the data is scientifically useful.</div>
+</div><div class="evidence-item">
+  <blockquote>The product latency of multispectral radiometric observations delivered by the Contractor, when averaged over any continuous thirty-day period, shall meet or exceed the required latency as specified in Table 3... Threshold: 3 hours, Objective: 60 minutes</blockquote>
+  <div class="ev-explanation">This is a measurable performance metric with a specific numeric threshold. It is outcome-focused: it measures whether the data arrived in time to be operationally useful, not whether the contractor followed a delivery procedure.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall maintain at least 80% operational availability. This availability accounts for routine maintenance, calibration activities, and orbital dynamics, and ensures that the spacecraft are capable of supporting NOAA&#x27;s data acquisition needs.</blockquote>
+  <div class="ev-explanation">An 80% constellation-level availability threshold is a quantitative performance standard measuring actual operational outcomes, not process adherence.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful insider rewards characteristics. The evaluation framework has two factors — Technical Capability and Price — with no past performance factor at all. There are no requirements for prior federal contracts at specific dollar thresholds, no federal-specific experience mandates, and no short lookback windows that would filter out non-incumbents. The operationality requirement (&#x27;only offerors who have operational capabilities to provide data at the time this RFP is released will be considered&#x27;) is the only potential gatekeeping criterion, but it is a legitimate capability requirement: this is a data acquisition pilot that requires vendors to actually have functioning satellites. A vendor newly entering the federal market but possessing an operational multispectral satellite constellation could compete on equal terms with any incumbent. The evaluation approach emphasizes technical capability assessed through proposed specifications — spectral bands, spatial resolution, latency, data formats — which a new entrant with operational hardware could fully address. The small business set-aside further signals an intent to broaden competition rather than entrench an incumbent. The solicitation explicitly notes it is for a Pilot Study and that threshold/objective requirements &#x27;are not necessarily indicative of requirements that may be developed for future contracts,&#x27; which suggests no single vendor&#x27;s prior knowledge of NOAA&#x27;s operational systems would confer a decisive advantage. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Only offerors who have operational capabilities to provide data at the time this RFP is released will be considered for an award.</blockquote>
+  <div class="ev-explanation">This operationality requirement restricts competition to vendors with currently functioning satellite systems. However, this is a legitimate capability requirement, not an incumbency filter — it ensures the government receives actual data during the pilot period rather than funding a vendor to build their system. Any vendor with an operational constellation could compete, regardless of prior federal contracts.</div>
+</div><div class="evidence-item">
+  <blockquote>Offerors shall provide a statement affirming that the proposed capabilities are in a current operational state at the time the RFP was released.</blockquote>
+  <div class="ev-explanation">Similar to the above, this requires demonstrated current capability but does not reference prior contract history, dollar thresholds, or federal-specific experience. It is a reasonable confirmation of readiness for a time-sensitive pilot acquisition.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl — present and meaningful, but not pervasive. The core requirements — spectral bands, spatial resolution thresholds, latency SLAs, geolocation accuracy — are well-structured as outcome-based performance parameters with explicit threshold and objective values. This is commendable and represents genuine performance-based acquisition thinking. The solicitation is clearly a pilot study with exploratory intent, and NOAA&#x27;s use of threshold/objective framing actively invites vendors to exceed minimums rather than just comply. These are significant mitigating factors against a higher severity rating.
+
+However, the delivery requirements section (Section III) introduces a meaningful layer of process prescription. Vendors must conform to NCCF ICD for data ingest, specific file formats, ISO metadata schema standards, NESDIS naming conventions, and internal constellation management practices (synchronized calibration algorithms). The Phase 1 structure treats delivery architecture as something NOAA will dictate rather than something vendors propose. Cumulatively, these requirements constrain how vendors design the data pipeline from sensor to NOAA cloud — not just what data quality is required at delivery.
+
+Critically, many of these process requirements are partially justified: NCCF ICD integration is a genuine interoperability constraint for NOAA&#x27;s existing infrastructure; ISO metadata standards enable discoverability in NOAA&#x27;s data enterprise; HTTPS/SFTP requirements are security baselines. The question is whether alternatives are genuinely available or whether the exceptions are nominal. The solicitation does nominally permit alternative delivery methods, and vendors are invited to explain their approaches.
+
+The calibration synchronization requirements push the furthest into vendor internal operations — prescribing how commercial satellite operators must manage their own constellations rather than what data quality NOAA requires from the output. This is the clearest example of process-over-outcome drafting in the document.
+
+Overall: a well-structured solicitation for a pilot data acquisition that crosses into prescriptive territory primarily in its delivery infrastructure and constellation management requirements. Severity 2 is appropriate — vendors have real latitude to propose differentiated technical capabilities but face meaningful constraints on how they deliver data.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The data delivery process along with file naming conventions, data formats, and metadata formats shall follow standard NESDIS methods and protocols. The Contractor shall deliver all files for secure ingest to the NESDIS Common Cloud Framework (NCCF) in accordance with the NCCF Interface Control Document (ICD) or alternative secure ingest methods such as the NESDIS Innovation Hub cloud services.</blockquote>
+  <div class="ev-explanation">This prescribes a specific delivery mechanism (NCCF ICD) and infrastructure rather than defining what the outcome of successful delivery looks like. While an alternative is nominally permitted, the requirement anchors vendors to NOAA&#x27;s internal system architecture, constraining how vendors design their data pipeline. A vendor with a more efficient delivery approach cannot propose it without first justifying deviation from the government&#x27;s specified system.</div>
+</div><div class="evidence-item">
+  <blockquote>The data descriptor files shall conform to the International Organization for Standardization (ISO) 19115-1:2014 and applicable amendments (content) and ISO 19139-1:2019 and applicable amendments (XML schema) standards.</blockquote>
+  <div class="ev-explanation">This is a borderline item — ISO metadata standards are legitimate interoperability constraints. However, when combined with the NCCF ICD requirement, file naming conventions, format specifications (NetCDF, HDF5, or geotiff), and timestamp precision requirements (±1 second), the aggregate effect is a highly prescribed delivery workflow. Individually defensible requirements collectively remove vendor flexibility in how data is packaged and transferred.</div>
+</div><div class="evidence-item">
+  <blockquote>All satellite or instrument configuration changes that may impact the quality, calibration, or continuity of science data shall be documented in a change log. Notifications of such changes shall be provided to the designated Government point of contact within 24 hours.</blockquote>
+  <div class="ev-explanation">This prescribes a specific process (change log maintenance, 24-hour notification) rather than defining an outcome (e.g., data quality shall not degrade without adequate notice). The requirement dictates the administrative mechanism rather than the performance standard, though the 24-hour window does provide a measurable threshold.</div>
+</div><div class="evidence-item">
+  <blockquote>The Contractor shall ensure cross-platform data consistency across their constellation of commercial multispectral instruments. All instruments shall support &#x27;mix-and-match&#x27; interoperability, enabling seamless integration of radiance data regardless of satellite platform. All instruments must have consistent calibration algorithms and gain models post-launch, with updates synchronized across the constellation.</blockquote>
+  <div class="ev-explanation">This dictates internal technical architecture and operational processes — specifically how the vendor must manage calibration synchronization across their constellation. This goes beyond specifying what data quality NOAA needs and prescribes how the vendor must operate their satellite systems internally. A vendor using a different but equally valid approach to ensuring cross-constellation consistency (e.g., post-processing harmonization rather than synchronized algorithms) would be non-compliant regardless of whether their output meets NOAA&#x27;s actual needs.</div>
+</div><div class="evidence-item">
+  <blockquote>In this initial phase, the Contractor shall supply the necessary technical documentation which may include format specifications, calibration data, and any other information that will be needed to ingest and process the data. Delivery mechanisms and data handling processes will be communicated to the Contractor. The Contractor will provide engineering support as needed to the Government to enable the acquisition and processing of the supplied datasets.</blockquote>
+  <div class="ev-explanation">The Phase 1 description frames data delivery architecture as a government-directed process: delivery mechanisms will be &#x27;communicated to&#x27; the contractor rather than negotiated or proposed by the vendor. This approach treats the vendor as a data factory that must conform to NOAA&#x27;s internal processes, rather than as a commercial service provider who brings their own mature delivery infrastructure. The one-way communication framing limits the contractor&#x27;s ability to propose a superior delivery approach.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit a severe rule-pool problem. It is a focused, technically coherent pilot study RFP with a clear purpose — acquiring commercial multispectral wildfire imagery — and most of its regulatory citations are at least plausibly relevant to that purpose. The SOW is well-organized, with defined threshold/objective requirements, specific data format standards, and a clear three-phase performance structure. The government has provided meaningful context in several places (e.g., explaining why VIIRS is the reference instrument, why ISO 19115 metadata standards apply, what the EESS frequency constraint is for).
+
+However, the solicitation shows moderate rule-pool characteristics in two areas. First, the security section applies a compliance framework (SP 800-53 high-impact baseline, with SCRA requirements designed for IT system acquisition) to what is operationally a commercial data-purchase arrangement. The solicitation does not explain why this level of security rigor applies to a vendor delivering processed radiance files to a NOAA cloud endpoint, nor does it differentiate between the seven cited frameworks or explain which ones govern as a baseline versus alternatives. Vendors new to NOAA would face meaningful interpretation burden. Second, the contract clauses section shows classic copy-forward accumulation — FAR 52.226-8 (text-messaging-while-driving) appears alongside substantive data-rights and security clauses with no differentiation — though this is common across federal contracting and is a minor concern here.
+
+The key mitigating factor is that this solicitation is relatively short (63 pages, 11-page SOW), does not have a dedicated &#x27;Applicable Documents&#x27; list of 20+ entries, and most cited standards receive at least brief contextual explanation. The compliance burden is elevated relative to the actual scope of work but does not rise to the level of an impenetrable wall. Severity 2 is appropriate: the security and SCRA framework citations are the primary concern, representing a mismatch between the compliance regime&#x27;s design purpose and this contract&#x27;s actual nature.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall comply with CAR 1352.239-72, section (i). The Contractor may request COR approval of alternate security accreditation methodologies for compliance with section (i) including: information security assessment methodology promulgated by the U.S Federal Government (specifically, National Institute of Standards and Technology (NIST) Special Publication (SP) 800-37, NIST SP 800-53, and NIST SP 800-171), or internationally recognized private industry information technology (IT) security frameworks (such as International Standards Organization (ISO)/International Electrotechnical Commission (IEC) 27033, 27001, 27006 and 27002, or Control Objectives for Information and Related Technology (COBIT)). The Contractor will provide an analysis for alternative methodologies compared to SP 800-53 high impact baseline identifying any gaps.</blockquote>
+  <div class="ev-explanation">The security section cites seven distinct frameworks (NIST SP 800-37, 800-53, 800-171, ISO/IEC 27033, 27001, 27006, 27002, and COBIT) without explaining which ones actually govern the work. The base requirement is CAR 1352.239-72(i), but the list of &#x27;alternatives&#x27; is broad and undifferentiated. Critically, applying an SP 800-53 high-impact baseline to a pilot study receiving commercially available satellite radiance data — essentially a data-purchase and delivery arrangement — appears disproportionate and is not explained. Vendors must independently determine which framework actually applies.</div>
+</div><div class="evidence-item">
+  <blockquote>Supply Chain Risk Assessment (SCRA) IAW Dept. of Commerce (DOC) Procurement Memorandum (PM) PM 2015-08 Supply Chain Risk Assessment (SCRA) Requirements for the Acquisition of Moderate-Impact and High-Impact Information Systems Section 5... conforms with DOC&#x27;s Commerce Information Technology Requirement (CITR) CITR0231 Pre-Acquisition Supply Chain Risk Management Assessment requirements.</blockquote>
+  <div class="ev-explanation">The SCRA section chains together multiple policy instruments (PM 2015-08, Section 515 of a 2015 Continuing Appropriations Act, CITR0231) without explaining how a commercial satellite imagery pilot — where the deliverable is processed radiance data pushed to a government cloud — constitutes the acquisition of a &#x27;moderate-impact or high-impact information system.&#x27; The solicitation applies a framework designed for IT system procurement to what is functionally a commercial data purchase contract, without contextualizing the distinction.</div>
+</div><div class="evidence-item">
+  <blockquote>The data descriptor files shall conform to the International Organization for Standardization (ISO) 19115-1:2014 and applicable amendments (content) and ISO 19139-1:2019 and applicable amendments (XML schema) standards. Data shall be provided only from instruments on satellites with an assigned World Meteorological Organization (WMO) satellite identifier or a unique, internationally recognized identifier such as the COSPAR ID. The data delivery process shall follow NOAA security requirements (see Section VI. SECURITY REQUIREMENTS). Spectral acquisitions must remain within the Earth exploration satellite service (EESS) allocations, as specified in the FCC Online Table of Frequency Allocations.</blockquote>
+  <div class="ev-explanation">Section III clusters four distinct standards bodies (ISO, WMO, COSPAR, FCC EESS) across consecutive delivery requirements without explaining how compliance with each will be verified or what happens if a vendor&#x27;s satellite identifier type is COSPAR but not WMO. The ISO metadata standards are plausibly relevant and explained by context; the FCC frequency allocation requirement is legitimate but cited with no guidance on how a vendor demonstrates compliance in a proposal. These are not unreasonable individually but are presented as a flat list without differentiation or prioritization.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.202-1 Definitions. (JUN 2020) / FAR 52.203-5 Covenant Against Contingent Fees. (MAY 2014) / FAR 52.203-7 Anti-Kickback Procedures. (JUN 2020) / FAR 52.203-12 Limitation on Payments to Influence Certain Federal Transactions. (JUN 2020) / FAR 52.203-17 Contractor Employee Whistleblower Rights. (NOV 2023) / FAR 52.204-19 Incorporation by Reference... / FAR 52.226-8 Encouraging Contractor Policies To Ban Text Messaging While Driving. (MAY 2024) / FAR 52.227-14 Rights in Data-General. (MAY 2014) - Alternate II (DEC 2007)</blockquote>
+  <div class="ev-explanation">The contract clauses section reproduces a list of FAR clauses in full or by reference without organizing them by relevance or function. FAR 52.226-8 (ban text messaging while driving) is a standard clause but has no conceivable operational relevance to a remote satellite data delivery pilot and illustrates the copy-forward nature of the list. Standard FAR incorporation by reference is normal, but the unreduced inclusion of clauses like this one alongside substantive data-rights provisions signals an uncurated approach.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a well-matched contract type for the requirements. NOAA is purchasing a defined commercial data product — satellite multispectral imagery — from vendors who already operate commercial constellations. The deliverable is well-specified: particular data levels (L1B, L1C), particular spectral bands, spatial resolution thresholds, latency targets, and availability metrics. The geographic scope is defined (two ROI size options), the performance period is fixed (10 months total), and the pricing schedule is structured by phase with clear deliverables per phase. This is precisely the situation where FFP works: a commercial product with known characteristics, objectively measurable performance criteria, and a stable (if bounded) scope. The pilot nature of the study does introduce some uncertainty — ROI locations are not finalized until post-award, and there is flexibility in exactly when the data delivery window starts — but NOAA has handled this appropriately by defining the uncertainty boundaries rather than leaving scope completely open. The 80% availability threshold, the threshold/objective requirement structure, and the two ROI pricing options all show deliberate design to let vendors price risk accurately. There is no indication that labor hours are the primary driver of cost (which would suggest T&amp;M), nor that technical uncertainty is so profound that cost reimbursement would be required. The FFP structure also aligns with the commercial nature of the acquisition (FAR Part 12) and the small business set-aside, where FFP is standard. The government is buying data, not buying hours of satellite engineers&#x27; time. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government intends to award one or more FIRM-FIXED PRICE (FFP) contracts.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type will be Firm-Fixed Price. This is the starting point for the analysis.</div>
+</div><div class="evidence-item">
+  <blockquote>Phase 1: Preparation - 1 month... Phase 2: Data Delivery - 6 months... Phase 3: Evaluation - 3 months</blockquote>
+  <div class="ev-explanation">The contract is structured into three discrete, time-bounded phases with clear deliverables: technical documentation and sample data in Phase 1, continuous data delivery over 6 months in Phase 2, and limited reachback support in Phase 3. The bounded phases support a fixed-price approach.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall deliver at least 80% of the constellation-level data (full-swath data) over a 3-9 month period during peak wildfire season (June - November), when any part of the full satellite swath intersects a predefined region of interest... The contractor may provide two pricing options: one for a region of interest that is 1900 km in the north/south direction and 1000 km in the east/west direction, and another for a 950 km (N/S) x 500 km (E/W) region.</blockquote>
+  <div class="ev-explanation">The data delivery requirement is quantified — 80% availability, defined geographic regions, defined spectral and spatial resolution thresholds. Two ROI sizing options with corresponding pricing allow vendors to scope their bids. This measurability supports fixed pricing.</div>
+</div><div class="evidence-item">
+  <blockquote>Horizontal Spatial Resolution (at nadir): Threshold: 200 m, Objective: 50 m; Geolocation Accuracy: Threshold: 100% of Horizontal spatial resolution, Objective: 50% of Horizontal spatial resolution; L1B product Latency: Threshold: 3 hours, Objective: 60 minutes</blockquote>
+  <div class="ev-explanation">Performance thresholds are quantitative and objectively verifiable. This is exactly the kind of clear, measurable specification that makes FFP appropriate — vendors can price to meet the threshold, and performance is binary enough to allow acceptance or rejection.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="1332KP26R0016 A0001.pdf">1332KP26R0016 A0001.pdf</div></div>
+  <a class="dl-btn" href="../attachments/82be4526da0a42398a7f8a7113c554c3_1332KP26R0016+A0001.pdf" download="1332KP26R0016 A0001.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment 2_Price Schedule WF Imagery 4-7-26.xlsx">Attachment 2_Price Schedule WF Imagery 4-7-26.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/82be4526da0a42398a7f8a7113c554c3_Attachment+2_Price+Schedule+WF+Imagery+4-7-26.xlsx" download="Attachment 2_Price Schedule WF Imagery 4-7-26.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Sol_1332KP26R0016.pdf">Sol_1332KP26R0016.pdf</div></div>
+  <a class="dl-btn" href="../attachments/82be4526da0a42398a7f8a7113c554c3_Sol_1332KP26R0016.pdf" download="Sol_1332KP26R0016.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="WF Imagery RFP - Questions Answered.pdf">WF Imagery RFP - Questions Answered.pdf</div></div>
+  <a class="dl-btn" href="../attachments/82be4526da0a42398a7f8a7113c554c3_WF+Imagery+RFP+-+Questions+Answered.pdf" download="WF Imagery RFP - Questions Answered.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Wildfire Imagery Pilot - Statement of Work 20260401.pdf">Wildfire Imagery Pilot - Statement of Work 20260401.pdf</div></div>
+  <a class="dl-btn" href="../attachments/82be4526da0a42398a7f8a7113c554c3_Wildfire+Imagery+Pilot+-+Statement+of+Work+20260401.pdf" download="Wildfire Imagery Pilot - Statement of Work 20260401.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

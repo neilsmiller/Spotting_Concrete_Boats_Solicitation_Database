@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DM Local Telecommunication Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DM Local Telecommunication Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 c99c33c55ebd4cec9b1b074a13f2dbf1</span>
+      <a class="sam-link" href="https://sam.gov/opp/c99c33c55ebd4cec9b1b074a13f2dbf1/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE AIR FORCE › AIR COMBAT COMMAND › FA4877  355 CONS PK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DG01</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">517111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (12 months) + 4 option years (12 months each)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful compliance-over-outcomes dysfunction. The QA structure in the Services Summary table is organized around measurable outcomes: 99.9% availability for continuous service, and time-bound restoration targets (1-hour response, 8-hour emergency restore, 24-hour serious restore, 2-day routine restore) for each outage priority category. These are SLA-style metrics that ask &#x27;did the service work?&#x27; rather than &#x27;did the vendor submit the right paperwork?&#x27; The reporting requirements are minimal and largely on-demand: billing records and CSRs are provided upon COR request, not on mandatory recurring cadences. There is no weekly status report, no monthly progress report with prescribed sections, no required meetings, and no plan-adherence tracking. The cutover plan requirement (section 4.2) is a pre-performance deliverable for transition management — a legitimate and proportionate requirement for a telecom cutover of 11,200 DID numbers — not an ongoing compliance mechanism. The security requirements in section 4.5 are standard base-access administrative requirements applicable to any contractor on a military installation; they do not constitute QA surveillance of service delivery. The solicitation&#x27;s accountability structure is appropriately outcome-focused for a commoditized telecom service: availability and outage restoration are the right things to measure, and the PWS measures them directly. Severity is rated 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Performance Objective 1: Perform and provide local access at the designated circuit demarcation points identified in Appendix 1 to this PWS. | Performance Threshold: Continuous operation local phone service 24/7/365 with 99.9% availability</blockquote>
+  <div class="ev-explanation">This is a clear outcome metric — 99.9% availability — not a process compliance measure. The QA table anchors accountability to actual service delivery, not documentation of activities.</div>
+</div><div class="evidence-item">
+  <blockquote>Performance Objective 2: Notify the Government POC NLT 30 days in advance of scheduled outage providing a detailed explanation for the outage. | Performance Threshold: Timely and detailed notification provided 100% of the time</blockquote>
+  <div class="ev-explanation">While this is process-adjacent (it measures whether the contractor followed the notification procedure), it is a binary, verifiable action directly tied to service continuity outcomes. It is a reasonable adjunct to the availability SLA, not a displacement of it.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4. Monthly Billing. The contractor will provide, upon request by an authorized Government Contracting Officer Representative (COR), an electronic copy of the current and/or past months billing records for the period of performance of the contract.</blockquote>
+  <div class="ev-explanation">Billing record production is the only recurring documentation requirement, and it is triggered on-request rather than mandatorily submitted on a fixed schedule. This is far lighter than prescriptive monthly/weekly reporting regimes that characterize the sin.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation shows minimal evidence of insider rewards. The PWS is a straightforward SIP trunking services requirement at Davis-Monthan AFB with clear technical specifications. The only personnel experience requirement — three years of relevant experience for the contract manager — is reasonable and capability-focused, not a narrow federal-specific mandate with dollar thresholds or short lookback windows. There are no past performance scoring criteria with specific contract dollar thresholds, no requirements for prior federal government contracts in a narrow domain, and no institutional knowledge requirements that could only be satisfied by the incumbent. The Q&amp;A attachment confirms the incumbent is Lumen, but the solicitation does not structure its evaluation criteria to advantage Lumen. The technical requirements are defined in vendor-neutral terms: SIP trunking compatibility with government-provided Cisco SBCs (C8300s running IOS-XE 17.12.5) and CUCM v15. Any qualified CLEC or national SIP trunking provider could realistically assess and respond to these requirements. The cutover plan requirement (Initial Cutover Plan with quote, Final Cutover Plan within 10 working days of award) could theoretically advantage an incumbent with insider knowledge of the network topology, but the solicitation provides sufficient technical detail in Appendix 1 (building locations, DID ranges, equipment specifics) to allow any competent provider to develop a credible plan. The Q&amp;A further supplements this with specifics on concurrent call volumes (~200 peak), monthly minutes (~4.3M), and equipment configuration. The Women-Owned Small Business set-aside may be a more significant competitive constraint than any experience requirement, but that is a separate policy matter outside the scope of this analysis. Overall, a qualified SIP trunking provider that has never held this contract could realistically and meaningfully compete.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contract manager and alternate(s) contract manager will have a minimum of three years&#x27; experience in work related to that which is being performed.</blockquote>
+  <div class="ev-explanation">This is the only explicit experience requirement in the solicitation. It requires three years of relevant experience for the contract manager — a reasonable threshold for a telecommunications services role. It does not specify federal government experience, a dollar threshold, or a narrow contract type. A commercial telecom professional with three years of SIP trunking or local exchange experience would qualify.</div>
+</div><div class="evidence-item">
+  <blockquote>Appropriate personnel must possess the qualifications and certifications to perform the requirements listed herein. These qualifications and certifications must include those required by the Original Equipment Manufacturer (OEM) to maintain, install, and/or operate the equipment covered by this contract.</blockquote>
+  <div class="ev-explanation">OEM certification requirements are capability-based, not incumbency-based. Cisco certification for personnel working with Cisco SBCs and CUCM is a legitimate domain competency standard available to any qualified telecom contractor, not a proxy for having held this specific contract.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of requirement sprawl. The core service requirement — SIP trunking with defined availability (99.9% uptime, 24/7/365), specific DID counts, and compatibility with existing government infrastructure — is genuinely outcome-oriented and appropriately scoped for a straightforward telecommunications utility contract. The performance objectives table is a positive sign: it defines thresholds rather than processes.
+
+However, several sections cross from outcome definition into process prescription. The outage management framework is the most significant example: while SLA timeframes are legitimate outcome requirements, the PWS overlays a government-controlled categorization system where the POC can reclassify any outage at will, and it prescribes specific notification mechanics (email, 30-day advance notice, sequential approval) rather than simply requiring adequate notification and timely restoration. Similarly, the cutover plan requirements are more prescriptive than necessary — mandating specific document sections, suggesting specific charting tools, and requiring government pre-approval before any deviation from the finalized plan.
+
+The security requirements section (4.5) is long but largely reflects legitimate installation access and information security obligations (REAL ID, OPSEC, CUI handling, Privacy Act) that apply to any contractor operating on a military installation. These are constraints on the problem space, not the solution space. The employee roster requirement requiring SSN collection is a minor exception — it goes beyond what the security outcome requires.
+
+Critically, the solicitation does NOT mandate specific technologies beyond the SIP trunking requirement itself (which is the stated need, not a solution prescription), does not dictate headcount or staffing structures, and explicitly encourages &#x27;innovative technical solutions&#x27; in Appendix 1. The Q&amp;A responses also show the government appropriately answered questions about infrastructure constraints rather than locking vendors into a specific architecture.
+
+Overall: sprawl is present and real, concentrated in the outage management procedures and cutover plan requirements, but it does not dominate the document. Vendors have meaningful room to propose their own technical architecture, staffing model, and service delivery approach. Severity 2 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor must notify the Government POC of any scheduled outage that will affect any telecommunication service NLT 30 days prior to the scheduled outage. The contractor must provide a detailed explanation for the outage, to include the amount of downtime and end users affected. The contractor must notify the Government POC via email of the need for any scheduled service outages. Such outages must be scheduled to minimize inconvenience to users. The Government POC must release all affected equipment and circuits prior to any service disruption.</blockquote>
+  <div class="ev-explanation">This prescribes a specific notification channel (email), specific advance notice period (30 days), and a government approval step (POC release) before any outage. While advance notification is a legitimate outcome requirement, mandating the specific medium and process flow (email, 30-day window, sequential approval) goes beyond defining the outcome (adequate advance notice) and into dictating the exact process. A contractor with a sophisticated network operations center might have better notification systems or workflows.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must respond to the outage NLT one hour of receipt of notification by the Government POC. The contractor must restore service NLT eight hours from the time the contractor responds to the Government notification. [Emergency] / NLT 24 hours [Serious] / NLT two calendar days [Routine]</blockquote>
+  <div class="ev-explanation">Response and restoration SLAs are legitimate outcome requirements. However, the PWS layers on top of these SLAs a government-controlled categorization system where &#x27;The Government POC can declare any outage as a catastrophic/emergency/serious/routine outage&#x27; regardless of technical severity. This removes contractor discretion in prioritizing restorations and substitutes the Government POC&#x27;s judgment for the contractor&#x27;s operational expertise — effectively dictating the contractor&#x27;s internal incident management process rather than just defining acceptable outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor must develop and submit an Initial Cutover Plan to the Government with their technical quote. A Final Cutover Plan must be submitted NLT ten (10) working days after contract award. This plan must include installation of the initial required services for cutover of LTS requirements, along with the recommended time frame to complete each phase of the cutover process. The contractor must coordinate deviations from the finalized Cutover Plan with the Government POC prior to any work commencing in the affected area.</blockquote>
+  <div class="ev-explanation">Requiring a cutover plan is reasonable. However, requiring government pre-approval for any deviation from the finalized plan before work commences constrains the contractor&#x27;s ability to adapt operationally. In telecommunications provisioning, network conditions change; requiring advance government coordination for every deviation substitutes a bureaucratic approval process for the contractor&#x27;s professional judgment about how to execute the cutover.</div>
+</div><div class="evidence-item">
+  <blockquote>4.2.1. Cutover Plan Content. The Cutover Plan must contain, at a minimum, the following site-specific information: a) Overview/Scope of plan... b) A detailed Implementation Plan in working days... The use of a Gantt or Milestone chart to illustrate your plan is suggested. c) Conditions/Support required... d) A listing of Offeror responsibilities; e) A listing of proposed Government responsibilities; f) Key Departments essential to the Offeror&#x27;s Installation and Cutover Plan available to participate in routine progress meetings with the Government on a weekly or bi-weekly basis. g) Key POC List...</blockquote>
+  <div class="ev-explanation">Specifying the internal structure and content of the contractor&#x27;s own planning documents (suggesting Gantt charts, prescribing the specific sections, mandating weekly/bi-weekly meeting cadences) goes beyond defining what a successful cutover looks like and into dictating how the contractor must organize and present its internal project management approach. This is a mild but characteristic example of prescribing process over outcome.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will maintain a current listing of employees performing services on DMAFB. The list will include employee&#x27;s name (as shown on Driver&#x27;s License), social security number, driver&#x27;s license number, state of issue, date of birth, and country of citizenship. Managers, supervisors, and/or superintendents must be identified on the list of employees. The contractor will submit the list to the COR, prior to the contract start date, and submit an updated list when an employee&#x27;s status or information changes, within 5 working days of the change. The name of any contractor employee that is terminated during the contract must be reported to the Contracting Officer in writing within one workday of the employee&#x27;s termination.</blockquote>
+  <div class="ev-explanation">Base access and personnel tracking requirements on military installations are legitimate security constraints. However, the requirement to collect and report employees&#x27; Social Security numbers to the COR prescribes a specific data collection methodology that goes well beyond what is needed for base access (which is handled through the DBIDS/REAL ID system described elsewhere in the same PWS). This represents process-level specificity that constrains how the contractor manages its workforce administration rather than defining a security outcome.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics. The regulatory citation problem is real but not severe. On the positive side: the PWS is not structured around a dedicated &#x27;Applicable Documents&#x27; list — citations are integrated into substantive sections, which is better than a bulk appendix. The core technical requirements (SIP trunking, outage response tiers, DID provisioning) are clearly stated and do not suffer from regulatory confusion. The Q&amp;A document also demonstrates genuine government engagement with scope questions.
+
+However, several distinct rule pool patterns are present. First, the catch-all citation of &#x27;FCC, PUC, DoD, AF, and industry standards&#x27; with no specification is classic undifferentiated compliance burden — vendors must independently research which specific rules apply. Second, the citation of 29 CFR 1926.58 (asbestos construction safety) is a clear boilerplate carryover with no relevance to a SIP trunking services contract; this is the strongest indicator of copy-forward accumulation without review. Third, the security requirements section (4.5.4 through 4.5.25) cites 14 sub-sections and over a dozen regulatory frameworks in an undifferentiated cascade — DoD 5200.01&#x27;s four-volume classified information security series, FOIA program requirements, PII breach cost liability, OPSEC media restrictions, and Ready Reserve screening requirements — without distinguishing between requirements that apply to all contractor personnel versus only those with system access, or explaining why a commercial carrier installing telecom equipment must bear PII breach notification costs. The FOIA citation is particularly questionable as it applies to federal agencies&#x27; disclosure obligations, not commercial contractors.
+
+The severity is 2 rather than 3 because: there is no single overwhelming &#x27;applicable documents&#x27; list; most security requirements, while excessive in volume, are at least plausibly connected to base-access work on a military installation; there are no direct contradictions between cited regulations and the solicitation&#x27;s purpose (unlike the VA SMS example); and the overall document is 64 pages for a well-defined telecom services scope, not an incomprehensible regulatory maze. A qualified telecom carrier familiar with DoD base-access contracting could parse this, though at elevated compliance interpretation cost compared to a well-curated solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor must follow all Federal Communications Commission (FCC), Public Utility Commission (PUC), Department of Defense (DoD), AF, and industry standards for this requirement.</blockquote>
+  <div class="ev-explanation">This citation is a catch-all that bundles four different regulatory bodies plus all &#x27;industry standards&#x27; without specifying which particular FCC rules, PUC tariff requirements, DoD directives, AF instructions, or industry standards actually apply. A vendor cannot tell whether this means specific FCC Part 68 interconnection rules, NANC porting rules, particular state PUC tariffs, or something else entirely.</div>
+</div><div class="evidence-item">
+  <blockquote>Reference the instructions in the Code of Federal Regulations (CFR) 29, Part 1926.58.</blockquote>
+  <div class="ev-explanation">29 CFR 1926.58 governs asbestos exposure for construction workers in the construction industry — it is an OSHA construction safety standard for asbestos abatement. For a SIP trunking services contract where the contractor is delivering IP-based voice circuits to a demarcation point, this regulation has no logical application. It appears to be a boilerplate carryover from a facilities or construction contract template.</div>
+</div><div class="evidence-item">
+  <blockquote>Security Training. All contractor employees will receive initial and recurring security education training from the Government sponsoring agency&#x27;s Security Manager. Training must be conducted in accordance with DoD 5200.01 V1-V4, Information Security Program, and AFI 31-1404, Air Force Information Security Program. Contractor personnel who work in Air Force controlled/restricted areas must be trained IAW AFI 31-101, The Air Force Installation Security Program.</blockquote>
+  <div class="ev-explanation">Three separate security training directives (DoD 5200.01 V1-V4, AFI 31-1404, AFI 31-101) are cited in rapid succession with no explanation of how they differ, which applies to which personnel categories, or what specific training content is required. DoD 5200.01 V1-V4 is a four-volume series covering classified information security program management — most of which is irrelevant to a commercial telecom carrier&#x27;s field technicians visiting a base to install SIP trunk equipment at a demarcation point.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor will comply with DoD 5400.7-R, Chapter 4, DoD Freedom of Information Act (FOIA) Program requirements... The Contractor will ensure that its employees fully understand and comply with Title 5 of US Code, Section 552.a and DoD 5400.7-R, DoD Freedom of Information Act Program.</blockquote>
+  <div class="ev-explanation">FOIA compliance requirements are cited twice (once in 4.5.13 under FOUO and again in 4.5.18 under Privacy Act) without differentiating between the two mandates or explaining how FOIA obligations attach to a commercial telecom carrier providing SIP trunks. FOIA applies to federal agency disclosure of government records — a commercial carrier installing circuit equipment has no FOIA obligations as an entity, making this citation either inapplicable or at minimum unexplained.</div>
+</div><div class="evidence-item">
+  <blockquote>4.5.4...DoD 5200.01 V1-V4...AFI 31-1404...AFI 31-101 / 4.5.5 AT Awareness Training / 4.5.6 Reporting Requirements / 4.5.7 Incident Notification / 4.5.13 FOUO / 4.5.14 Physical Security / 4.5.15 Key Control / 4.5.16 Travel / 4.5.17 Controlled/Restricted Areas / 4.5.18 Privacy Act / 4.5.19 CUI / 4.5.20 PII / 4.5.21 OPSEC / 4.5.22 Continuation of Essential Contractor Services</blockquote>
+  <div class="ev-explanation">Sections 4.5.4 through 4.5.25 contain fourteen consecutive security and compliance sub-sections citing over a dozen distinct directives and regulatory frameworks. For a telecommunications carrier whose primary performance obligation is delivering SIP trunks to a demarcation point in Building 5010, this cascade of security requirements — including CUI handling, PII breach cost responsibility, OPSEC media restrictions, and Ready Reserve screening — represents an accumulation that is disproportionate to the actual work. No prioritization or context is provided to help a vendor distinguish which of these requirements are operationally significant versus boilerplate carryovers.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses Firm Fixed Price across all CLINs (base and option periods) for SIP trunking services at Davis-Monthan AFB. The contract type aligns well with the nature of the requirement. SIP trunking is a commercially available, carrier-grade telecommunications utility with well-established tariff structures. The scope is stable and well-defined: 11,200 DID numbers, a known demarcation point, a 99.9% uptime SLA, and approximately 43,000 calls per month with a peak of ~200 concurrent sessions. These parameters are knowable in advance and routinely priced by carriers on a flat monthly basis. The incumbent (Lumen) is identified, providing market comparables. The pricing structure — a monthly flat rate for recurring services, a one-time NRC for installation, and a one-time cutover fee — mirrors standard commercial telecom billing and is exactly the structure that FFP is designed for. There is no meaningful ambiguity in scope that would favor T&amp;M or cost-reimbursement. The government owns and operates its own SBCs and edge infrastructure, so the contractor&#x27;s deliverable is narrowly scoped to providing SIP trunk capacity and PSTN interconnection to a defined demarcation point. Option periods replicate the same structure, which is appropriate for a utility service with predictable costs over time. One minor note: the NRC CLINs (0001, 1001, 2001, 3001, 4001) are priced at &#x27;quantity 1, job&#x27; which could encompass unpredictable add/change orders during the performance period. However, the Q&amp;A and PWS context suggest these are primarily provisioning charges at contract start, not open-ended change order vehicles. Overall, FFP is the correct contract type for this requirement.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>CLIN 0002 Monthly Recurring Charges: Contractor will provide monthly telecommunication services IAW the PWS and Appendix 1 for DAVIS MONTHAN... Firm Fixed Price | 12 | Months</blockquote>
+  <div class="ev-explanation">The core recurring service CLIN is priced as Firm Fixed Price per month. This is appropriate for SIP trunking services, which are a well-defined, commercially available telecommunications utility with stable monthly costs. Carriers routinely quote flat monthly rates for SIP trunk capacity, making FFP a natural fit.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0001 Non-Recurring Charges: Contractor will invoice for Non-Recurring Charges (NRCs) as required IAW the PWS and Appendix 1 for DAVIS MONTHAN... Firm Fixed Price | 1 | Job</blockquote>
+  <div class="ev-explanation">The one-time setup/installation NRC CLIN is also FFP. Non-recurring charges for telecom provisioning (circuit installation, number porting) are standard tariffed items with predictable costs, making FFP appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>CLIN 0003 Cutover: Contractor will provide Cutover services IAW the PWS and Appendix 1 for DAVIS MONTHAN... Firm Fixed Price | 1 | Job</blockquote>
+  <div class="ev-explanation">The cutover CLIN is FFP for a discrete, bounded task — porting 11,200 DIDs in a single cutover event. The Q&amp;A confirms the government&#x27;s intent: &#x27;The actual porting should occur all at once by the winning provider, this is how we accomplished this in the past.&#x27; A single-event cutover with known DID inventory is estimable and appropriate for FFP.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 1 Clauses and Provisions.pdf">Attachment 1 Clauses and Provisions.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c99c33c55ebd4cec9b1b074a13f2dbf1_Attachment+1+Clauses+and+Provisions.pdf" download="Attachment 1 Clauses and Provisions.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 4 LTS PWS revised 5 May 26.pdf">Attachment 4 LTS PWS revised 5 May 26.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c99c33c55ebd4cec9b1b074a13f2dbf1_Attachment+4+LTS+PWS+revised+5+May+26.pdf" download="Attachment 4 LTS PWS revised 5 May 26.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 6 Questions and Answers- FA487726QA500.pdf">Attachment 6 Questions and Answers- FA487726QA500.pdf</div></div>
+  <a class="dl-btn" href="../attachments/c99c33c55ebd4cec9b1b074a13f2dbf1_Attachment+6+Questions+and+Answers-+FA487726QA500.pdf" download="Attachment 6 Questions and Answers- FA487726QA500.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Attachment_2_Pricing_Schedule_LTS.xlsx">Attachment_2_Pricing_Schedule_LTS.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/c99c33c55ebd4cec9b1b074a13f2dbf1_Attachment_2_Pricing_Schedule_LTS.xlsx" download="Attachment_2_Pricing_Schedule_LTS.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📃</div>
+  <div class="file-info"><div class="file-name" title="Attachment_3_Wage_Determination.txt">Attachment_3_Wage_Determination.txt</div></div>
+  <a class="dl-btn" href="../attachments/c99c33c55ebd4cec9b1b074a13f2dbf1_Attachment_3_Wage_Determination.txt" download="Attachment_3_Wage_Determination.txt" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

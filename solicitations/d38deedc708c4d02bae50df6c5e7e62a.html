@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MAPS RFP Draft 5, Virtual Listening Session &amp; Survey! — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>MAPS RFP Draft 5, Virtual Listening Session &amp; Survey!</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d38deedc708c4d02bae50df6c5e7e62a</span>
+      <a class="sam-link" href="https://sam.gov/opp/d38deedc708c4d02bae50df6c5e7e62a/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-03-17</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE ARMY › W6QK ACC-APG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-03-17</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Multiple Award Indefinite Delivery Indefinite Quantity (MA IDIQ); Task Orders may be Fixed Price (FP), Time-and-Materials (T&amp;M), and Cost Reimbursement (CR) with a hybrid of all types</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">5-year Base Ordering Period plus one 5-year Optional Ordering Period (maximum 10 years)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Screening Questions (Pass/Fail)</li><li>Systems and Certifications (M.4.1 Systems; M.4.2 Certifications)</li><li>Past Performance: Recency (M.5.1)</li><li>Past Performance: Relevance (M.5.2)</li><li>Past Performance: NAICS Alignment (M.5.3)</li><li>Past Performance: Performance Quality (M.5.4)</li><li>Past Performance: Dollar Value (M.5.5)</li><li>Past Performance: Passthrough Rate (M.5.6)</li><li>Past Performance: Vacancy Rate (M.5.7) [LOE QPs only]</li><li>Past Performance: Time to Fill Rate (M.5.8) [LOE QPs only]</li><li>Past Performance: Schedule (M.5.9) [Outcome-Based QPs only]</li><li>Past Performance: Completeness (M.5.10) [Outcome-Based QPs only]</li><li>Price (M.6)</li><li>Small Business Subcontracting Plan (M.7) [Large Businesses only]</li><li>Final Gate / Responsibility Determination (M.8)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics. The base contract&#x27;s QA architecture is substantially process-focused: the QASP is described but its actual performance standards are entirely deferred to the task order level; the base-level performance metrics treat CPARS ratings and proposal submission as primary accountability measures; and the quality control provisions emphasize maintaining systems, following procedures, and keeping records rather than defining measurable outcomes. These are meaningful deficiencies. However, the severity is held to a moderate 2 rather than a severe 3 for several reasons. First, this is an IDIQ vehicle, and deferring specific performance standards to the task order level is structurally appropriate — the solicitation explicitly states that technical requirements, QASPs, and deliverables will be specified at the TO level. Second, the solicitation does include some genuinely outcome-oriented elements: the off-ramp criteria reference vacancy rates and time-to-fill metrics as concrete performance thresholds; the scorecard evaluation criteria reward outcome-based qualifying projects (Schedule and Completeness metrics tied to AQLs and documented efficiencies); and the G.4 cost overrun provisions establish quantified accountability tied to actual cost performance. Third, unlike the canonical compliance-over-outcomes pattern, there is no evidence of overlapping reporting cadences, mandated report formats with prescribed sections, or excessive meeting frequency at the base contract level — those burdens are appropriately left to task orders. The sin is real but confined: the base contract&#x27;s QA framework is a process-compliance shell with outcome metrics largely absent, but the architecture is designed to be populated at the order level, which partially mitigates the concern.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government shall evaluate the contractor&#x27;s performance under this contract in accordance with the Quality Assurance Surveillance Plan (QASP). This plan is primarily focused on what the Government must do to ensure that the contractor has performed in accordance with the performance standards. It defines how performance standards will be applied, the frequency of surveillance, and the minimal acceptable defect rate(s).</blockquote>
+  <div class="ev-explanation">The QASP description focuses on verifying that the contractor &#x27;performed in accordance with the performance standards&#x27; — but no performance standards are actually defined at the base contract level. The reference to &#x27;minimal acceptable defect rate(s)&#x27; is entirely undefined, leaving the surveillance mechanism as a placeholder with no measurable outcomes attached to it.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall implement and maintain a Quality Assurance System to ensure product integrity that meets or exceeds the requirements. These requirements are commonly accepted practices employed by industry both in national and international environments. The contractor shall identify specific military/commercial standards/procedures to be used or applied prior to implementing the system.</blockquote>
+  <div class="ev-explanation">This QA requirement is entirely process-focused: the contractor must have a system, identify standards, and follow procedures. There is no definition of what &#x27;product integrity&#x27; means in measurable terms, no acceptance criteria, and no outcomes-based standard against which the QA system will be evaluated.</div>
+</div><div class="evidence-item">
+  <blockquote>Metric: Performance | Performance Objective: Perform all contractual requirements in accordance with the PWS and PRS for individual task orders; few or no minor problems for which contractor corrective action is satisfactory | Standard to be Met: 100% compliance; no Marginal or Unsatisfactory ratings for base IDIQ contract or individual task orders in CPARS</blockquote>
+  <div class="ev-explanation">The primary performance metric at the base IDIQ level equates &#x27;good performance&#x27; with &#x27;no bad CPARS ratings&#x27; — which is itself a process-compliance measure derived from government assessors following a rating process, not from whether mission outcomes were achieved. The standard &#x27;performs in accordance with the PWS&#x27; is circular and plan-adherence focused.</div>
+</div><div class="evidence-item">
+  <blockquote>Metric: Participation | Performance Objective: Submit acceptable proposals in response to task order RFPs | Standard to be Met: At least one (1) acceptable proposal per 36 months of the ordering period</blockquote>
+  <div class="ev-explanation">One of the enumerated performance metrics for this vehicle measures whether the contractor submits proposals — a purely administrative/process activity with no connection to the quality or outcomes of actual work performed. This reveals that the base contract&#x27;s accountability structure is organized around process participation rather than performance results.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4.2.2 RECORDS — The contractor shall maintain records of all inspections and tests to demonstrate that the quality approach satisfies contract and task order requirements. / 4.4.2.4 CONTINUOUS PROCESS IMPROVEMENT — The contractor shall monitor the effectiveness of their quality system and continually improve quality processes.</blockquote>
+  <div class="ev-explanation">The records and continuous improvement requirements focus on documenting and improving the quality system itself — not on demonstrating that outcomes were achieved. &#x27;Demonstrate that the quality approach satisfies requirements&#x27; measures process compliance. There is no requirement to demonstrate that end-users were satisfied or that mission objectives were met.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate case of insider rewards — severity 2 — with meaningful tilt toward established federal defense contractors but meaningful mitigants that prevent a severity 3 finding.
+
+The clearest insider-reward mechanism is the dollar-value scoring rubric for Large Businesses, which awards quadruple the points for contracts over $50M versus contracts between $2.5M and $25M. This is not a capability test; it is a reward for having already won large federal contracts. A company with deep engineering expertise whose largest prior engagement was a $20M task order is treated as substantially less qualified than one with a $51M contract, regardless of actual performance quality.
+
+The five-gate screening wall for Large Businesses — clearance, ISO 9001, CMMC, audited accounting system, and audited purchasing system — is the most exclusionary structural feature. Each gate has individual justification, but their collective application as hard pass/fail thresholds before any scoring begins means that a capable commercial engineering firm without a DCMA-audited accounting system is eliminated before being evaluated at all. Establishing a DCMA-audited accounting system takes years and typically requires substantial federal contract history to trigger the audit in the first place — a classic catch-22 for new entrants.
+
+However, there are meaningful mitigating factors that prevent a severity 3 rating. First, the solicitation expressly creates four distinct offeror categories — Large Business, Emerging Large Business, Small Business, and Commercial-Sector Vendor — with the Commercial-Sector Vendor category specifically designed for firms with no prior federal contracting history (defined as entities that have not performed any government contracts in the last four years). The Commercial-Sector Vendor category has lighter screening requirements (only CMMC Level 2 self-certification), different scoring rubrics, and reserved award slots (15 per domain). This is a genuine structural accommodation for non-incumbents, not a cosmetic one.
+
+Second, the dollar thresholds for Small Businesses and Commercial-Sector Vendors are substantially lower ($10M for maximum points) and the minimum QP threshold of $2.5M is low enough to encompass a broad range of commercial work.
+
+Third, the solicitation has gone through five drafts with explicit industry engagement, and the Summary of Changes indicates the government has actively responded to feedback — including specifically adding the Emerging Large Business category and allowing subcontract experience for qualifying projects. This iterative process suggests the government is genuinely attempting to broaden competition rather than protect an incumbent.
+
+The net effect is a solicitation that heavily advantages established federal defense contractors competing as Large Businesses, but has built meaningful on-ramps for smaller firms and commercial entrants. The playing field is tilted, not closed.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>To be considered a QP, each submitted project must meet all the following minimum criteria: ... Meet or exceed a minimum total contract value of $2.5M; For Large, Emerging Large and Small Businesses QPs shall have at least one (1) year of performance that is not over four (4) years old.</blockquote>
+  <div class="ev-explanation">The minimum $2.5M contract value threshold combined with the four-year lookback window is a stacked requirement. While $2.5M is relatively modest, the combination with domain-specific NAICS alignment requirements and a four-year window begins to narrow the eligible pool — though this is less severe for the large MAPS vehicle size.</div>
+</div><div class="evidence-item">
+  <blockquote>Large Businesses: The Offeror will receive 4,000 points per QP if their total contract value is greater than $50M. The Offeror will receive 2,000 points per QP if their total contract value is between $25M and $50M. The Offeror will receive 1,000 points per QP if their total contract value is between $2.5M and $25M.</blockquote>
+  <div class="ev-explanation">The dollar-value scoring rubric heavily rewards vendors who have previously held large federal contracts. A Large Business with three QPs above $50M can earn 12,000 points on this factor alone, while a fully capable vendor whose largest relevant contract was $20M earns only 1,000 points per QP. This is an evaluation bonus for scale of prior contract work — an incumbency proxy — rather than a test of capability to perform the new work.</div>
+</div><div class="evidence-item">
+  <blockquote>Active Secret Facility Clearance [as a mandatory Screening Question for Large Businesses, Emerging Large Businesses, and Small Businesses] ... Is your company ISO 9001:2015 or ISO 9001:2013 certified? ... Is your company CMMC Final Level 2 (self) certified? ... Government Determined Acceptable Accounting System [and] Government Determined Acceptable Purchasing System [required for Large Businesses to pass screening].</blockquote>
+  <div class="ev-explanation">The stacking of five hard pass/fail screening requirements — Secret facility clearance, ISO 9001 certification, CMMC Level 2 self-certification, a DCMA-audited accounting system, and a DCMA-reviewed purchasing system — creates a high institutional barrier. Each requirement individually has some legitimate basis, but their combination as mandatory gates effectively limits competition to established federal defense contractors. A highly capable commercial firm moving into federal work would fail multiple gates simultaneously, not because it lacks capability but because it lacks the incumbent infrastructure.</div>
+</div><div class="evidence-item">
+  <blockquote>CPARS will be pulled for all of the five (5) NAICS codes identified in the acquisition over the last three (3) years... For [Large Businesses], if 5% or more of the element ratings are MARGINAL or below the Offeror is excluded from evaluations... If an Offeror has no CPARS ratings, the Offeror will not be evaluated for this screening question.</blockquote>
+  <div class="ev-explanation">Using CPARS as a screening gate — while giving a pass to vendors with no CPARS — creates a paradox that nominally accommodates newcomers but then disadvantages them in scoring. The tie-breaker provisions rely heavily on CPARS Exceptional and Very Good ratings, meaning vendors without CPARS history lose systematically in any competitive tie. This advantages incumbents who have accumulated favorable federal CPARS ratings over time.</div>
+</div><div class="evidence-item">
+  <blockquote>M.5.4 PERFORMANCE QUALITY: The Government will evaluate the QPs to see how many of the CPARS or submitted PPQ elements have Satisfactory or above ratings... If the Offeror has CPARS, the Government will utilize CPARS. If no CPARS are available, then the Government will utilize the PPQ (Attachment 0004) submitted by the Offeror.</blockquote>
+  <div class="ev-explanation">While the solicitation nominally permits PPQs as an alternative to CPARS, the point structure awards up to 30,000 points based on performance quality ratings. Vendors with federal CPARS records have objective third-party verification; vendors relying on PPQs face greater scrutiny skepticism and the Government retains broad downward-adjustment authority. This creates a structural advantage for vendors with established federal past performance records over equally capable commercial entrants.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a framework IDIQ solicitation, and its structure fundamentally limits the degree to which requirement sprawl can manifest. Section C (the PWS) deliberately defers most technical requirements to individual task orders: &#x27;Technical requirements will be determined at task order level,&#x27; &#x27;The requirements shall be defined in the individual task order,&#x27; and &#x27;Technical data deliverables will be specified in individual task orders.&#x27; The PWS provides illustrative lists of service categories (Engineering Services, Big Data Analytics, Help Desk Support, etc.) but explicitly frames these as examples of what falls &#x27;within scope,&#x27; not step-by-step process mandates. There are no staffing tables, no prescribed workflows, no tool mandates for the core professional services work.
+
+The prescriptive elements that do exist — AT Level 1 training, OPSEC training, CMMC compliance, CAC requirements, eCMRA reporting — are almost entirely DoD and Army regulatory mandates. These are constraints on who can work on Army installations and how classified information is handled, not constraints on how a vendor delivers engineering, IT, or advisory services. The Section 4.4.2 quality control language (&#x27;The contractor shall implement and maintain a Quality Assurance System&#x27;) is high-level and standard — it does not prescribe what QA methodology to use.
+
+The screening and evaluation criteria in Sections L and M are heavily certification- and past-performance-based (CMMC, ISO 9001, CPARS, facility clearances). These are threshold qualifications and award discriminators, not process mandates for contract performance.
+
+The MAPS solicitation is structured as an IDIQ vehicle where the real requirements will live at the task-order level. Evaluating it for requirement sprawl at the base contract level necessarily yields a low finding — the government has consciously reserved technical specificity for individual orders. This is an appropriate design choice for a broad professional services vehicle, not an evasion of the issue. A final assessment on sprawl would require reviewing representative task order PWS documents, which are not included here. Based solely on the base contract, severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>All contractor employees, to include subcontractor employees, requiring access to Army installations, facilities and controlled access areas shall complete AT Level 1 awareness training within 30-calendar days after contract start date... The contractor shall submit certificates of completion for each affected contractor employee and subcontractor employee within 30-calendar days after completion of training by all employees and subcontractor personnel.</blockquote>
+  <div class="ev-explanation">This specifies a particular training program and reporting cadence. However, it is a DoD security mandate (AR 525-13) applicable to all contractors on Army installations — a regulatory compliance requirement, not vendor-specific process sprawl. The government has no discretion to waive these security training obligations, so it is a legitimate constraint rather than the government prejudging how the contractor should deliver its core services.</div>
+</div><div class="evidence-item">
+  <blockquote>The contractor shall report ALL contractor labor hours (including subcontractor labor hours) required for performance of services provided under this contract for the ACC-APG via the eCMRA secure data collection site... using the following web address: http://www.ecmra.mil/</blockquote>
+  <div class="ev-explanation">This mandates a specific reporting platform and submission process. While this is prescriptive about mechanism, it reflects a government-wide enterprise reporting requirement rather than a choice about how professional services are delivered. It constrains an administrative deliverable, not the substantive work approach, and is therefore a marginal instance of sprawl rather than a meaningful constraint on vendor innovation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate rule pool problem, but through an unusual mechanism: rather than the classic overwhelming list of cited regulations, the MAPS Draft 5 exhibits regulatory opacity — the compliance framework is simultaneously fragmented across multiple sections and largely deferred or missing. The core problem is structural: Section 2.0 (Applicable Documents) contains no actual documents; Section I (Contract Clauses) is TBD; and Section K (Representations and Certifications) is TBD. This means vendors reviewing Draft 5 cannot assess their compliance burden for a 10-year, $multi-billion IDIQ covering five technical domains. What IS present exhibits the undifferentiated presentation characteristic of rule pools: sixteen AT/OPSEC sub-requirements of varying conditionality listed without a clear applicability matrix; eight inspection and acceptance clauses covering mutually exclusive contract types listed without differentiation; and a single arbitration clause cited in isolation. The solicitation does not rise to severity 3 because the security requirements in Section 4.2, while numerous, are genuinely relevant to work that spans CONUS/OCONUS/classified environments, and there are no glaring contradictions or clearly irrelevant citations of the type seen in classic rule pool examples. The ISO, CMMC, and clearance requirements are explained with reasonable context. However, the combination of deferred clause lists, a null applicable documents section, and undifferentiated conditional requirements creates a compliance landscape that vendors cannot price or plan for — the functional equivalent of a rule pool, achieved through omission rather than accumulation. Severity 2 is appropriate: the burden is elevated but not yet impenetrable, and the draft nature of the document suggests the TBD sections will eventually be populated.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.0 APPLICABLE DOCUMENTS
+The contractor is responsible for all applicable documents to ensure compliance with Department of Defense (DOD) specifications and standards, applicable industry standards, or other required documentation shall be specified at the individual task order level.</blockquote>
+  <div class="ev-explanation">The solicitation&#x27;s entire &#x27;Applicable Documents&#x27; section (Section 2.0) is a single placeholder sentence with zero actual citations. It defers all document applicability to task order level without providing any curated list of foundational regulatory requirements for an IDIQ covering five technical domains over 10 years. This is the inverse of a traditional rule pool — not an overwhelming list, but an abdication of the guidance function entirely. Vendors have no baseline understanding of which regulations govern the IDIQ contract itself.</div>
+</div><div class="evidence-item">
+  <blockquote>SECTION E – INSPECTION AND ACCEPTANCE
+The following clauses will be added to Section E:
+52.246-1
+52.246-4
+52.246-5
+52.246-6
+52.246-7
+52.246-8
+52.246-15
+52.246-26</blockquote>
+  <div class="ev-explanation">Section E lists eight FAR 52.246-series inspection and acceptance clauses with no explanation of which apply to which contract types, domains, or task order scenarios. FAR 52.246-1 applies to supplies; 52.246-4 to services; 52.246-5 to cost-reimbursement services; 52.246-6 to time-and-materials; 52.246-7 and -8 to fixed-price production contracts; 52.246-15 to certificate of conformance; 52.246-26 to foreign manufacturers. Many of these are mutually exclusive or inapplicable depending on contract type, yet all are listed without differentiation. A vendor cannot determine which apply to their specific domain or contract type.</div>
+</div><div class="evidence-item">
+  <blockquote>4.2 ANTITERRORISM /OPERATIONALSECURITY (AT/OPSEC) REQUIREMENTS
+[Sections 4.2.1 through 4.2.16 listing AT Level 1 Training, AT Awareness Training for Overseas Travel, iWATCH Training, OPSEC Training, ATCTS, Cybersecurity/IT Training, Cybersecurity/IT Certification, Access and General Protection, Classified Information handling, TARP, CAC requirements, non-CAC facility access, CAAF, foreign country performance, DD Form 254, and Visitor Group Security Agreement]</blockquote>
+  <div class="ev-explanation">Sixteen separate security and antiterrorism sub-requirements (4.2.1 through 4.2.16) are listed as base contract requirements with no indication of which apply conditionally. Several are explicitly labeled &#x27;FOR CONTRACTS THAT REQUIRE...&#x27; (e.g., 4.2.4, 4.2.7, 4.2.9) — meaning the government acknowledges these are conditional — yet all are included in the base PWS without a mechanism for determining applicability short of reading each paragraph. Sub-sections covering OCONUS/deployed contractor requirements (4.2.13, 4.2.14) apply to a narrow subset of task orders but are presented at the same level as universal requirements like cybersecurity training. Vendors must parse all 16 to determine which actually govern their work.</div>
+</div><div class="evidence-item">
+  <blockquote>SECTION I – CONTRACT CLAUSES
+TBD (Clauses will be added in ACWS)
+SECTION K – REPRESENTATIONS, CERTIFICATIONS, AND OTHER STATEMENT OF BIDDERS
+TBD</blockquote>
+  <div class="ev-explanation">Sections I and K — the primary locations where the full regulatory clause set would normally appear — are both marked TBD in Draft 5. This means the complete compliance framework is unknown to offerors at proposal time. The solicitation simultaneously omits the clause list AND defers all applicable documents to task order level (Section 2.0), leaving vendors with no coherent picture of the regulatory environment governing an IDIQ contract with a 10-year ordering period across five technical domains.</div>
+</div><div class="evidence-item">
+  <blockquote>H.1 (Regulatory site DFARS 252.222-7006) RESTRICTIONS ON THE USE OF MANDATORY ARBITRATION AGREEMENTS</blockquote>
+  <div class="ev-explanation">The single explicitly cited regulatory clause in Section H is DFARS 252.222-7006, a labor/arbitration restriction. No context is provided for why this clause is called out by name when all other contract clauses are deferred to TBD in Section I. This isolated citation — without the surrounding clause framework — is not positioned to help vendors understand the compliance landscape; it appears as an orphaned reference that raises more questions than it answers about how the contract clauses will ultimately be structured.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">MAPS is a broad IDIQ vehicle spanning five domains with vastly different scope predictability — from routine IT support and training (where FFP or structured T&amp;M is workable) to basic and exploratory research (where cost-reimbursement is necessary). The base contract explicitly permits FP, T&amp;M, and CR but provides no guidance, criteria, or domain-specific guardrails on when each type is appropriate. The cost-overrun clause in G.4 and the CPFF fee structure in H.4 suggest CR will be a dominant pricing vehicle across the vehicle, including for work types (e.g., help desk support, program management, IT training) where fixed-price contracting is often achievable and would better protect the government from runaway costs. At the same time, the government cannot be faulted too severely here: this is a draft IDIQ vehicle, and IDIQ base contracts commonly defer contract-type decisions to task orders. The real risk is that without explicit guidance, ordering contracting officers will default to cost-reimbursement or T&amp;M across all domains because it is the path of least resistance, even when fixed-price would be more appropriate for well-defined, routine services. The Performance Requirements Summary table (which includes a &#x27;Cost Control&#x27; metric requiring &#x27;100% compliance; no contractor-included cost overruns&#x27;) also reflects an unrealistic expectation that may be better achieved through fixed-price contracting but is applied generically across all contract types. The severity is moderate (2) rather than severe (3) because: the IDIQ structure genuinely requires flexibility across domains; the solicitation does acknowledge multiple contract types; and the final contract type decision is made at the task order level where domain-specific judgment can be applied. However, the absence of any structuring guidance creates a predictable failure mode: CR or T&amp;M will be applied to routine, predictable work, removing cost incentives and enabling billing inflation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>TOs allowed under this contract are Fixed Price (FP), Time-and-Materials (T&amp;M), and Cost Reimbursement (CR) with a hybrid of all types.</blockquote>
+  <div class="ev-explanation">The base IDIQ contract explicitly permits all three major contract types at the task order level — FP, T&amp;M, and CR — without specifying when each is appropriate. This is not inherently problematic for an IDIQ vehicle, but it defers the pricing-type decision entirely to individual task orders, meaning mismatches can occur at execution without any guardrails in the base contract.</div>
+</div><div class="evidence-item">
+  <blockquote>Contract types may include both firm-fixed-price and cost reimbursement and will be determined at the individual task order and contract line item (CLIN) levels.</blockquote>
+  <div class="ev-explanation">Section C reinforces that contract type decisions are fully deferred to task order level. The base PWS provides no guidance or criteria for when to use FP versus CR versus T&amp;M, even though the five domains span radically different work types — from routine help desk support (Foundational IT, NAICS 541519) to basic scientific research (RDT&amp;E, NAICS 541715). These have fundamentally different risk profiles and predictability characteristics, yet no differentiation is made.</div>
+</div><div class="evidence-item">
+  <blockquote>The H.4 Fee: Established maximum allowable fee rate ceilings for Cost-Plus-Fixed-Fee contracts. Non-Experimental, Developmental, or Research Work 5% / Experimental, Developmental, or Research Work 7%</blockquote>
+  <div class="ev-explanation">The solicitation anticipates CPFF task orders across the vehicle, including for non-experimental work. CPFF is a cost-reimbursement vehicle that is appropriate for R&amp;D but is a poor fit for Management and Advisory Services or Foundational IT (e.g., help desk, IT supply chain management), where scope can often be defined with sufficient certainty to support fixed-price contracting. The fee cap structure does not restrict CPFF to R&amp;D domains.</div>
+</div><div class="evidence-item">
+  <blockquote>1. Engineering, Logistics and Operational Services / 2. Research, Development, Test and Evaluation (RDT&amp;E) Services / 3. Management and Advisory Services / 4. Emerging IT Services / 5. Foundational IT Services</blockquote>
+  <div class="ev-explanation">The five domains bundled into this single IDIQ vehicle have wildly divergent scope predictability. Foundational IT (help desk, IV&amp;V, IT training) and Management &amp; Advisory (program management, financial services, training) involve repeatable, labor-intensive services where T&amp;M or even FFP is often appropriate and quantities can be estimated. RDT&amp;E (basic research, quantum computing, exploratory research) almost always requires cost-reimbursement. Lumping them under a single vehicle with no contract-type guidance creates structural pressure to apply the same pricing approach to incompatible work types.</div>
+</div><div class="evidence-item">
+  <blockquote>G.4.1. If in any performance period, the Contractor is projecting a cost overrun in excess of 10% of the proposed estimated cost for a particular labor rate for that period... the projected cost overrun may trigger a Show Cause or Termination for Default</blockquote>
+  <div class="ev-explanation">The solicitation creates a cost-overrun mechanism tied to labor rates that presupposes cost-type task orders with proposed estimated costs. This mechanism is appropriate for CR contracts but would be redundant or inapplicable under FFP. The inclusion of this clause without domain-specific or contract-type-specific scoping suggests that CR will be the predominant pricing vehicle across diverse domains — including those where fixed-price would better protect the government&#x27;s interests.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Scorecard - Commercial-Sector Vendors - 10MAR2026.pdf">Attachment 0002 Scorecard - Commercial-Sector Vendors - 10MAR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d38deedc708c4d02bae50df6c5e7e62a_Attachment+0002+Scorecard+-+Commercial-Sector+Vendors+-+10MAR2026.pdf" download="Attachment 0002 Scorecard - Commercial-Sector Vendors - 10MAR2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Scorecard - Emerging Large Businesses - 10MAR2026.pdf">Attachment 0002 Scorecard - Emerging Large Businesses - 10MAR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d38deedc708c4d02bae50df6c5e7e62a_Attachment+0002+Scorecard+-+Emerging+Large+Businesses+-+10MAR2026.pdf" download="Attachment 0002 Scorecard - Emerging Large Businesses - 10MAR2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Attachment 0002 Scorecard - Small Businesses - 10MAR2026.pdf">Attachment 0002 Scorecard - Small Businesses - 10MAR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d38deedc708c4d02bae50df6c5e7e62a_Attachment+0002+Scorecard+-+Small+Businesses+-+10MAR2026.pdf" download="Attachment 0002 Scorecard - Small Businesses - 10MAR2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="MAPS Request For Proposal %28RFP%29 Draft 5 - 10MAR2026.pdf">MAPS Request For Proposal %28RFP%29 Draft 5 - 10MAR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d38deedc708c4d02bae50df6c5e7e62a_MAPS+Request+For+Proposal+%28RFP%29+Draft+5+-+10MAR2026.pdf" download="MAPS Request For Proposal %28RFP%29 Draft 5 - 10MAR2026.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Summary of Changes to Draft 5 - 10MAR2026.pdf">Summary of Changes to Draft 5 - 10MAR2026.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d38deedc708c4d02bae50df6c5e7e62a_Summary+of+Changes+to+Draft+5+-+10MAR2026.pdf" download="Summary of Changes to Draft 5 - 10MAR2026.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

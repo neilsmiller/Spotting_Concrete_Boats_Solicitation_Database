@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIRCUIT CARD ASSEMB — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>CIRCUIT CARD ASSEMB</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 f5b8ea653f3a48e39c2efc2504a06beb</span>
+      <a class="sam-link" href="https://sam.gov/opp/f5b8ea653f3a48e39c2efc2504a06beb/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-04</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA MARITIME › DLA MARITIME MECHANICSBURG › SPRMM1 DLA MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334290</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-04</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward DLA supply solicitation for a manufactured hardware item (Circuit Card Assembly, NSN-based, part number G526470-1). The accountability structure is appropriate for the procurement type and does not exhibit the compliance-over-outcomes pattern in any meaningful way. The QA section is brief and standard: contractor self-inspection under MIL-I-45208, government right to surveil, and record retention for one year. There are no weekly status reports, no prescribed report formats, no meeting cadences, no plan-adherence tracking, and no requirement to document activities rather than results. The primary outcome measure is implicit but clear: the delivered item must conform to the design drawing (cage code/part number reference) and pass inspection. Acceptance is based on product conformance, not on whether the contractor submitted paperwork on schedule. The MIL-I-45208 reference does require a documented inspection system, which is a process element, but for a manufactured electronic assembly with military pedigree requirements, an inspection system standard is a well-established and reasonable mechanism for assuring product quality — not a substitute for outcome accountability. There is no reporting burden whatsoever beyond record retention. Severity 1 is appropriate: this solicitation has minimal compliance-over-outcomes concerns, consistent with a simple, fixed-price hardware buy where physical conformance to specification is the operative measure of success.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein. Except as otherwise specified in the contract/purchase order, the Contractor may use his own or any other facilities suitable for the performance of the inspection requirements specified herein, unless disapproved by the Government. The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">This language delegates inspection responsibility to the contractor and reserves government oversight rights, which is standard for fixed-price supply contracts. It does not impose a process-compliance reporting burden; inspection is tied to whether the physical item conforms to specifications — an outcome-oriented check.</div>
+</div><div class="evidence-item">
+  <blockquote>HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT (DEC 2014)|1|MIL-I-45208|</blockquote>
+  <div class="ev-explanation">MIL-I-45208 is an inspection system standard that requires contractors to maintain a documented inspection system. This does impose a process requirement (maintain an inspection program), but for a manufactured hardware item like a circuit card assembly, an inspection system standard is a legitimate and conventional proxy for product conformance. It is not the same as the activity-reporting burden that characterizes severe compliance-over-outcomes problems.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3 Records - Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">Record-keeping is a process requirement, but it is minimal in scope — one record type, tied directly to inspection work, retained for a defined period. There is no prescribed format, no required submission cadence, and no overlapping reporting obligation. This does not constitute compliance theater.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate insider rewards concern driven primarily by the authorized distributor requirement combined with the absence of technical data. The combination effectively limits the competitive pool to vendors who already hold a distribution authorization from CAGE 49956 — a relationship that, by definition, only existing channel partners possess. A capable vendor with no prior relationship with that specific OEM cannot compete, regardless of their broader electronics supply or manufacturing competency.
+
+That said, this pattern is common and arguably defensible in DLA spare parts procurement for military electronics. The rationale is genuine: counterfeit and non-conforming electronic parts represent a documented safety and mission risk in defense applications, and restricting award to OEM-authorized distributors is a recognized quality assurance mechanism, not purely incumbency protection. The requirement is not about prior federal contract experience, dollar thresholds, or lookback windows — the classic insider rewards indicators — but about an OEM authorization relationship that in principle any distributor could obtain.
+
+The severity is assessed at 2 rather than 3 because: (1) the restriction is product-specific and quality-motivated, not evaluation-criteria-based favoritism; (2) there is no stacking of federal-specific experience mandates, dollar thresholds, or short lookback windows; and (3) the authorized distributor framework is a publicly known commercial channel — a new entrant could in principle seek OEM authorization. The absence of technical data amplifies the concern but is itself a separate systemic issue in DLA spare parts procurement rather than a deliberate evaluation manipulation. The playing field is tilted toward existing channel partners, but the door is not entirely closed to new entrants willing to establish OEM authorization relationships.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement restricts award exclusively to authorized distributors of the original manufacturer (CAGE 49956, part numbers G311180-1 and G526470-1). Any vendor that is not already in an authorized distribution relationship with that specific OEM cannot compete, regardless of their general capability to source or supply the item. This is a structural incumbency-adjacent requirement — it does not test general competency to supply circuit card assemblies, but rather a pre-existing commercial relationship with one specific manufacturer.</div>
+</div><div class="evidence-item">
+  <blockquote>The CIRCUIT CARD ASSEMB furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. ;49956 G526470-1;</blockquote>
+  <div class="ev-explanation">The requirement is locked to a single OEM&#x27;s cage code and part number. Combined with the authorized distributor restriction, only vendors already embedded in that manufacturer&#x27;s distribution network can respond. A capable electronics supplier not holding an authorization agreement with CAGE 49956 is categorically excluded, irrespective of their technical or supply chain competence.</div>
+</div><div class="evidence-item">
+  <blockquote>Drawings or technical data are not available for this item.</blockquote>
+  <div class="ev-explanation">The absence of drawings or technical data means that alternative manufacturers or non-authorized suppliers have no pathway to qualify as an equivalent source. Without access to the technical data package, no vendor could propose an alternate design or demonstrate form-fit-function equivalence. This forecloses the possibility of competition from vendors outside the existing authorized distributor network, reinforcing the insider-favoring structure created by the authorized distributor requirement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a DLA Maritime supply purchase order for a circuit card assembly (NSN item, CAGE 49956 ref G526470-1), a controlled defense spare part. The document is largely composed of standard DLA/NAVSUP boilerplate clauses — MIL-I-45208 quality requirements, MIL-STD-130 marking, MIL-STD-2073 packaging, configuration control under MIL-STD-973, and standard FAR/DFARS administrative provisions. The nature of the requirement is fundamentally a &#x27;deliver a conforming item to a design&#x27; procurement rather than a services contract, which changes the sprawl calculus significantly. For supply procurements, specifying the design standard (CAGE/part number), quality system (MIL-I-45208), marking (MIL-STD-130), and packaging (MIL-STD-2073) is the appropriate and expected way to define WHAT is needed — these are outcome constraints (deliver an item conforming to the design), not process mandates telling vendors how to run their factory floor. The most procedurally detailed section is the MIL-STD-973 configuration control tailoring, but this is a standard defense practice for configuration-managed items and the government has proactively waived many sub-paragraphs. Notably, the solicitation does not prescribe manufacturing methods, staffing structures, production workflows, or tooling — the classic markers of requirement sprawl. The vendor retains full latitude in how they manufacture or source the conforming item (as an authorized distributor or manufacturer). The change code framework (Codes 1-6) is more procedural but serves a legitimate supply chain traceability function for defense parts. Overall, this solicitation is outcome-focused for its type: deliver a conforming circuit card assembly that meets the design specification. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.3 Changes in Design, Material Servicing, or Part Number - Except for a Code 1 change, which shall be processed as provided in the code statement shown below, no substitution of items shall be made until the NAVICP-MECH Contracting Officer has notified and approval has been given by issuance of a written change order... the type of change shall be indicated by code number in accordance with one of the following statements: Code 1... Code 2... Code 3... Code 4... Code 5... Code 6...</blockquote>
+  <div class="ev-explanation">This section prescribes a specific procedural framework for how design changes must be communicated and classified. However, this is a borderline case: it is largely a configuration management control process required to protect government interests in defense supply chain integrity, not a prescription of how to manufacture the item. It constrains the change notification process, not the production approach itself.</div>
+</div><div class="evidence-item">
+  <blockquote>3.5 Configuration Control in accordance with MIL-STD-973 Short Form procedures - The requirements of MIL-STD-973 are hereby invoked... [followed by an extensive list of paragraphs A through AF specifying which sub-paragraphs of MIL-STD-973 are required or waived]</blockquote>
+  <div class="ev-explanation">This is the most procedurally detailed section in the solicitation, invoking a multi-paragraph tailoring of MIL-STD-973. However, MIL-STD-973 is a recognized defense configuration management standard, and invoking it with tailoring notes is standard DLA/NAVSUP practice for controlled defense items. The government has made an effort to reduce burden by explicitly waiving many paragraphs. This is a legitimate regulatory/technical constraint rather than sprawl introduced by the drafting process.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a standard DLA Maritime spare parts solicitation for a circuit card assembly — a discrete manufactured item procurement with a well-defined scope. The regulatory citations present are not an extreme pool by federal contracting standards, and many (MIL-I-45208, MIL-STD-130, MIL-STD-2073, WAWF payment instructions, higher-level quality requirements) are genuinely applicable to manufactured defense electronics. The solicitation is not citing 88 regulations or including obviously irrelevant provisions like energy-efficiency standby power rules.
+
+However, several features push this to a moderate (severity 2) finding. First, the MIL-STD-973 tailoring block reproduces 32 applicability notes, most marking provisions inapplicable — the inverse of curation. A well-drafted solicitation would cite only the applicable paragraphs. Second, the &#x27;Applicable Documents&#x27; section references an attachment that does not exist (0 attachments posted), meaning vendors cannot actually see the document list they are told governs performance. Third, the solicitation contains what appears to be a duplicated full requirement block for a different item (MODULATOR SUBASSEMB), suggesting copy-forward drafting without review. Fourth, the header regulatory clauses are presented in raw template format with no explanatory text.
+
+None of these rise to severe: there are no clearly irrelevant regulations, no contradictions between cited policies and the work, and the total number of named standards is modest. But the combination of an inaccessible applicable documents list, a 32-item MIL-STD-973 checklist presented in bulk form, and apparent copy-forward artifacts from a prior procurement represent a moderate, not minimal, rule pool burden on vendors.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>HIGHER-LEVEL CONTRACT QUALITY REQUIREMENT (DEC 2014)|1|MIL-I-45208| INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)|2||| INSPECTION AND ACCEPTANCE - SHORT VERSION|8|x||x|||||| WIDE AREA WORKFLOW PAYMENT INSTRUCTIONS (JAN 2023)|16|... SECURITY PROHIBITIONS AND EXCLUSIONS (CLASS DEVIATION 2026-O0025)(FEB 2026)|7|||||||| ALTERNATE A, ANNUAL REPRESENTATIONS AND CERTIFICATIONS (DEVIATION 2026-O0043)(FEB 2026))|13|||||||||||||| NOTICE OF PRIORITY RATING FOR NATIONAL DEFENSE, EMERGENCY PERPARDENESS, AND ENRGY PROGAM USE (APRIL 2008))|2||X|</blockquote>
+  <div class="ev-explanation">The solicitation header presents a block of regulatory clause citations in raw pipe-delimited format with blank parameter fields (||||). These clauses are recited without any contextual explanation of how each applies to the specific procurement of a circuit card assembly. A vendor reading this cannot readily distinguish which clauses carry substantive compliance obligations versus which are standard boilerplate insertions.</div>
+</div><div class="evidence-item">
+  <blockquote>3.5 Configuration Control in accordance with MIL-STD-973 Short Form procedures - The requirements of MIL-STD-973 are hereby invoked in the contract/purchase order. The tailoring notes stated in the order cited in paragraph 6.2.1.3 are stated below: A. Considered, tailoring implemented B. Automated processing and submittal is not required... [through] AF. Paragraph 5.4.2.2.3.2b is not required for this contract/purchase order.</blockquote>
+  <div class="ev-explanation">MIL-STD-973 is invoked with 32 separate tailoring notes (A through AF), the majority of which simply state that various paragraphs are &#x27;not required&#x27; or &#x27;NA to this contract/purchase order.&#x27; Rather than citing only the paragraphs that do apply, the solicitation reproduces the full tailoring checklist and marks most items inapplicable. This is an inversion of good regulatory curation: a vendor must parse 32 line items to identify the handful of MIL-STD-973 provisions that actually matter (5.3.3.2, 5.3.6.4, 5.3.6.7, 5.3.6.7.3, 5.3.6, 5.4.3, 5.4.4, 5.4.2.2.3.2b with exceptions, and 5.3.6.6/5.3.6.6.2).</div>
+</div><div class="evidence-item">
+  <blockquote>2.1 Applicable Documents - The document(s) listed below form a part of this contract/purchase order including modifications or exclusions. 2.1.1 &#x27;Document References&#x27; listed below must be obtained by the Contractor. Ordering information is included as an attachment to this contract/purchase order.</blockquote>
+  <div class="ev-explanation">The solicitation references an &#x27;Applicable Documents&#x27; section and instructs contractors to obtain those documents via attachment — but no attachment is provided (the solicitation header states &#x27;0 Attachments&#x27;). Vendors are told documents govern this work but cannot access or review the list. This compounds the rule pool problem: not only are standards cited without context, the complete list is not even visible in the solicitation itself.</div>
+</div><div class="evidence-item">
+  <blockquote>6.1 Ordering Information for Document References - [lists DODSSP, QuickSearch, Subscription Services Desk, Commander Indian Head Division NSWC, DCMC, Contracting Officer NAVSUP-WSS Code 87321, Commanding Officer NAVSUP-WSS Code 009, Commanding Officer NAVSUP-WSS Code 1 Support Branch, DD Form 1425 to NAVSUP-WSS]</blockquote>
+  <div class="ev-explanation">Section 6.1 lists eight separate procurement channels for obtaining referenced documents from different government offices. This administrative complexity is a secondary symptom of rule pools: the regulatory landscape is sufficiently fragmented that vendors must navigate multiple bureaucratic channels just to assemble the compliance documents they are expected to know and follow. No guidance is given on which channel applies to which document category relevant to this specific item.</div>
+</div><div class="evidence-item">
+  <blockquote>This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the MODULATOR SUBASSEMB ... [full SCOPE/APPLICABLE DOCUMENTS/REQUIREMENTS/QUALITY ASSURANCE/PACKAGING/NOTES sections repeated verbatim] ... 1. SCOPE 1.1 This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the CIRCUIT CARD ASSEMB .</blockquote>
+  <div class="ev-explanation">The solicitation appears to contain duplicate item requirement blocks — one for a &#x27;MODULATOR SUBASSEMB&#x27; (Cage ref. 49956 G311180-1) and one for the &#x27;CIRCUIT CARD ASSEMB&#x27; (Cage ref. 49956 G526470-1) — with nearly identical regulatory boilerplate repeated in full for each. This copy-forward pattern, where the same regulatory sections are reproduced wholesale rather than tailored, is a hallmark of rule pool accumulation. The MODULATOR SUBASSEMB block appears to be an artifact of a prior or related procurement that was not removed or distinguished.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a firm-fixed-price purchase order for manufacture and delivery of a specific Navy circuit card assembly (NSN-based, part number G526470-1) and a modulator subassembly (G311180-1). The inclusion of FAR 52.246-2 (Inspection of Supplies—Fixed-Price) confirms the FFP pricing structure. FFP is the correct contract type here. The requirements are well-defined: specific part numbers, known cage codes, defined quality standards (MIL-I-45208, MIL-STD-130, MIL-STD-2073), and established configuration control procedures. The scope is a discrete manufactured supply item with no ambiguity in what must be delivered. This is precisely the scenario FAR 16.202-1 envisions for FFP: the risk is minimal and can be predicted with acceptable certainty because the government is procuring a known, identifiable item. There is no mismatch between the pricing structure and the nature of the requirement. Severity is 1 — the contract type is appropriate for the work.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)</blockquote>
+  <div class="ev-explanation">The solicitation incorporates FAR 52.246-2, Inspection of Supplies—Fixed-Price, which is the standard clause for fixed-price supply contracts. This confirms the contract pricing structure is firm-fixed-price.</div>
+</div><div class="evidence-item">
+  <blockquote>1.1 This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the CIRCUIT CARD ASSEMB ... 3.1 Cage Code/Reference Number Items - The CIRCUIT CARD ASSEMB furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. ;49956 G526470-1;</blockquote>
+  <div class="ev-explanation">The requirement is to manufacture and deliver a specific, known part number (G526470-1) from a defined design. This is a well-scoped deliverable: a discrete, tangible supply item with a defined part number and configuration. Fixed-price is appropriate for this type of requirement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

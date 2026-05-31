@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JTE Computer System, Dig — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>JTE Computer System, Dig</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 b91f7a8ea45c44c0a7d8c37be7dea1ba</span>
+      <a class="sam-link" href="https://sam.gov/opp/b91f7a8ea45c44c0a7d8c37be7dea1ba/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA AVIATION › DLA AVIATION OGDEN › DLA  AVIATION AT OGDEN, UT</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Price or Cost</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward DLA supply solicitation for four units of a NSN-identified digital computer system (NSN 7010-01-705-5751) from a qualified/restricted source (Northrop Grumman). The solicitation structure is purely transactional: quote a price, deliver the hardware by the required delivery date, meet packaging and marking standards, and submit a Counterfeit Prevention Plan within 30 days of contract award. There are no performance work statements requiring ongoing services, no QA surveillance plans, no reporting cadences, no prescribed status report formats, no required meetings, and no plan-adherence tracking mechanisms. The accountability structure is entirely product-acceptance oriented — the item either conforms to the NSN specification and passes origin inspection, or it does not. The SOW attached is focused exclusively on packaging and marking requirements (MIL-STD-2073-1, MIL-STD-129, etc.), not on ongoing performance reporting. The Counterfeit Prevention Plan CDRL is a single one-time deliverable appropriate to the supply chain risk context. This solicitation does not exhibit compliance-over-outcomes pathology because there is no ongoing service relationship to monitor — it is a buy of hardware. Sin #2 is essentially inapplicable to this acquisition type. Severity is 1 (minimal).</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Quality Assurance: Standard Inspection</blockquote>
+  <div class="ev-explanation">The quality assurance mechanism specified is &#x27;Standard Inspection&#x27; — a reference to FAR 52.246-2, Inspection of Supplies—Fixed-Price. This is a product-acceptance standard, not a process-compliance mechanism. It asks whether the delivered item meets contract requirements, which is outcome-focused (did the right item arrive in conforming condition), not compliance theater.</div>
+</div><div class="evidence-item">
+  <blockquote>Counterfeit Prevention Plan
+CDRL A005
+...Required Delivery
++IAW1423 1 EA *30 Calendar Days</blockquote>
+  <div class="ev-explanation">The one deliverable beyond the hardware itself is a Counterfeit Prevention Plan. This is a single documentation requirement tied to supply chain integrity — a legitimate and narrow risk-mitigation document, not an overlapping reporting cadence. There is no weekly status report, monthly progress report, or meeting cadence specified.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a DLA Aviation Request for Quotation for 4 units of NSN 7010-01-705-5751, a digital computer system (JTE), from a qualified/restricted source: Northrop Grumman (CAGE 1L4J7). The solicitation is a straightforward supply procurement with firm-fixed pricing evaluated solely on price. The Section M evaluation criteria state explicitly that &#x27;All evaluation factors other than cost or price, when combined, are Significantly Less Important than Cost or Price&#x27; — and the only listed evaluation factor is price.
+
+There are no experience requirements, past performance thresholds, federal-specific experience mandates, dollar-value minimums for prior contracts, or lookback windows of any kind. There are no key personnel qualifications, no technical evaluation criteria scoring institutional knowledge, and no transition plan requirements. The solicitation contains no elements that would function as insider rewards in the Niskanen Center framework.
+
+The one feature that limits competition — restriction to Northrop Grumman as the only qualified source — is a qualified products/approved source restriction, not an experience-based insider reward. This reflects a legitimate sole-source or restricted competition determination based on the technical/manufacturing qualification of the item (a specific NSN part), which is a distinct procurement mechanism from experience requirements that benefit incumbents. DLA regularly restricts hardware procurements to approved manufacturers for safety, interoperability, and supply chain integrity reasons that have nothing to do with rewarding a prior service contractor.
+
+The SOW addresses only preservation, packaging, and marking requirements — logistical and technical standards with no experience criteria attached.
+
+Note: This solicitation was subsequently canceled and replaced by SPRHA526R0382, so its practical impact is moot, but as written it presents no insider rewards problem. Severity is 1.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward DLA supply procurement for 4 units of a specific NSN item (7010-01-705-5751, a Northrop Grumman digital computer system) from a qualified/restricted source. It is a firm-fixed-price purchase of a specific manufactured product, not a services contract where requirement sprawl characteristically appears.
+
+The solicitation&#x27;s &#x27;Statement of Work&#x27; is entirely devoted to packaging, marking, and shipping requirements — prescribing MIL-STD-2073-1, MIL-STD-129, MIL-STD-647, MIL-STD-147, and related standards. These are not sprawl. They are mandatory DoD logistics infrastructure requirements that exist to ensure supply chain integrity, warehouse compatibility, and safe transport of military materiel. Every contractor selling into the DoD supply chain must meet these standards regardless of the specific contract, and they represent &#x27;what must be achieved&#x27; (conforming packaging and marking) rather than &#x27;how the vendor should run their business.&#x27;
+
+The core acquisition requirement is simply: deliver 4 each of part number 1320-5630003-01 (Cage 1L4J7) by 21 May 2027, packaged and marked to military standards. There is no services scope, no staffing structure, no workflow being prescribed, no incumbent process being replicated. The single CDRL deliverable is a Counterfeit Prevention Plan — a reasonable supply chain assurance document for a restricted-source electronic item.
+
+The solicitation is also already canceled and replaced by SPRHA526R0382, which is noted in the amendment. Even as written, this is a competently scoped product procurement. Requirement sprawl at any meaningful severity requires a solicitation that constrains vendor solution space across a services or complex delivery scope — that is not present here. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The offeror shall use MIL-STD 2073-1, to develop military packaging using the decision chart in accordance with the requirements of the section, Section 5 and all Appendices therein. Military packaging requirements shall be documented in accordance with Appendix E and as specified on the Contract Data Requirements List (CDRL).</blockquote>
+  <div class="ev-explanation">This passage prescribes a specific standard and methodology for packaging development. However, for a DoD supply contract involving military materiel, MIL-STD-2073-1 compliance is a well-established regulatory and logistical constraint rather than discretionary process sprawl. The government has legitimate interoperability and storage reasons to mandate military packaging standards. This is closer to a legitimate constraint than solution-space sprawl.</div>
+</div><div class="evidence-item">
+  <blockquote>The offeror shall use MIL-STD 129, and adhere to the minimum uniform military marking, labels, requirements for materiel shipment and storage... The offeror shall also ensure and affix a completed DD Form 1574, Serviceable Tag-Materiel or DD Form 1574-1... to each unit pack or intermediate container and prime outer container(s).</blockquote>
+  <div class="ev-explanation">This prescribes specific forms and standards for marking. While specific, these are standardized DoD logistics requirements necessary for supply chain traceability and inventory management — they reflect mandatory DoD infrastructure requirements, not contractor process preferences. This is not sprawl in the meaningful sense.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a DLA supply solicitation for 4 units of a single, qualified-source digital computer system (NSN 7010-01-705-5751, restricted to Northrop Grumman). The core acquisition is administratively straightforward. The solicitation itself (Sections B through M) follows standard DLA boilerplate with FAR/DFARS clauses incorporated by reference — this is normal and not a rule pool concern. However, the SOW attachment, which governs packaging and marking, presents a moderate rule pool problem. It lists approximately 17 distinct standards and regulatory documents in a master-template style, several of which (ISPM-15 for wood pallets in international trade, ICAO/IATA/IMDG hazardous materials codes, MIL-STD-648 for specialized container design) have no evident connection to shipping 4 computer units domestically from a single domestic source to DLA Distribution Barstow. The hazardous materials compliance section is the clearest example: it requires adherence to four international dangerous goods regimes without establishing that the item is actually hazardous. This is characteristic of copy-forward accumulation — a packaging SOW template applied without review for applicability to the specific item. The severity is moderate (2) rather than severe (3) because: (1) the main solicitation body&#x27;s clause citations are standard FAR/DFARS incorporations by reference, which is normal practice; (2) the rule pool is confined to the packaging SOW rather than pervading the entire solicitation; (3) many of the packaging standards cited (MIL-STD-2073-1, MIL-STD-129, MIL-STD-130) are genuinely applicable to DoD materiel procurement; and (4) the acquisition is restricted to a single qualified source, meaning the pool of vendors affected is narrow. A potential bidder familiar with DLA packaging requirements would recognize the template nature of the SOW and know which standards practically apply. This is elevated boilerplate accumulation, not a severe undifferentiated compliance avalanche.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>MIL-STD 2073-1, Standard Practice for Military Packaging... ASTM D3951, Standard Practice For Commercial Packaging... MIL-STD 129, Military Marking For Shipment and Storage... INTERNATIONAL STANDARDS FOR PHYTOSANITARY MEASURES (ISPM 15) REQUIREMENTS... ELECTROSTATIC MATERIAL... MIL-STD-147, Palletized Unit Loads... MIL-STD-648, Department of Defense Design Criteria Standard, Specialized Shipping Containers... HAZARDOUS MATERIALS... FED-STD-313...</blockquote>
+  <div class="ev-explanation">The SOW attachment enumerates at least 9 separate packaging and marking standards in sequence with minimal context tying each to the specific item being procured (4 digital computer systems from a single qualified source). While some standards like MIL-STD-2073-1 and MIL-STD-129 are plausibly applicable to any DoD materiel shipment, others — such as ISPM-15 (wood packaging for international phytosanitary purposes), MIL-STD-648 (specialized shipping container design), and MIL-STD-147 (palletized unit loads) — are presented as equally applicable without explanation of whether they actually govern this specific item. The list reads as a master template applied wholesale rather than a curated set for this acquisition.</div>
+</div><div class="evidence-item">
+  <blockquote>AFI 24-602V2_AFGM2018-01, Preparation and Movement of Air Force Cargo... AFMAN 24-604, Preparing Hazardous Materials for Military Air Shipments... DOT Title 29, Occupational Safety and Health Administration, Labor... DOT Title 49... ICAO Technical Instructions... IATA Dangerous Goods Regulation... IMDG Code... ANSI/ESD S20.20... ESD TR20.20... ISPM 15... MIL-STD-2073-1... MIL-STD-129... MIL-STD-648... MIL-STD-147... MIL-HDBK-773... TO 00-85B-3... FED-STD-313</blockquote>
+  <div class="ev-explanation">The SOW&#x27;s final page lists 17 &#x27;Applicable Government Packaging Documents&#x27; in a block under the heading &#x27;NOTE: UTILIZE THE MOST RECENT REVISION&#x27; with zero contextual guidance on which apply to this specific item. Notably, multiple hazardous materials standards (AFMAN 24-604, DOT Title 49, ICAO, IATA, IMDG) are listed for what is a digital computer system with no indication it contains hazardous materials. This strongly suggests copy-forward accumulation from a template rather than deliberate curation.</div>
+</div><div class="evidence-item">
+  <blockquote>HAZARDOUS MATERIALS: The offeror shall ensure Hazardous shipments are prepared, label, certified and comply with International Civil Aviation Organization (ICAO), U.S. Code of Federal Regulations (CFR) Title 49, International Air Transport Association (IATA) Dangerous Goods Regulation, International Maritime Dangerous Goods Code (IMDG, Annex 1), and AFMAN24-604</blockquote>
+  <div class="ev-explanation">This section mandates compliance with four separate hazardous materials shipping regimes (ICAO, 49 CFR, IATA, IMDG) for a procurement of 4 digital computer systems (NSN 7010-01-705-5751, a JTE computer system). There is no indication in the solicitation that these systems contain hazardous materials requiring international dangerous goods certification. Applying international maritime and air dangerous goods codes to a standard military electronics procurement is a textbook example of an inapplicable regulation carried forward from a master template.</div>
+</div><div class="evidence-item">
+  <blockquote>252.225-7972 PROHIBITION ON THE PROCUREMENT OF FOREIGN-MADE UNMANNED AIRCRAFT SYSTEMS... 252.225-7973 PROHIBITION ON THE PROCUREMENT OF FOREIGN-MADE UNMANNED AIRCRAFT SYSTEMS-REPRESENTATION</blockquote>
+  <div class="ev-explanation">The solicitation includes two full UAS prohibition clauses — with the clause at 252.225-7972 spanning nearly two pages of text — for a procurement of 4 digital computer systems. While DFARS mandates inclusion of these clauses broadly, their presence here with no contextual note that they are inapplicable to this acquisition adds to the undifferentiated regulatory burden. A vendor must read through extensive UAS prohibition language to determine it simply does not apply to what they are being asked to supply.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a simple supply procurement for 4 units of a specific, named digital computer system (NSN 7010-01-705-5751) from a single qualified source (Northrop Grumman). The contract type is Firm Fixed Price, and CLIN 0001 is the only priced line item. CLIN 0002 (Counterfeit Prevention Plan) is Not Separately Priced and is a documentation deliverable tied to the hardware purchase. FFP is the standard and appropriate contract type for a discrete hardware buy where the item, quantity, manufacturer, and part number are all fully specified. There is no labor-hour ambiguity, no undefined scope, and no evolving requirements — the government is simply purchasing a known item for delivery to a specified location by a specified date. The SOW is entirely focused on packaging, marking, and shipping standards, which are deterministic requirements that do not introduce scope uncertainty. No mismatch between contract type and requirements is present. This is a severity 1 finding.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Item No. 0001 Firm Fixed Price Quantity U/I Unit Price Amount 4 EA ... NSN: 7010-01-705-5751FD COMPUTER SYSTEM,DIG JTE Manufacturer Part Number 1L4J7 1320-5630003-01</blockquote>
+  <div class="ev-explanation">The contract uses Firm Fixed Price for the delivery of 4 units of a specific, identified National Stock Number (NSN) item with a known manufacturer part number. This is a straightforward supply purchase of a defined, discrete hardware item — exactly the scenario where FFP is appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>This acquisition is restricted to qualified source: Northrop Grumman (Cage 1L4J7).</blockquote>
+  <div class="ev-explanation">The item is a sole-source supply acquisition from a single qualified manufacturer. The part number and manufacturer are fully specified, meaning the government knows exactly what it is buying. Under these conditions, FFP is a reasonable fit because the deliverable is well-defined even if competition is limited.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="CDRLCPP.pdf">CDRLCPP.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b91f7a8ea45c44c0a7d8c37be7dea1ba_CDRLCPP.pdf" download="CDRLCPP.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SOW.pdf">SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b91f7a8ea45c44c0a7d8c37be7dea1ba_SOW.pdf" download="SOW.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SPRHA526Q0653.pdf">SPRHA526Q0653.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b91f7a8ea45c44c0a7d8c37be7dea1ba_SPRHA526Q0653.pdf" download="SPRHA526Q0653.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SPRHA526Q0653_0001 - Canceled CUI SSI.pdf">SPRHA526Q0653_0001 - Canceled CUI SSI.pdf</div></div>
+  <a class="dl-btn" href="../attachments/b91f7a8ea45c44c0a7d8c37be7dea1ba_SPRHA526Q0653_0001+-+Canceled+CUI+SSI.pdf" download="SPRHA526Q0653_0001 - Canceled CUI SSI.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

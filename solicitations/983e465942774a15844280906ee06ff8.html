@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Louisiana Technology Transfer Support to NASA SSC — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>Louisiana Technology Transfer Support to NASA SSC</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 983e465942774a15844280906ee06ff8</span>
+      <a class="sam-link" href="https://sam.gov/opp/983e465942774a15844280906ee06ff8/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-27</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NATIONAL AERONAUTICS AND SPACE ADMINISTRATION › NASA SHARED SERVICES CENTER</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">B599</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541990</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-27</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12 months (4/28/2026 to 4/30/2026)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of compliance over outcomes. The entire accountability structure — a weekly activity report, weekly staff meeting participation, and a final report — is framed around activity documentation rather than outcome measurement. The SOW&#x27;s task definitions (technology transfer, technology maturation, regional partnerships, benchmarking) are stated as activity lists (&#x27;conduct reviews,&#x27; &#x27;maintain a working knowledgebase,&#x27; &#x27;facilitate visits&#x27;) without any associated performance targets, success criteria, or quantifiable outcomes. There is no equivalent of &#x27;X licenses executed per quarter,&#x27; &#x27;Y university partnerships established,&#x27; or any other metric that would allow the government to evaluate whether the contractor&#x27;s activities actually advanced NASA&#x27;s technology transfer mission.
+
+However, this is not a severe case. The reporting burden itself is relatively light — one weekly report plus meeting participation, not a cascade of overlapping weekly/monthly/quarterly formats with prescribed sections. The contract is also short (12 months) and the work is inherently relationship- and outreach-oriented, where activity documentation may capture meaningful proxy information. The benchmarking task (Task 4) gestures toward analytical output (&#x27;gap analysis&#x27;) that could inform outcome assessment, though no targets are set. The sole-source nature of the contract — awarded to a state agency under an MOU mandate — may explain why rigorous outcome metrics were not developed: the relationship pre-exists the contract and is partly policy-driven rather than performance-driven. Still, the complete absence of any performance standard, success metric, or outcome measure in the deliverables section means the government has no contractual mechanism to evaluate whether the contractor did a good job versus merely showed up and filed reports. Severity 2 is appropriate: compliance mechanisms exist and are not grossly burdensome, but they crowd out outcome focus almost entirely.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Provide a weekly activity report no later than noon every Wednesday using the online system provided by the Technology Development Office.</blockquote>
+  <div class="ev-explanation">The weekly activity report requirement focuses on activity documentation and schedule adherence (submission by a specific deadline) rather than measuring whether the activities achieved any outcome. There is no accompanying performance target — no metric for how many licensees were engaged, how many partnerships formed, or what commercial outcomes resulted. This is compliance-focused reporting: did the contractor submit the report on time, covering activities performed.</div>
+</div><div class="evidence-item">
+  <blockquote>Participation in weekly Technology Transfer staff meetings periodically to communicate activities under this task.</blockquote>
+  <div class="ev-explanation">The required participation in weekly meetings is described solely in terms of communicating activities — what was done — rather than reviewing outcomes, progress toward goals, or performance against defined targets. Combined with the weekly written report, this creates overlapping cadences covering the same ground (activities performed), without any outcome dimension.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide a final report within ten (10) days of completion of this contract. The report shall be delivered to the SSC Technology Transfer Officer via email. The final report should document the contractor&#x27;s notable activities and accomplishments during the contract period of performance.</blockquote>
+  <div class="ev-explanation">Even the capstone accountability document — the final report — is framed around documenting &#x27;notable activities and accomplishments&#x27; rather than measuring performance against defined success criteria, targets, or mission outcomes. There are no benchmarks against which accomplishments are assessed. This is the last opportunity to evaluate whether the contract succeeded, and it defaults to a narrative of activities rather than outcome measurement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents the most extreme form of the Insider Rewards sin: it is not merely structured to favor the incumbent — it is explicitly written to award a sole source contract to one named entity, the Louisiana Department of Economic Development. The sole source justification document (Tab 06) does not identify any objective experience thresholds, dollar requirements, or evaluation criteria that a competitor would need to meet, because there is no competition. Instead, the justification is entirely built around the incumbent&#x27;s unique legal mandate (state executive order), its pre-existing MOU with NASA, and its accumulated relationship network — all of which are definitionally unreplicable by any other vendor.
+
+The core test — &#x27;Could a qualified vendor who has never worked this specific contract realistically compete?&#x27; — is answered explicitly by the government itself: no. The J&amp;A states that &#x27;no other organization has the extensive contacts within industry and academic&#x27; to perform this work. This is not a finding that requires inference; it is stated government policy.
+
+While there is a facially plausible legal basis for the sole source (a state-level MOU and executive order do create a unique institutional arrangement), the J&amp;A does not demonstrate that the underlying capability — technology transfer liaison, stakeholder engagement, licensing support — is genuinely unavailable from other sources. The justification conflates the incumbent&#x27;s existing relationships (an artifact of prior incumbency) with unique capability. This is the classic insider rewards self-reinforcing cycle: the incumbent has won before, accumulated relationships, and those accumulated relationships are now cited as the reason no one else can win.
+
+Severity 3 is clearly warranted. The competition is entirely closed, the justification is relationship-based rather than capability-based, and the two-day response window forecloses even the theoretical possibility of a competitive response.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>** THIS IS A SOLE SOURCE REQUIREMENT ** ... NASA/NSSC intends to issue a sole source contract to ECONOMIC DEVELOPMENT, LOUISIANA DEPARTMENT OF 100 North ST FL 7 Baton Rouge, Louisiana 70802-5200 under the authority of FAR 12.102(a). It has been determined that ECONOMIC DEVELOPMENT, LOUISIANA DEPARTMENT OF is the sole provider of Louisiana Technology Transfer Support to NASA SSC.</blockquote>
+  <div class="ev-explanation">This is not merely a tilted playing field — it is a fully closed one. The solicitation explicitly names the incumbent as the sole provider and proceeds under sole source authority. No other vendor can compete regardless of their capability or qualifications.</div>
+</div><div class="evidence-item">
+  <blockquote>The LTTO is mandated by Executive Order MJF 96-22 to maintain a Technology Transfer Office at Stennis Space Center as the main point of contact for NASA&#x27;s Technology Transfer Program... An MOU exists between the State of LA (Governor&#x27;s Office) and NASA, emphasizing the importance of this unique partnership and a commitment to providing whatever support is needed by NASA.</blockquote>
+  <div class="ev-explanation">The sole source justification relies on an executive order mandate and a pre-existing MOU between the State of Louisiana and NASA. These legal and quasi-legal instruments institutionalize the incumbent relationship, making the insider reward structural rather than merely preferential. Any competitor would need to not only demonstrate capability but undo a state executive order and a gubernatorial-level MOU to be considered.</div>
+</div><div class="evidence-item">
+  <blockquote>No other organization has the extensive contacts within industry and academic to assist in meeting the technology transfer objective. The synergy amongst the LTTO and NASA Technology Transfer would be lost to SSC Test Data and Information Management, causing obstacles and delays in transferring technology.</blockquote>
+  <div class="ev-explanation">The J&amp;A explicitly frames accumulated relationship capital — contacts with Louisiana industry and academia — as a unique qualification possessed only by the incumbent. This is a textbook institutional knowledge requirement: the agency asserts that the relationship network built during prior performance cannot be replicated by a new entrant, which directly rewards incumbency rather than capability.</div>
+</div><div class="evidence-item">
+  <blockquote>The SSC Technology Transfer Office has a long-standing relationship with the Louisiana Technology Transfer Office. The synergistic nature of the mission of both organizations provides a unique opportunity to leverage LTTO programs and clients towards meeting the goals of NASA&#x27;s Technology Transfer mission.</blockquote>
+  <div class="ev-explanation">&#x27;Long-standing relationship&#x27; and &#x27;synergistic&#x27; mission alignment are incumbency proxies, not capability proxies. The justification is that the incumbent has been doing this work for a long time — precisely the pattern the Insider Rewards sin describes. This framing would rationalize perpetual sole-sourcing to any vendor that has held a contract long enough.</div>
+</div><div class="evidence-item">
+  <blockquote>Interested organizations may submit their capabilities and qualifications to perform the effort in writing to the identified point of contact not later than 7 a.m. Central Standard Time on 4/29/2026.</blockquote>
+  <div class="ev-explanation">The response window is approximately two days from posting (April 27 to April 29 at 7 a.m.). Even in the unlikely event a qualified competitor existed and wanted to respond, a 2-day window to submit a capability statement for a 12-month technology transfer contract is effectively prohibitive, reinforcing the sole-source outcome through procedural design.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This SOW exhibits moderate requirement sprawl. The task definitions across all four task areas are written predominantly as activity lists — things the contractor will do — rather than as measurable outcomes or end states. There is no statement of what success looks like: no metrics for technology transfer deals closed, licensees identified, partnerships established, or faculty collaborations initiated. The language consistently uses &#x27;support,&#x27; &#x27;conduct,&#x27; &#x27;engage,&#x27; &#x27;maintain,&#x27; and &#x27;provide&#x27; to describe prescribed activities rather than defining a performance baseline the vendor must achieve by whatever means they choose.
+
+That said, the severity is moderate rather than severe for several reasons. First, the SOW is quite brief (three pages), which limits the total volume of prescriptive language. Second, the nature of the work — relationship-based technology transfer brokering — is inherently difficult to reduce to pure outcome metrics, and some activity description is expected in this context. Third, this is a sole-source award to a state agency operating under a statutory mandate (Executive Order MJF 96-22) and an existing MOU, meaning the &#x27;how&#x27; is largely predetermined by the intergovernmental relationship structure, not by poor procurement drafting. The prescriptive activity lists likely reflect what the Louisiana Technology Transfer Office already does under the MOU rather than an agency attempting to micro-manage a competitive vendor.
+
+Nevertheless, the absence of any performance metrics, measurable deliverables beyond administrative reports, or outcome-oriented success criteria is a genuine weakness. A better SOW would complement the activity descriptions with at least some quantitative targets — number of licensing inquiries supported, university visits facilitated, or new company contacts added to the knowledgebase — so the government has a basis for assessing whether the contractor delivered value, not just activity.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Conduct reviews and analysis of NASA technology which could provide commercial further research and development opportunities to the private and academic sectors in the geographic region.
+• Support the SSC New Technology Representative and Software Release Authority to seek licensees for the NASA patent portfolio and software catalog.
+• Support NASA/SSC T2U and T2X entrepreneurship initiatives in Louisiana.
+• Engage NASA Technology Transfer personnel and others to interact with industry, academia and others in the region to utilize NASA technology or leverage NASA research opportunities.</blockquote>
+  <div class="ev-explanation">These bullets describe specific activities the contractor &#x27;shall&#x27; perform — conducting reviews, supporting named programs (T2U, T2X), engaging specific personnel — rather than defining an outcome such as &#x27;increase the number of active NASA technology licensees in Louisiana by X.&#x27; A vendor cannot propose an alternative engagement model or prioritize different activities based on their expertise; they are told what to do step by step.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide updates regularly on technology-oriented companies, entrepreneurs, and university research faculty in LA that are/have developed new, innovative technologies that may be of interest to NASA.
+• Support on-going meetings to engage technical, scientific, and program personnel at Stennis with LA universities or other research institutions and their Offices of Research/Sponsored Programs to NASA mission-needs.</blockquote>
+  <div class="ev-explanation">These requirements prescribe specific activities (regular updates, supporting ongoing meetings) without defining what success looks like — e.g., how many companies identified, what conversion rate to NASA partnerships, or what research collaborations are initiated. The contractor is told to perform the actions, not to achieve a result.</div>
+</div><div class="evidence-item">
+  <blockquote>Maintain a working knowledgebase of academia and industry involved in technology development and maturation with interest in NASA developed technology and capabilities.</blockquote>
+  <div class="ev-explanation">This dictates a specific tool or artifact (a &#x27;working knowledgebase&#x27;) without specifying what outcome it must enable. A vendor cannot propose an alternative information-management approach — a CRM, a structured partnership pipeline, or a curated newsletter — that might more effectively serve the underlying mission need.</div>
+</div><div class="evidence-item">
+  <blockquote>Provide a weekly activity report no later than noon every Wednesday using the online system provided by the Technology Development Office.
+... Participation in weekly Technology Transfer staff meetings periodically to communicate activities under this task.</blockquote>
+  <div class="ev-explanation">While deliverable requirements are generally legitimate, mandating weekly activity reports on a fixed schedule via a specific government-provided system, combined with mandatory attendance at weekly staff meetings, specifies a particular operating cadence and toolset rather than a communication outcome. This constrains how the vendor structures their work week and reporting without linking frequency to any performance threshold.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents no meaningful rule pool problem. The entire document — spanning the SOW, sole source justification, and synopsis — contains virtually no regulatory citation list at all. The SOW references NASA&#x27;s Strategic Objective 3.1 and mentions the MOU between NASA-SSC and the State of Louisiana, but does not enumerate a list of applicable regulations, standards, or compliance frameworks for the contractor to navigate. The sole source justification references FAR 12.102(a) and mentions Executive Order MJF 96-22 (the Louisiana executive order mandating the LTTO), both of which are directly germane to the basis for the sole source decision. The synopsis cites FAR Part 12 commercial item procedures and a single NASA FAR Supplement clause (1852.215-84, Ombudsman), both of which are standard procedural references appropriate to any simplified acquisition. There is no &#x27;Applicable Documents&#x27; section, no bulk regulatory citation list, no compliance framework enumeration, and no evidence of copy-forward accumulation of rules. The work described — technology transfer outreach, partnership development, briefing facilitation, and weekly reporting — does not inherently trigger complex regulatory overlays (no IT systems, no PII handling, no classified information, no safety-critical activities). A vendor reading this solicitation would face minimal regulatory interpretation burden. If anything, the solicitation errs in the opposite direction: it provides so little compliance structure that there is almost nothing to analyze for rule pool risk. Severity is 1.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The solicitation does not explicitly state the contract pricing type (e.g., FFP, T&amp;M, cost-plus), but the invocation of FAR Part 12 commercial item procedures strongly implies a fixed-price structure, most likely a firm-fixed-price level-of-effort arrangement. This is consistent with the nature of the work: the tasks are recurring liaison, outreach, and relationship-management activities performed by a known incumbent (the Louisiana Technology Transfer Office) under a long-standing MOU. The deliverables are well-defined — weekly activity reports, meeting participation, and a final report — and the 12-month period of performance is stable and predictable. The labor content is not highly variable; the contractor is essentially providing a standing team to perform a bounded set of engagement activities. A fixed-price or fixed-price level-of-effort structure is appropriate here: the government knows roughly what it is buying (ongoing T2 liaison services from a specific state agency), the incumbent has years of experience performing these activities, and cost should be estimable. There is no indication that scope is highly uncertain or that the quantity of labor would be unpredictable in ways that would necessitate T&amp;M. The absence of a dollar amount in the justification and some document-template artifacts (blank fields, apparent date inconsistencies) reflect sloppy form completion rather than a structural pricing mismatch. Overall, the contract type implied by the solicitation appears reasonably well-matched to the requirements, and no meaningful square peg concern is present.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The total estimated cost of this effort is and the estimated period of performance or lead-time for delivery is 4/28/2026 to 4/30/2026.</blockquote>
+  <div class="ev-explanation">The sole source justification document leaves the dollar amount blank, so the total contract value is not disclosed. However, the period of performance stated here (4/28 to 4/30, a two-day window) appears to be a placeholder or administrative artifact, while the SOW states a 12-month period of performance. This inconsistency makes it difficult to fully assess the contract structure, but it does not directly indicate a pricing type mismatch.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government intends to acquire Commercial items or services using the provisions, clauses and procedures prescribed in FAR Part 12 for Commercial</blockquote>
+  <div class="ev-explanation">The solicitation invokes FAR Part 12 (commercial items/services). This is consistent with a firm-fixed-price or fixed-price approach, which is the default under FAR Part 12. The services being acquired — relationship management, outreach, technology transfer liaison work, weekly reports — are relatively well-defined, recurring activities suitable for a fixed-price or level-of-effort fixed-price arrangement.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0040967 Tab 04 4 SOW.pdf">SATPC0040967 Tab 04 4 SOW.pdf</div></div>
+  <a class="dl-btn" href="../attachments/983e465942774a15844280906ee06ff8_SATPC0040967+Tab+04+4+SOW.pdf" download="SATPC0040967 Tab 04 4 SOW.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0040967 Tab 06 RDSS..pdf">SATPC0040967 Tab 06 RDSS..pdf</div></div>
+  <a class="dl-btn" href="../attachments/983e465942774a15844280906ee06ff8_SATPC0040967+Tab+06+RDSS..pdf" download="SATPC0040967 Tab 06 RDSS..pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="SATPC0040967 Tab 07 Capability Statement.pdf">SATPC0040967 Tab 07 Capability Statement.pdf</div></div>
+  <a class="dl-btn" href="../attachments/983e465942774a15844280906ee06ff8_SATPC0040967+Tab+07+Capability+Statement.pdf" download="SATPC0040967 Tab 07 Capability Statement.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

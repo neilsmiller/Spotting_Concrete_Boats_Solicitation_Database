@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DELL SERVERS — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DELL SERVERS</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 2439eac514974870b338b938294052b7</span>
+      <a class="sam-link" href="https://sam.gov/opp/2439eac514974870b338b938294052b7/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Combined Synopsis/Solicitation</span>
+      <span class="pill">2026-04-22</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NSWC DAHLGREN</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7K20</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Combined Synopsis/Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-04-22</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed-Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation lacks sufficient content to meaningfully assess the Compliance Over Outcomes sin. The posting is a combined synopsis/solicitation for a commercial hardware purchase (Dell PowerEdge R760XD2 server) with an attached requirements list (bill of materials) and a Statement of Work that is explicitly marked as REDACTED — the SOW PDF produced no extractable text (pages 1 and 2 are blank in the provided content). Without the SOW, there is no visibility into any QA surveillance plan, reporting requirements, meeting cadences, deliverable acceptance criteria, or performance standards. The requirements list is purely a hardware configuration manifest with part numbers and quantities. The solicitation body itself is brief, focused on acquisition mechanics (sole source justification, SAM registration, OEM authorization letters, LPTA award basis), and contains no reporting, monitoring, or quality assurance language beyond standard commercial item acquisition boilerplate. Because the primary document where this sin would manifest — the SOW — is unavailable due to redaction, a reliable assessment cannot be made. It is also worth noting that this is fundamentally a commercial hardware/installation procurement, not a services contract, so the risk of elaborate compliance-over-outcomes reporting structures is lower than in a professional services acquisition. However, the SOW does reference &#x27;unique software installation, security hardening, and on-site integration services,&#x27; which could carry QA implications — but without the SOW text, no determination is possible.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-severe">Severe</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation represents a severity 3 insider rewards situation — the most extreme form — because it is structured as a sole source acquisition explicitly naming SelecTech, LLC as the only acceptable vendor for integration services. The justification rests entirely on accumulated institutional knowledge, proprietary processes, and program-specific expertise that, by the government&#x27;s own account, cannot be replicated by any other vendor. This is not a case of tilted evaluation criteria or stacked experience thresholds; competition has been eliminated entirely rather than merely constrained. The solicitation&#x27;s own language confirms vendor capture: the agency cannot articulate requirements in vendor-neutral terms because the incumbent&#x27;s tribal knowledge has become inseparable from the program&#x27;s operational definition. The 6-day response window and the dual restriction (authorized Dell reseller for hardware plus sole-source for services) compound the exclusionary effect. While sole source acquisitions are sometimes legally justified under FAR 6.302-1, the justification here — &#x27;deep institutional knowledge,&#x27; &#x27;proprietary processes,&#x27; and &#x27;custom scripts&#x27; developed by the incumbent — reflects a dependency relationship that has grown over time from a failure to maintain competitive requirements. A qualified vendor who has never held this contract could not realistically compete under any reading of this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Sole Source - FAR 6.103-1(b)</blockquote>
+  <div class="ev-explanation">The solicitation is structured as a sole source acquisition, which by definition excludes all vendors except the named incumbent (SelecTech, LLC). This is the most extreme form of insider rewards — not merely tilting the playing field but closing it entirely to all other competitors.</div>
+</div><div class="evidence-item">
+  <blockquote>SelecTech, LLC&#x27;s deep institutional knowledge of the program, and their critical on-site integration support, SelecTech is the only vendor capable of meeting the government&#x27;s needs without adding risk to the program.</blockquote>
+  <div class="ev-explanation">The justification for sole source is explicitly framed around accumulated institutional knowledge that only the incumbent possesses. &#x27;Deep institutional knowledge of the program&#x27; is a textbook insider-rewards rationale — it rewards incumbency directly rather than demonstrated capability, and it signals that the agency&#x27;s requirements cannot be articulated in vendor-neutral terms because the agency depends on the incumbent&#x27;s tribal knowledge.</div>
+</div><div class="evidence-item">
+  <blockquote>This history has uniquely positioned them to develop and refine the specific software configurations and security protocols required by the program. This transformation involves proprietary processes, custom scripts, and a deep understanding of the interplay between the hardware, software, and the program&#x27;s operational network.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly identifies proprietary processes, custom scripts, and program-specific knowledge as disqualifying factors for any non-incumbent. These are classic markers of vendor capture: the government&#x27;s requirements have been defined in terms that only the existing vendor can satisfy, creating a self-reinforcing dependency that forecloses future competition.</div>
+</div><div class="evidence-item">
+  <blockquote>Quotes will only be accepted from authorized re-sellers who have provided a Letter of Authorization.</blockquote>
+  <div class="ev-explanation">Even for the hardware component (the Dell server), the solicitation restricts the pool to authorized Dell resellers who can provide a Letter of Authorization. While this has a surface-level commercial rationale, combined with the sole-source structure for integration services, it stacks an additional gatekeeping criterion that narrows the field further and reinforces incumbent advantage.</div>
+</div><div class="evidence-item">
+  <blockquote>This tailored solution cannot be purchased from another vendor or replicated without significant mission risk, schedule delays, and engineering costs.</blockquote>
+  <div class="ev-explanation">This language explicitly asserts that the agency has become so dependent on the incumbent&#x27;s methods that replicating the solution would be prohibitively costly. This is a direct admission of vendor capture — the government is acknowledging it cannot separate the requirement from the incumbent, which is precisely the self-reinforcing cycle that insider rewards structures produce over time.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation does not exhibit meaningful requirement sprawl. It is a sole-source, simplified acquisition procurement for a specific commercial hardware product (Dell PowerEdge R760XD2) plus associated integration services from a named vendor. The extensive component-level specificity in the requirements list reflects the nature of a hardware purchase — you must specify what you are buying — and is further justified by the stated interoperability need with existing fleet equipment. This is fundamentally different from requirement sprawl in a services context, where prescriptive bullets constrain how a vendor performs ongoing work. The solicitation describes integration service outcomes (software installation, security hardening, on-site integration) without visible step-by-step process mandates in the available text. Critically, the SOW attachment — which is where sprawl most commonly appears in service acquisitions — was redacted and could not be reviewed. This limits the analysis somewhat, but the visible solicitation body is outcome-oriented and appropriate for its procurement type. There are no indicators of consensus-driven requirement accumulation, incumbent process capture, or staffing prescription. Severity is 1: the solicitation is competently scoped for what it is.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>210-BGSS PowerEdge R760XD2 Server (configuration follows) ... [followed by ~55 line-item part numbers specifying exact hardware components]</blockquote>
+  <div class="ev-explanation">The requirements list specifies exact Dell part numbers for every component — processors, memory, drives, NICs, RAID controllers, power supplies, etc. This is prescriptive about HOW the hardware is configured. However, this is a sole-source procurement for a specific, named hardware product that must integrate with an existing system. The component-level specificity reflects a legitimate interoperability constraint (form, fit, and function compatibility with existing fleet equipment) rather than process sprawl in the service-delivery sense. The government is buying a defined product, not a service — so specifying the product configuration is appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>unique CTERA software installation, security hardening on-site integration services to be provided by SelecTech, LLC</blockquote>
+  <div class="ev-explanation">The SOW attachment was redacted and unavailable, so the full scope of integration service requirements cannot be assessed. The description identifies the service deliverables (software installation, security hardening, on-site integration) at an outcome level without visible step-by-step process mandates in the available text. Without the SOW content, this cannot be flagged as sprawl — it reads more like a deliverable description.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a streamlined combined synopsis/solicitation for a commercial hardware purchase (Dell PowerEdge R760XD2 server with associated integration services) under FAR Part 12 simplified acquisition procedures. The document does not contain an &#x27;Applicable Documents&#x27; list, a &#x27;Referenced Standards&#x27; section, or any bulk regulatory citation section of the kind that constitutes rule pools.
+
+The regulatory references in the solicitation body are limited and purposeful: FAR Part 12 (commercial items), FAR Part 5 (publicizing), FAR 6.103-1(b) (sole source justification), FAR 19.104-1 (set-aside context), DFARS 252.225-7013 (Duty-Free Entry, cited with a clear rationale regarding tariff/duty charges), and Buy American/Trade Agreements threshold language — all of which are standard and directly applicable to this type of procurement. The SF 1449 incorporates FAR/DFARS clauses by reference, which is normal federal contracting practice and explicitly excluded from the rule pools definition.
+
+The SOW attachment was substantially redacted (only blank pages visible), so it is possible that a compliance section exists there that could not be reviewed. However, the materials list and solicitation body — which together constitute the bulk of the available text — show no signs of accumulated, undifferentiated regulatory citation. There is no evidence of copy-forward regulatory accumulation, contradictory compliance requirements, or irrelevant policy inclusions.
+
+For a single commercial server procurement with a narrow, well-defined scope (hardware delivery plus on-site integration), the regulatory footprint here is appropriately minimal. A vendor reading this solicitation can readily understand the compliance landscape. Severity 1 is appropriate.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a well-matched use of firm-fixed-price contracting. The government is purchasing a single, precisely specified Dell PowerEdge R760XD2 server with a detailed, exhaustive bill of materials (50+ line items with exact Dell part numbers) plus associated support services (ProSupport, warranty). The scope is entirely well-defined: a specific commercial product with known configuration, shipped to a known location, with 3-year support terms. There is no ambiguity in deliverables, no evolving requirements, and no unpredictable labor content that would argue for T&amp;M or cost-reimbursement. The inclusion of SelecTech integration services (CTERA software installation, security hardening, on-site integration) introduces a modest service component, but the SOW is described as a defined, bounded task — installing specific software and hardening a specific system — rather than open-ended labor. FFP is appropriate here because the contractor knows exactly what hardware to deliver and what services to perform, costs can be estimated with reasonable certainty, and the government benefits from price competition among authorized Dell resellers. The contract type is well-matched to the requirement. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government will utilize Simplified Acquisition Procedures, and the order will be issued on a firm fixed-price basis.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract will be firm-fixed-price (FFP). This is the appropriate contract type for this requirement.</div>
+</div><div class="evidence-item">
+  <blockquote>210-BGSS PowerEdge R760XD2 Server... See the attached SF1449 Solicitation &amp; Requirements List with configuration.</blockquote>
+  <div class="ev-explanation">The requirements list shows a fully specified, itemized bill of materials with exact Dell part numbers, quantities, and configurations. The deliverable is a discrete, well-defined commercial hardware product — exactly the context for which FFP is designed.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="0326-01 - Dell Servers_Materials List.xlsx">0326-01 - Dell Servers_Materials List.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/2439eac514974870b338b938294052b7_0326-01+-+Dell+Servers_Materials+List.xlsx" download="0326-01 - Dell Servers_Materials List.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="0326-01_SOW_Rev1_REDACTED.pdf">0326-01_SOW_Rev1_REDACTED.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2439eac514974870b338b938294052b7_0326-01_SOW_Rev1_REDACTED.pdf" download="0326-01_SOW_Rev1_REDACTED.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0017826Q6721.pdf">Solicitation - N0017826Q6721.pdf</div></div>
+  <a class="dl-btn" href="../attachments/2439eac514974870b338b938294052b7_Solicitation+-+N0017826Q6721.pdf" download="Solicitation - N0017826Q6721.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

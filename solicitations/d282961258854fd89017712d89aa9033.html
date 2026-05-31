@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H30 Engineering Services — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>H30 Engineering Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d282961258854fd89017712d89aa9033</span>
+      <a class="sam-link" href="https://sam.gov/opp/d282961258854fd89017712d89aa9033/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-05-01</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSEA › NAVSEA WARFARE CENTER › NSWC DAHLGREN</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R425</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">—</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-01</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">CPFF</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base period + 4 option years</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate case of compliance-over-outcomes. The QASP does include some outcome-oriented language — customer satisfaction targets, a timeliness standard, and a structured performance rating framework with narrative descriptors — which prevents a severity 3 finding. The CPARS linkage and the explicit option-exercise tie to satisfactory performance ratings also suggest some genuine accountability intent.
+
+However, the actual measurable standards in Table 3 (the Performance Requirements Surveillance Matrix) are predominantly process- and compliance-focused. For the broadest coverage category (SOW paragraphs C.3.1-C.3.14, covering the entire engineering scope), the AQL is &#x27;90% Compliant&#x27; measured by &#x27;Periodic Inspection and Customer Feedback&#x27; — which operationalizes quality as schedule adherence and customer satisfaction with reports rather than technical outcomes. The software AQL is &#x27;90% compliant with requirements,&#x27; which measures whether code matches a specification rather than whether it performs in its operational context. The IA/RMF outcome is defined as timely submission of correctly formatted documentation. The management standard is 95% staffing fill rate and invoice accuracy.
+
+What is conspicuously absent for a defense engineering and weapons system integration contract: any technical performance metrics (simulation accuracy, test coverage, integration success rates), any mission-oriented outcome measures (system readiness, lethality assessment validity, test schedule support effectiveness), or any measures of whether the engineering work products were used or useful.
+
+The QASP&#x27;s stated intent — &#x27;The ability to make decisions based on the analysis of performance data is the cornerstone of performance management&#x27; — is sound, but the actual measurement framework does not operationalize it. The gap between the stated philosophy and the actual AQLs is the hallmark of moderate compliance-over-outcomes: the government knows it wants outcomes but defaults to measuring what is easily auditable. Severity 2 is appropriate: there are mitigating outcome-oriented elements (customer satisfaction, CPARS, performance rating tiers), but the primary accountability instruments measure process compliance rather than engineering results.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Contractor shall ensure that a rapid response is given in the completion of tasking and maintain 95% customer satisfaction with task support and content of monthly reports. ... 90% Customer Satisfaction with task support and content of monthly reports.</blockquote>
+  <div class="ev-explanation">This is the most outcome-oriented performance standard in the QASP — a customer satisfaction target. However, it is defined entirely in terms of satisfaction with &#x27;task support and content of monthly reports,&#x27; meaning the primary measurable outcome is whether the government likes the paperwork, not whether the engineering work accomplished its technical purpose.</div>
+</div><div class="evidence-item">
+  <blockquote>SOW paragraphs C.3.1 – C.3.14 support meets the requirements of each Work Element. C.3.1-C.3.14 Support has the desired skill level and provides technical inputs and deliverables as required. ... 90% Compliant. Periodic Inspection and Customer Feedback.</blockquote>
+  <div class="ev-explanation">The AQL for the broadest category of SOW tasking — covering all fourteen work elements — is simply &#x27;90% Compliant&#x27; with &#x27;Periodic Inspection and Customer Feedback&#x27; as the monitoring method. This measures adherence to requirements and schedule, not whether the engineering outputs actually advanced the mission. For a defense R&amp;D engineering contract, there is no technical performance target, no system-level metric, and no measure of whether the work produced useful results.</div>
+</div><div class="evidence-item">
+  <blockquote>Accurate, functional, and error-free software code | Provide software design and development support | Software code meets requirements and functions as designed with no defects | 90% compliant | 100% inspection by COR and/or SMEs</blockquote>
+  <div class="ev-explanation">Software quality is measured as &#x27;90% compliant&#x27; with requirements — i.e., does the code match the spec. There is no performance metric (throughput, latency, defect escape rate, test pass rate against operational scenarios) that would indicate whether the software actually performs its intended function in a weapons system context. Compliance with requirements documents substitutes for functional outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>RMF Cyber Accreditations successfully submitted on schedule. | Complete all RFM requirements and associated artifacts | Correct format and adherence to IA and RMF guidelines and documentation requirements. | 95% compliant with no more than one rework required per submission. On time delivery of RMF artifacts in compliance with customer required schedule.</blockquote>
+  <div class="ev-explanation">The &#x27;desired outcome&#x27; for information assurance is successfully submitting documentation artifacts on schedule, and quality is measured as format compliance with RMF guidelines. This is a pure documentation-compliance metric — whether the paperwork was submitted correctly and on time — rather than whether the systems being accredited are actually secure or operationally available.</div>
+</div><div class="evidence-item">
+  <blockquote>Compliance monitor staffing, technical progress, financial status, and all personnel travel. Additionally, track personnel approved to charge on contract, provide copies of all invoices, and ensure all invoiced costs represent services that have been performed including deliverable items | PM and operational capability of all positions and personnel must work with the COR to stay staffed at 95% | Periodic sampling of equipment and monthly review of equipment via the PM&#x27;s checklists.</blockquote>
+  <div class="ev-explanation">Management performance is operationalized almost entirely as staffing compliance (95% positions filled) and invoice/cost tracking. The monitoring method — &#x27;monthly review of equipment via the PM&#x27;s checklists&#x27; — is a process check. There is no metric for whether the management approach actually improved technical execution or mission outcomes.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation presents a moderate-to-elevated insider rewards concern, warranting a severity 2 rating. The most significant factor is the highly program-specific technical qualifications embedded in labor category definitions — particularly the Senior Computer Systems/Software Engineer (SM-2/SM-3/SM-6/ESSM specific interface experience, VxWorks SMP), the Principal Engineer (Aegis AWS/VLS prelaunch sequencing), and the Software Developer (Threat Engineering) (NGTS/ITASE). These are not broad domain competencies; they are system-specific knowledge signatures that exist almost exclusively in people currently working this or closely adjacent programs at NSWCDD. The 20-year Principal Engineer requirement with Aegis/VLS interface specificity is particularly constraining — this is a very small labor population nationally.
+
+The federal-specific PM experience mandate (10 years managing government contracts) adds another layer of incumbency bias without clear technical justification. And the labor mix evaluation structure — where deviations require explanation and risk penalty — creates an informational asymmetry that benefits the incumbent.
+
+Mitigating factors prevent a severity 3 rating: (1) Many qualifications, while specific, reflect genuine domain requirements for missile defense engineering work — this is a specialized national security capability, and some narrowness is expected and appropriate; (2) the solicitation attracted 50+ companies to Industry Day, suggesting the market perceives the opportunity as competitive; (3) several labor categories (Junior Engineer, Configuration Management Analyst, Program Analyst, Systems Administrator) have broadly accessible qualification standards; (4) the past performance form is generic and does not impose specific dollar thresholds or lookback windows that would mechanically exclude competitors. The solicitation tilts the playing field toward incumbents through workforce-level qualification specificity, but does not categorically close it.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>SENIOR COMPUTER SYSTEMS/SOFTWARE ENGINEER
+A Bachelor&#x27;s degree from an accredited college or university in an engineering, scientific, or technical discipline. Ten (10) years professional technical experience which includes at least five (5) years specialized experience performing computer hardware engineering, software design, coding and compilation of code... Specialized experience with development of Real-Time VxWorks Symmetric Multi-Processing (SMP) software. Expertise related to hardware and software development for Standard Missile (SM)-2, SM-3, SM-6, and Evolved Sea Sparrow Missile (ESSM) missile internal interfaces, such as experience with SM-3 Kill Warhead Data Link (KWDL), SM-3 Missile Test Data (MTD), SM-2/Sm-6 initialization message digital interface, and vertical launch system.</blockquote>
+  <div class="ev-explanation">This requirement compounds general experience with a highly specific platform demand: experience with SM-3 KWDL, SM-3 MTD, SM-2/SM-6 initialization digital interfaces, and VLS — all of which are program-specific interfaces tied directly to the Navy&#x27;s current weapon systems. These are not generalized software engineering skills; they are system-specific interface knowledge that realistically only individuals who have worked on this specific program family — likely under the current or a closely related incumbent contract — would possess. Requiring this at the labor category level (not just as a nice-to-have) substantially narrows the eligible workforce.</div>
+</div><div class="evidence-item">
+  <blockquote>Principal Engineer
+• Twenty (20) years of missile integration and test experience with at least seven (7) years of specialized experience
+o Specialized experience is defined as significant systems engineering responsibilities in a minimum of two of the following areas:
+d. Experience with Interface and interactions between Aegis Weapon System (AWS) computer program, and the Vertical Launching System (VLS) during Standard Missile prelaunch sequencing, beacon capture and through midcourse guidance phase of flight and transition to terminal homing</blockquote>
+  <div class="ev-explanation">The Principal Engineer qualification requires 20 years of missile integration experience and specifically names Aegis Weapon System and VLS prelaunch/midcourse sequencing experience as a qualifying specialization. This is an extraordinarily narrow technical domain. The Aegis AWS/VLS interface is a single DoD program-family construct. Individuals with 20 years in this specific domain are a small population, and those who have worked this particular interface are almost certainly connected to the current or prior NSWCDD H30 contractor team. This functions less as a capability test and more as a description of someone already embedded in this program.</div>
+</div><div class="evidence-item">
+  <blockquote>SOFTWARE DEVELOPER (THREAT ENGINEERING)
+Specialized experience with Next Generation Threat System (NGTS) and Advanced Framework for Simulation Integration and Modeling (AFSIM) is desired to support the assessment of Blue Force weapons and tactics in simulated engagements... Experience with combat management systems and weapons systems, particularly missiles, is highly desired. Technical skills and abilities should include experience with modern C++ programming (e.g., C++11 or later), experience with multiple simulation environments, particularly NGTS, AFSIM, or the Integrated Threat Analysis and Simulation Environment (ITASE)</blockquote>
+  <div class="ev-explanation">While labeled &#x27;desired,&#x27; NGTS and ITASE are DoD-specific simulation environments with very limited industry penetration outside of existing Navy/NSWCDD contractor support roles. AFSIM is more broadly used, but the combination — NGTS, AFSIM, and ITASE — points to someone who has worked specifically within this threat engineering community. When &#x27;desired&#x27; qualifications are this specific and this uncommon, they effectively become de facto requirements in competitive evaluation, because a vendor proposing someone without this background will score lower against one that can.</div>
+</div><div class="evidence-item">
+  <blockquote>Program Manager
+• Fifteen (15) years professional technical experience including at least five (5) years specialized experience in the management of the development or evaluation of Department of Defense (DoD) Weapons Systems
+• Ten (10) years program management experience, which includes both technical and administrative aspects of Government contract performance, providing contract data deliverables, and having oversight of contract schedule and cost
+• Experience related to maritime, launcher, missile, or DOD weapon control or effectiveness systems.</blockquote>
+  <div class="ev-explanation">The Program Manager requirement demands 15 years total, 10 years of government contract performance management experience, and DoD weapons systems specialization — stacking federal-specific experience mandates with domain narrowness. The requirement for managing &#x27;Government contract performance, providing contract data deliverables&#x27; explicitly excludes commercial program managers with equivalent complexity experience. This is a federal-specific experience mandate that is not justified by skills unique to government work: cost management, schedule oversight, and team leadership are not government-exclusive competencies.</div>
+</div><div class="evidence-item">
+  <blockquote>If the proposed labor mix differs from the estimate provided above, the Offeror shall describe how/why the proposed labor mix will result in a high quality, efficient, and cost effective solution. If the Offeror does not explain deviations from the above labor mix it may result in upward cost adjustments or one or more weaknesses/deficiencies during evaluation.</blockquote>
+  <div class="ev-explanation">The government has provided a highly specific labor mix estimate — 22 distinct labor categories, many with program-specific qualifications — and signals that deviations will result in evaluation penalties. An incumbent knows exactly how the current work is staffed and can propose a labor mix that mirrors the estimate precisely. A new entrant must reverse-engineer the government&#x27;s staffing model from sparse public information and risk weakness findings if their independent judgment about optimal staffing differs. This structurally advantages the incumbent&#x27;s institutional knowledge of current staffing patterns.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl, primarily concentrated in the Personnel Qualifications Guide (Attachment J.4) rather than throughout the entire document. The QASP (Attachment J.2) is actually reasonably outcome-oriented — it defines acceptable quality levels, customer satisfaction thresholds, and performance ratings without heavily prescribing how the work must be done. Similarly, the broader scope description focuses on service categories rather than step-by-step processes. The sprawl that exists is meaningful but bounded: the labor hour ceiling, the prescribed labor mix with deviation penalties, the highly specific labor category qualifications (especially for Senior Computer Systems/Software Engineer and Principal Engineer), and the exact FTE counts for key personnel together constitute a staffing structure mandate rather than a capability requirement. A vendor cannot propose that they will deliver the same engineering outcomes with a different team composition or a more automated workflow without facing evaluation penalties. The specificity of required experience — down to named missile programs, specific software frameworks, and interface-level knowledge — creates a qualification profile that virtually requires familiarity with the current program&#x27;s technical environment, which is a classic signal of incumbent-capture drafting. However, the solicitation stops short of prescribing step-by-step work processes for most technical tasks, and the QASP focuses on outcomes and customer satisfaction rather than methodology. The sprawl is real and would constrain competition, but it is primarily channeled through staffing prescriptions rather than pervasive process mandates, warranting a severity of 2 rather than 3.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Offerors&#x27; proposals may not deviate from the total number of hours included in Section B... If the proposed labor mix differs from the estimate provided above, the Offeror shall describe how/why the proposed labor mix will result in a high quality, efficient, and cost effective solution. If the Offeror does not explain deviations from the above labor mix it may result in upward cost adjustments or one or more weaknesses/deficiencies during evaluation.</blockquote>
+  <div class="ev-explanation">The solicitation fixes the total labor hours and treats deviations from the government&#x27;s prescribed labor mix as weaknesses requiring justification. This effectively mandates a staffing structure rather than allowing vendors to propose the team composition they believe best achieves the outcomes. A vendor who could deliver the same results with a different skill mix — perhaps fewer senior engineers and better tooling, or more automation — is penalized for proposing it.</div>
+</div><div class="evidence-item">
+  <blockquote>SENIOR COMPUTER SYSTEMS/SOFTWARE ENGINEER: A Bachelor&#x27;s degree... Ten (10) years professional technical experience which includes at least five (5) years specialized experience performing computer hardware engineering... Specialized experience with development of Real-Time VxWorks Symmetric Multi-Processing (SMP) software. Expertise related to hardware and software development for Standard Missile (SM)-2, SM-3, SM-6, and Evolved Sea Sparrow Missile (ESSM) missile internal interfaces, such as experience with SM-3 Kill Warhead Data Link (KWDL), SM-3 Missile Test Data (MTD), SM-2/Sm-6 initialization message digital interface, and vertical launch system.</blockquote>
+  <div class="ev-explanation">The qualification requirements for individual labor categories prescribe not just experience levels but specific platform knowledge (SM-2, SM-3, SM-6, ESSM, VxWorks SMP) as requirements or strong preferences. While some domain specificity is legitimate for classified weapons work, the layering of specific missile system interface experience down to individual engineer qualifications dictates the composition of the workforce in a way that effectively requires knowledge of the incumbent&#x27;s current technical environment, limiting competition to those who have already worked on these exact programs.</div>
+</div><div class="evidence-item">
+  <blockquote>Principal Engineer: Twenty (20) years of missile integration and test experience with at least seven (7) years of specialized experience... Specialized experience is defined as significant systems engineering responsibilities in a minimum of two of the following areas: a. Missile Systems; b. Weapon/Combat Systems; c. Aegis Ballistic Missile Defense; d. Experience with Interface and interactions between Aegis Weapon System (AWS) computer program, and the Vertical Launching System (VLS) during Standard Missile prelaunch sequencing, beacon capture and through midcourse guidance phase of flight and transition to terminal homing...</blockquote>
+  <div class="ev-explanation">The Principal Engineer qualification specifies 20 years of experience and prescribes the exact technical domains the incumbent must have worked in, down to specific missile flight phases. This level of specificity for a single labor category goes beyond defining the capability needed and instead describes a specific individual profile — almost certainly mirroring the incumbent personnel. This restricts competition rather than defining an outcome the government needs to achieve.</div>
+</div><div class="evidence-item">
+  <blockquote>The solicitation requires eight (8) Key Personnel positions, with Program Manager and Senior Software Engineer each requiring 1 FTE to fill; Senior Mechanical Engineer, Principal Engineer, Electrical Engineer – Junior, and Electrical Engineer Mid/Journeyman each will require 2 FTEs to fill; Senior Systems Engineer will require 2.5 FTE to fill; Senior Electrical Engineer will require 3 FTEs to fill.</blockquote>
+  <div class="ev-explanation">The government has prescribed not just the types of key personnel but the exact number of FTEs required for each key position. Specifying 2.5 FTE for Senior Systems Engineer and 3 FTEs for Senior Electrical Engineer dictates organizational structure rather than defining what technical capabilities are needed and allowing vendors to staff appropriately. This removes vendor discretion over team architecture and likely reflects the incumbent&#x27;s current staffing model.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">Based on the documents provided — which include the Cost Proposal Spreadsheet, the QASP, the Personnel Qualifications Guide, the Past Performance Reference form, and the Industry Day registration list — this solicitation does not exhibit a meaningful Rule Pools pattern. Notably, the documents do not contain a dedicated &#x27;Applicable Documents&#x27; or &#x27;Referenced Standards&#x27; section at all. No bulk list of regulations, directives, executive orders, or compliance frameworks appears anywhere in the provided attachments. The regulatory citations that do appear are few, targeted, and contextually embedded: DoD Directive 8570.01-M is cited only in connection with IA/sysadmin personnel qualifications; FAR 52.222-50, FAR 52.219-8/9, and CUI handling appear only in the QASP&#x27;s performance evaluation matrix with explicit performance standards tied to each. The Personnel Qualifications Guide cites no regulatory compliance frameworks at all — it is focused on education, years of experience, and technical skills. The absence of a governing &#x27;Section J&#x27; documents list or &#x27;Applicable Regulations&#x27; section could itself be a concern (vendors may not know what standards govern the actual engineering work), but that is a different sin than Rule Pools. The solicitation does not demonstrate the hallmarks of this sin: no bulk accumulation of uncurated regulations, no irrelevant policies, no contradictions between cited regulations and the work&#x27;s purpose. The compliance footprint visible in the provided documents is modest and appropriate for a DoD engineering services contract. Severity is assessed at 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Per DoD Directive 8570.01-M or successor, this position requires Information Assurance Technical (IAT) Level 2 or higher and requires this position to be designated as an Information Technology (IT) Level 1.</blockquote>
+  <div class="ev-explanation">The solicitation does reference DoD Directive 8570.01-M in the context of IA and system administrator roles — this is a targeted, contextually appropriate citation tied directly to the personnel qualifications for those specific positions. It is not dropped into a bulk list without explanation; it is embedded in role-specific requirements where its relevance is self-evident.</div>
+</div><div class="evidence-item">
+  <blockquote>FAR 52.222-50 Combatting Trafficking in Persons... Controlled Unclassified Information (CUI)... Counterfeit Materiel Oversight and Assurance... Small Business Subcontracting... FAR 52.219-8 and 52.219-9</blockquote>
+  <div class="ev-explanation">The QASP&#x27;s Regulatory Compliance section references a small, coherent set of regulatory compliance areas (anti-trafficking, CUI handling, counterfeit material, small business subcontracting). Each is framed within a performance evaluation context that explains what compliance looks like and how it will be assessed. This is curated regulatory guidance, not a bulk dump.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">The contract type is Cost-Plus-Fixed-Fee (CPFF), delivered through the SeaPort-NxG IDIQ vehicle. This is an appropriate match for the requirements. The work involves professional engineering support across a wide range of disciplines (systems engineering, software development, electrical and mechanical engineering, IA, configuration management, etc.) at a Navy RDTE center. In this context: (1) individual task-level scope is inherently unpredictable — tasking arises from program needs that evolve over a 5-year period of performance; (2) the government is purchasing expert labor capacity rather than a defined deliverable, making fixed-price inappropriate; (3) the RDTE environment means technical uncertainty is structural, not incidental; and (4) the SeaPort-NxG vehicle is specifically designed for this type of CPFF engineering support. The CPFF structure is well-suited here because it reimburses actual costs (appropriate when costs cannot be predicted with precision) while providing a fixed fee that preserves some profit incentive and administrative simplicity. The QASP includes performance surveillance mechanisms, CPARS reporting, and quantitative acceptable quality levels, which partially compensate for the reduced cost-control incentives inherent in any cost-reimbursement arrangement. The government has also capped pass-through at 8% and established fee maximums, adding further financial discipline. A T&amp;M contract would be a reasonable alternative for some of the more discrete support tasks, but CPFF is not a mismatch for this scope. There is no meaningful square peg concern here.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Total Labor Cost Plus Fixed Fee (CPFF)</blockquote>
+  <div class="ev-explanation">The cost proposal spreadsheet explicitly labels the contract type as Cost-Plus-Fixed-Fee (CPFF). This is a cost-reimbursement vehicle, meaning the government reimburses allowable incurred costs and pays a fixed fee on top.</div>
+</div><div class="evidence-item">
+  <blockquote>professional system engineering, mechanical engineering, electrical engineering, computer hardware and software engineering, design and technical direction agent engineering, configuration management (CM), logistics support services, mechanical and electrical engineering technician services, project management and project management support functions, accounting and business services, technical writing services, information assurance (IA) support services, and system administration services</blockquote>
+  <div class="ev-explanation">The SOW encompasses a broad, multi-disciplinary mix of engineering and technical support services for an R&amp;D-oriented warfare center (RDTE). The scope is wide and the nature of individual tasks will vary with evolving program needs, making cost estimation inherently uncertain — consistent with appropriate use of cost-reimbursement.</div>
+</div><div class="evidence-item">
+  <blockquote>NSWCDD is an engineering, software development, and system test and integration center for Research, Development, Test, and Evaluation (RDTE) components of the US Navy</blockquote>
+  <div class="ev-explanation">The RDTE context is directly relevant to contract type selection. R&amp;D and test/evaluation work is precisely the type of environment where requirements evolve, technical risk is high, and cost estimation at the task level is difficult — all of which favor cost-reimbursement over fixed-price or T&amp;M.</div>
+</div><div class="evidence-item">
+  <blockquote>Maximum Fixed Fee Allowed by SeaPort-e IDIQ Contract ... Maximum Pass Through Allowed by SeaPort-e IDIQ Contract | 0.08</blockquote>
+  <div class="ev-explanation">The contract rides on the SeaPort-NxG IDIQ vehicle, which is a cost-reimbursement vehicle commonly used for Navy engineering and technical support services. The CPFF structure is standard and expected for this vehicle type, and the government has capped fee and pass-through rates, providing meaningful cost controls.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="H30 Industry Day Registrations.pdf">H30 Industry Day Registrations.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d282961258854fd89017712d89aa9033_H30+Industry+Day+Registrations.pdf" download="H30 Industry Day Registrations.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="J.2-Quality Assurance Surveillance Plan %28QASP%29.pdf">J.2-Quality Assurance Surveillance Plan %28QASP%29.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d282961258854fd89017712d89aa9033_J.2-Quality+Assurance+Surveillance+Plan+%28QASP%29.pdf" download="J.2-Quality Assurance Surveillance Plan %28QASP%29.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="J.4-Personnel Qualifications Guide.pdf">J.4-Personnel Qualifications Guide.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d282961258854fd89017712d89aa9033_J.4-Personnel+Qualifications+Guide.pdf" download="J.4-Personnel Qualifications Guide.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="J.5-Past Performance Reference.pdf">J.5-Past Performance Reference.pdf</div></div>
+  <a class="dl-btn" href="../attachments/d282961258854fd89017712d89aa9033_J.5-Past+Performance+Reference.pdf" download="J.5-Past Performance Reference.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="J.6 - Cost Proposal Spreadsheet %28Example%29.xlsx">J.6 - Cost Proposal Spreadsheet %28Example%29.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/d282961258854fd89017712d89aa9033_J.6+-+Cost+Proposal+Spreadsheet+%28Example%29.xlsx" download="J.6 - Cost Proposal Spreadsheet %28Example%29.xlsx" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

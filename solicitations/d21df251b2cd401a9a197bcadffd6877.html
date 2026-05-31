@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DA10 - Strategic Laydown and Dispersal (SLD) Decision Support Tool (DST) Product — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>DA10 - Strategic Laydown and Dispersal (SLD) Decision Support Tool (DST) Production Services</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 d21df251b2cd401a9a197bcadffd6877</span>
+      <a class="sam-link" href="https://sam.gov/opp/d21df251b2cd401a9a197bcadffd6877/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-05-05</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC NORFOLK</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">DA10</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541511</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-05</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">FFP</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">12-month base period plus one 6-month option period</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a pre-solicitation notice only — a brief synopsis announcing intent to award a sole source follow-on production contract to Peraton Labs under FAR Part 12 and 10 U.S.C. 4022(f)(2). No Statement of Work (SOW), Performance Work Statement (PWS), Quality Assurance Surveillance Plan (QASP), deliverables schedule, reporting requirements, or performance metrics are attached or described in the text. The notice contains zero attachments and provides only high-level program context: what the SLD DST is, why a sole source is justified, the anticipated contract structure (12-month base plus 6-month option), and the contracting officer&#x27;s contact information. Without an attached SOW/PWS or any specification of reporting cadences, meeting requirements, acceptance criteria, or performance standards, there is no basis on which to assess whether the accountability structure measures compliance versus outcomes. A meaningful analysis of Sin #2 requires the actual contract requirements document, which has not been released at the pre-solicitation stage.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a pre-solicitation notice (presolicitation synopsis) without any attached Statement of Work, Performance Work Statement, evaluation criteria, or experience/qualification requirements. The document contains no information about personnel qualifications, past performance evaluation criteria, specific dollar thresholds for prior contracts, or any other criteria that could be assessed for insider rewards patterns. There is insufficient content to evaluate Sin #4 in a meaningful way. Notably, the notice does explicitly identify this as a sole-source acquisition directed to Peraton Labs under 10 U.S.C. 4022(f)(2) — the statutory follow-on production authority for successful OT prototype participants — but this is a legal procurement mechanism rather than an insider reward embedded in solicitation evaluation criteria. The sole-source justification itself is a separate policy question (about competition policy) distinct from the structural solicitation sin of writing experience requirements that covertly exclude non-incumbents. Without the actual solicitation, SOW/PWS, and evaluation criteria documents, no meaningful assessment of insider rewards criteria is possible.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a pre-solicitation notice only — it contains no attached Statement of Work (SOW), Performance Work Statement (PWS), Statement of Objectives (SOO), or detailed technical requirements. The description is a high-level summary of intent: it identifies the requirement (transitioning an SLD DST prototype to full operational capability), the statutory authority for sole source award (10 U.S.C. 4022(f)(2)), the intended awardee (Peraton Labs), and the contract structure (12-month base plus one 6-month option). There are no task lists, staffing prescriptions, workflow procedures, or tool mandates present in the text. Without an attached PWS or SOW, it is not possible to meaningfully assess whether the solicitation dictates HOW work shall be performed versus WHAT outcomes are needed. The actual solicitation — which would contain the substantive requirements — had not been issued at the time of this notice. Accordingly, sufficient_content is set to false and no requirement sprawl findings can be made.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-insufficient">Insufficient Data</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    <p style="font-family:var(--font-ui);font-size:13px;color:var(--muted);margin-bottom:12px">⚠ Insufficient content to evaluate this sin — the solicitation lacked a substantive Statement of Work or attachments.</p>
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This posting is a pre-solicitation notice only — a brief announcement of intent to award a sole source contract to Peraton Labs. No Statement of Work (SOW), Performance Work Statement (PWS), Statement of Objectives (SOO), or any attachments are included (the notice explicitly states &#x27;0 Attachments&#x27;). The description provides high-level context about the SLD Decision Support Tool and the statutory basis for sole source authority (10 U.S.C. 4022(f)(2)), but contains no &#x27;Applicable Documents&#x27; section, no referenced standards, no compliance framework citations, and no regulatory requirement lists of any kind. Without the actual solicitation documents — particularly the SOW/PWS where rule pools most commonly appear — there is no basis for meaningfully assessing whether this solicitation commits Sin #3. The notice simply lacks the content necessary to evaluate regulatory citation patterns. Additionally, the response deadline listed (2026-04-30) predates the posting date (2026-05-05), which may indicate a data entry anomaly but does not affect the substance of this analysis.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a firm-fixed-price contract for a software development and transition effort that includes development, modernization, sustainment, maintenance, and scaling of a prototype decision support tool to full operational capability. FFP is defensible here — but only partially. The mitigating factor is that the prototype has already been successfully delivered under a prior OT agreement, so Peraton Labs has deep familiarity with the system and both parties have a documented baseline. This reduces (but does not eliminate) scope uncertainty. However, prototype-to-production transitions in software routinely surface new requirements, integration challenges, and infrastructure dependencies that are difficult to anticipate and price accurately in advance. The work description bundles inherently variable activities — scaling, modernization, and development — alongside more predictable ones like initial sustainment and maintenance. Pricing all of these together under FFP forces the vendor to either pad the bid to cover uncertainty or risk losses when surprises emerge. A hybrid approach (FFP for defined deliverables like specific capability milestones, with T&amp;M or labor-hour CLINs for sustainment and exploratory scaling work) would better align incentives and risk. That said, this is not a severe mismatch: the existence of a working prototype and a documented performance baseline meaningfully constrains scope uncertainty, and the government can plausibly argue that the prior OT work gives Peraton Labs enough information to estimate costs accurately. The severity is assessed as moderate (2): the FFP choice is defensible given the prototype baseline, but the bundling of development and scaling work — which carry residual uncertainty — into a single FFP contract creates meaningful risk of costly modifications if the production hardening process surfaces unexpected requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>It is the intent of the Government to process this procurement under FAR Part 12 and to ultimately award a firm fixed priced (FFP) contract on a sole source basis to the awardee of the Other Transaction prototype project which developed the SLD DST prototype, which is Peraton Labs.</blockquote>
+  <div class="ev-explanation">The government explicitly states it will use FFP pricing. The key question is whether this is appropriate given the nature of the work: transitioning a prototype to full operational capability, including &#x27;data and analytics services, digital tool development, modernization, initial sustainment and maintenance, and scaling.&#x27; Prototype-to-production transitions frequently encounter scope uncertainties that are difficult to price accurately under FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>initial development to reach Full Operational Capability of the Strategic Laydown and Dispersal (SLD) Decision Support Tool (DST), to include data and analytics services, digital tool development, modernization, initial sustainment and maintenance, and scaling of the SLD DST as it transitions into full production</blockquote>
+  <div class="ev-explanation">The scope bundles multiple distinct work types — development, modernization, sustainment, maintenance, and scaling — into a single FFP contract. Development and scaling activities carry inherent scope uncertainty (unknowns surface during integration and production hardening), whereas sustainment and maintenance are more routine. Bundling uncertain development work with routine maintenance under a single FFP creates pricing risk: the vendor must pad the fixed price to cover development unknowns, or underbid and absorb losses.</div>
+</div><div class="evidence-item">
+  <blockquote>The resultant contract will include a base period of twelve (12) months plus one six (6) month option period.</blockquote>
+  <div class="ev-explanation">An 18-month total performance window for a prototype-to-FOC transition covering development, modernization, sustainment, and scaling is relatively compressed. Under FFP, if scope expands or technical challenges arise during production hardening — common in software transitions — the government must issue contract modifications, which are costly and disruptive. A T&amp;M or cost-plus-fixed-fee structure would give the government more flexibility to manage emerging requirements without formal modifications.</div>
+</div><div class="evidence-item">
+  <blockquote>Following the successful delivery of the SLD DST prototype as documented in Determination of Successful Prototype (IWRP-22-LANT-2594, Deliverable 5.6), OPNAV N52 is seeking support to transition the prototype created under IWRP-22-LANT-2594 to an operational production capability</blockquote>
+  <div class="ev-explanation">A successful prototype has been delivered, which does provide a defined baseline and reduces some scope uncertainty relative to a greenfield effort. This is the primary mitigating factor supporting FFP: Peraton Labs knows the codebase, the government has documented prototype deliverables, and both parties have a shared understanding of the system. This makes FFP more defensible than it would be for a novel development effort.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

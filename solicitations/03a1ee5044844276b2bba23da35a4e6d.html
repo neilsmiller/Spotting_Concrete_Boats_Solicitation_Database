@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RECEIVER,LIGHT,SIGN — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>RECEIVER,LIGHT,SIGN</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 03a1ee5044844276b2bba23da35a4e6d</span>
+      <a class="sam-link" href="https://sam.gov/opp/03a1ee5044844276b2bba23da35a4e6d/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-08</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA MARITIME › DLA MARITIME MECHANICSBURG › SPRMM1 DLA MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7G21</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334419</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-08</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value">—</div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward fixed-price supply contract for a physical component (RECEIVER,LIGHT,SIGN) procured by DLA Maritime. The quality assurance structure is minimal and appropriate for the contract type: the contractor is responsible for inspection to ensure the item conforms to the referenced design (Cage/part number 02UU8/A90280012M), marking per MIL-STD-130, and packaging per MIL-STD-2073. There are no weekly status reports, no prescribed report formats, no overlapping reporting cadences, no meeting mandates, and no plan-adherence tracking requirements. The accountability mechanism — deliver a conforming physical item — is inherently outcome-focused for a supply procurement. The compliance over outcomes sin is most virulent in service and IT contracts where process adherence displaces outcome measurement; it is structurally unlikely to appear in a simple supply solicitation of this type. The inspection and record-keeping language (Sections 4.1-4.3) is boilerplate FAR-derived text that serves legitimate conformance verification purposes. No meaningful evidence of compliance theater exists in this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.1 Responsibility for Inspection - Unless otherwise specified in the contract/purchase order, the Contractor is responsible for the performance of all inspection requirements as specified herein. Except as otherwise specified in the contract/purchase order, the Contractor may use his own or any other facilities suitable for the performance of the inspection requirements specified herein, unless disapproved by the Government. The Government reserves the right to perform any of the inspections set forth in the specification where such inspections are deemed necessary to assure supplies and services conform to prescribed requirements.</blockquote>
+  <div class="ev-explanation">This is standard FAR/DFARS inspection language for a fixed-price supply contract. It delegates inspection responsibility to the contractor while preserving government rights. There is no compliance theater here — the accountability mechanism is product conformance (does the item meet the specification?), which is outcome-oriented for a supply contract.</div>
+</div><div class="evidence-item">
+  <blockquote>4.3 Records - Records of all inspection work by the Contractor shall be kept complete and available to the Government during the performance of contract/purchase order and for a period of 365 calendar days after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">This is a record-retention requirement, which is the closest element to process compliance. However, for a physical goods supply contract, maintaining inspection records is a standard quality assurance mechanism tied to product conformance verification — not a substitute for outcome measurement. There is no burdensome reporting cadence or prescribed format structure here.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a DLA spare parts solicitation (NSN-based procurement) for a RECEIVER,LIGHT,SIGN — a relatively straightforward commercial/military supply item procured through the Defense Logistics Agency&#x27;s standard acquisition process. The solicitation contains no experience requirements, no past performance evaluation criteria with dollar thresholds or lookback windows, no federal-specific experience mandates, and no evaluation scoring rubrics of any kind. The only restriction that could conceivably narrow the vendor pool is the authorized distributor requirement (Section 6.2), which is standard practice for DLA supply chain integrity and applies equally to any vendor willing to obtain OEM authorization — it does not reward the incumbent specifically. There are no stacked criteria, no institutional knowledge requirements, and no transition plan evaluation. A qualified vendor who has never held this contract could realistically compete simply by demonstrating authorized distributor status and offering a conforming item at a competitive price. Severity is assessed at 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.2 Notice To Distributors/Offerors - Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement limits award to authorized distributors of the original manufacturer. While this restricts the vendor pool, it is a product-integrity requirement (ensuring the government receives genuine, traceable parts) rather than an incumbency-favoring criterion. Any vendor who obtains authorized distributor status from the OEM can compete, regardless of whether they have held this contract before. This is a capability/authorization requirement, not an insider reward.</div>
+</div><div class="evidence-item">
+  <blockquote>3.1 Cage Code/Reference Number Items - The RECEIVER,LIGHT,SIGN furnished under this contract/purchase order shall be the design represented by Cage Code(s) reference number(s). Cage _______ ref. no. ;02UU8 A90280012M(0222438-1);</blockquote>
+  <div class="ev-explanation">The requirement to supply a specific NSN/part number from a specific CAGE code is standard for DLA supply chain acquisitions of military spare parts. It constrains what item can be supplied but does not preferentially reward any incumbent contractor over another qualified authorized distributor.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">0 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is for a commercial/military spare part — a RECEIVER,LIGHT,SIGN — procured by DLA Maritime Mechanicsburg under a fixed-price supply contract. The requirement is essentially a product specification buy, not a services contract where requirement sprawl typically manifests.
+
+The solicitation defines the requirement by reference to a CAGE code and part number (Cage ref. no. 02UU8 A90280012M/0222438-1), which is the standard DLA approach for spare parts procurement: the government specifies WHAT item is needed (by design reference), not HOW to manufacture it. The contractor is free to manufacture using its own processes, facilities, and methods as long as the output conforms to the referenced design.
+
+The prescriptive elements present — MIL-STD-130 marking, MIL-STD-2073 packaging, inspection recordkeeping for 365 days, change notification codes, and production facility change procedures — are all legitimate constraints, not sprawl. They represent: (1) DoD-wide standards for identification and packaging that protect interoperability and logistics, (2) quality assurance baselines that define what conformance looks like, and (3) administrative procedures governing contract modifications. None of these dictate the manufacturing process or remove the vendor&#x27;s ability to optimize how they produce the item.
+
+The change code system (Codes 1–6) is a standard notification framework for design changes, not a process mandate. The authorized distributor requirement (Section 6.2) narrows the offeror pool but is a sourcing constraint tied to product authenticity, not a process prescription.
+
+There is no SOW or PWS with task-level process requirements, no staffing prescriptions, no workflow mandates, and no step-by-step performance instructions. The solicitation is appropriately minimal for a supply-type procurement. Requirement sprawl as defined — solicitation dictating HOW work is done rather than WHAT outcome is needed — is not materially present here.</div>
+    
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">3 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a DLA supply solicitation for a discrete physical part (RECEIVER,LIGHT,SIGN, NSN-type item) under NAICS 334419. The regulatory footprint is minimal and appropriate. The solicitation incorporates standard FAR/DFARS clauses by reference (inspection of supplies, WAWF payment instructions, small business subcontracting, etc.) — all normal for a fixed-price supply contract. The only technical standards cited by name are MIL-STD-130 (marking) and MIL-STD-2073 (packaging), both of which are standard, directly applicable requirements for any physical part delivered to DoD. The solicitation notes that drawings/technical data are not available and relies on CAGE code and reference number to define the item — a common approach for spare parts buys. The applicable documents section is essentially empty of enumerated documents; the solicitation acknowledges this by saying documents must be obtained by the contractor but lists none specifically beyond the two MIL-STDs. There is no evidence of bulk, undifferentiated regulatory lists, irrelevant standards, or copy-forward accumulation. The compliance landscape is readily interpretable. Severity 1 is appropriate.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>2.1 Applicable Documents - The document(s) listed below form a part of this contract/purchase order including modifications or exclusions. 2.1.1 &quot;Document References&quot; listed below must be obtained by the Contractor.</blockquote>
+  <div class="ev-explanation">The solicitation references an applicable documents section but does not enumerate a long list of documents. In practice, the only specific standards cited are MIL-STD-130 (marking) and MIL-STD-2073 (packaging), both of which are directly and obviously relevant to the physical supply item being procured.</div>
+</div><div class="evidence-item">
+  <blockquote>Marking - This item shall be physically identified in accordance with ;MIL-STD-130, REV N, 16 NOV 2012;</blockquote>
+  <div class="ev-explanation">MIL-STD-130 governs item identification and marking for military supplies — directly applicable to a physical part (RECEIVER,LIGHT,SIGN) being delivered to the government. This is a curated, relevant citation, not a bulk dump.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-STD 2073 PACKAGING APPLIES AS FOUND ELSEWHERE IN THE SCHEDULE</blockquote>
+  <div class="ev-explanation">MIL-STD-2073 governs military packaging — directly applicable to a physical supply item. Again, this is a relevant, appropriate citation for a parts procurement.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a straightforward supply procurement for a discrete, identifiable physical component (a light sign receiver) procured under a fixed-price vehicle. The contract type is clearly fixed-price, as evidenced by the &#x27;INSPECTION OF SUPPLIES--FIXED-PRICE&#x27; clause. The requirement is precisely defined: a specific part number from a specific manufacturer, with military standard marking and packaging requirements. There is no uncertainty about scope, no variable labor, and no evolving requirements — the government knows exactly what it wants and the vendor either can or cannot supply it at a quoted price. This is the textbook use case for a firm-fixed-price contract: a commercial/military supply item with a defined specification, measurable delivery, and minimal performance uncertainty. Fixed-price appropriately places risk on the vendor to deliver the correct item. There is no mismatch between the pricing structure and the nature of the requirement. Severity 1 — no square peg issue.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>INSPECTION OF SUPPLIES--FIXED-PRICE (AUG 1996)</blockquote>
+  <div class="ev-explanation">The solicitation explicitly invokes the FAR fixed-price inspection clause, confirming that this procurement uses a fixed-price contract structure.</div>
+</div><div class="evidence-item">
+  <blockquote>Cage _______ ref. no. ;02UU8 A90280012M(0222438-1);</blockquote>
+  <div class="ev-explanation">The requirement is to procure a specific, identified physical part — a RECEIVER,LIGHT,SIGN — referenced by cage code and part number. This is a well-defined, tangible supply item with a known specification, making fixed-price entirely appropriate.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

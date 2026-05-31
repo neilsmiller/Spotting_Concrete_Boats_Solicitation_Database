@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>COMPUTER SUBASSEMBL — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>COMPUTER SUBASSEMBL</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 475f8d2149824e00b537fe337e149d10</span>
+      <a class="sam-link" href="https://sam.gov/opp/475f8d2149824e00b537fe337e149d10/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Solicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEFENSE LOGISTICS AGENCY › DLA MARITIME › DLA MARITIME MECHANICSBURG › SPRMM1 DLA MECHANICSBURG</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">7B22</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">334111</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Solicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Fixed-Price</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value"><span class="muted">—</span></div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Lowest Price Technically Acceptable (LPTA)</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a straightforward DLA supply procurement for a manufactured computer subassembly (NSN/NIIN items) rather than a services or IT contract. The solicitation&#x27;s accountability structure is dominated by physical inspection and acceptance of tangible hardware deliverables — the primary quality mechanism is source inspection and final acceptance of the physical item, not process reporting. There are no overlapping reporting cadences, no weekly/monthly status reports, no prescribed report formats, no meeting requirements, and no waterfall-style plan-adherence tracking. The QA requirements (ISO 9001 quality system, inspection records, source inspection) are standard, proportionate controls for a hardware manufacturing contract. The LPTA evaluation criterion and physical acceptance testing constitute outcome-oriented accountability appropriate for this type of procurement. The solicitation does not exhibit the compliance-over-outcomes pattern in any meaningful way. Severity is 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.2 Quality System Requirements - The supplier shall provide and maintain a quality system acceptable to the Government. The quality system requirements shall be in accordance with ISO 9001.</blockquote>
+  <div class="ev-explanation">ISO 9001 certification is a process-compliance standard — it certifies that the contractor maintains a documented quality management system, not that delivered items perform well. However, for a manufactured hardware item like a computer subassembly, this is a standard and proportionate requirement, not an indicator of compliance theater dominating the accountability structure.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4 Records of Inspection - Records of all inspection work performed by the Contractor, as referenced elsewhere in this contract, shall be kept complete and available to the Government during the performance of the contract and for a period of four years after final delivery of supplies.</blockquote>
+  <div class="ev-explanation">This is a records-retention requirement focused on process documentation. However, it is a standard FAR/DFARS requirement for government supply contracts and is paired with physical inspection and acceptance of the actual hardware deliverable.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">1 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This is a DLA supply chain solicitation for a specific computer subassembly (NIIN 015143668, P/N 433D1045-1) to be built using government-furnished material. The solicitation is evaluated on Lowest Price Technically Acceptable (LPTA) criteria, which significantly reduces the opportunity for insider rewards through evaluation scoring. There are no experience requirements tied to dollar thresholds, no federal-specific experience mandates, no lookback windows, and no institutional knowledge requirements. The only potentially restrictive requirement is the authorized distributor provision, which limits competition to vendors with OEM authorization — but this is a standard supply chain security measure for a specific part rather than an incumbency preference. Any vendor who obtains OEM authorization can compete, regardless of whether they have held this contract before. The solicitation also explicitly requires disclosure of the OEM and CAGE code when the offeror is not the manufacturer, further indicating openness to multiple sourcing paths. Overall, a qualified vendor new to this specific contract could realistically compete if they can obtain OEM authorization and meet the ISO 9001 quality requirement. Severity is rated 1 — minimal.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Notice To Distributors/Offerors - Consideration for award of contract shall be given only to authorized distributors of the original manufacturer&#x27;s item represented in this solicitation. If you desire to be considered as a potential source for award of this contract, proof of being an authorized distributor shall be provided on company letterhead signed by a responsible company official and sent with your offer to the Procurement Contracting Officer.</blockquote>
+  <div class="ev-explanation">This requirement restricts competition to authorized distributors of the original manufacturer. While this limits the vendor pool, it reflects a legitimate supply chain integrity concern for a specific manufactured part (CAGE 51435, P/N 433D1045-1) rather than an incumbency bias. Any authorized distributor — not just a prior contract holder — can qualify, and the authorization status is determined by the OEM, not by prior government contract experience.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a DLA supply chain procurement for a specific manufactured computer subassembly (NSN-identified, part number 433D1045-1) using Government Furnished Material. It is fundamentally a &#x27;make to print&#x27; or &#x27;buy to spec&#x27; acquisition for a discrete hardware item — not a services contract. The structure and content reflect this appropriately.
+
+The requirements in this solicitation are predominantly outcome- and standard-focused: produce the specified item (identified by CAGE/part number), comply with ISO 9001 quality standards, follow MIL-STD marking and packaging requirements, meet electrostatic discharge and mercury-free constraints, and maintain inspection records. None of these dictate a step-by-step manufacturing process — they define what the finished product must be and what quality system must underpin it.
+
+The most detailed section (3.5, Mercury Free) is long but exists because of genuine safety imperatives for submarine/surface ship applications. It explains testing methodology and contamination thresholds, but these are inspection and acceptance criteria, not manufacturing process mandates. A contractor could manufacture the assembly using any process that achieves mercury-free output.
+
+The change-code framework (Section 3.3) is a standard DLA/Navy supply chain control mechanism governing substitutions, not a process prescription. The production facility change clause (UCF Section F) restricts where work is performed but is a standard supply chain integrity control.
+
+This solicitation does not exhibit the hallmarks of requirement sprawl: there are no bullet-list process mandates, no staffing prescriptions, no workflow dictates, and no tool/technology lock-in beyond interoperability with PIEE/WAWF for invoicing (a legitimate government system constraint). The solicitation is appropriately scoped for a manufactured hardware item acquisition. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>3.4 Electrostatic Discharge Control - The Contractor shall comply with the electrostatic discharge control requirements established in ANSI/ESD S20.20...</blockquote>
+  <div class="ev-explanation">This is a legitimate safety/technical standard constraint, not sprawl. It defines a compliance baseline for protecting sensitive electronics without dictating how the contractor structures their manufacturing process.</div>
+</div><div class="evidence-item">
+  <blockquote>3.5 Mercury Free - The material supplied under this contract/purchase order is intended for use on submarines/surface ships and therefore shall contain no metallic mercury and shall be free from mercury contamination...</blockquote>
+  <div class="ev-explanation">While lengthy, the mercury prohibition is a legitimate safety and mission-critical constraint for submarine/surface ship use. It defines WHAT is prohibited and why, rather than dictating HOW the contractor manufactures the item. The detail is proportionate to the safety risk.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits a moderate level of rule pooling, warranting a severity 2 rating. The applicable documents list is short (five entries) and not the sprawling 20+ citation dump characteristic of severe cases. For a military electronics manufacturing contract, standards governing marking (MIL-STD-129), identification (MIL-STD-130), ESD control (MIL-STD-1686/ANSI-ESD S20.20), and quality (ISO 9001) are all plausibly relevant to the scope. This is not a situation where patently irrelevant regulations have been bulk-imported. However, several problems elevate this above minimal severity. First, the cited standards are presented in raw database-export format with zero contextual explanation — no sentence in the document explains what MIL-HDBK-773 requires of this vendor or which production activities MIL-STD-130 governs. Second, and most concretely, the solicitation contains an internal contradiction: MIL-STD-1686C is listed as an applicable document but section 3.4 explicitly states that ANSI/ESD S20.20 has superseded it — meaning vendors are directed to comply with a standard that has been replaced by another standard also referenced in the text. This is a classic symptom of copy-forward accumulation where old references are never pruned. Third, the clause headers in the description block use pipe-delimited boilerplate formatting with multiple blank or &#x27;TBD&#x27; fields, offering no interpretive guidance. The compliance burden is manageable for an experienced DLA vendor familiar with standard naval supply chain requirements, but a new entrant would need to independently research each document&#x27;s current status and applicability. The contradiction between MIL-STD-1686C and ANSI/ESD S20.20 is the most significant finding — it is a concrete example of an outdated reference surviving unremediated into a live solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>DOCUMENT REF DATA=MIL-STD-129 | | |P |041029|A| |03| 
+DOCUMENT REF DATA=MIL-STD-130 | | |M |051202|A| | | 
+DOCUMENT REF DATA=MIL-HDBK-773 | | |A |050630|A| | | 
+DOCUMENT REF DATA=MIL-STD-1686 | | |C |951025|A| | | 
+DOCUMENT REF DATA=ISO9001 | | | |010417|A| | |</blockquote>
+  <div class="ev-explanation">The solicitation lists five document references in a raw, tabular format with no explanatory text connecting each standard to a specific aspect of the work. The format provides version/date codes but no description of what each document requires or why it applies to manufacturing this specific computer subassembly.</div>
+</div><div class="evidence-item">
+  <blockquote>3.4 Electrostatic Discharge Control - The Contractor shall comply with the electrostatic discharge control requirements established in ANSI/ESD S20.20 ... which superseded MIL-STD-1686C.</blockquote>
+  <div class="ev-explanation">The solicitation acknowledges that ANSI/ESD S20.20 superseded MIL-STD-1686C, yet MIL-STD-1686C remains listed in the Applicable Documents section (DOCUMENT REF DATA=MIL-STD-1686). This is a direct contradiction — an obsolete standard is cited in the document references while the body text directs vendors to its superseding replacement. A vendor must reconcile which standard actually governs.</div>
+</div><div class="evidence-item">
+  <blockquote>ITEM UNIQUE IDENTIFICATION AND VALUATION (JAN 2023)|19||||||||||||||||||||</blockquote>
+  <div class="ev-explanation">Standard clause headers are listed without explanatory text, showing only the clause name and pipe-delimited fields — many populated with blank values (&#x27;TBD&#x27; or empty). Vendors must independently look up and parse each clause to understand its requirements, with no contextual guidance on which are substantively relevant to this specific manufacture order.</div>
+</div><div class="evidence-item">
+  <blockquote>MIL-HDBK-773 | | |A |050630|A|</blockquote>
+  <div class="ev-explanation">MIL-HDBK-773 is a handbook on microcircuit specifications. Its connection to this solicitation — manufacturing a computer subassembly from government-furnished material — is plausible but unexplained. No language in the solicitation body references MIL-HDBK-773 directly or explains what aspect of this work it governs, leaving vendors to determine its applicability independently.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">2 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation is a fixed-price supply contract (implied throughout by LPTA evaluation criteria, the Request for Quotation format with quantity price breaks, and the structure of the purchase order) for the manufacture of a specific computer subassembly (NIIN 015143668, P/N 433D1045-1). The requirement is well-defined: a specific part number, government-furnished material provided, ISO 9001 quality standards, and MIL-SPEC marking and packaging requirements. There is no ambiguity in scope, no evolving requirements, and no labor-intensive service component that would call for T&amp;M or cost-reimbursement. Fixed-price is the textbook appropriate contract type for a defined hardware deliverable where costs can be estimated by competing vendors, risk can be priced in, and performance is objectively measurable (deliver conforming units). No mismatch between contract type and requirements is present. Severity is 1.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Award evaluations will be made using the Lowest Price Technically Acceptable (LPTA) criteria per DFARS 215.101-2-70(a)(1)(i).</blockquote>
+  <div class="ev-explanation">LPTA evaluation criteria are standard for fixed-price supply procurements where the requirement is well-defined and the government seeks the lowest price meeting technical standards. This is consistent with a fixed-price contract structure.</div>
+</div><div class="evidence-item">
+  <blockquote>1.1 This contract/purchase order contains the requirements for manufacture and the contract quality requirements for the COMPUTER SUBASSEMBL.</blockquote>
+  <div class="ev-explanation">This is a supply/manufacture procurement for a defined hardware item (a computer subassembly, part number 433D1045-1). Fixed-price is the appropriate contract type for a defined deliverable with a specific part number.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <p class="no-attach">No attachments available for this solicitation.</p>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>

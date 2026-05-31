@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CNAP FLAG OFFICE SUPPORT SERVICES — Spotting Concrete Boats</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f7f7f5;
+  --surface:   #ffffff;
+  --surface2:  #f2f2ef;
+  --border:    #e0dedd;
+  --text:      #1a1a18;
+  --muted:     #888882;
+  --accent:    #1a4fa3;
+  --accent2:   #1a4fa3;
+  --danger:    #c0392b;
+  --warn:      #b85c00;
+
+  --sev-minimal:      #e8f5eb;
+  --sev-minimal-txt:  #1e6b30;
+  --sev-moderate:     #fff4e0;
+  --sev-moderate-txt: #8a4b00;
+  --sev-severe:       #fdecea;
+  --sev-severe-txt:   #a02020;
+  --sev-insuf:        #f2f2ef;
+  --sev-insuf-txt:    #aaa9a3;
+
+  --radius: 5px;
+  --radius-lg: 10px;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-ui:   'Inter', system-ui, sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+a { color: var(--accent2); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.sev-minimal      { background: var(--sev-minimal);  color: var(--sev-minimal-txt); }
+.sev-moderate     { background: var(--sev-moderate); color: var(--sev-moderate-txt); }
+.sev-severe       { background: var(--sev-severe);   color: var(--sev-severe-txt); }
+.sev-insufficient { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+.sev-unknown      { background: var(--sev-insuf);    color: var(--sev-insuf-txt); border: 1px solid var(--border); }
+
+header.site-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+header.site-header .logo {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+header.site-header .logo em {
+  font-style: normal;
+  color: var(--accent);
+}
+header.site-header nav a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin-left: 20px;
+}
+header.site-header nav a:hover { color: var(--text); }
+
+.detail-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+  margin: 24px 0 20px;
+}
+.back-link:hover { color: var(--text); text-decoration: none; }
+
+.notice-header {
+  margin-bottom: 28px;
+}
+.notice-header h1 {
+  font-family: var(--font-ui);
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  color: var(--text);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.notice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--muted);
+}
+.notice-meta .pill {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3px 10px;
+  color: var(--muted);
+}
+.notice-meta .sam-link {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-weight: 700;
+  font-size: 11px;
+}
+.notice-meta .sam-link:hover { text-decoration: none; opacity: .85; }
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.info-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+}
+.info-card .card-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.info-card .card-value {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--text);
+  word-break: break-word;
+}
+.info-card .card-value ul {
+  margin: 6px 0 0 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.info-card .card-value li { margin-bottom: 3px; }
+.info-card .card-value .muted { color: var(--muted); }
+
+.sins-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.sin-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.sin-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  cursor: pointer;
+  border-bottom: 1px solid transparent;
+  transition: background .15s;
+}
+.sin-header:hover { background: var(--surface2); }
+.sin-header.open { border-bottom-color: var(--border); }
+.sin-header .sin-name {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+.sin-header .sin-desc {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--muted);
+  flex: 2;
+}
+.sin-header .chevron {
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform .2s;
+}
+.sin-header.open .chevron { transform: rotate(180deg); }
+
+.sin-body {
+  display: none;
+  padding: 18px 20px;
+}
+.sin-body.open { display: block; }
+
+.sin-body .reasoning-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.sin-body .reasoning {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  margin-bottom: 20px;
+}
+
+.evidence-list { margin-top: 4px; }
+.evidence-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.evidence-item blockquote {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent2);
+  border-left: 2px solid var(--accent2);
+  padding-left: 10px;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.evidence-item .ev-explanation {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.attachments-section {
+  margin-top: 32px;
+}
+.attachments-section h2 {
+  font-family: var(--font-ui);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 14px;
+  letter-spacing: -.02em;
+}
+.attach-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+.attach-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.attach-item .file-icon {
+  font-size: 22px;
+  width: 30px;
+  text-align: center;
+}
+.attach-item .file-info { flex: 1; overflow: hidden; }
+.attach-item .file-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.attach-item a.dl-btn {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.attach-item a.dl-btn:hover { border-color: var(--accent2); color: var(--accent2); text-decoration: none; }
+
+.no-attach {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo">Spotting <em>Concrete Boats</em></div>
+  <nav>
+    <a href="../index.html">← Dashboard</a>
+  </nav>
+</header>
+
+<div class="detail-wrap">
+  <a class="back-link" href="../index.html">← Back to Dashboard</a>
+
+  <div class="notice-header">
+    <h1>CNAP FLAG OFFICE SUPPORT SERVICES</h1>
+    <div class="notice-meta">
+      <span class="pill">📋 4057f18d6cc94dddaeed85c5c6413383</span>
+      <a class="sam-link" href="https://sam.gov/opp/4057f18d6cc94dddaeed85c5c6413383/view" target="_blank">↗ View on SAM.gov</a>
+      <span class="pill">Presolicitation</span>
+      <span class="pill">2026-05-06</span>
+    </div>
+  </div>
+
+  <div class="section-grid">
+    
+    <div class="info-card">
+      <div class="card-label">Agency / Office</div>
+      <div class="card-value">DEPT OF DEFENSE › DEPT OF THE NAVY › NAVSUP › NAVSUP GLOBAL LOGISTICS SUPPORT › NAVSUP FLC SAN DIEGO</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Product / Service Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">R408</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">NAICS Code</div>
+      <div class="card-value"><code style="font-family:var(--font-mono);font-size:14px">541330</code></div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Solicitation Type</div>
+      <div class="card-value">Presolicitation</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Posted Date</div>
+      <div class="card-value">2026-05-06</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Contract Type</div>
+      <div class="card-value">Firm Fixed Price (FFP)</div>
+    </div>
+    <div class="info-card">
+      <div class="card-label">Performance Period</div>
+      <div class="card-value">1 base year (06 Jun 2026 – 05 Jun 2027) + 4 option years (through 05 Jun 2031), plus a 6-month extension option under FAR 52.217-8 (total not to exceed 66 months)</div>
+    </div>
+    <div class="info-card" style="grid-column: span 2">
+      <div class="card-label">Evaluation Criteria</div>
+      <div class="card-value"><ul><li>Factor I - Technical (Sub-factor 1: Technical Approach; Sub-factor 2: Management Plan; Sub-factor 3: Staffing)</li><li>Factor II - Past Performance</li><li>Factor III - Price</li></ul></div>
+    </div>
+    
+  </div>
+
+  <div class="sins-section">
+    <h2>Sin Analysis</h2>
+    <div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Compliance Over Outcomes</div>
+      <div class="sin-desc">Does the contract measure process compliance rather than actual outcomes?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate compliance-over-outcomes characteristics, warranting a severity 2 rating. The accountability structure has a meaningful gap: the only formal quality deliverable is a QCP that describes the contractor&#x27;s self-evaluation processes, and the inspection/acceptance language for all CLINs simply references the PWS, which contains no measurable performance standards, SLAs, or outcome metrics. For a contract covering event planning for receptions of up to 1,500 guests, food sanitation compliance, facility maintenance coordination, and ceremonial gear warehousing, the absence of any objective success criteria — even basic ones like &#x27;zero food safety violations,&#x27; &#x27;inventory accuracy within X%,&#x27; or &#x27;trouble calls submitted within Y hours of identification&#x27; — is notable. The reporting burden is not excessive by the standards of the most severe cases of this sin: there is no proliferation of overlapping weekly/monthly/quarterly report formats with prescribed sections, and no waterfall-style schedule-deviation tracking. The contract is relatively simple (2 FTE, FFP, support services) and the scope is operational rather than developmental. However, what reporting exists is entirely activity-focused, and there are no countervailing outcome metrics anywhere in the document. The government&#x27;s oversight model relies on reviewing the contractor&#x27;s process documentation and credential verification rather than evaluating event quality, inventory management effectiveness, or customer satisfaction. This is compliance-over-outcomes in its moderate form: process mechanisms exist but crowd out outcome measurement without fully dominating the document the way a severe case would.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>Management/Quality Control Plan (QCP): The contractor shall ensure quality service is maintained to perform services throughout the life of the contract and methods for improving the overall quality are also employed. Offerors shall therefore prepare and submit a management/quality control plan. The final Government approved plan shall be submitted within five working days of contract start date. The plan shall discuss the Contractor&#x27;s overall approach and procedures for evaluating each of the major service areas contained in the PWS, communicating with the Government, resolving deficiencies, identifying potential improvements, and managing day to day operations. As part of the management/QCP, the contractor may conduct internal QC inspections. Results of any contractor internal QC inspections and corrective actions taken shall be made available to the Government for review throughout the performance of this work statement.</blockquote>
+  <div class="ev-explanation">The QCP deliverable is the primary — and essentially only — formal accountability mechanism in the contract. It focuses entirely on process: the contractor&#x27;s &#x27;approach and procedures for evaluating&#x27; service areas, &#x27;communicating with the Government,&#x27; and &#x27;resolving deficiencies.&#x27; There are no performance targets, no metrics for event quality, no service level standards (e.g., inventory accuracy rates, event satisfaction scores, response times for trouble calls). The government will review the contractor&#x27;s self-reported inspection results rather than measuring against objective outcomes.</div>
+</div><div class="evidence-item">
+  <blockquote>Conduct initial wall-to-wall inventory upon assumption of duties, and provide a written report of inventory results to CNAP N41. Initial CDRL deadline is within 30 days of contract award then semi-annually thereafter.</blockquote>
+  <div class="ev-explanation">The inventory report is a deliverable measuring process completion (was the inventory conducted?) rather than any outcome standard (what percentage accuracy is required? what is the acceptable rate of missing or damaged items?). Semi-annual reporting of inventory activity without a serviceability threshold or accuracy benchmark is compliance tracking, not outcome measurement.</div>
+</div><div class="evidence-item">
+  <blockquote>4.4.2 Identify items and quantities requiring laundry services and provide list to CNAP N41, weekly.</blockquote>
+  <div class="ev-explanation">A weekly list submission to N41 is an activity-reporting requirement with no associated standard. There is no metric for turnaround time, no acceptable loss rate for laundered items, and no quality standard for returned linens. The accountability mechanism is &#x27;did you submit the list&#x27; rather than &#x27;is the linen inventory maintained at adequate levels for events.&#x27;</div>
+</div><div class="evidence-item">
+  <blockquote>Instructions: See Performance Work Statement (PWS) for Acceptance/inspection criteria.</blockquote>
+  <div class="ev-explanation">Section E, repeated for every CLIN (5000–5004), defers acceptance criteria entirely to the PWS — which itself contains no measurable performance standards, no SLAs, and no outcome benchmarks. The acceptance criteria referenced simply do not exist in any substantive form, leaving the COR with no objective basis for acceptance decisions other than confirming that specified activities were performed.</div>
+</div><div class="evidence-item">
+  <blockquote>The Government reserves the right to review the resumes of contractor employees performing under the contract solely for the purpose of ascertaining their qualifications relative to the personnel qualifications listed in the PWS.</blockquote>
+  <div class="ev-explanation">The government&#x27;s ongoing oversight mechanism is credential verification — checking whether personnel meet input qualifications — rather than evaluating whether those personnel are actually performing well. This is an input-compliance check substituting for performance evaluation.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Insider Rewards</div>
+      <div class="sin-desc">Do requirements or criteria favor incumbent or well-connected contractors?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate insider-rewards characteristics, warranting a severity 2 rating. The evidence does not rise to severity 3 because: (1) the contract is small (2 FTEs, FFP), limiting the competitive distortion; (2) it is a WOSB set-aside within SeaPort NxG, meaning the pool is already pre-qualified MAC holders, which somewhat reduces the marginal harm of additional specificity; (3) the evaluation criteria do not award explicit bonus points for incumbency or specific contract dollar thresholds; and (4) past performance requirements allow a 4-year lookback for &#x27;similar services&#x27; without imposing specific dollar minimums. However, several factors tilt the field toward the incumbent in ways that go beyond legitimate capability testing. The personnel qualification requirements collectively describe the incumbent&#x27;s current workforce rather than a capability standard. The legacy software list (Corel Draw Suite 12, Adobe CS-era products) is the most concrete indicator: no competent graphics professional working in 2026 would be trained on these versions unless they were using the specific workstations already at this command. The &#x27;Flag or Private Mess&#x27; experience requirement excludes equivalent hospitality experience. The requirement for &#x27;thorough knowledge of Official Representation Instruction&#x27; requires familiarity with an internal Navy policy document. Each of these requirements individually might be defensible, but their combination — especially against the backdrop of a named incumbent — creates a profile that describes Tek Source&#x27;s existing staff rather than testing whether a new vendor could do this work. A qualified small business with relevant hospitality, facilities coordination, and graphic design experience would face genuine disadvantage in competing, not because they lack capability, but because they lack the specific institutional fingerprints this solicitation encodes as requirements.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>6.2.5 Flag Secretary Office Support Experience: Recent, within three (3) years of period of performance start date experience that demonstrates: 6.2.5.1 Capability as a facility self-help/help-desk coordinator 6.2.5.2 Capability as an engraving/graphics designer that is proficient with the following software programs/packages: (a) Microsoft Project (b) Adobe Photoshop CS (c) Corel Draw Suite 12 (d) Studio 9 (e) Adobe Indesign CS (f) Adobe Illustrator CS</blockquote>
+  <div class="ev-explanation">The requirement for experience specifically as a &#x27;Flag Secretary Office Support&#x27; coordinator, combined with a narrow 3-year recency window, is moderately tilted toward the incumbent. More notably, the list of required software includes legacy, outdated versions — &#x27;Adobe Photoshop CS,&#x27; &#x27;Corel Draw Suite 12,&#x27; &#x27;Studio 9,&#x27; and &#x27;Adobe Illustrator CS&#x27; — these are product versions from the mid-2000s. A competent graphics professional today would use current Creative Cloud versions. Requiring proficiency in these specific legacy suites functions less as a capability test and more as a description of what software is currently installed at the site — knowledge a new vendor would only gain by working this specific contract.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2.6.3 Knowledge and understanding of all rules, regulations, and protocols governing dining and reception service to the Flag Officer Community and a thorough knowledge of Official Representation Instruction.</blockquote>
+  <div class="ev-explanation">&#x27;Official Representation Instruction&#x27; is a specific internal Navy document governing how official representation funds are spent. Requiring &#x27;thorough knowledge&#x27; of this specific instruction, as a personnel qualification for a catering/event-support role, requires familiarity with agency-specific internal policy that a capable vendor without prior Navy flag-level contract experience would not have. This is institutional knowledge that functions as an incumbency proxy.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2.6.4 Prior work experience supporting/managing a Flag or Private Mess.</blockquote>
+  <div class="ev-explanation">This requirement narrows the eligible labor pool to individuals who have worked in a military Flag Mess or a private mess — an extremely narrow category. While the underlying skills (food service logistics, formal event management) are transferable from many hospitality contexts, the specific requirement for a &#x27;Flag or Private Mess&#x27; explicitly excludes candidates with equivalent experience in high-end catering, hotel banquet management, or other formal event service environments. This functions as an incumbency filter because the current contractor&#x27;s incumbent staff would meet this requirement by virtue of having held this contract.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2.6.1 Knowledge and understanding of Etiquette and Formal Service, at Official Function Flag level receptions.</blockquote>
+  <div class="ev-explanation">The qualifier &#x27;at Official Function Flag level receptions&#x27; is narrower than necessary to test the underlying capability. Formal service etiquette is a transferable skill; professionals from luxury hospitality, embassy event services, or high-protocol catering backgrounds would have equivalent competency. By specifying &#x27;Flag level receptions&#x27; specifically, the requirement signals familiarity with the specific social protocols of this command environment — knowledge more likely held by incumbent staff than by otherwise-qualified newcomers.</div>
+</div><div class="evidence-item">
+  <blockquote>The incumbent for this requirement is Tek Source USA, Inc.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly identifies the incumbent by name in Section A. Combined with the highly specific, operationally granular personnel qualifications described above — legacy software versions, Flag-mess-specific experience, knowledge of internal Navy representation instructions — this pattern is consistent with requirements drafted with the incumbent&#x27;s known workforce characteristics in mind rather than capability-neutral criteria that any qualified vendor could meet.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Requirement Sprawl</div>
+      <div class="sin-desc">Does the scope dictate HOW work is done rather than WHAT must be achieved?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">5 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate requirement sprawl. The PWS is organized as a detailed task list — largely inherited from the incumbent Tek Source USA&#x27;s apparent current operations — that specifies HOW each function is performed rather than defining service outcomes and letting vendors propose their approach. The most pronounced examples are in Section 4 (Performance Requirements): meal composition is defined by dish count, training timelines are prescribed by day windows, a specific government spreadsheet tool is mandated, and legacy software titles are named rather than capability standards set. The staffing structure is also prescribed (2 FTE Material Coordinators) with headcount fixed in the price template rather than allowing vendors to propose how they would staff to achieve the required outcomes.
+
+However, the sprawl does not rise to severe (level 3) for several reasons. First, this is genuinely a support services contract for a small, operationally constrained environment — a military flag headquarters with specific protocols, security requirements, and command relationships that legitimately constrain how work can be done. Some process specificity (e.g., coordinating through CNAP N41, obtaining approval from CNAP N412 before issuing ceremonial gear) reflects real organizational constraints rather than arbitrary prescription. Second, the security requirements (SECRET clearance, CAC processing, JPAS procedures) are regulatory mandates, not sprawl. Third, the contract scope is narrow — 2 FTEs doing coordinative/logistics work — limiting how much room for innovation exists in any case. The solicitation is not a multi-volume systems acquisition where sprawl would catastrophically constrain competition; it is a small support services buy where the prescriptive task descriptions primarily signal incumbency capture rather than broad innovation suppression. The severity is 2: sprawl is real and present, particularly in the events planning and personnel qualification sections, but it does not dominate the entire document, and the legitimate constraints of the military operational environment explain some of the specificity.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>4.2.2.2 Standard preparation of formal meals consists of five courses plus a minimum of two appetizers.
+4.2.2.3 Standard preparation for stand-up or buffet receptions consists of two protein dishes, two vegetable/fruit dishes, two starch side dishes to complement the protein dishes, two-to-three choices for deserts, and beverage selection</blockquote>
+  <div class="ev-explanation">This prescribes the exact composition of meals down to the number of courses, appetizers, protein dishes, vegetable dishes, starch dishes, and dessert choices. These are process and format mandates, not outcome requirements. An outcome-oriented requirement would state something like &#x27;menus shall be appropriate for the event type, guest count, and approved budget.&#x27; A skilled culinary coordinator should be free to propose the appropriate menu structure — the government has pre-determined the solution rather than defining the standard of service.</div>
+</div><div class="evidence-item">
+  <blockquote>4.2.4 Ten to fifteen days (10-15) prior to smaller events with fewer than 100 guests, the contractor shall create recipes for the approved menu items and demonstrate proper food handling, sanitation, preparation, presentation, set-up, and service to CNAP staff Culinary Specialists (CS&#x27;s) and assigned working personnel.
+4.2.5 Twenty-one to forty-five (21-45) days prior to larger events with more than 100 guests, the contractor shall create recipes for the approved menu items and demonstrate proper food handling, sanitation, preparation, presentation, set-up, and service...</blockquote>
+  <div class="ev-explanation">These paragraphs mandate a specific timeline and training methodology — the contractor must conduct demonstrations within prescribed windows rather than being evaluated on whether the event was executed successfully. This is a classic HOW prescription: the government specifies the training format, timing, and cadence rather than defining the outcome (e.g., &#x27;events shall be executed in compliance with NAVMED P5010 food safety standards with no reportable sanitation deficiencies&#x27;). A vendor cannot substitute an alternative approach to knowledge transfer that might be equally or more effective.</div>
+</div><div class="evidence-item">
+  <blockquote>4.2.3 Complete the &#x27;AIRPAC Event Checklist&#x27; spreadsheet for each official function/event, identifying event name, date, time, place, number of guests, food, equipment (e.g. tables, tents, chairs, lighting, heaters, grills, service ware, serving dishes, etc.), linens, manpower, and consumables (e.g. towels, soap, trash bags, etc.) needed for the event and commensurate with the number of guests.</blockquote>
+  <div class="ev-explanation">Requiring use of a specific government-created spreadsheet tool (the &#x27;AIRPAC Event Checklist&#x27;) prescribes the exact administrative process. The government&#x27;s legitimate interest is in having complete and accurate event planning documentation. Mandating one particular tool and listing every data field the contractor must populate substitutes a process mandate for an outcome requirement. A vendor with a superior event management system or platform cannot use it — they must conform to the government&#x27;s chosen tool regardless of its efficiency.</div>
+</div><div class="evidence-item">
+  <blockquote>6.2.5.2 Capability as an engraving/graphics designer that is proficient with the following software programs/packages: (a) Microsoft Project (b) Adobe Photoshop CS (c) Corel Draw Suite 12 (d) Studio 9 (e) Adobe Indesign CS (f) Adobe Illustrator CS</blockquote>
+  <div class="ev-explanation">This prescribes six specific legacy software titles — including notably dated versions (Corel Draw Suite 12, Adobe CS-era products) — rather than stating a capability requirement such as &#x27;proficiency in professional vector graphics and layout software.&#x27; This locks prospective personnel into proficiency with tools that may be obsolete or replaced by functionally equivalent alternatives. A vendor cannot propose an employee who produces equivalent-quality graphic design work using current industry tools if those specific product versions are not in the candidate&#x27;s background. The requirement reads as a copy from the incumbent&#x27;s actual setup rather than a statement of needed capability.</div>
+</div><div class="evidence-item">
+  <blockquote>4.1.2 Submit trouble calls through the Public Works Department for all 13 buildings...4.1.4 Maintain custodial control of 13 Government Vehicles...The contractor shall maintain a database identifying tag number of vehicles assigned to the Command, the responsible department, and the mileage.</blockquote>
+  <div class="ev-explanation">Multiple Section 4 tasks prescribe the exact administrative mechanism (submit through Public Works, maintain a database with specific fields) rather than stating the outcome (buildings are maintained in good repair; vehicle fleet is tracked and accounted for). While some process context is helpful, the PWS across Section 4 consistently reads as a step-by-step operating manual for how the current incumbent performs the job — each task specifies the action, the channel, and often the frequency, leaving vendors no latitude to propose more efficient approaches.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Rule Pools</div>
+      <div class="sin-desc">Does the contract bury contractors in undifferentiated regulatory citations?</div>
+    </div>
+    <span class="badge sev-moderate">Moderate</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation exhibits moderate rule pool characteristics — a severity 2 finding — but does not reach the severe threshold for several reasons. The regulatory citation volume is elevated but not at the level of a 50+ or 88-item &#x27;Applicable Documents&#x27; list characteristic of the most egregious examples. The solicitation is also a Navy SeaPort NxG task order, which means a substantial portion of the clause burden lives in the base MAC contract and is not reproduced here. What is present, however, shows clear signs of uncurated template accumulation: (1) a Japan-performance clause included in a San Diego contract; (2) NIST 800-171 assessment requirements for what is essentially a 2-FTE physical/logistical support role; (3) a multi-page security boilerplate block in Section H that fails to differentiate between which requirements apply to the SECRET-cleared facilities liaison role versus the non-cleared event planning role, despite the PWS explicitly acknowledging this distinction; and (4) DoD information security program directives cited alongside tasks like linen laundering and engraving plaques with no contextual bridge. The mitigating factors keeping this at severity 2 rather than 3 are: the overall solicitation is relatively compact (59 pages total across three documents); the FAR/DFARS clause list in Section I is incorporated by reference per standard practice and is not excessively long by DoD standards; there are no outright contradictions between cited regulations and the solicitation&#x27;s purpose (unlike the SMS-platform example in the definition); and the security requirements, while over-inclusive for this scope, are not entirely implausible for work performed in a classified headquarters environment. The core problem is passive template management — the security text clearly was not reviewed against the specific work scope before insertion — but the overall compliance burden, while elevated, remains navigable for vendors experienced with Navy contracting.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The contractor shall comply with all applicable DoD security regulations, policies and procedures during the performance of this task order. The contractor shall not disclose and must safeguard Classified Information, Procurement Sensitive Information, Computer Systems (Hardware) and data, Privacy Act Data, Sensitive but Unclassified (SBU) information and all other Government work obtained or generated in the performance of this contract. Contractor personnel on site will participate in all Government activity security awareness training. The Contractor FSO shall refer to and follow the National Industrial Security Program Operating Manual (NISPOM) DoD 5220.22-M and applicable Government security policies for security guidance.
+· DoD 5200.1R Information Security Program
+· DoD 5200.2-R Personnel Security Program</blockquote>
+  <div class="ev-explanation">These two DoD directives are cited in the context of a facilities liaison/event planning/laundry support contract where the primary work involves managing linens, submitting maintenance trouble calls, planning menus, and managing ceremonial gear. DoD 5200.1R (Information Security Program) and DoD 5200.2-R (Personnel Security Program) are cited without explanation of how an information security program or personnel security program specifically governs the act of, say, engraving plaques or conducting a wall-to-wall inventory of ceremonial gear. The citations appear to be boilerplate security language carried forward from a template.</div>
+</div><div class="evidence-item">
+  <blockquote>Executive Order 13467, Reforming Processes Related to Suitability for Government Employee, Fitness for Contractor Employees and Eligibility for Access to Classified National Security Information, Homeland Security Presidential Directive (HSPD)-12, requires government agencies to develop and implement Federal security standards for Federal employees and contractors. The 5 CFR 32 Part 157 in concert with DoD Manual 1000.13, Vol 1, implements the Federal Standards.</blockquote>
+  <div class="ev-explanation">This language, embedded in Section H, cites an Executive Order, a Homeland Security Presidential Directive, a CFR part, and a DoD Manual in a single paragraph, all without explaining how each specifically applies to this scope of work. The work involves facilities liaison, event menu planning, and warehouse management of ceremonial gear — yet the solicitation pastes in an entire boilerplate security framework covering classified national security information access. No differentiation is made between which parts of this regulatory chain are actually triggered by the work versus which are generic template inclusions.</div>
+</div><div class="evidence-item">
+  <blockquote>52.204-2 Security Requirements (MAR 2021)
+52.217-5 Evaluation of Options (Jul 1990)
+52.219-14 Limitations on Subcontracting (Oct 2022)
+2.219-30 Notice of Set-Aside for, or Sole-Source Award to, Women-Owned Small Business Concerns Eligible Under the Women-Owned Small Business Program. (OCT 2022)
+52.224-3 Privacy Training (Jan 2017)
+52.228-5 Insurance-Work on a Government Installation (Jan 1997)
+52.237-2 Protection of Government Buildings, Equipment, and Vegetation. (Apr 1984) 252.204-7000 Disclosure of Information (OCT 2016) 252.204-7003 Control of Government Personnel Work Product (APR 1992)
+252.204-7012 (Dev) Safeguarding Covered Defense Information and Cyber Incident Reporting (DEVIATION 2024-00013, REVISION 1) 252.204-7018 Prohibition on the Acquisition of Covered Defense Telecommunications Equipment or Services (Jan 2021)
+252.204-7019 Notice of NIST SP 800-171 DoD Assessment Requirements (NOV 2023) 252.204-7020 NIST SP 800-171 DoD Assessment Requirements (Jan 2023)
+252.222-7006 Restrictions on the Use of Mandatory Arbitration Agreements (JAN 2023) 252.225-7976 Contractor Personnel Performing in Japan. (DEVIATION 2018-00019) 252.232-7007 Limitation of Governments Obligation (APR 2014)</blockquote>
+  <div class="ev-explanation">The clause list in Section I includes 252.225-7976, &#x27;Contractor Personnel Performing in Japan,&#x27; which is entirely inapplicable — the place of performance is explicitly Naval Air Station North Island, San Diego, CA. Additionally, 252.204-7019 and 252.204-7020 (NIST SP 800-171 DoD Assessment Requirements) apply to contractors handling Controlled Unclassified Information in their own information systems, yet this contract&#x27;s work is primarily physical and logistical (managing linens, submitting maintenance trouble calls, planning menus, warehousing ceremonial gear). The inclusion of NIST 800-171 assessment requirements for a facilities/event support contract with 2 FTEs performing largely physical tasks appears to be an uncurated template carryover. No context is provided to explain which clauses are operationally relevant versus boilerplate inclusions.</div>
+</div><div class="evidence-item">
+  <blockquote>SUPTXT204-9400(4-22) CONTRACTOR UNCLASSIFIED ACCESS TO FEDERALLY CONTROLLED FACILITIES, SENSITIVE INFORMATION, INFORMATION TECHNOLOGY (IT) SYSTEMS OR PROTECTED HEALTH INFORMATION... [spanning approximately 5 pages of Section H]</blockquote>
+  <div class="ev-explanation">Section H contains an extensive multi-page block of security regulatory language covering privileged IT access (Tier 5 investigations), enhanced IT access (Tier 3 investigations), non-sensitive duties, background investigation requirements for classified vs. non-classified positions, CUI handling, SAAR-N forms, DISS procedures, and more — all presented as a single undifferentiated block. The PWS itself notes that only the Flag Secretary Office Support role requires SECRET clearance, while &#x27;Official Flag Functions and Events Planning and Ceremonial and Reception Gear Warehousing: Contractor personnel providing support to these requirements are not required to have a security clearance.&#x27; Despite this bifurcation acknowledged in the PWS, the Section H security text makes no attempt to map each regulatory requirement to the specific roles where it applies. A vendor reading Section H cannot determine which of the multiple IT access tiers, investigation types, or CUI handling requirements applies to which of their two FTE positions without extensive parsing.</div>
+</div></div>
+  </div>
+</div><div class="sin-card">
+  <div class="sin-header" onclick="toggleSin(this)">
+    <div>
+      <div class="sin-name">Square Peg</div>
+      <div class="sin-desc">Is the pricing/contract type mismatched to the nature of the work?</div>
+    </div>
+    <span class="badge sev-minimal">Minimal</span>
+    <span class="badge" style="background:var(--surface2);color:var(--muted);border:1px solid var(--border);font-size:10px">4 quotes</span>
+    <span class="chevron">▾</span>
+  </div>
+  <div class="sin-body">
+    
+    <div class="reasoning-label">Reasoning</div>
+    <div class="reasoning">This solicitation uses a Firm Fixed Price contract type for a set of recurring, well-characterized support services: facilities liaison, engraving/graphic design, ceremonial warehouse management, laundry services, and event planning support. These are not novel or technically uncertain requirements. The scope is well-defined in the PWS, the staffing level is specified (2 FTE Material Coordinators), the annual hours are fixed (3,824 per year), and the event calendar is documented with historical guest counts. The work occurs at a fixed government site during standard business hours (7:30 AM – 4:00 PM, Monday through Friday), with known exceptions for official functions. The primary variable — overtime for official functions — is addressed through FAR 22.103, meaning it is a recognized and manageable exception rather than a structural uncertainty. FFP is appropriate here because: (1) requirements are stable and recurring; (2) the labor quantity is predictable (2 FTE, fixed hours); (3) performance standards are measurable (inventory reports, event checklists, QCP); and (4) the services are analogous to commercial facility and event support services routinely purchased on a fixed-price basis. A T&amp;M contract would be misaligned because the government would lose cost control over a straightforward, routine-labor engagement. A cost-reimbursement contract would be entirely inappropriate given the simplicity and predictability of the requirement. The FFP structure here aligns well with the nature of the work. There is no meaningful square peg concern in this solicitation.</div>
+    <div class="reasoning-label">Evidence Quotes</div><div class="evidence-list"><div class="evidence-item">
+  <blockquote>The Government contemplates award of a single Firm Fixed Price (FFP) SeaPort NxG task from this solicitation.</blockquote>
+  <div class="ev-explanation">The solicitation explicitly states the contract type is Firm Fixed Price. This is confirmed throughout the document, including Section B where all CLINs (5000-5004) are labeled &#x27;Pricing Arrangement: Firm Fixed Price&#x27; priced per 12-month periods.</div>
+</div><div class="evidence-item">
+  <blockquote>Material Coordinator | 2 | 3824 | [Labor Rate] | [Fringe] | [OH] | [G&amp;A] | [Burdened Rate] | [Fee] | [Extended]</blockquote>
+  <div class="ev-explanation">The price template shows a fixed labor category (Material Coordinator) with a fixed number of FTEs (2) and fixed annual hours (3824 per year, i.e., approximately 1,912 hours per FTE per year). This is a predictable, stable labor requirement — not an unpredictable or variable one — making FFP appropriate.</div>
+</div><div class="evidence-item">
+  <blockquote>Work shall be full time during the Government&#x27;s regular business hours, which are Monday through Friday between the hours of 7:30 AM and 4:00 PM, except federal holidays.</blockquote>
+  <div class="ev-explanation">The scope of work describes a consistent, recurring set of services with defined standard hours. The primary duties — facilities liaison, engraving/graphic design, warehouse management, laundry services, and event planning support — are all well-characterized recurring services with a predictable cadence, supporting the use of FFP.</div>
+</div><div class="evidence-item">
+  <blockquote>Table 4.5 CALENDAR OF FLAG EVENTS ... JULY Fleet Week Reception ... SEPTEMBER PCO/XO Reception ... OCTOBER SPEEDFEST ... [etc.]</blockquote>
+  <div class="ev-explanation">The calendar of flag events gives a predictable annual cycle of events that the contractor must support. Average guest counts are provided for each event, enabling offerors to estimate labor requirements with reasonable accuracy. This predictability is consistent with a FFP structure.</div>
+</div></div>
+  </div>
+</div>
+  </div>
+
+  <div class="attachments-section">
+    <h2>Attachments</h2>
+    <div class="attach-grid"><div class="attach-item">
+  <div class="file-icon">📊</div>
+  <div class="file-info"><div class="file-name" title="Price Template.xlsx">Price Template.xlsx</div></div>
+  <a class="dl-btn" href="../attachments/4057f18d6cc94dddaeed85c5c6413383_Price+Template.xlsx" download="Price Template.xlsx" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="PWS FLAG SUPPORT DRAFT.pdf">PWS FLAG SUPPORT DRAFT.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4057f18d6cc94dddaeed85c5c6413383_PWS+FLAG+SUPPORT+DRAFT.pdf" download="PWS FLAG SUPPORT DRAFT.pdf" target="_blank">View / Download</a>
+</div><div class="attach-item">
+  <div class="file-icon">📄</div>
+  <div class="file-info"><div class="file-name" title="Solicitation - N0024426R3102 DRAFT.pdf">Solicitation - N0024426R3102 DRAFT.pdf</div></div>
+  <a class="dl-btn" href="../attachments/4057f18d6cc94dddaeed85c5c6413383_Solicitation+-+N0024426R3102+DRAFT.pdf" download="Solicitation - N0024426R3102 DRAFT.pdf" target="_blank">View / Download</a>
+</div></div>
+  </div>
+</div>
+
+<script>
+function toggleSin(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>
